@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <!-- Instructions:
+              mvn clean test                                                                                                  :   execute tests
+       mvn properties:read-project-properties replacer:replace jboss-as:execute-commands -Denvironment=[dev|prod]      :   execute project CLI commends to either dev or prod environments
+       mvn jboss-as:deploy -DskipTests -Denvironment=[dev|prod]                                                        :   builds web artifact and deploys to either dev or prod environemnts
+ -->
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.redhat.gpte.ops</groupId>
+    <artifactId>parent</artifactId>
+    <version>1.0</version>
+  </parent>
+  <artifactId>course-completion-process</artifactId>
+  <packaging>war</packaging>
+  <name>GPTE Course Completion Process</name>
+  <url>http://www.redhat.com</url>
+  <properties>
+    <version.jboss.maven.plugin>7.7.Final</version.jboss.maven.plugin>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+  </properties>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-salesforce</artifactId>
+    </dependency>
+  </dependencies>
+
+</project>

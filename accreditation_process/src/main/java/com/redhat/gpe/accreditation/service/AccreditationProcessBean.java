@@ -1,0 +1,422 @@
+package com.redhat.gpe.accreditation.service;
+
+import com.redhat.gpe.accreditation.util.Constants;
+import com.redhat.gpe.accreditation.util.SpreadsheetRule;
+import com.redhat.gpe.accreditation.util.WebClientDevWrapper;
+import com.redhat.gpe.domain.canonical.AccreditationDefinition;
+import com.redhat.gpe.domain.canonical.Student;
+import com.redhat.gpe.domain.canonical.StudentAccreditation;
+import com.redhat.gpe.domain.helper.Accreditation;
+import com.redhat.gpte.services.AttachmentValidationException;
+import com.redhat.gpte.services.GPTEBaseServiceBean;
+import org.apache.camel.Body;
+import org.apache.camel.Exchange;
+import org.apache.camel.Message;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
+
+public class AccreditationProcessBean extends GPTEBaseServiceBean {
+
+    private static final String TOKEN_URL = "sb_tokenURL";
+    private static final String PERSON_EMAIL = "sb_personIdByEmailURL";
+    private static final String Q_URL = "sb_addQualificationUrl";
+    private static final String GRANT_TYPE = "sb_grantType";
+
+    private static final String CLIENT_ID = "sb_skillsbase_clientId";
+    private static final String CLIENT_SECRET = "sb_skillsbase_clientSecret";
+    private static final String SUCCESS = "success";
+    private static final String ERROR = "error";
+    private static final String CAMEL_FILE_HEADER_NAME = "CamelFileName";
+    private static final String DRL_PATH = "accred_drl_rules_path";
+    private static final String TSV = "tsv";
+    private static final String DRL = "drl";
+    private static final String LMS_REFRESH_STORED_PROC = "call lms_transactional.refresh_lms_reporting";
+
+    private Logger logger = Logger.getLogger(getClass());
+    
+    private String tokenUrl;
+    private String personIdByEmailUrl;
+    private String addQualificationUrl;
+
+    private String grantType;
+    private String clientId;
+    private String clientSecret;
+    private String drlPath;
+    
+    private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+    public AccreditationProcessBean() {
+        tokenUrl = System.getProperty(TOKEN_URL);
+        if(StringUtils.isEmpty(tokenUrl))
+            throw new RuntimeException("must set system property: "+TOKEN_URL);
+
+        personIdByEmailUrl = System.getProperty(PERSON_EMAIL);
+        if(StringUtils.isEmpty(personIdByEmailUrl))
+            throw new RuntimeException("must set system property: "+PERSON_EMAIL);
+
+        addQualificationUrl = System.getProperty(Q_URL);
+        if(StringUtils.isEmpty(addQualificationUrl))
+            throw new RuntimeException("must set system property: "+Q_URL);
+
+        clientId = System.getProperty(CLIENT_ID);
+        if(StringUtils.isEmpty(clientId))
+            throw new RuntimeException("must set system property: "+CLIENT_ID);
+
+        clientSecret = System.getProperty(CLIENT_SECRET);
+        if(StringUtils.isEmpty(clientSecret))
+            throw new RuntimeException("must set system property: "+CLIENT_SECRET);
+
+        grantType = System.getProperty(GRANT_TYPE);
+        if(StringUtils.isEmpty(grantType))
+            throw new RuntimeException("must set system property: "+GRANT_TYPE);
+
+        drlPath = System.getProperty(DRL_PATH);
+        if(StringUtils.isEmpty(drlPath))
+            throw new RuntimeException("must set system property: "+DRL_PATH);
+
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append("init() \n    tokenUrl = "+tokenUrl);
+        sBuilder.append("\n    personIdByEmailUrl = "+personIdByEmailUrl);
+        sBuilder.append("\n    addQualificationUrl = "+addQualificationUrl);
+        sBuilder.append("\n    clientId = "+clientId);
+        sBuilder.append("\n    clientSecret = "+clientSecret);
+        sBuilder.append("\n    grantType = "+grantType);
+        logger.info(sBuilder.toString()); 
+    }
+    
+
+/*  **********************    Student Accreditation     *************************** */
+    
+    public List<Accreditation> selectUnprocessedStudentAccreditations() {
+        List<Accreditation> sAccreds = canonicalDAO.selectUnprocessedStudentAccreditationsByProcessStatus(StudentAccreditation.UNPROCESSED);
+        if(sAccreds == null || sAccreds.isEmpty()) {
+            logger.info("selectUnprocessedStudentAccreditations() no StudentAccreditation objects found with status = "+StudentAccreditation.UNPROCESSED);
+        }
+        else {
+            logger.info("selectUnprocessedStudentAccreditations() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
+        }
+        return sAccreds;
+    }
+    
+    public void setAccreditationIdOnAccreditationObj(@Body Accreditation accredObj){
+        if(accredObj.getAccreditationId() != null && accredObj.getAccreditationId() != 0)
+            return;
+        
+        int accredId = canonicalDAO.getAccreditationIdGivenName(accredObj.getAccreditationName());
+        logger.info(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getAccreditationName());
+        accredObj.setAccreditationId(accredId);
+    }
+    
+    public void addStudentAccreditationToDB(@Body Accreditation apWrapper) {
+        canonicalDAO.addStudentAccreditation(apWrapper.getStudentAccred());
+    }
+    
+    public boolean isRedHatStudentFromStudentAccreditation(@Body Accreditation saObj) {
+        if(saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) > 0) {
+            return true;
+        }else {
+            logger.debug(saObj.getStudent().getEmail()+" : Not a Red Hat associate.  Will not update SkillsBase");
+            return false;
+        }
+    }
+/* ************************************************************************************ */
+   
+    
+    
+    public void getToken(Exchange exchange) {
+        
+        Message in = exchange.getIn();
+        try {
+                
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+            
+            HttpPost post = new HttpPost(tokenUrl);
+            
+            // set up name value pairs
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("grant_type", grantType));
+            nvps.add(new BasicNameValuePair("client_id", clientId));
+            nvps.add(new BasicNameValuePair("client_secret", clientSecret));
+
+            // set HTTP request message body
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+
+            // send POST message
+            HttpResponse httpResponse = httpclient.execute(post);
+
+            // process response
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            JSONObject jsonResponse = new JSONObject(response);
+            String token = jsonResponse.getString("access_token");
+
+            in.setHeader(Constants.TOKEN, token);
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+    }
+    
+    public void getSkillsBasePersonId(Exchange exchange) {
+
+        Message in = exchange.getIn();
+        Accreditation studentAccredObj = in.getBody(Accreditation.class);
+        String theEmail = studentAccredObj.getStudent().getEmail();
+        logger.info(theEmail+" : Getting personId from Skills Base web service.");
+        
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+            HttpPost post = new HttpPost(personIdByEmailUrl);
+
+            // set up header
+            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            
+            // set up name value pairs
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("email", theEmail));
+
+            // set HTTP request message body
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+
+            // send POST message
+            HttpResponse httpResponse = httpclient.execute(post);
+
+            // process response
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            JSONObject jsonResponse = new JSONObject(response);
+
+            String status = jsonResponse.getString("status");
+            
+            logger.info(theEmail+" : response: " + response+" : status = "+status);
+
+            // parse person id
+            String personId = null;
+            if (SUCCESS.equalsIgnoreCase(status)) {
+                JSONObject jsonData = jsonResponse.getJSONObject("data");
+                personId = jsonData.getString("id");
+
+                studentAccredObj.getStudent().setSkillsbasePersonId(personId);
+            } else if (ERROR.equalsIgnoreCase(status)) {
+                String message = jsonResponse.getString("message");
+
+                if (message.contains("No person found")) {
+                    studentAccredObj.getStudent().setSkillsbasePersonId(null);
+                } else {
+                    throw new RuntimeException(message);
+                }
+            }
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+    }
+    
+    public void addQualification(Exchange exchange) {
+
+        Message in = exchange.getIn();
+        Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
+        
+        Student studentObj = denormalizedStudentAccred.getStudent();
+        AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
+        StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
+
+        String accredName = accredObj.getAccreditationname();
+        
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+
+            HttpPost post = new HttpPost(addQualificationUrl);
+            logger.info(studentObj.getEmail() +" : Sending the following qualification to Skills Base web service : " + accredName);
+
+            // set up header
+            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            
+            // set up name value pairs
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("name", accredName));
+            nvps.add(new BasicNameValuePair("person_id", studentObj.getSkillsbasePersonId()));
+            nvps.add(new BasicNameValuePair("status", Constants.COMPLETED));
+            
+            String startDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+            nvps.add(new BasicNameValuePair("start_date", startDateStr));
+            
+            String endDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+            nvps.add(new BasicNameValuePair("end_date", endDateStr));
+
+            // set HTTP request message body
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+
+            // send POST message
+            HttpResponse httpResponse = httpclient.execute(post);
+
+            // process response
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            JSONObject jsonResponse = new JSONObject(response);
+
+            String status = jsonResponse.getString("status");
+
+            logger.info(studentObj.getEmail() +" : addQualification() response: " + response+" : status = "+status);
+
+            if (!"success".equalsIgnoreCase(status)) {
+                String message = "Error sending qualification. Student email: " + studentObj.getEmail() + ",  qualification: " + accredName;
+                logger.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+    }
+    
+    public void validateSpreadsheetRules(Exchange exchange) {
+
+        @SuppressWarnings("unchecked")
+        List<SpreadsheetRule> sRules = (List<SpreadsheetRule>)exchange.getIn().getBody();
+        if(sRules.isEmpty())
+            throw new RuntimeException("no Spreadsheet Rules parsed");
+        
+        int rNumber = 4;  // there are 3 rows of headers
+        Integer problemNumber = 0;
+        String fileName = (String) exchange.getIn().getHeader(CAMEL_FILE_HEADER_NAME);
+        StringBuilder eBuilder = new StringBuilder(fileName);
+
+        Set<String> courseSet = new HashSet<String>();
+        Set<String> accredSet = new HashSet<String>();
+        
+        for(SpreadsheetRule sRule : sRules) {
+        	
+        	// 0) set generated RuleName
+        	sRule.generateRuleName(rNumber);
+            
+            // 1)  Validate dates
+            problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getBeginDate());
+            problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getEndDate());
+            
+            // 2)  Validate course completions
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse1(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse2(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse3(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse4(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse5(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse6(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse7(), courseSet);
+            
+            // 3)  Validate Accreditation
+            problemNumber = checkAccreditation(problemNumber, rNumber, sRule, eBuilder, sRule.getAccredName(), accredSet);
+ 
+            rNumber++;
+        }
+        
+        // 4 throw exception if validation errors exist
+        if(problemNumber > 0)
+               exchange.setException(new AttachmentValidationException("\nTotal # of Spreadsheet Validation errors: "+problemNumber+"\n"+eBuilder.toString()));
+    }
+    
+    private Integer checkDate(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String dString){
+        if(!StringUtils.isEmpty(dString)){
+            try {
+                SpreadsheetRule.rulesSDF.parse(dString);
+            } catch (ParseException e) {
+                problemNumber++;
+                eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Date related ParseException: "+dString);
+                eBuilder.append("\n"+sRule);
+            }
+        }
+        return problemNumber;
+    }
+    
+    private Integer checkCourse(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String courseName, Set courseSet) {
+        if(!StringUtils.isEmpty(courseName)) {
+            try {
+                if(!courseSet.contains(courseName)) {
+                    courseSet.add(courseName);
+                    this.canonicalDAO.getCourseByCourseName(courseName, null);
+                }
+            } catch(org.springframework.dao.EmptyResultDataAccessException e) {
+                problemNumber++;
+                eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Canonical course name not found : \""+courseName+"\"");
+                eBuilder.append("\n"+sRule);
+            } catch(org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+                problemNumber++;
+                eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Canonical course name  : \""+courseName+ "\" : Exception message = "+e.getLocalizedMessage());
+                eBuilder.append("\n"+sRule);
+            }
+        }
+        return problemNumber;
+    }
+    
+    private Integer checkAccreditation(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String accredName, Set accredSet) {
+        if(StringUtils.isEmpty(accredName)){
+            problemNumber++;
+            eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Accreditation column must not be null.");
+            eBuilder.append("\n"+sRule);
+        }else {
+            try {
+                if(!accredSet.contains(accredName)) {
+                    accredSet.add(accredName);
+                    this.canonicalDAO.getAccreditationIdGivenName(accredName);
+                }
+            } catch(org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+                problemNumber++;
+                eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Accreditation name not found : \""+accredName+"\"");
+                eBuilder.append("\n"+sRule);
+            }
+        }
+        return problemNumber;
+    }
+
+
+    public void setHeadersForGeneratingDRL(Exchange exchange)  {
+           SpreadsheetRule sRule = (SpreadsheetRule) exchange.getIn().getBody();
+
+           exchange.getIn().setHeader(SpreadsheetRule.BEGIN_DATE, sRule.getBeginDate());
+           exchange.getIn().setHeader(SpreadsheetRule.END_DATE, sRule.getEndDate() == null?"":sRule.getEndDate());
+           
+            exchange.getIn().setHeader(SpreadsheetRule.COURSE1, sRule.getCourse1());
+            if(StringUtils.isNotEmpty(sRule.getCourse2()))
+                exchange.getIn().setHeader(SpreadsheetRule.COURSE2, sRule.getCourse2());
+            if(StringUtils.isNotEmpty(sRule.getCourse3()))
+                exchange.getIn().setHeader(SpreadsheetRule.COURSE3, sRule.getCourse3());
+            if(StringUtils.isNotEmpty(sRule.getCourse4()))
+                exchange.getIn().setHeader(SpreadsheetRule.COURSE4, sRule.getCourse4());
+            if(StringUtils.isNotEmpty(sRule.getCourse5()))
+                exchange.getIn().setHeader(SpreadsheetRule.COURSE5, sRule.getCourse5());
+            if(StringUtils.isNotEmpty(sRule.getCourse6()))
+                exchange.getIn().setHeader(SpreadsheetRule.COURSE6, sRule.getCourse6());
+            if(StringUtils.isNotEmpty(sRule.getCourse7()))
+                exchange.getIn().setHeader(SpreadsheetRule.COURSE7, sRule.getCourse7());
+            
+            exchange.getIn().setHeader(SpreadsheetRule.ACCRED_NAME, sRule.getAccredName());
+            exchange.getIn().setHeader(SpreadsheetRule.RULE_NAME, sRule.getRuleName());
+    }
+
+    public void changeSuffixOfRuleFileName(Exchange exchange) {
+
+        String fileName = (String) exchange.getIn().getHeader(CAMEL_FILE_HEADER_NAME);
+        String newFileName = fileName.replace(TSV, DRL);
+        logger.info("changeSuffixOfRuleFileName() new rule file name = "+newFileName);
+        exchange.getIn().setHeader(CAMEL_FILE_HEADER_NAME, newFileName);
+    }
+}

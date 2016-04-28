@@ -1,0 +1,41 @@
+How To Create Unirest JAR with all dependencies
+
+1. Follow the steps at http://blog.mashape.com/installing-unirest-java-with-the-maven-assembly-plugin/
+
+   This will create the JAR file with all dependencies
+   unirest-java-1.4.8-SNAPSHOT-jar-with-dependencies.jar
+   
+2. Copy the JAR file above to a known directory. You will use that directory in the next step.
+   
+2. Now, manually install this in the Maven repo
+
+mvn install:install-file -Dfile=unirest-java-1.4.8-SNAPSHOT-jar-with-dependencies.jar -DgroupId=com.mashape.unirest -DartifactId=unirest-java -Dversion=1.4.8-with-dependencies -Dpackaging=jar
+
+This will install the file, then you can reference it with the following coordinates
+
+3. In your features file, you can reference this with
+
+		<bundle>wrap:mvn:com.mashape.unirest/unirest-java/1.4.8-with-dependencies</bundle>				
+
+
+
+
+=====
+
+Note if you need to make changes to feature file and update it
+		
+You want to make changes to the Fuse feature file
+
+1. Edit the feature file in a text editor
+
+2. Copy it to ${fuse.home}
+
+3. In Karaf, run:  features:refreshurl      
+
+     This will tell Fuse to look at the new file
+
+4. Verify the contents with:  features:info <your feature name> 
+
+5. Install the feature again
+
+  features:install lms-ipa-ldap/1.0		

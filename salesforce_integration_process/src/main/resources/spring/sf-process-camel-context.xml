@@ -1,0 +1,33 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       ">
+
+  <!-- Allows Spring to leverage java system properties -->
+  <context:property-placeholder />
+
+  <bean id="salesforce" class="org.apache.camel.component.salesforce.SalesforceComponent">
+    <property name="packages" value="${salesforce_model_package}" />
+    <property name="loginConfig">
+        <bean class="org.apache.camel.component.salesforce.SalesforceLoginConfig">
+            <property name="loginUrl" value="https://login.salesforce.com"/>
+            <property name="clientId" value="${salesforce_clientid}"/>
+            <property name="clientSecret" value="${salesforce_clientsecret}"/>
+            <property name="userName" value="${salesforce_username}"/>
+            <property name="password" value="${salesforce_password}"/>
+        </bean>
+    </property>
+  </bean>
+
+  <!--route id="salesforceOpportunities">
+                      <from uri="{{cc_salesforce_uri}}"/>
+        <to uri="salesforce:query?sObjectQuery=SELECT id,name,IPA__c from Contact where IPA__c = false&amp;sObjectClass=com.redhat.gpe.domain.integration.salesforce.QueryRecordsContact" />
+        <to uri="log: Query result back from Salesforce:${body}" />
+   </route -->
+
+</beans>

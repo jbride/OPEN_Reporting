@@ -1,0 +1,1 @@
+../../../../../db_scripts/lms_transactional_ddl.sql

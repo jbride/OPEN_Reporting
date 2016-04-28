@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+       ">
+
+  <!-- Allows Spring to leverage java system properties -->
+  <context:property-placeholder />
+
+  <!-- In JBoss EAP, use existing transactionalDS datasource available via JNDI/IronJacamar.
+       In test harness, define the transactionalDS datasource directly here in XML DSL.
+       Note the use of Spring style variable substition variables.
+  -->
+  <bean id="transactionalDS" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+    <property name="driverClassName" value="${lms_transactional_driverClassName}" />
+    <property name="url" value="${lms_transactional_url}" />
+    <property name="username" value="${lms_transactional_username}" />
+    <property name="password" value="${lms_transactional_password}" />
+  </bean>
+
+</beans>

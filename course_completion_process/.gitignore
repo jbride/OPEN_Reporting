@@ -1,0 +1,8 @@
+*target/
+/inbox-for-attachments/
+.DS_Store
+.DS_Store?
+.html
+.idea/
+*.iml
+

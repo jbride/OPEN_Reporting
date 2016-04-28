@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<jboss-deployment-structure>
+  <deployment>
+    <dependencies>
+      <module name="org.apache.camel"/>
+      <module name="org.apache.commons.lang"/>
+      <module name="org.apache.commons.lang3"/>
+      <module name="org.apache.commons.io"/>
+
+      <!-- https://github.com/redhat-gpe/OPEN_Admin/issues/123 -->
+      <module name="org.springframework.spring" export="true" meta-inf="export" />
+
+    </dependencies>
+  </deployment>
+</jboss-deployment-structure>

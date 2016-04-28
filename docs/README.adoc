@@ -1,0 +1,231 @@
+:uri:
+:toc: manual
+:toc-placement: preamble
+:numbered:
+
+= GPTE Integration Projects
+
+Administration Guide
+
+== Overview
+== Administration
+
+=== Operating System
+. Ensure that a `jboss` operating system user (with groupId = 100) exists.
+. As root:  chown -R jboss:100 /opt
+. Install mysql JDBC :
++
+-----
+yum install -y mysql-connector-java.noarch
+-----
+. Install JDK 8 :
++
+-----
+yum install java-1.8.0-openjdk-devel.x86_64
+-----
+. Install mariadb-server :
++
+-----
+yum install mariadb-server
+-----
+
+=== OPEN_Admin project
+Execute everything in this section as the `jboss` operating system user.
+
+=== Clone
+-----
+git clone https://github.com/redhat-gpe/OPEN_Admin.git
+-----
+
+NOTE: For the purposes of this project, the term `$PROJECT_HOME` refers to the following directory: `/path/to/cloned/OPEN_Admin/integration`
+
+==== Configure Maven settings
+
+-----
+cp $PROJECT_HOME/config/maven/settings.xml ~/.m2
+-----
+
+=== MySQL
+
+=== JBoss Fuse
+
+==== installation and configuration
+
+NOTE: Execute all of the following as the `jboss` operating system user.
+
+. Download the following from the Red Hat Support Portal:
+.. *jboss-eap-6.4.4-full-build.zipjboss-eap-6.4.*-full-build.zip*
+.. *fuse-eap-installer-6.2.1.redhat-084.jarfuse-eap-installer-6.2.1.redhat-*.jar*
+. unzip JBoss EAP into: `/opt/jboss/eap`
++
+NOTE: For the purpose of this admin guide, the term `$JBOSS_HOME` will refer to the following path: `/opt/jboss/eap/jboss-eap-6.4`.
+. Change directories into: $JBOSS_HOME
+. java -jar /path/to/fuse-eap-installer-6.2.1.redhat-084.jarfuse-eap-installer-6.2.1.redhat-412.jar
+
+. Create `com.mysql.jdbc` JBoss module
++
+----
+cd $JBOSS_HOME
+cp -r $PROJECT_HOME/config/modules/* modules
+cd modules/system/layers/base/com/mysql/jdbc/main
+ln -sf  /usr/share/java/mysql-connector-java.jar modules/system/layers/base/com/mysql/jdbc/main/mysql-connector-java.jar
+----
+
+. Execute JBoss CLI based changes
+.. Start JBoss EAP in `admin-mode`:
++
+-----
+./bin/standalone.sh -c standalone-camel.xml --admin-only
+-----
+.. In another terminal window (again as the `jboss` operating system user), change directories to `$PROJECT_HOME`.
+.. Execute :
++
+-----
+$JBOSS_HOME/bin/jboss-cli.sh -c --file=config/cli/eap-configs.cli
+-----
+. Modify JBoss start-up JAVA_OPTS :
++
+-----
+cp $PROJECT_HOME/config/bin/standalone.conf $JBOSS_HOME/bin
+-----
+
+==== OS service
+Execute the following as the `root` operating system user:
+
+. Configure the service
+.. mkdir /etc/jbosseap
+.. cp $PROJECT_HOME/config/service/gpte-integration.conf /etc/jbosseap
+.. cp $PROJECT_HOME/config/service/gpte-integration.service /usr/lib/systemd/system
+.. Create a link of gpte-integration.service for systemd
++
+-----
+ln -sf /usr/lib/systemd/system/gpte-integration.service /etc/systemd/system/multi-user.target.wants/gpte-integration.service
+-----
++
+.. Then enable the service
++
+-----
+sudo systemctl enable gpte-integration.service
+-----
+
+. start
++
+-----
+sudo systemctl start gpte-integration.service
+-----
+
+. check log
++
+-----
+sudo journalctl -u gpte-integration -f
+-----
+
+. Gain access to `JBoss Command Line Interface`:
++
+-----
+$JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
+-----
+
+== Hawtio Admin Console
+The `Hawtio` admin console can be reached by navigating to the following URL using your browser:
+
+-----
+http://docker1.ose.opentlc.com:8205/hawtio/http://docker1.ose.opentlc.com:8205/hawtio/
+-----
+
+NOTE: hawtio web app presents the `white screen of death` until all javascript client libraries have been downloaded.
+The size of this client side download is about 5.5MBs.
+Use a browser tool such as `Firebug` to monitor download progress of these client side libraries to your browser.
+
+Login using the following credentials: `admin / jb0ssredhat!`
+
+== course_completion_process
+
+. As `jboss` operating system user, change directories into `course_completion_process` project:
++
+-----
+cd $PROJECT_HOME/integration/course_completion_process
+-----
+. Execute `course_completion_process` specific CLI
++
+-----
+mvn jboss-as:execute-commands -P eapProfile
+-----
+. Build and deploy application to JBoss
++
+-----
+mvn jboss-as:deploy -P eapProfile -DskipTests
+-----
+
+== skillsbase_integration
+
+=== Gmail
+Allow camel email component to connect to gmail .
+
+. Execute steps #2 and #3 for the following gmail accounts:
+* *rht.gpte.sb.test@gmail.com*
+* *gpeskills@gmail.com*
+
+. Open your browser, authenticate into gmail and navigate to the following site:
++
+-----
+https://myaccount.google.com/security#connectedapps
+-----
+. Set value of `Allow less secure apps` to `On`
++
+image::skillsbase_integration/doc/images/gmail_settings.png[]
+
+=== MySQL Tables
+
+-----
+mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
+mysql -u lms_trans -plms_trans lms_transactional < db_scripts/data_load/lms_transactional_data.sql
+delete from lms_transactional.Students where StudentID > 10399
+mysqldump --no-create-db --no-create-info -u lms_trans -p'lms_trans' lms_transactional > db_scripts/data_load/lms_transactional_data.sql
+-----
+
+=== Configure, build and deploy
+
+. As `jboss` operating system user, change directories into `skillsbase_integration` project:
++
+-----
+cd $PROJECT_HOME/integration/skillsbase_integration
+-----
+. Execute `skillsbase_integration` specific CLI
++
+-----
+mvn properties:read-project-properties replacer:replace jboss-as:execute-commands
+-----
+. Build and deploy application to JBoss
++
+-----
+mvn jboss-as:deploy -DskipTests
+-----
+
+. Undeploy app
++
+-----
+mvn clean
+-----
+
+=== Clean `employee-assessment` tables
+
+-----
+mysql -u lms -p lms < db_scripts/biz-scripts/employee-assessment-cleanup.sql
+-----
+
+-----
+SkillsBase will recognize you as a new user ... it will send you thru a "self assessment" wizard ... then your SB account is activated.
+So in Production ... each Red Hat employee would need to manually log into to the SB GUI and do this.
+Ideally, it would be great if there was someway to auto-create these accounts.
+Maybe we should talk to the SB team about doing this.  It will make our life a bit easier since we will always find the user and be able to send the qualifications over.
+right now we have a "gap" because of the manual login process
+-----
+
+== ipa_integration
+
+-----
+mysql -u root -p mysql <  scripts/create-user.sql
+mysql -u root -p mysql <  scripts/create-tables.sql
+mysql -u root -p mysql <  scripts/load-reference-data.sql
+-----

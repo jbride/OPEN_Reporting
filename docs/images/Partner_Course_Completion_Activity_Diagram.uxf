@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.1.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>0</x>
+      <y>20</y>
+      <w>120</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Partner LMSs
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>470</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>EIP Services /
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>30</x>
+      <y>110</y>
+      <w>20</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>340</x>
+      <y>110</y>
+      <w>20</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>540</x>
+      <y>110</y>
+      <w>20</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>20</x>
+      <y>100</y>
+      <w>200</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>pull course
+completions
+lt=&lt;-</panel_attributes>
+    <additional_attributes>180.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>160</y>
+      <w>350</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>           email course
+           completions
+lt=&lt;-</panel_attributes>
+    <additional_attributes>330.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>200</y>
+      <w>110</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>validate
+data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;40.0;40.0;40.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>280</x>
+      <y>0</y>
+      <w>140</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>GPTE Operations</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>350</x>
+      <y>280</y>
+      <w>210</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Acknowledgement
+of receipt
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;20.0;190.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>710</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>collection/processing
+tables
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>790</x>
+      <y>110</y>
+      <w>20</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>550</x>
+      <y>250</y>
+      <w>260</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>      Completion Data
+                                         
+                                                                                                        processing
+lt=&lt;-</panel_attributes>
+    <additional_attributes>240.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>130</x>
+      <y>0</y>
+      <w>160</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>Partner Operations</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>200</x>
+      <y>110</y>
+      <w>20</w>
+      <h>280</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>320</y>
+      <w>350</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>              Acknowledgement
+              of receipt
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;20.0;330.0;20.0</additional_attributes>
+  </element>
+</diagram>

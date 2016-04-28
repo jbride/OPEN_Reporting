@@ -1,0 +1,3 @@
+<jboss-web>
+  <context-root>user-registration-process</context-root>
+</jboss-web>

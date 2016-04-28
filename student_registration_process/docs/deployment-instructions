@@ -1,0 +1,167 @@
+Steps to Deploy on JBoss Fuse
+
+1. Clone the code from github:  www.github.com/redhat-gpe/OPEN_Admin.git
+
+2. IF running locally and using Maven
+
+2.1 Copy config file com.redhat.gpe.lms.ipaldap.cfg to $fuse_home/etc
+
+2.2 Build the application locally
+
+  cd OPEN_Admin/lms_integration_ipa_ldap
+  mvn clean install
+
+3. IF building locally and deploying remotely
+
+3.1 Build the application locally
+
+  cd OPEN_Admin/lms_integration_ipa_ldap
+  mvn clean package
+
+3.2 Copy the lms JAR file up to server
+
+  scp target/lms-integration-ipa-ldap-1.0.0.jar <your-opentlc-account>@<<remote-server>>:lms-ipa-ldap
+
+3.2. Copy the lms feature file up to server
+
+  scp lms-ipa-ldap-features.xml <your-opentlc-account>@<<remote-server>>:lms-ipa-ldap
+
+3.2. Copy the lms configuration file up to server
+
+  scp com.redhat.gpe.lms.ipaldap.cfg <your-opentlc-account>@<<remote-server>>:lms-ipa-ldap
+
+3.3. Copy the unirest-jar file up to server
+   Note: see "how-to-create-unirest-jar-with-dependencies.txt" for details on creating this file
+
+  scp ${unirest.build.dir}/target/unirest-java-1.4.8-SNAPSHOT-jar-with-dependencies.jar <your-opentlc-account>@<<remote-server>>:lms
+      
+4. Connect to remote server
+
+  ssh <your-opentlc-account>@<<remote-server>>
+
+
+5. Start JBoss Fuse (if not running)
+
+  cd ${fuse.home}
+
+  bin/start
+
+6. Check the status
+
+Wait about 30 seconds for the server to start. You can check the status with the following command
+
+  bin/status
+
+If it says, "Running..." then you can proceed to the next step.
+
+8. Start Fuse Admin client
+
+  bin/client
+
+9. Install the LMS-IPA-LDAP features
+
+9.1 Copy the properties file to ${fuse.home}/etc
+
+  cp com.redhat.gpe.lms.ipaldap.cfg ${fuse.home}/etc
+
+9.1 Copy the features file to ${fuse.home}
+
+  cp lms-ipa-ldap-features.xml ${fuse.home}
+
+9.2 Install the Unirest HTTP JAR file in the Maven Repo
+
+  mvn install:install-file -Dfile=unirest-java-1.4.8-SNAPSHOT-jar-with-dependencies.jar -DgroupId=com.mashape.unirest -DartifactId=unirest-java -Dversion=1.4.8-with-dependencies -Dpackaging=jar
+
+9.2 Add the LMS Features
+Run the following commands at the Karaf CLI:
+
+  features:addUrl file:${fuse.home}/lms-ipa-ldap-features.xml
+  features:refreshUrl  
+  features:install lms-ipa-ldap/1.0
+  
+9.3 Add the LMS app code
+
+  # If installing from file system
+  osgi:install -s file:/home/fuse/lms/lms-integration-ipa-ldap-1.0.0.jar
+
+  # If installing from Maven
+  osgi:install -s mvn:com.redhat.gpe/lms-integration-ipa-ldap/1.0.0
+  
+10. View the Fuse logs to make sure the app started. Enter the following command at the Karaf CLI:
+
+  log:display | grep lms.ipaldap
+
+You should see....
+
+  ... (CamelContext: lms-ipaldap) started
+
+That means the app is installed successfully.
+
+Monitoring Logs
+===============
+1. You can view the logs. First start the Fuse Admin client
+
+  bin/client
+
+2. View the log tails with
+
+   log:tail
+
+3. If you want to see the DEBUG logs for this app
+
+   log:set DEBUG com.redhat.gpe
+   
+4. Then you can view the debug messages with
+
+   log:tail
+   
+5. To set it back to info level, just do
+
+   log:set DEBUG com.redhat.gpe
+
+Managing Properties
+===================
+
+Note: It is not hot deploy lookup for changes. You need to manually restart your bundle
+
+Run the Fuse CLI
+
+When editing a configuration the commands are used as follows:
+	1. Start the editing session for the specified configuration.
+
+               JBossFuse:karaf@root> config:edit com.redhat.gpe.lms.ipaldap
+
+     2. Lists the properties in the configuration.
+               
+               JBossFuse:karaf@root> config:proplist
+
+
+     3. Set the value for a configuration property.
+               config:propset propertyName propertyValue
+
+              JBossFuse:karaf@root> config:propset email.username tester
+
+     4. Save the settings
+
+               JBossFuse:karaf@root> config:update
+
+     5. Now restart the Camel Bundle to pick up new properties
+          
+               JBossFuse:karaf@root> osgi:restart <bundleId>
+
+
+MySQL accounts
+
+Dev
+ user: lms
+ pass: R@dhat#
+ 
+Production
+ user: lms-ipa-ldap
+ pass: R@dhat#
+
+Extra
+=====
+
+How remove and update features
+

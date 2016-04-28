@@ -1,0 +1,459 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.1.1">
+  <zoom_level>10</zoom_level>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>0</x>
+      <y>20</y>
+      <w>120</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Sumtotal /
+rh.dokeos.com /
+Partner LMSs
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1300</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>collection/processing
+tables
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>330</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>EIP Services /
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1710</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Dashbuilder Reports
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>50</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>200</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>400</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1190</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1780</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>60</x>
+      <y>120</y>
+      <w>160</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Manually pull
+raw accreditation 
+data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>140.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>210</x>
+      <y>160</y>
+      <w>210</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>Manually email
+raw accreditation
+data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>190.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>200</y>
+      <w>120</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>validate
+data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;40.0;50.0;40.0;50.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>260</y>
+      <w>980</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>                                                                                       persist
+                                                                                       data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>960.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>630</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>550</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>IPA LDAP /
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>310</y>
+      <w>240</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>Retrieve Skill Exchange
+attributes (geo/role)
+lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;20.0;220.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>750</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Skills Base
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>820</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>400</y>
+      <w>430</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>	                     Push new 
+	                     accreditation data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>410.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1120</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>LMS DB Scripts
+
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1510</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>reporting
+tables
+
+forge.opentlc.com
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1370</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1580</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>350</y>
+      <w>980</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>                                                                                       persist
+                                                                                      data
+lt=&lt;-</panel_attributes>
+    <additional_attributes>960.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>530</y>
+      <w>800</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>                                                                        trigger data
+                                                                       processing
+lt=&lt;-</panel_attributes>
+    <additional_attributes>780.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1590</x>
+      <y>820</y>
+      <w>210</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes> Render Reports
+lt=&lt;-</panel_attributes>
+    <additional_attributes>190.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>940</x>
+      <y>20</y>
+      <w>160</w>
+      <h>70</h>
+    </coordinates>
+    <panel_attributes>Sales Force
+
+bg=orange</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>1010</x>
+      <y>110</y>
+      <w>20</w>
+      <h>740</h>
+    </coordinates>
+    <panel_attributes/>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>440</y>
+      <w>620</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>                                          Push new
+                                             accreditation data
+                                                                                                        processing
+lt=&lt;-</panel_attributes>
+    <additional_attributes>600.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLActor</id>
+    <coordinates>
+      <x>140</x>
+      <y>0</y>
+      <w>140</w>
+      <h>110</h>
+    </coordinates>
+    <panel_attributes>GPTE Operations</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>490</y>
+      <w>1390</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>                                                                                                                                        undeploy                                                                                
+                  
+lt=&lt;-</panel_attributes>
+    <additional_attributes>1370.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>410</x>
+      <y>790</y>
+      <w>1390</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>                                                                                                                                        re-deploy                                                                                
+                  
+lt=&lt;-</panel_attributes>
+    <additional_attributes>1370.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>570</y>
+      <w>400</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>                  Create company
+                  codes
+                                                                       processing
+lt=&lt;-</panel_attributes>
+    <additional_attributes>380.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>630</y>
+      <w>400</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>                  Create compliance
+                  tables
+                                                                       processing
+lt=&lt;-</panel_attributes>
+    <additional_attributes>380.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1200</x>
+      <y>700</y>
+      <w>400</w>
+      <h>60</h>
+    </coordinates>
+    <panel_attributes>                  Create reporting
+                  tables
+                                                                       processing
+lt=&lt;-</panel_attributes>
+    <additional_attributes>380.0;20.0;10.0;20.0</additional_attributes>
+  </element>
+</diagram>

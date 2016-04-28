@@ -1,0 +1,15 @@
+package com.redhat.gpe.accreditation.rules;
+
+dialect "mvel"
+
+import java.util.Date
+import java.util.ArrayList
+import com.redhat.gpe.domain.canonical.Student
+import com.redhat.gpe.domain.canonical.StudentAccreditation
+import com.redhat.gpe.domain.helper.CourseCompletion
+import com.redhat.gpe.domain.helper.Accreditation
+import com.redhat.gpte.util.DroolsCommandHelper
+
+global ArrayList accreditationList
+
+

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:camel="http://camel.apache.org/schema/spring"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="
+            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+        ">
+
+  <!-- Defines transactionalDS bean along with any other environment specific needs -->
+  <import resource="classpath:spring/environment-specific-camel-context.xml" />
+
+  <!-- Spring configuration based on annotations: required for Spring Autowiring -->
+  <context:annotation-config />
+
+  <bean id="sbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="transactionalDS" />
+  </bean>
+
+  <bean id="canonicalDAO" class="com.redhat.gpe.dao.DomainDAOImpl" />
+
+  <bean id="baseServiceBean" class="com.redhat.gpte.services.GPTEBaseServiceBean" />
+  <bean id="emailServiceBean" class="com.redhat.gpte.services.EmailServiceBean" />
+
+  <bean id="invalidTypeEx" class="com.redhat.gpte.services.AttachmentValidationException">
+      <!--constructor-arg index="0" value="Unable to route email attachments from: ${header.Return-Path}, subject ${header.subject}"/ -->
+      <constructor-arg index="0" value="Unable to route email attachment"/>
+  </bean>
+
+  <camelContext trace="false" id="gpte-universal-process" xmlns="http://camel.apache.org/schema/spring">
+
+    <onException>
+        <exception>java.lang.Exception</exception>
+
+        <!-- Exception propogated to JUnit tests when set to false -->
+        <!-- Setting of sys property substition doesn't appear to take affect -->
+        <!-- handled><constant>{{sb_onexception_handled}}</constant></handled -->
+        <!--handled><constant>{{ipa_onexception_handled}}</constant></handled-->
+        <handled><constant>true</constant></handled>
+
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+        <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+        <to uri="seda:send-email"/>
+    </onException>
+
+    <route id="receive-gpte-operation-files">
+        <description>
+        </description>
+        <from uri="{{gpte_receive_ops_files_uri}}"/>
+        <log message="Received file from: ${header.Return-Path}, subject ${header.subject}" id="log_receive_file"/>
+        <filter>
+            <method ref="emailServiceBean" method="isValidCamelMessage"></method>
+            <to uri="bean:emailServiceBean?method=moveAttachmentsToBody" />
+            <to uri="bean:emailServiceBean?method=determineAttachmentType" />
+            <choice>
+                <when>
+                    <simple>${header.ATTACHMENT_TYPE} == "student_registration"</simple>
+                    <to uri="vm:receive-sumtotal-student-reg" />
+                </when>
+                <when>
+                    <simple>${header.ATTACHMENT_TYPE} == "dokeos_cc"</simple>
+                    <to uri="vm:receive_dokeos_input" />
+                </when>
+                <when>
+                    <simple>${header.ATTACHMENT_TYPE} == "sumtotal_cc"</simple>
+                    <to uri="vm:receive_sumtotal_input" />
+                </when>
+                <when>
+                    <simple>${header.ATTACHMENT_TYPE} == "rules_spreadsheet"</simple>
+                    <to uri="bean:emailServiceBean?method=writeRulesSpreadsheetsToDisk" />
+                </when>
+                <otherwise>
+                    <throwException ref="invalidTypeEx" />
+                </otherwise>
+            </choice>
+        </filter>
+    </route>
+
+    <route id="trigger_lms_reporting_stored_proc">
+      <from uri="{{gpte_trigger_lms_reporting_stored_proc}}"/>
+      <setBody><constant>call lms_transactional.refresh_lms_reporting</constant></setBody>
+      <to uri="bean:baseServiceBean?method=triggerStoredProcedure" id="trigger-lms-reporting-stored-proc" />
+    </route>
+
+    <route id="send-email">
+        <from uri="seda:send-email"/>
+        <removeHeaders pattern="*" excludePattern="Return-Path"/>
+        <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
+        <to uri="bean:emailServiceBean?method=clearAttachments"/>
+        <setHeader headerName="From">
+            <constant>GPTE Operations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
+        </setHeader>
+        <choice id="if-exception-exists">
+            <when>
+                <simple>${exception.message} != null</simple>
+                <setHeader headerName="Subject">
+                    <constant>GPTE Operation Services ({{jboss.host.name}}): Problem processing data</constant>
+                </setHeader>
+
+                <!-- Appears that exception.message is not passed to velocity template -->
+                <setBody><simple>${exception.message}</simple></setBody>
+
+                <to uri="velocity:emailTemplates/problem-reply-email.vm"/>
+            </when>
+            <otherwise>
+                <setHeader headerName="Subject">
+                    <constant>GPTE Operation Services ({{jboss.host.name}}): Success</constant>
+                </setHeader>
+                <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
+            </otherwise>
+        </choice>
+        <filter>
+            <constant>{{sb_enable_all_emails}}</constant>
+            <to uri="smtps://smtp.gmail.com?username={{sb_email_username}}&amp;password={{sb_email_password}}" id="send_email"/>
+            <log message="Sent reply email to: ${header.to}"/>
+        </filter>
+    </route>
+
+  </camelContext>
+
+</beans>

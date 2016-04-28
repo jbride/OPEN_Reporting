@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.redhat.gpte.ops</groupId>
+        <artifactId>commons</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>gpte-services</artifactId>
+    <packaging>jar</packaging>
+    <name>GPTE Operations Commons: SERVICES</name>
+    <url>http://www.redhat.com</url>
+    <properties>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>com.redhat.gpte.ops</groupId>
+            <artifactId>gpte-domain</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.redhat.gpte.ops</groupId>
+            <artifactId>gpte-dao</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <!-- Jakarta Commons Date Utils -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
+
+
+    </dependencies>
+    <build>
+        <plugins>
+
+        </plugins>
+    </build>
+</project>

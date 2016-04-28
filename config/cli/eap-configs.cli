@@ -1,0 +1,5 @@
+batch
+    /subsystem=datasources/jdbc-driver=mysql:add(driver-xa-datasource-class-name=com.mysql.jdbc.jbdc2.optional.MysqlXAConnection,driver-name=mysql,driver-module-name=com.mysql.jdbc)
+
+    # TO-DO :  Need CLI that sets the following COLOR-PATTERN:  %K{level}%d{HH:mm:ss,SSS} %-5p [%c] %s%E%n
+run-batch

@@ -1,0 +1,495 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.redhat.gpte.ops</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <name>GPTE Operations Parent</name>
+  <properties>
+
+    <jboss.fuse.bom.version>6.2.1.redhat-084</jboss.fuse.bom.version>
+    <camel.version>2.15.1.redhat-621084</camel.version>
+    <wildfly.camel.version>2.3.0.redhat-621084</wildfly.camel.version>
+    <spring.version>4.1.6.RELEASE</spring.version>
+    <drools.kie.version>6.3.0.Final-redhat-7</drools.kie.version>
+
+    <version.gpte.ops.project>1.0</version.gpte.ops.project>
+
+    <!-- cli.port>10115</cli.port -->
+    <!-- wildfly 9 / eap7 with port-offset of 125 -->
+    <cli.port>10124</cli.port>
+    <!-- EAP 6.4 with port-offset of 125 -->
+
+    <environment>test</environment>
+  </properties>
+  <modules>
+    <module>commons</module>
+    <module>course_completion_process</module>
+    <module>accreditation_process</module>
+    <module>student_registration_process</module>
+    <module>gpte_universal_process</module>
+  </modules>
+  <dependencyManagement>
+    <dependencies>
+
+      <!-- pom imports -->
+      <dependency>
+        <groupId>org.jboss.fuse.bom</groupId>
+        <artifactId>jboss-fuse-parent</artifactId>
+        <version>${jboss.fuse.bom.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-parent</artifactId>
+        <version>${camel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.camel</groupId>
+        <artifactId>wildfly-camel</artifactId>
+        <version>${wildfly.camel.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-bom</artifactId>
+        <version>${drools.kie.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-bom</artifactId>
+        <version>${drools.kie.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- GPTE integration libraries -->
+      <dependency>
+        <groupId>com.redhat.gpte.ops</groupId>
+        <artifactId>gpte-domain</artifactId>
+        <version>${version.gpte.ops.project}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.redhat.gpte.ops</groupId>
+        <artifactId>gpte-dao</artifactId>
+        <version>${version.gpte.ops.project}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.redhat.gpte.ops</groupId>
+        <artifactId>gpte-services</artifactId>
+        <version>${version.gpte.ops.project}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.redhat.gpte.ops</groupId>
+        <artifactId>gpte-util</artifactId>
+        <version>${version.gpte.ops.project}</version>
+      </dependency>
+
+
+      <dependency>
+        <groupId>javax.enterprise</groupId>
+        <artifactId>cdi-api</artifactId>
+        <version>1.0.0.SP4-redhat-6</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.spec.javax.ejb</groupId>
+        <artifactId>jboss-ejb-api_3.1_spec</artifactId>
+        <version>1.0.2.Final-redhat-3</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-bindy</artifactId>
+        <version>${camel.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-salesforce</artifactId>
+        <version>${camel.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>2.6</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!--Apache POI-->
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi-ooxml</artifactId>
+        <version>3.11</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.poi</groupId>
+        <artifactId>poi</artifactId>
+        <version>3.11</version>
+      </dependency>
+
+      <!-- REST web services -->
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.3.6</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20090211</version>
+        <scope>provided</scope>
+      </dependency>
+      <!-- Jakarta Commons Date Utils -->
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.3.2</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- CSV validation -->
+      <dependency>
+        <groupId>au.com.bytecode</groupId>
+        <artifactId>opencsv</artifactId>
+        <version>2.4</version>
+      </dependency>
+      <dependency>
+        <groupId>com.mashape.unirest</groupId>
+        <artifactId>unirest-java</artifactId>
+        <version>1.4.5</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+        <version>1.7.2.redhat-3</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>1.7.2.redhat-3</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.16-redhat-2</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.1.0.redhat-4</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!--Spring-->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-jdbc</artifactId>
+        <version>${spring.version}</version>
+
+        <!-- TO-DO:  https://github.com/redhat-gpe/OPEN_Admin/issues/123 -->
+        <scope>provided</scope>
+
+      </dependency>
+
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${spring.version}</version>
+        <scope>provided</scope>
+      </dependency>
+
+      <!-- https://github.com/jboss-integration/fuse-bxms-integ.git -->
+      <!-- http://maven.repository.redhat.com/techpreview/all/org/kie/kie-camel/6.2.0.Final-redhat-6/kie-camel-6.2.0.Final-redhat-6.pom -->
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-camel</artifactId>
+        <version>6.2.0.Final-redhat-6</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-jaxb</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-cxf</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-xstream</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-aop</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-api</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
+
+      <!-- test deps -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.11</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-email</artifactId>
+        <version>1.4</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-test-spring</artifactId>
+        <version>${camel.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-velocity</artifactId>
+        <version>${camel.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-mail</artifactId>
+        <version>${camel.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-sql</artifactId>
+        <version>${camel.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>mysql</groupId>
+        <artifactId>mysql-connector-java</artifactId>
+        <version>5.1.31</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jooq</groupId>
+        <artifactId>jooq</artifactId>
+        <version>3.7.2</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.commons-dbcp</artifactId>
+        <version>1.4_3</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>properties-maven-plugin</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <quiet>false</quiet>
+            <files>
+              <!-- 
+                This plugin is always used by child maven projects.
+                Subsequently, relative path from child maven project to central properties files will always be: ../properties/${environment}.properties
+              -->
+              <file>../properties/${environment}.properties</file>
+            </files>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.19</version>
+          <configuration>
+            <!--argLine>-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y</argLine -->
+            <systemPropertyVariables>
+              <!--
+                Tests always executed by child maven projects
+                Subsequently, relative path from child maven project to central properties files will always be: ../properties/${environment}.properties
+              -->
+              <props_file_location>../properties/test.properties</props_file_location>
+            </systemPropertyVariables>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.camel.maven</groupId>
+          <artifactId>camel-salesforce-maven-plugin</artifactId>
+          <!-- version must be changed to a supported one when troubleshoot why this is getting errors -->
+          <!--version>2.16.2</version -->
+          <version>${camel.version}</version>
+
+          <configuration>
+            <outputDirectory>${project.build.sourceDirectory}</outputDirectory>
+            <packageName>${salesforce_model_package}</packageName>
+            <clientId>${salesforce_clientid}</clientId>
+            <clientSecret>${salesforce_clientsecret}</clientSecret>
+            <userName>${salesforce_username}</userName>
+            <password>${salesforce_password}</password>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.4</version>
+          <configuration>
+            <failOnMissingWebXml>false</failOnMissingWebXml>
+          </configuration>
+        </plugin>
+        <plugin>
+                <!-- Specify the maven code generator plugin -->
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+                <version>3.7.2</version>
+
+
+                <dependencies>
+                    <dependency>
+                        <groupId>mysql</groupId>
+                        <artifactId>mysql-connector-java</artifactId>
+                        <version>5.1.31</version>
+                    </dependency>
+                </dependencies>
+
+                <!-- Specify the plugin configuration.
+                     The configuration format is the same as for the standalone code generator -->
+                <configuration>
+
+                    <!-- JDBC connection parameters -->
+                    <jdbc>
+                        <driver>com.mysql.jdbc.Driver</driver>
+                        <url>jdbc:mysql://localhost/mysql</url>
+                        <user>root</user>
+                        <password>${mysql_root_password}</password>
+                    </jdbc>
+
+                    <generator>
+                        <name>org.jooq.util.JavaGenerator</name>
+                        <strategy>
+                            <name>org.jooq.util.DefaultGeneratorStrategy</name>
+                        </strategy>
+                        
+
+                        <!-- Generator parameters: http://www.jooq.org/doc/3.7/manual/code-generation/codegen-advanced/#N35720 -->
+                        <generate>
+                            <relations>false</relations>
+                            <deprecated>false</deprecated>
+                            <generatedAnnotation>false</generatedAnnotation>
+                            <records>false</records>
+                            <pojos>true</pojos>
+                            <interfaces>false</interfaces>
+                            <jpaAnnotations>false</jpaAnnotations>
+                            <validationAnnotations>false</validationAnnotations>
+                            <springAnnotations>false</springAnnotations>
+                            <globalObjectReferences>false</globalObjectReferences>
+                            <fluentSetters>false</fluentSetters>
+                        </generate>
+
+                        <database>
+                            <name>org.jooq.util.mysql.MySQLDatabase</name>
+                            <includes>.*</includes>
+                            <excludes></excludes>
+                            <inputSchema>lms_transactional</inputSchema>
+                        </database>
+                        <target>
+                            <packageName>com.redhat.gpe.domain.canonical</packageName>
+                            <directory>target/jooq-generated</directory>
+                        </target>
+                    </generator>
+
+                </configuration>
+            </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  <repositories>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </repository>
+    <repository>
+      <id>redhat-techpreview-all-repository</id>
+      <name>Red Hat Tech Preview repository (all)</name>
+      <url>http://maven.repository.redhat.com/techpreview/all/</url>
+    </repository>
+    <repository>
+      <id>jboss-public-repository</id>
+      <name>JBoss Public Maven Repository</name>
+      <url>http://repository.jboss.org/nexus/content/repositories/public/</url>
+    </repository>
+    <repository>
+      <id>jboss-fuse-ea</id>
+      <url>http://repository.jboss.org/nexus/content/groups/ea</url>
+    </repository>
+    <repository>
+      <id>jboss-releases</id>
+      <name>JBoss.org Fuse Releases</name>
+      <url>http://repository.jboss.org/nexus/content/repositories/fs-releases/</url>
+    </repository>
+    <repository>
+      <id>fusesource-public-repository</id>
+      <name>FuseSource Release Repository</name>
+      <url>http://repository.jboss.org/nexus/content/repositories/fs-public/</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>redhat-techpreview-all-repository</id>
+      <name>Red Hat Tech Preview repository (all)</name>
+      <url>http://maven.repository.redhat.com/techpreview/all/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>jboss-public-repository</id>
+      <name>JBoss Public Maven Repository</name>
+      <url>http://repository.jboss.org/nexus/content/repositories/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+</project>

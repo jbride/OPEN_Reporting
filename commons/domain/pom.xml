@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <!-- Instructions:
+            The following are manual commands that should be executed from this "commons" directory :
+
+         mvn jooq-codegen:generate -Dmysql_root_password=<root_db_password>                                                             :   generate "canonical" domain model source code from database tables
+         find target/jooq-generated -name '*.java' | xargs perl -pi -e 's/\.tables\.pojos//'                                            :   fix package names of generated classes
+         cp target/jooq-generated/com/redhat/gpe/domain/canonical/tables/pojos/*.java \
+            src/main/java/com/redhat/gpe/domain/canonical/                                                                              :   copy generated domain source to version controlled directory
+
+         mvn properties:read-project-properties camel-salesforce:generate                                                               :   generate entities for salesforce
+   -->
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.redhat.gpte.ops</groupId>
+        <artifactId>commons</artifactId>
+        <version>1.0</version>
+    </parent>
+    <artifactId>gpte-domain</artifactId>
+    <packaging>jar</packaging>
+    <name>GPTE Operations Commons: domain</name>
+    <url>http://www.redhat.com</url>
+    <properties>
+        <version.jboss.maven.plugin>7.7.Final</version.jboss.maven.plugin>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-salesforce</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+        </dependency>
+        <!-- test deps -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+    </dependencies>
+    <build>
+
+        <!-- Determines name of built artifact in target directory of project
+             Does not dictate name of artifact pushed to maven repo as part of "install" phase -->
+        <!--finalName>gpte-commons-domain-${version}</finalName -->
+
+        <plugins>
+            <!-- Generates the client classes to integrate with Salesforce -->
+            <plugin>
+                <groupId>org.apache.camel.maven</groupId>
+                <artifactId>camel-salesforce-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jooq</groupId>
+                <artifactId>jooq-codegen-maven</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>

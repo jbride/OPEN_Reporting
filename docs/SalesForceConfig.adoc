@@ -1,0 +1,40 @@
+== Configuring your account in SalesForce
+
+
+After creation of you Salesforce developer account, we need to create a connected app, to do so, follow the steps:
+
+. Click Build -> Create -> Apps -> Connected Apps panel -> New
+. The Enable OAuth Settings checkbox should be selected.
+. Select Full Access as permission.
+. Callback url can be https://localhost:8443/rest/callback
+. When you click Save, the Consumer Key is created and displayed, and a Consumer Secret is created (click the link to reveal it).
+. Copy both these values and save it in `dev.properties`.
+. Go to Administer -> Manage Apps -> Connected Apps
+. Select your app
+. Click Edit
+. Change values in OAuth Policies as:
+.. The Permitted Users should be set to All users may self authorize.
+.. The IP Relaxation should be set to Relax IP restrictions.
+
+== Adding a custom field in Contact entity in Salesforce
+
+A field called IPA in the Contact must be added to control the flow of students that are in the IPA server and Salesforce.
+
+. To add the field called IPA follow the instructions https://help.salesforce.com/apex/HTViewHelpDoc?id=adding_fields.htm&language=en[here].
+
+== Executing
+
+Before execute the SalesForceTest class, the client must be created, so execute:
+
+-----
+mvn -Denvironment=test properties:read-project-properties camel-salesforce:generate -DskipTests
+-----
+
+Client classes will be generated in the project build source directory (refer to the attribute `<outputDirectory>` in `pom.xml`)
+The classes generated under salesforce package are not committed to repository because in a case of field changes in Salesforce, the client is always up-to-date.
+
+To run tests execute:
+
+-----
+mvn -Denvironment=test properties:read-project-properties test
+-----
