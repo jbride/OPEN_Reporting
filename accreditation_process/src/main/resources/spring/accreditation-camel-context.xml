@@ -62,6 +62,8 @@
       </kie:kbase>
   </kie:kmodule>
 
+  <bean id="reportOnCoursesAggregatorStrategy" class="com.redhat.gpe.accreditation.service.ReportOnCoursesResultsAggregator" />
+
   <camelContext trace="false" id="accreditation-process" xmlns="http://camel.apache.org/schema/spring">
     <dataFormats>
         <bindy type="Csv" classType="com.redhat.gpe.accreditation.util.SpreadsheetRule" id="bindyRules"/>
@@ -281,6 +283,36 @@
     </route>
     <!--    *************************************************************************************************   -->
 
+
+
+
+    <!--    *************************************************************************************************   -->
+    <!--    *************                     Canonical Courses Report                          *************   -->
+
+    <route id="report-on-courses">
+        <description>
+            Provide a report of accreditation logic rules associated with Canonical Courses.
+            Should highlight orphan courses (those courses where no accreditation rule references the course) 
+        </description>
+        <from uri="{{accred_report_on_courses_uri}}" />
+        <unmarshal ref="bindyRules"/>
+        <log message="SpreadsheetRule:  ${header.CamelFileName}" loggingLevel="INFO"/>
+        <to uri="direct:report-on-courses-aggregate"/>
+    </route>
+
+    <route id="report-on-courses-aggregate">
+        <from uri="direct:report-on-courses-aggregate"/>
+        <aggregate strategyRef="reportOnCoursesAggregatorStrategy" completionTimeout="3000" >
+            <correlationExpression>
+                <simple>true</simple>
+            </correlationExpression>
+            <log message="Report On Courses Aggregate:  Done" loggingLevel="INFO"/>
+            <to uri="bean:accreditationProcessBean?method=reportOnCanonicalCourses"/>
+            <to uri="seda:send-email"/>
+        </aggregate>
+    </route>
+
+    <!--    *************************************************************************************************   -->
 
 
 

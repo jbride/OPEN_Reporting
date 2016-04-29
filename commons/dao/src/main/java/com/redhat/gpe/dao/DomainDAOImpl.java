@@ -71,6 +71,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return companyId;
     }
     
+   
     /* ****************************************************************************** */
     
 
@@ -91,7 +92,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     public List<DenormalizedStudent> selectStudentsByIpaStatus(int status) {
         StringBuilder sql = new StringBuilder("SELECT ");
-        sql.append(Student.WHERE_CLAUSE+", "+Company.WHERE_CLAUSE);
+        sql.append(Student.FROM_CLAUSE+", "+Company.FROM_CLAUSE);
         sql.append("FROM Students s, Companies c ");
         sql.append("WHERE s.ipaStatus="+status);
         sql.append(" AND s.CompanyId = c.CompanyID");
@@ -210,6 +211,15 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return courseObj;
         
     }
+    
+    public List<Course> listCanonicalCourses() {
+    	StringBuilder sBuilder = new StringBuilder("select ");
+    	sBuilder.append(Course.FROM_CLAUSE);
+    	sBuilder.append(" from Courses c");
+		List<Course> courses = sbJdbcTemplate.query(sBuilder.toString(), new CourseRowMapper());
+		return courses;
+	}
+    
 /* ******************************************************************************* */
     
     
@@ -262,7 +272,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         StringBuilder sBuilder = new StringBuilder();
         
         // StudentCourse has both CourseID and CourseName
-        sBuilder.append("SELECT "+StudentCourse.WHERE_CLAUSE+", "+Course.WHERE_CLAUSE+", "+Student.WHERE_CLAUSE+", "+Language.WHERE_CLAUSE+" ");
+        sBuilder.append("SELECT "+StudentCourse.FROM_CLAUSE+", "+Course.FROM_CLAUSE+", "+Student.FROM_CLAUSE+", "+Language.FROM_CLAUSE+" ");
         
         sBuilder.append("FROM StudentCourses sc, Courses c, Students s, Languages l ");
         sBuilder.append("WHERE sc.CourseID = c.CourseId ");
@@ -314,7 +324,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     public List<Accreditation> selectUnprocessedStudentAccreditationsByProcessStatus(int processedStatus) {
         StringBuilder sBuilder = new StringBuilder();
-        sBuilder.append("SELECT "+Student.WHERE_CLAUSE+","+AccreditationDefinition.WHERE_CLAUSE+","+StudentAccreditation.WHERE_CLAUSE+","+Course.WHERE_CLAUSE+" "); 
+        sBuilder.append("SELECT "+Student.FROM_CLAUSE+","+AccreditationDefinition.WHERE_CLAUSE+","+StudentAccreditation.WHERE_CLAUSE+","+Course.FROM_CLAUSE+" "); 
         sBuilder.append("FROM Students s, AccreditationDefinitions a, StudentAccreditations sa, Courses c ");
         sBuilder.append("WHERE sa.StudentID = s.StudentID ");
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
@@ -348,6 +358,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         logger.info("triggerStoredProcedure simpleJdbcCall = "+this.simpleJdbcCall+" : storedProcCall = "+storedProcCall);
         sbJdbcTemplate.update(storedProcCall);
     }
+
+	
     
 /*****************************************************/
     

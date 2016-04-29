@@ -36,7 +36,7 @@ public class Student implements Serializable {
     public static final String ACTIVATION_DATE = "ActivationDate";
     public static final String DEACTIVATION_DATE = "DeActivationDate";
 
-    public static final String WHERE_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate";
+    public static final String FROM_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate";
 
     public static final int SKILLSBASE_PERSON_UNVERIFIED = 0;
     public static final int SKILLSBASE_PERSON_NOTIFIED_NO_ACCOUNT=1;

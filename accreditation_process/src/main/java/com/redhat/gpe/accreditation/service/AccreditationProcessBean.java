@@ -4,11 +4,13 @@ import com.redhat.gpe.accreditation.util.Constants;
 import com.redhat.gpe.accreditation.util.SpreadsheetRule;
 import com.redhat.gpe.accreditation.util.WebClientDevWrapper;
 import com.redhat.gpe.domain.canonical.AccreditationDefinition;
+import com.redhat.gpe.domain.canonical.Course;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentAccreditation;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
+
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -28,7 +30,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -332,6 +336,31 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         // 4 throw exception if validation errors exist
         if(problemNumber > 0)
                exchange.setException(new AttachmentValidationException("\nTotal # of Spreadsheet Validation errors: "+problemNumber+"\n"+eBuilder.toString()));
+    }
+    
+    public void reportOnCanonicalCourses(Exchange exchange) {
+    	
+    	StringBuilder sBuilder = new StringBuilder();
+    	Map<String, List<SpreadsheetRule>> reportMap = new HashMap<String, List<SpreadsheetRule>>();
+    	
+    	// 1) Get list of spreadsheet rules from exchange
+    	List<SpreadsheetRule> rules = (List<SpreadsheetRule>) exchange.getIn().getBody();
+    	if(rules == null || rules.size() ==0) {
+    		logger.error("reportOnCanonicalCourses() # of rules is zero");
+    		return;
+    	}
+    	sBuilder.append("\n# of rules: "+rules.size());
+    	
+    	// 2) Get list of canonical courses
+    	List<Course> courseList = canonicalDAO.listCanonicalCourses();
+    	for(Course courseObj : courseList){
+    		reportMap.put(courseObj.getCoursename(), new ArrayList<SpreadsheetRule>());
+    	}
+    	sBuilder.append("\n# of Canonical Courses: "+reportMap.size());
+    	
+    	logger.info(sBuilder.toString());
+    	
+    	exchange.getIn().setBody(sBuilder.toString());
     }
     
     private Integer checkDate(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String dString){

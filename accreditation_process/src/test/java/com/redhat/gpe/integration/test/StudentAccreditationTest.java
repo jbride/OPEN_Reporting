@@ -46,7 +46,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     public void init() {}
 
 
-    //@Ignore
+    @Ignore
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 

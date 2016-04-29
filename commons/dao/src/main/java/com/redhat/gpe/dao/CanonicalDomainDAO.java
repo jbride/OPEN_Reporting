@@ -30,6 +30,7 @@ public interface CanonicalDomainDAO {
     
     /********  Course  ********/
     public Course getCourseByCourseName(String courseName, String sourceName);
+    public List<Course> listCanonicalCourses();
     
     
     /* *******  Student Courses  ********/

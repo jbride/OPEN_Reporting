@@ -18,7 +18,7 @@ public class Language implements Serializable {
     public static final String LANGUAGE_ID = "languageid";
     public static final String LANGUAGE_NAME = "languagename";
 
-    public static final String WHERE_CLAUSE = "l.languageid,l.languagename";
+    public static final String FROM_CLAUSE = "l.languageid,l.languagename";
 
     private String languageid;
     private String languagename;

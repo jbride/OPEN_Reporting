@@ -20,7 +20,7 @@ public class Company implements Serializable {
     public static final String COMPANY_NAME = "companyname";
     public static final String PARTNER_TYPE = "partnertype";
     public static final String PARTNER_TIER = "partnertier";
-    public static final String WHERE_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier ";
+    public static final String FROM_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier ";
 
     private Integer companyid = 0;
     private String  accountid;
