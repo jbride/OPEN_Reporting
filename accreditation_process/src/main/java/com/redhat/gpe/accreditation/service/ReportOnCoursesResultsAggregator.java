@@ -20,7 +20,16 @@ public class ReportOnCoursesResultsAggregator implements Service, TimeoutAwareAg
     
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
         
+    	// 1)  generate ruleName based on spreadsheet row number
+    	int rNumber = 4;  // there are 3 rows of headers
     	List<SpreadsheetRule> latestRules = (List<SpreadsheetRule>)newExchange.getIn().getBody();
+    	for(SpreadsheetRule sRule : latestRules) {
+    		sRule.generateRuleName(rNumber);
+    		rNumber++;
+    	}
+    	
+    	
+    	// 2) merge new spreadsheet rules into list of old spreadsheet rules
         if( oldExchange == null ) {
             oldExchange = new DefaultExchange(newExchange);
             oldExchange.getIn().setBody(latestRules);
@@ -29,6 +38,7 @@ public class ReportOnCoursesResultsAggregator implements Service, TimeoutAwareAg
         	oldRules.addAll(latestRules);
         }
         List<SpreadsheetRule> oldRules = (List<SpreadsheetRule>) oldExchange.getIn().getBody();
+        
         logger.info("aggregate() latest file = "+newExchange.getIn().getHeader(HEADER_CAMEL_FILENAME)+" : # of aggregated rules = "+oldRules.size());
         return oldExchange;
     }

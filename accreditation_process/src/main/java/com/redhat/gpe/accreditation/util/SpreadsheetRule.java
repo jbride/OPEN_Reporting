@@ -56,6 +56,7 @@ public class SpreadsheetRule implements java.io.Serializable {
     private String notes;
     
     private String ruleName;
+    private int spreadsheetRowNumber;
     
 
 	public SpreadsheetRule() {
@@ -70,7 +71,7 @@ public class SpreadsheetRule implements java.io.Serializable {
 	}
 	
 	/* Generate a unique rule name.
-	 *   The accreditaiton name is not unique in a spreadsheet
+	 *   The accreditation name is not unique in a spreadsheet
 	 */
 	public void generateRuleName(int rowNumber) {
 		ruleName = rowNumber+"_"+accredName;
@@ -171,6 +172,14 @@ public class SpreadsheetRule implements java.io.Serializable {
                 + ", course5=" + course5 + ", course6=" + course6
                 + ", course7=" + course7 + ", accredName=" + accredName + "]";
     }
+
+	public int getSpreadsheetRowNumber() {
+		return spreadsheetRowNumber;
+	}
+
+	public void setSpreadsheetRowNumber(int spreadsheetRowNumber) {
+		this.spreadsheetRowNumber = spreadsheetRowNumber;
+	}
     
 }
 

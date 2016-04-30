@@ -349,7 +349,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         
         StringBuilder sBuilder = new StringBuilder();
         Map<String, List<String>> reportMap = new HashMap<String, List<String>>();  //key=courseName, value=List of associated rule names
-        Map<String, List<String>> issueMap = new HashMap<String, List<String>>();  //key=accredName, value=List of unknown courses
+        Map<String, List<String>> issueMap = new HashMap<String, List<String>>();  //key=ruleName, value=List of unknown courses
         
         // 1) Get list of spreadsheet rules from exchange
         List<SpreadsheetRule> rules = (List<SpreadsheetRule>) exchange.getIn().getBody();
@@ -397,7 +397,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
         
         // 6)  Print Issues
-        sBuilder.append("\n\nIssues:  Accreditation name / unknown course");
+        sBuilder.append("\n\nIssues:  rule name / unknown course");
         for(Map.Entry<String, List<String>> eResult : issueMap.entrySet()) {
             for(String course : eResult.getValue())
                 sBuilder.append("\n\t"+eResult.getKey()+"\t\t\t\t : \""+course+"\"");
@@ -435,12 +435,12 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private void ruleHelper(Map<String, List<String>> reportMap, String course, SpreadsheetRule rule, Map<String, List<String>> issueMap){
         List<String> rules = reportMap.get(course);
         if(rules != null)
-            rules.add(rule.getAccredName());
+            rules.add(rule.getRuleName());
         else{
             if(! issueMap.containsKey(rule.getRuleName())){
-                issueMap.put(rule.getAccredName(), new ArrayList<String>());
+                issueMap.put(rule.getRuleName(), new ArrayList<String>());
             }
-            issueMap.get(rule.getAccredName()).add(course);
+            issueMap.get(rule.getRuleName()).add(course);
         }
     }
     
