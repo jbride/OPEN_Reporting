@@ -371,7 +371,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     		associateRulesToCourses(reportMap, rule, issueMap);
     	}
     	
-    	// 4)  Sort
+    	// 4)  Sort	:  http://www.mkyong.com/java/how-to-sort-a-map-in-java/
     	Map<String, Integer> unsortMap = new HashMap<String, Integer>();
     	for(Map.Entry<String, List<String>> eResult : reportMap.entrySet()) {
     		unsortMap.put(eResult.getKey(), eResult.getValue().size());
