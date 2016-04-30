@@ -317,9 +317,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         Set<String> accredSet = new HashSet<String>();
         
         for(SpreadsheetRule sRule : sRules) {
-        	
-        	// 0) set generated RuleName
-        	sRule.generateRuleName(rNumber);
+            
+            // 0) set generated RuleName
+            sRule.generateRuleName(rNumber);
             
             // 1)  Validate dates
             problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getBeginDate());
@@ -346,102 +346,102 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
     
     public void reportOnCanonicalCourses(Exchange exchange) {
-    	
-    	StringBuilder sBuilder = new StringBuilder();
-    	Map<String, List<String>> reportMap = new HashMap<String, List<String>>();  //key=courseName, value=List of associated rule names
-    	Map<String, List<String>> issueMap = new HashMap<String, List<String>>();  //key=accredName, value=List of unknown courses
-    	
-    	// 1) Get list of spreadsheet rules from exchange
-    	List<SpreadsheetRule> rules = (List<SpreadsheetRule>) exchange.getIn().getBody();
-    	if(rules == null || rules.size() ==0) {
-    		logger.error("reportOnCanonicalCourses() # of rules is zero");
-    		return;
-    	}
-    	sBuilder.append("\n# of rules: "+rules.size());
-    	
-    	// 2) Get list of canonical courses
-    	List<Course> courseList = canonicalDAO.listCanonicalCourses();
-    	for(Course courseObj : courseList){
-    		reportMap.put(courseObj.getCoursename(), new ArrayList<String>());
-    	}
-    	sBuilder.append("\n# of Canonical Courses: "+reportMap.size());
-    	
-    	// 3) Associate rules to courses
-    	for(SpreadsheetRule rule: rules) {
-    		associateRulesToCourses(reportMap, rule, issueMap);
-    	}
-    	
-    	// 4)  Sort	:  http://www.mkyong.com/java/how-to-sort-a-map-in-java/
-    	Map<String, Integer> unsortMap = new HashMap<String, Integer>();
-    	for(Map.Entry<String, List<String>> eResult : reportMap.entrySet()) {
-    		unsortMap.put(eResult.getKey(), eResult.getValue().size());
-    	}
-    	List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
-    	Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
-			public int compare(Map.Entry<String, Integer> o1,
+        
+        StringBuilder sBuilder = new StringBuilder();
+        Map<String, List<String>> reportMap = new HashMap<String, List<String>>();  //key=courseName, value=List of associated rule names
+        Map<String, List<String>> issueMap = new HashMap<String, List<String>>();  //key=accredName, value=List of unknown courses
+        
+        // 1) Get list of spreadsheet rules from exchange
+        List<SpreadsheetRule> rules = (List<SpreadsheetRule>) exchange.getIn().getBody();
+        if(rules == null || rules.size() ==0) {
+            logger.error("reportOnCanonicalCourses() # of rules is zero");
+            return;
+        }
+        sBuilder.append("\n# of rules: "+rules.size());
+        
+        // 2) Get list of canonical courses
+        List<Course> courseList = canonicalDAO.listCanonicalCourses();
+        for(Course courseObj : courseList){
+            reportMap.put(courseObj.getCoursename(), new ArrayList<String>());
+        }
+        sBuilder.append("\n# of Canonical Courses: "+reportMap.size());
+        
+        // 3) Associate rules to courses
+        for(SpreadsheetRule rule: rules) {
+            associateRulesToCourses(reportMap, rule, issueMap);
+        }
+        
+        // 4)  Sort    :  http://www.mkyong.com/java/how-to-sort-a-map-in-java/
+        Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+        for(Map.Entry<String, List<String>> eResult : reportMap.entrySet()) {
+            unsortMap.put(eResult.getKey(), eResult.getValue().size());
+        }
+        List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+        Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+            public int compare(Map.Entry<String, Integer> o1,
                                            Map.Entry<String, Integer> o2) {
-				return (o1.getValue()).compareTo(o2.getValue());
-			}
-		});
-    	Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
-		for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
-			Map.Entry<String, Integer> entry = it.next();
-			sortedMap.put(entry.getKey(), entry.getValue());
-		}
-    	
+                return (o1.getValue()).compareTo(o2.getValue());
+            }
+        });
+        Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+        for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
+            Map.Entry<String, Integer> entry = it.next();
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        
 
-    	// 5)  Print Course association results
-    	sBuilder.append("\n\nResults:  Course / # of rules referencing this course\n");
-    	for(Map.Entry<String, Integer> eResult : sortedMap.entrySet()) {
-    		sBuilder.append("\n\t"+eResult.getKey()+"\t\t : "+eResult.getValue());
-    	}
-    	
-    	// 6)  Print Issues
-    	sBuilder.append("\n\nIssues:  Accreditation name / unknown course");
-    	for(Map.Entry<String, List<String>> eResult : issueMap.entrySet()) {
-    		for(String course : eResult.getValue())
-    		    sBuilder.append("\n\t"+eResult.getKey()+"\t\t\t\t : "+course);
-    	}
-    	
-    	logger.info(sBuilder.toString());
-    	
-    	exchange.getIn().setBody(sBuilder.toString());
+        // 5)  Print Course association results
+        sBuilder.append("\n\nResults:  Course / # of rules referencing this course\n");
+        for(Map.Entry<String, Integer> eResult : sortedMap.entrySet()) {
+            sBuilder.append("\n\t"+eResult.getKey()+"\t\t : "+eResult.getValue());
+        }
+        
+        // 6)  Print Issues
+        sBuilder.append("\n\nIssues:  Accreditation name / unknown course");
+        for(Map.Entry<String, List<String>> eResult : issueMap.entrySet()) {
+            for(String course : eResult.getValue())
+                sBuilder.append("\n\t"+eResult.getKey()+"\t\t\t\t : \""+course+"\"");
+        }
+        
+        logger.info(sBuilder.toString());
+        
+        exchange.getIn().setBody(sBuilder.toString());
     }
     
     private void associateRulesToCourses(Map<String, List<String>> reportMap, SpreadsheetRule rule, Map<String, List<String>> issueMap) {
 
-    	if(StringUtils.isNotEmpty(rule.getCourse1())){
-    		ruleHelper(reportMap, rule.getCourse1(), rule, issueMap);
-    		if(StringUtils.isNotEmpty(rule.getCourse2())){
-    			ruleHelper(reportMap, rule.getCourse2(), rule, issueMap);
-    			if(StringUtils.isNotEmpty(rule.getCourse3())){
-    				ruleHelper(reportMap, rule.getCourse3(), rule, issueMap);
-    				if(StringUtils.isNotEmpty(rule.getCourse4())){
-    					ruleHelper(reportMap, rule.getCourse4(), rule, issueMap);
-    					if(StringUtils.isNotEmpty(rule.getCourse5())){
-    						ruleHelper(reportMap, rule.getCourse5(), rule, issueMap);
-    						if(StringUtils.isNotEmpty(rule.getCourse6())){
-    							ruleHelper(reportMap, rule.getCourse6(), rule, issueMap);
-    							if(StringUtils.isNotEmpty(rule.getCourse7())){
-    								ruleHelper(reportMap, rule.getCourse7(), rule, issueMap);
-    							}
-    						}
-    					}
-    				}
-    			}
-    		}
-    	}
+        if(StringUtils.isNotEmpty(rule.getCourse1())){
+            ruleHelper(reportMap, rule.getCourse1(), rule, issueMap);
+            if(StringUtils.isNotEmpty(rule.getCourse2())){
+                ruleHelper(reportMap, rule.getCourse2(), rule, issueMap);
+                if(StringUtils.isNotEmpty(rule.getCourse3())){
+                    ruleHelper(reportMap, rule.getCourse3(), rule, issueMap);
+                    if(StringUtils.isNotEmpty(rule.getCourse4())){
+                        ruleHelper(reportMap, rule.getCourse4(), rule, issueMap);
+                        if(StringUtils.isNotEmpty(rule.getCourse5())){
+                            ruleHelper(reportMap, rule.getCourse5(), rule, issueMap);
+                            if(StringUtils.isNotEmpty(rule.getCourse6())){
+                                ruleHelper(reportMap, rule.getCourse6(), rule, issueMap);
+                                if(StringUtils.isNotEmpty(rule.getCourse7())){
+                                    ruleHelper(reportMap, rule.getCourse7(), rule, issueMap);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     private void ruleHelper(Map<String, List<String>> reportMap, String course, SpreadsheetRule rule, Map<String, List<String>> issueMap){
-    	List<String> rules = reportMap.get(course);
-    	if(rules != null)
-    		rules.add(rule.getAccredName());
-    	else{
-    	    if(! issueMap.containsKey(rule.getRuleName())){
-    	    	issueMap.put(rule.getAccredName(), new ArrayList<String>());
-    	    }
-    	    issueMap.get(rule.getAccredName()).add(course);
-    	}
+        List<String> rules = reportMap.get(course);
+        if(rules != null)
+            rules.add(rule.getAccredName());
+        else{
+            if(! issueMap.containsKey(rule.getRuleName())){
+                issueMap.put(rule.getAccredName(), new ArrayList<String>());
+            }
+            issueMap.get(rule.getAccredName()).add(course);
+        }
     }
     
     private Integer checkDate(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String dString){
