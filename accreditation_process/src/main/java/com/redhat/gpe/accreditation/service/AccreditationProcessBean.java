@@ -33,7 +33,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -369,14 +372,28 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     	}
     	
     	// 4)  Sort
-    	//List<Map.Entry<String, List<String>>> list = new LinkedList<Map.Entry<String, List<String>>>(reportMap.entrySet());
-    	//Collections.sort(list, new ListSizeComparator());
+    	Map<String, Integer> unsortMap = new HashMap<String, Integer>();
+    	for(Map.Entry<String, List<String>> eResult : reportMap.entrySet()) {
+    		unsortMap.put(eResult.getKey(), eResult.getValue().size());
+    	}
+    	List<Map.Entry<String, Integer>> list = new LinkedList<Map.Entry<String, Integer>>(unsortMap.entrySet());
+    	Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+			public int compare(Map.Entry<String, Integer> o1,
+                                           Map.Entry<String, Integer> o2) {
+				return (o1.getValue()).compareTo(o2.getValue());
+			}
+		});
+    	Map<String, Integer> sortedMap = new LinkedHashMap<String, Integer>();
+		for (Iterator<Map.Entry<String, Integer>> it = list.iterator(); it.hasNext();) {
+			Map.Entry<String, Integer> entry = it.next();
+			sortedMap.put(entry.getKey(), entry.getValue());
+		}
     	
 
     	// 5)  Print Course association results
     	sBuilder.append("\n\nResults:  Course / # of rules referencing this course\n");
-    	for(Map.Entry<String, List<String>> eResult : reportMap.entrySet()) {
-    		sBuilder.append("\n\t"+eResult.getKey()+"\t\t : "+eResult.getValue().size());
+    	for(Map.Entry<String, Integer> eResult : sortedMap.entrySet()) {
+    		sBuilder.append("\n\t"+eResult.getKey()+"\t\t : "+eResult.getValue());
     	}
     	
     	// 6)  Print Issues
