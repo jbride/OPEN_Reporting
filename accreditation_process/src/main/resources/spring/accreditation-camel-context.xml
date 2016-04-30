@@ -295,6 +295,8 @@
             Should highlight orphan courses (those courses where no accreditation rule references the course) 
         </description>
         <from uri="{{accred_report_on_courses_uri}}" />
+        <setHeader headerName="NUMBER_OF_LINES_TO_SKIP"><constant>3</constant></setHeader>
+        <to uri="bean:accreditationProcessBean?method=removeHeaderLinesFromSpreadsheet"/>
         <unmarshal ref="bindyRules"/>
         <log message="SpreadsheetRule:  ${header.CamelFileName}" loggingLevel="INFO"/>
         <to uri="direct:report-on-courses-aggregate"/>

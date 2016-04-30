@@ -1,6 +1,7 @@
 package com.redhat.gpe.accreditation.service;
 
 import com.redhat.gpe.accreditation.util.Constants;
+import com.redhat.gpe.accreditation.util.ListSizeComparator;
 import com.redhat.gpe.accreditation.util.SpreadsheetRule;
 import com.redhat.gpe.accreditation.util.WebClientDevWrapper;
 import com.redhat.gpe.domain.canonical.AccreditationDefinition;
@@ -10,6 +11,7 @@ import com.redhat.gpe.domain.canonical.StudentAccreditation;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
+import com.sun.xml.bind.v2.util.QNameMap.Entry;
 
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
@@ -30,7 +32,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -341,7 +345,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     public void reportOnCanonicalCourses(Exchange exchange) {
     	
     	StringBuilder sBuilder = new StringBuilder();
-    	Map<String, List<SpreadsheetRule>> reportMap = new HashMap<String, List<SpreadsheetRule>>();
+    	Map<String, List<String>> reportMap = new HashMap<String, List<String>>();  //key=courseName, value=List of associated rule names
+    	Map<String, List<String>> issueMap = new HashMap<String, List<String>>();  //key=accredName, value=List of unknown courses
     	
     	// 1) Get list of spreadsheet rules from exchange
     	List<SpreadsheetRule> rules = (List<SpreadsheetRule>) exchange.getIn().getBody();
@@ -354,13 +359,72 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     	// 2) Get list of canonical courses
     	List<Course> courseList = canonicalDAO.listCanonicalCourses();
     	for(Course courseObj : courseList){
-    		reportMap.put(courseObj.getCoursename(), new ArrayList<SpreadsheetRule>());
+    		reportMap.put(courseObj.getCoursename(), new ArrayList<String>());
     	}
     	sBuilder.append("\n# of Canonical Courses: "+reportMap.size());
+    	
+    	// 3) Associate rules to courses
+    	for(SpreadsheetRule rule: rules) {
+    		associateRulesToCourses(reportMap, rule, issueMap);
+    	}
+    	
+    	// 4)  Sort
+    	//List<Map.Entry<String, List<String>>> list = new LinkedList<Map.Entry<String, List<String>>>(reportMap.entrySet());
+    	//Collections.sort(list, new ListSizeComparator());
+    	
+
+    	// 5)  Print Course association results
+    	sBuilder.append("\n\nResults:  Course / # of rules referencing this course\n");
+    	for(Map.Entry<String, List<String>> eResult : reportMap.entrySet()) {
+    		sBuilder.append("\n\t"+eResult.getKey()+"\t\t : "+eResult.getValue().size());
+    	}
+    	
+    	// 6)  Print Issues
+    	sBuilder.append("\n\nIssues:  Accreditation name / unknown course");
+    	for(Map.Entry<String, List<String>> eResult : issueMap.entrySet()) {
+    		for(String course : eResult.getValue())
+    		    sBuilder.append("\n\t"+eResult.getKey()+"\t\t\t\t : "+course);
+    	}
     	
     	logger.info(sBuilder.toString());
     	
     	exchange.getIn().setBody(sBuilder.toString());
+    }
+    
+    private void associateRulesToCourses(Map<String, List<String>> reportMap, SpreadsheetRule rule, Map<String, List<String>> issueMap) {
+
+    	if(StringUtils.isNotEmpty(rule.getCourse1())){
+    		ruleHelper(reportMap, rule.getCourse1(), rule, issueMap);
+    		if(StringUtils.isNotEmpty(rule.getCourse2())){
+    			ruleHelper(reportMap, rule.getCourse2(), rule, issueMap);
+    			if(StringUtils.isNotEmpty(rule.getCourse3())){
+    				ruleHelper(reportMap, rule.getCourse3(), rule, issueMap);
+    				if(StringUtils.isNotEmpty(rule.getCourse4())){
+    					ruleHelper(reportMap, rule.getCourse4(), rule, issueMap);
+    					if(StringUtils.isNotEmpty(rule.getCourse5())){
+    						ruleHelper(reportMap, rule.getCourse5(), rule, issueMap);
+    						if(StringUtils.isNotEmpty(rule.getCourse6())){
+    							ruleHelper(reportMap, rule.getCourse6(), rule, issueMap);
+    							if(StringUtils.isNotEmpty(rule.getCourse7())){
+    								ruleHelper(reportMap, rule.getCourse7(), rule, issueMap);
+    							}
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    }
+    private void ruleHelper(Map<String, List<String>> reportMap, String course, SpreadsheetRule rule, Map<String, List<String>> issueMap){
+    	List<String> rules = reportMap.get(course);
+    	if(rules != null)
+    		rules.add(rule.getAccredName());
+    	else{
+    	    if(! issueMap.containsKey(rule.getRuleName())){
+    	    	issueMap.put(rule.getAccredName(), new ArrayList<String>());
+    	    }
+    	    issueMap.get(rule.getAccredName()).add(course);
+    	}
     }
     
     private Integer checkDate(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String dString){
