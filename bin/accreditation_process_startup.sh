@@ -2,6 +2,7 @@
 
 # Usage
 #   ./bin/accreditation_process_startup.sh -env=dev -f          :   start accred process in the foreground using dev environment properties
+#   ./bin/accreditation_process_startup.sh -env=test -f -d      :   start accred process in the foreground using test environment properties and Java debugger enabled
 #   ./bin/accreditation_process_startup.sh -env=prod            :   start accred process in the background using prod environment properties
 
 for var in $@
@@ -9,6 +10,7 @@ do
     case "$var" in
         -u) UNDEPLOY=true ;;
         -f) FOREGROUND=true ;;
+        -d) DEBUG=true ;;
         -env=*) ENVIRONMENT=`echo $var | cut -f2 -d\=` ;;
     esac
 done
@@ -56,7 +58,10 @@ function buildAndStart() {
         exit 1;
     fi
 
-    # JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y"
+    if [ ! -z "$DEBUG" ]; then
+        JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,address=8787,server=y,suspend=y"
+    fi
+
     if [ ! -z "$FOREGROUND" ]; then
         java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap
     else
