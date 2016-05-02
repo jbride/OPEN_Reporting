@@ -34,7 +34,7 @@ public class ReportOnCoursesTest extends CamelSpringTestSupport {
     @Before
     public void init() {}
     
-    //@Ignore
+    @Ignore
     @Test
     public void testReportOnCoursesTest() throws InterruptedException, IOException {
         Endpoint endpoint = context.getEndpoint(REPORT_ON_COURSES_URI);

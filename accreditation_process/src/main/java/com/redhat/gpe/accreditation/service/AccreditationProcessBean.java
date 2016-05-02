@@ -350,6 +350,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         StringBuilder sBuilder = new StringBuilder();
         Map<String, List<String>> reportMap = new HashMap<String, List<String>>();  //key=courseName, value=List of associated rule names
         Map<String, List<String>> issueMap = new HashMap<String, List<String>>();  //key=ruleName, value=List of unknown courses
+        Map<String, List<String>> warningMap = new HashMap<String, List<String>>();  //key=ruleName, value=List of problemetic course
         
         // 1) Get list of spreadsheet rules from exchange
         List<SpreadsheetRule> rules = (List<SpreadsheetRule>) exchange.getIn().getBody();
@@ -368,7 +369,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         
         // 3) Associate rules to courses
         for(SpreadsheetRule rule: rules) {
-            associateRulesToCourses(reportMap, rule, issueMap);
+            associateRulesToCourses(reportMap, warningMap,  rule, issueMap);
         }
         
         // 4)  Sort    :  http://www.mkyong.com/java/how-to-sort-a-map-in-java/
@@ -403,27 +404,34 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
                 sBuilder.append("\n\t"+eResult.getKey()+"\t\t\t\t : \""+course+"\"");
         }
         
+        // 7)  Print Warnings
+        sBuilder.append("\n\nWarnings:  rule name / course with trailing white space");
+        for(Map.Entry<String, List<String>> eResult : warningMap.entrySet()) {
+            for(String course : eResult.getValue())
+                sBuilder.append("\n\t"+eResult.getKey()+"\t\t\t\t : \""+course+"\"");
+        }
+        
         logger.info(sBuilder.toString());
         
         exchange.getIn().setBody(sBuilder.toString());
     }
     
-    private void associateRulesToCourses(Map<String, List<String>> reportMap, SpreadsheetRule rule, Map<String, List<String>> issueMap) {
+    private void associateRulesToCourses(Map<String, List<String>> reportMap, Map<String, List<String>> warningMap, SpreadsheetRule rule, Map<String, List<String>> issueMap) {
 
         if(StringUtils.isNotEmpty(rule.getCourse1())){
-            ruleHelper(reportMap, rule.getCourse1(), rule, issueMap);
+            ruleHelper(reportMap, warningMap, rule.getCourse1(), rule, issueMap);
             if(StringUtils.isNotEmpty(rule.getCourse2())){
-                ruleHelper(reportMap, rule.getCourse2(), rule, issueMap);
+                ruleHelper(reportMap, warningMap, rule.getCourse2(), rule, issueMap);
                 if(StringUtils.isNotEmpty(rule.getCourse3())){
-                    ruleHelper(reportMap, rule.getCourse3(), rule, issueMap);
+                    ruleHelper(reportMap, warningMap, rule.getCourse3(), rule, issueMap);
                     if(StringUtils.isNotEmpty(rule.getCourse4())){
-                        ruleHelper(reportMap, rule.getCourse4(), rule, issueMap);
+                        ruleHelper(reportMap, warningMap, rule.getCourse4(), rule, issueMap);
                         if(StringUtils.isNotEmpty(rule.getCourse5())){
-                            ruleHelper(reportMap, rule.getCourse5(), rule, issueMap);
+                            ruleHelper(reportMap, warningMap, rule.getCourse5(), rule, issueMap);
                             if(StringUtils.isNotEmpty(rule.getCourse6())){
-                                ruleHelper(reportMap, rule.getCourse6(), rule, issueMap);
+                                ruleHelper(reportMap, warningMap, rule.getCourse6(), rule, issueMap);
                                 if(StringUtils.isNotEmpty(rule.getCourse7())){
-                                    ruleHelper(reportMap, rule.getCourse7(), rule, issueMap);
+                                    ruleHelper(reportMap, warningMap, rule.getCourse7(), rule, issueMap);
                                 }
                             }
                         }
@@ -432,15 +440,26 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             }
         }
     }
-    private void ruleHelper(Map<String, List<String>> reportMap, String course, SpreadsheetRule rule, Map<String, List<String>> issueMap){
+    private void ruleHelper(Map<String, List<String>> reportMap, Map<String, List<String>> warningMap, String course, SpreadsheetRule rule, Map<String, List<String>> issueMap){
         List<String> rules = reportMap.get(course);
         if(rules != null)
             rules.add(rule.getRuleName());
         else{
-            if(! issueMap.containsKey(rule.getRuleName())){
-                issueMap.put(rule.getRuleName(), new ArrayList<String>());
+            // Determine if the course exists if make case insensitive and remove trailing spaces
+            String trimmedCourse = course.trim();
+            List<String> trimmedRules = reportMap.get(trimmedCourse);
+            if(trimmedRules != null) {
+                if(! warningMap.containsKey(rule.getRuleName())){
+                    warningMap.put(rule.getRuleName(), new ArrayList<String>());
+                }
+                warningMap.get(rule.getRuleName()).add(course);
+                trimmedRules.add(rule.getRuleName());
+            } else {
+                if(! issueMap.containsKey(rule.getRuleName())){
+                    issueMap.put(rule.getRuleName(), new ArrayList<String>());
+                }
+                issueMap.get(rule.getRuleName()).add(course);
             }
-            issueMap.get(rule.getRuleName()).add(course);
         }
     }
     
