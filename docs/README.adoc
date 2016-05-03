@@ -19,7 +19,7 @@ Administration Guide
 . Secure copy latest *.tsv files to `docker1.ose.opentlc.com`
 +
 -----
-scp /home/jbride/Downloads/*.tsv jboss@docker1.ose.opentlc.com:/tmp/gpte/inbox-for-rules-spreadsheets/
+scp $HOME/Downloads/*.tsv jboss@docker1.ose.opentlc.com:/tmp/gpte/inbox-for-rules-spreadsheets/
 -----
 . SSH into docker1 as the `jboss` operating system user:
 +
