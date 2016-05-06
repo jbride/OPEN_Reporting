@@ -30,6 +30,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -52,6 +53,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -74,6 +76,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -96,6 +99,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -118,6 +122,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -139,6 +144,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -164,6 +170,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -189,6 +196,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -212,6 +220,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -233,6 +242,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -255,6 +265,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -277,6 +288,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -299,6 +311,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -320,6 +333,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -342,6 +356,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -364,6 +379,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -386,6 +402,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -407,6 +424,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -428,6 +446,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -454,6 +473,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");  
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -480,6 +500,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");  
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -501,6 +522,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -522,6 +544,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -544,6 +567,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -565,6 +589,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -586,6 +611,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -608,6 +634,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -630,6 +657,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -652,6 +680,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
@@ -676,6 +705,7 @@ then
     accreditation.setCourseName(latestCC.getCourseName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
 
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
