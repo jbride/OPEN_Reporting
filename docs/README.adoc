@@ -2,6 +2,7 @@
 :toc: manual
 :toc-placement: preamble
 :numbered:
+:rulesspreadsheet: link:https://docs.google.com/spreadsheets/d/1KNENn8-lKtK3T_KFckPoFJBf_qALcd6FdR4cfKYgNHU/edit#gid=256351[GPTE Accreditation Rules Spreadsheet]
 
 = GPTE Integration Projects
 
@@ -9,6 +10,36 @@ Administration Guide
 
 == Overview
 == Administration
+
+=== Execute Rules Spreadsheet Validation
+
+. Download `DCI`, `MW` and `CI` tabs from {rulesspreadsheet}
+.. For all three spreadsheet tabs, navigate to `File -> Download As -> Tab Separated Value (.tsv, current sheet)
+.. Save all three spreadsheets to your local file system, ie:  $HOME/Downloads
+. Secure copy latest *.tsv files to `docker1.ose.opentlc.com`
++
+-----
+scp $HOME/Downloads/*.tsv jboss@docker1.ose.opentlc.com:/tmp/gpte/inbox-for-rules-spreadsheets/
+-----
+. SSH into docker1 as the `jboss` operating system user:
++
+-----
+ssh jboss@docker1.ose.opentlc.com
+-----
+. Change diretories to OPEN_Reporting
++
+-----
+cd /opt/OPEN_Reporting
+-----
+. Modify email address that validation reports should be sent to:
+.. vi properties/test.properties
+.. Modify value of:  `admin_email`
+. Start `accreditation-process` in `docker1.ose.opentlc.com`:
+.. start JVM
++
+-----
+./bin/accreditation_process_startup.sh -f -env=test
+-----
 
 === Operating System
 . Ensure that a `jboss` operating system user (with groupId = 100) exists.

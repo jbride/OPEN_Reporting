@@ -21,7 +21,7 @@ import java.io.IOException;
 public class RulesSpreadsheetValidationTest extends CamelSpringTestSupport {
     
     private static final String VALIDATE_RULES_SPREADSHEET_URI = "direct:validate-rules-spreadsheet";
-    public static final String INBOX_PATH = "target/test-classes/rules-spreadsheet";
+    public static final String INBOX_PATH = "/tmp/gpte/inbox-for-rules-spreadsheets";
     private static final String RULES_SPREADSHEET_NAME = "accred_rules_spreadsheet_name";
     private String spreadsheetName = null;
     
@@ -40,7 +40,7 @@ public class RulesSpreadsheetValidationTest extends CamelSpringTestSupport {
     @Before
     public void init() {}
     
-    @Ignore
+    //@Ignore
     @Test
     public void testValidateRulesSpreadsheet() throws InterruptedException, IOException {
         File csvFile = new File(INBOX_PATH, spreadsheetName);
