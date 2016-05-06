@@ -48,13 +48,16 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     public void init() {}
 
 
-    @Ignore
+    //@Ignore
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 
         // admin@slamsys.io ; studentId = 10301
         // agomez@criticalperu.com ; student = 10387
         int studentId = 10387;
+        
+        //int studentId = 10386; // course completions but no accreditations
+        //int studentId = 20387; // bogus student
 
         Endpoint endpoint = context.getEndpoint(DETERMINE_ACCREDITATION_FOR_STUDENT_URI);
         Exchange exchange = endpoint.createExchange();

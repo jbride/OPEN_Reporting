@@ -557,27 +557,29 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     public void setStudentAccreditationsJSONResponse(Exchange exchange) {
     	StringBuilder jsonBuilder = new StringBuilder(OPEN_PAREN);
         List<CourseCompletion> studentCourses = (List<CourseCompletion>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
-        int count = 0;
-        jsonBuilder.append("\n\t\"courseCommpletions\": "+OPEN_BRACKET);
-        for(CourseCompletion ccObj : studentCourses){
+        if(studentCourses != null) {
+            int count = 0;
+            jsonBuilder.append("\n\t\"courseCommpletions\": "+OPEN_BRACKET);
+            for(CourseCompletion ccObj : studentCourses){
         	String courseName = ccObj.getCourseName();
         	jsonBuilder.append("\n\t\t\""+courseName+"\"");
         	count++;
         	if(count != studentCourses.size())
         		jsonBuilder.append(",");
-        }
-        jsonBuilder.append("\n\t"+CLOSED_BRACKET+",");
+            }
+            jsonBuilder.append("\n\t"+CLOSED_BRACKET+",");
         
-        List<Accreditation> accreds = (List<Accreditation>)exchange.getIn().getHeader(RULES_FIRED_HEADER);
-        jsonBuilder.append("\n\t\"rulesFired\": "+OPEN_BRACKET);
-        count = 0;
-        for(Accreditation aObj : accreds){
+            List<Accreditation> accreds = (List<Accreditation>)exchange.getIn().getHeader(RULES_FIRED_HEADER);
+            jsonBuilder.append("\n\t\"rulesFired\": "+OPEN_BRACKET);
+            count = 0;
+            for(Accreditation aObj : accreds){
         	jsonBuilder.append("\n\t\t\""+aObj.getRuleFired()+"\"");
         	count++;
         	if(count != accreds.size())
         		jsonBuilder.append(",");
+            }
+            jsonBuilder.append("\n\t"+CLOSED_BRACKET);
         }
-        jsonBuilder.append("\n\t"+CLOSED_BRACKET);
         jsonBuilder.append("\n"+CLOSED_PAREN);
         exchange.getIn().setBody(jsonBuilder.toString());
     }

@@ -40,7 +40,7 @@ public class RulesSpreadsheetValidationTest extends CamelSpringTestSupport {
     @Before
     public void init() {}
     
-    //@Ignore
+    @Ignore
     @Test
     public void testValidateRulesSpreadsheet() throws InterruptedException, IOException {
         File csvFile = new File(INBOX_PATH, spreadsheetName);
