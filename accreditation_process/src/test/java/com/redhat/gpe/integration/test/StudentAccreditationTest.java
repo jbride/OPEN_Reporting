@@ -32,6 +32,8 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     private static final String PERSIST_NEW_ACCREDITATION_URI = "direct:persist-new-accreditation";
     private static final String PROCESS_NEW_STUDENT_ACCREDS_URI = "accred_process-new-student-accreds-uri";
     private static final String SET_ACCRED_ID_ON_ACCRED_OBJ_URI = "direct:set-accredId-on-accredObj";
+    private static final String IDENTIFY_FIRED_RULES_ONLY_HEADER = "IDENTIFY_FIRED_RULES_ONLY";
+    private static final String RESPOND_JSON_HEADER = "RESPOND_JSON";
     
     public StudentAccreditationTest() throws IOException {
         PropertiesSupport.setupProps();
@@ -50,13 +52,19 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 
-        int studentId = DomainMockObjectHelper.getMockStudent().getStudentid();
+        // admin@slamsys.io ; studentId = 10301
+        // agomez@criticalperu.com ; student = 10387
+        int studentId = 10387;
 
         Endpoint endpoint = context.getEndpoint(DETERMINE_ACCREDITATION_FOR_STUDENT_URI);
         Exchange exchange = endpoint.createExchange();
         Message in = exchange.getIn();
         in.setBody(studentId);
-        template.send(DETERMINE_ACCREDITATION_FOR_STUDENT_URI, exchange);
+        in.setHeader(IDENTIFY_FIRED_RULES_ONLY_HEADER, "true");
+        in.setHeader(RESPOND_JSON_HEADER, "true");
+        Exchange outE = template.send(DETERMINE_ACCREDITATION_FOR_STUDENT_URI, exchange);
+        System.out.println("testDeterminAccreditationForStudent() response = "+outE.getIn().getBody());
+        
     }
    
 

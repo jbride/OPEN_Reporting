@@ -86,7 +86,7 @@
 
     <!--    *************************************************************************************************   -->
     <!--    *************                        ACCREDITATION LOGIC                            *************   -->
-    <route id="determine-accreditations">
+    <route id="determine-accreditations-for-all">
         <description> 
             1) Periodically checks for StudentCourses that have yet to be evaluated by the rules engine
             2) Gets List of StudentCourse objects from database for students with unevaluated student courses
@@ -94,7 +94,7 @@
             4) Persists student accreditations to database
             5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
         </description> 
-        <from uri="{{accred_determine-accreditations-uri}}"/>
+        <from uri="{{accred_determine-accreditations-for-all-uri}}"/>
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... determine-accreditations" loggingLevel="INFO"/>
         <bean method="dumpKieBase" ref="droolsHelper"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
@@ -107,27 +107,38 @@
 
     <route id="determine-accreditations-for-student">
         <description> 
-            1) Given: Integer studentId , retrieves all StudentCourse objects
+            1) Given: Integer studentId , retrieves all StudentCourse objects for that student
             2) If List of StudentCourse objects is > 0, then executes accreditation logic
             3) If accreditation logic returns a non-empty List of Accreditation objects, then this route executes the following:
             3.a) persists the Accreditation object
             3.b) sets the processed flag on all StudentCourse objects associated with that student
+            4) if header contains RESPOND_JSON == true, then returns json of results
         </description> 
         <from uri="direct:determine-accred-for-student"/>
-        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/>
+        <setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader> <!-- need to retrieve later in this route -->
+        <log message="${header.STUDENT_ID} : determine-accred-for-student: TEST_RULES_ONLY=${header.TEST_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="DEBUG"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/> <!-- sets header:  STUDENT_COURSES -->
         <filter>
             <simple>${body.size} > 0</simple>
             <to uri="direct:execute-accreditation_rules-uri" id="execute-accreditation-rules-on-student-courses" />
+            <setHeader headerName="RULES_FIRED"><simple>${body}</simple></setHeader> <!-- needed if providing JSON response -->
             <filter>
-                <simple>${body.size} > 0</simple>
-                <split id="loop-for-each-accreditation">
+                <simple>${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
+                <filter>
+                    <simple>${body.size} > 0</simple>
+                    <split id="loop-for-each-accreditation">
                         <simple>${body}</simple>
                         <to uri="bean:accreditationProcessBean?method=setAccreditationIdOnAccreditationObj" />
                         <to uri="direct:persist-student-accreditations" id="persist-student-accreds" />
-                        <setBody><simple>${body.student}</simple></setBody>
-                        <to uri="direct:set-processed-on-student-course-by-student" id="call-set-processed-on-student-course-by-student" />
-                </split>
+                    </split>
+                </filter>
+                <setBody><simple>${header.STUDENT_ID}</simple></setBody>
+                <to uri="direct:set-processed-on-student-course-by-student" id="call-set-processed-on-student-course-by-student" />
             </filter>
+        </filter>
+        <filter>
+            <simple>${header.RESPOND_JSON} == true</simple>
+            <to uri="bean:accreditationProcessBean?method=setStudentAccreditationsJSONResponse" />
         </filter>
     </route>
 
@@ -154,7 +165,7 @@
 
     <route id="set-processed-on-student-course-by-student" >
         <description> 
-            Expects the following payload:  Student
+            Expects the following payload:  Integer studentId
             Responsible for updating processed field on StudentCourse objects associated with a student 
         </description>
         <from uri="direct:set-processed-on-student-course-by-student"/>

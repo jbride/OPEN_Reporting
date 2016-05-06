@@ -21,6 +21,8 @@ public class GPTEBaseServiceBean {
     
     protected static final String RED_HAT_SUFFIX = "redhat.com";
     private static final String NUMBER_OF_LINES_TO_SKIP = "NUMBER_OF_LINES_TO_SKIP";
+	protected static final String STUDENT_COURSES_HEADER = "STUDENT_COURSES";
+	protected static final String RULES_FIRED_HEADER = "RULES_FIRED";
     
     private Logger logger = Logger.getLogger(getClass());
     
@@ -71,7 +73,8 @@ public class GPTEBaseServiceBean {
         canonicalDAO.triggerStoredProcedure(storedProcName);
     }
     
-    public List<CourseCompletion> selectStudentCoursesByStudent(@Body Integer studentId) {
+    public List<CourseCompletion> selectStudentCoursesByStudent(Exchange exchange) {
+    	Integer studentId = (Integer)exchange.getIn().getBody();
         List<CourseCompletion> sCourses = canonicalDAO.selectPassedStudentCoursesByStudent(studentId);
         if(sCourses == null || sCourses.isEmpty()) {
             logger.warn("selectStudentCoursesByStudent() no student courses found of studentId = "+studentId);
@@ -81,6 +84,7 @@ public class GPTEBaseServiceBean {
             StringBuilder sBuilder = new StringBuilder(mostRecent.getStudent().getEmail()+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
             sBuilder.append(" Most recent = "+mostRecent.getCourseName() );
             logger.info(sBuilder.toString());
+            exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
         }
         return sCourses;
     }
@@ -96,9 +100,9 @@ public class GPTEBaseServiceBean {
         return studentIds;
     }
     
-    public int setProcessedOnStudentCourseByStudent(@Body Student studentObj) {
-        int numUpdated = canonicalDAO.updateStudentCourseProcessedByStudent(studentObj, StudentCourse.PROCESSED_ALL);
-        logger.info(studentObj.getEmail()+" : set following # of StudentCourses to processed: "+numUpdated);
+    public int setProcessedOnStudentCourseByStudent(@Body Integer studentId) {
+        int numUpdated = canonicalDAO.updateStudentCourseProcessedByStudent(studentId, StudentCourse.PROCESSED_ALL);
+        logger.info(studentId+" : set following # of StudentCourses to processed: "+numUpdated);
         return numUpdated;
     }
     

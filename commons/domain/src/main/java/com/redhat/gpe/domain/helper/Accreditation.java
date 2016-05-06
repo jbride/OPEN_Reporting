@@ -8,6 +8,9 @@ import com.redhat.gpe.domain.canonical.Course;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentAccreditation;
 
+/* 
+ * Denormalized wrapper of a student accrediation
+ */
 public class Accreditation {
     private AccreditationDefinition accreditationDefinition;
     private Student student;
@@ -23,6 +26,7 @@ public class Accreditation {
     
     private Date accreditationDate;
     private String accreditationType = StudentAccreditation.Types.Active.name();
+    private String ruleFired;  // name of rule that instantiated this Accreditation object
     
     public Accreditation() {
         this.accreditationDefinition = new AccreditationDefinition();
@@ -32,6 +36,12 @@ public class Accreditation {
         
         if(accreditationDate == null)
             this.setAccreditationDate(new Timestamp(new Date().getTime()));
+    }
+    public String getRuleFired() {
+        return ruleFired;
+    }
+    public void setRuleFired(String x) {
+        ruleFired = x;
     }
     public AccreditationDefinition getAccreditation() {
         return accreditationDefinition;

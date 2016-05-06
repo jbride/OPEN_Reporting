@@ -8,6 +8,9 @@ import com.redhat.gpe.domain.canonical.StudentCourse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/*
+ * Denormalized wrapper of a student course completion
+ */
 public class CourseCompletion {
     
     private Course course;

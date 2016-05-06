@@ -36,6 +36,7 @@ public interface CanonicalDomainDAO {
     /* *******  Student Courses  ********/
     public void addStudentCourse(StudentCourse sCourse);
     public int updateStudentCourseProcessedByStudent(Student studentObj, int processedValue);
+    public int updateStudentCourseProcessedByStudent(Integer studentId, int processedValue);
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus);
     public List<Integer> selectStudentCourseIdsByStatus(int processedStatus);
     public List<CourseCompletion> selectPassedStudentCoursesByStudent(int studentId);

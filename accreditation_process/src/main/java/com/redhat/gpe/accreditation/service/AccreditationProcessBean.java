@@ -9,6 +9,7 @@ import com.redhat.gpe.domain.canonical.Course;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentAccreditation;
 import com.redhat.gpe.domain.helper.Accreditation;
+import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.sun.xml.bind.v2.util.QNameMap.Entry;
@@ -59,6 +60,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String TSV = "tsv";
     private static final String DRL = "drl";
     private static final String LMS_REFRESH_STORED_PROC = "call lms_transactional.refresh_lms_reporting";
+    private static final String OPEN_PAREN = "{";
+    private static final String CLOSED_PAREN = "}";
+	private static final Object OPEN_BRACKET = "[";
+	private static final Object CLOSED_BRACKET = "]";
 
     private Logger logger = Logger.getLogger(getClass());
     
@@ -131,7 +136,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             return;
         
         int accredId = canonicalDAO.getAccreditationIdGivenName(accredObj.getAccreditationName());
-        logger.info(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getAccreditationName());
+        logger.debug(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getAccreditationName());
         accredObj.setAccreditationId(accredId);
     }
     
@@ -528,5 +533,33 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         String newFileName = fileName.replace(TSV, DRL);
         logger.info("changeSuffixOfRuleFileName() new rule file name = "+newFileName);
         exchange.getIn().setHeader(CAMEL_FILE_HEADER_NAME, newFileName);
+    }
+
+    public void setStudentAccreditationsJSONResponse(Exchange exchange) {
+    	StringBuilder jsonBuilder = new StringBuilder(OPEN_PAREN);
+        List<CourseCompletion> studentCourses = (List<CourseCompletion>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
+        int count = 0;
+        jsonBuilder.append("\n\t\"courseCommpletions\": "+OPEN_BRACKET);
+        for(CourseCompletion ccObj : studentCourses){
+        	String courseName = ccObj.getCourseName();
+        	jsonBuilder.append("\n\t\t\""+courseName+"\"");
+        	count++;
+        	if(count != studentCourses.size())
+        		jsonBuilder.append(",");
+        }
+        jsonBuilder.append("\n\t"+CLOSED_BRACKET+",");
+        
+        List<Accreditation> accreds = (List<Accreditation>)exchange.getIn().getHeader(RULES_FIRED_HEADER);
+        jsonBuilder.append("\n\t\"rulesFired\": "+OPEN_BRACKET);
+        count = 0;
+        for(Accreditation aObj : accreds){
+        	jsonBuilder.append("\n\t\t\""+aObj.getRuleFired()+"\"");
+        	count++;
+        	if(count != accreds.size())
+        		jsonBuilder.append(",");
+        }
+        jsonBuilder.append("\n\t"+CLOSED_BRACKET);
+        jsonBuilder.append("\n"+CLOSED_PAREN);
+        exchange.getIn().setBody(jsonBuilder.toString());
     }
 }

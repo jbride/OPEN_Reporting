@@ -240,13 +240,17 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             StudentCourse.UNPROCESSED
         );
     }
-
+    
     public int updateStudentCourseProcessedByStudent(Student studentObj, int processedValue) {
+    	return this.updateStudentCourseProcessedByStudent(studentObj.getStudentid(), processedValue);
+    }
+
+    public int updateStudentCourseProcessedByStudent(Integer studentId, int processedValue) {
     
         StringBuilder sql = new StringBuilder("update StudentCourses set Processed=");
         sql.append(processedValue);
         sql.append(" where StudentID=");
-        sql.append(studentObj.getStudentid());
+        sql.append(studentId);
         return sbJdbcTemplate.update(sql.toString());
     }
     
