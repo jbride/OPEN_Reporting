@@ -80,6 +80,13 @@
     </onException>
 
 
+     <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
+     <rest path="/gpte_accreditation/students/">
+        <get uri="{STUDENT_ID}" produces="application/json" >
+            <to uri="direct:determine-accred-for-student" />
+        </get>
+    </rest>
+
 
 
 
@@ -115,7 +122,15 @@
             4) if header contains RESPOND_JSON == true, then returns json of results
         </description> 
         <from uri="direct:determine-accred-for-student"/>
-        <setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader> <!-- need to retrieve later in this route -->
+        <choice>
+            <!-- Ensure that value of STUDENT_ID is set both in header and body.
+                 Header is later in this route -->
+            <when><simple>${header.STUDENT_ID} != null</simple>
+                <setBody><simple>${header.STUDENT_ID}</simple></setBody>
+            </when>
+            <otherwise><setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader></otherwise>
+        </choice>
+        <to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/>
         <log message="${header.STUDENT_ID} : determine-accred-for-student: TEST_RULES_ONLY=${header.TEST_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="DEBUG"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/> <!-- sets header:  STUDENT_COURSES -->
         <filter>
@@ -139,6 +154,7 @@
         <filter>
             <simple>${header.RESPOND_JSON} == true</simple>
             <to uri="bean:accreditationProcessBean?method=setStudentAccreditationsJSONResponse" />
+            <to uri="bean:accreditationProcessBean?method=clearHeaders" />
         </filter>
     </route>
 

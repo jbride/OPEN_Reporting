@@ -32,6 +32,7 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -554,33 +555,34 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         exchange.getIn().setHeader(CAMEL_FILE_HEADER_NAME, newFileName);
     }
 
-    public void setStudentAccreditationsJSONResponse(Exchange exchange) {
-    	StringBuilder jsonBuilder = new StringBuilder(OPEN_PAREN);
+    public void setStudentAccreditationsJSONResponse(Exchange exchange) throws org.json.JSONException {
         List<CourseCompletion> studentCourses = (List<CourseCompletion>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
+        JSONObject jObject = new JSONObject();
         if(studentCourses != null) {
-            int count = 0;
-            jsonBuilder.append("\n\t\"courseCommpletions\": "+OPEN_BRACKET);
-            for(CourseCompletion ccObj : studentCourses){
-        	String courseName = ccObj.getCourseName();
-        	jsonBuilder.append("\n\t\t\""+courseName+"\"");
-        	count++;
-        	if(count != studentCourses.size())
-        		jsonBuilder.append(",");
+        	
+        	// 1)  add email
+            CourseCompletion firstCCObj = studentCourses.get(0);
+            Student studentObj = firstCCObj.getStudent();
+            jObject.put("email", studentObj.getEmail());
+            
+            // 2)  add List of CourseCompletion names
+            List<String> courseCompletions = new ArrayList<String>();
+            for(CourseCompletion cc : studentCourses){
+            	courseCompletions.add(cc.getCourseName());
             }
-            jsonBuilder.append("\n\t"+CLOSED_BRACKET+",");
+            jObject.put("courseCompletions", courseCompletions);
         
+            // 3) add List of Accreditation names
             List<Accreditation> accreds = (List<Accreditation>)exchange.getIn().getHeader(RULES_FIRED_HEADER);
-            jsonBuilder.append("\n\t\"rulesFired\": "+OPEN_BRACKET);
-            count = 0;
+            List<String> rulesFired = new ArrayList<String>();
             for(Accreditation aObj : accreds){
-        	jsonBuilder.append("\n\t\t\""+aObj.getRuleFired()+"\"");
-        	count++;
-        	if(count != accreds.size())
-        		jsonBuilder.append(",");
+        	    rulesFired.add(aObj.getRuleFired());
             }
-            jsonBuilder.append("\n\t"+CLOSED_BRACKET);
+            jObject.put("accredRulesFired", rulesFired);
+        } else {
+        	jObject.put("email", "Student not found");
         }
-        jsonBuilder.append("\n"+CLOSED_PAREN);
-        exchange.getIn().setBody(jsonBuilder.toString());
+        
+        exchange.getIn().setBody(jObject);
     }
 }

@@ -12,6 +12,7 @@
     <wildfly.camel.version>2.3.0.redhat-621084</wildfly.camel.version>
     <spring.version>4.1.6.RELEASE</spring.version>
     <drools.kie.version>6.3.0.Final-redhat-7</drools.kie.version>
+    <jetty.version>9.2.9.v20150224</jetty.version>
 
     <version.gpte.ops.project>1.0</version.gpte.ops.project>
 
@@ -107,6 +108,12 @@
       <dependency>
         <groupId>org.apache.camel</groupId>
         <artifactId>camel-bindy</artifactId>
+        <version>${camel.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-jetty</artifactId>
         <version>${camel.version}</version>
         <scope>provided</scope>
       </dependency>

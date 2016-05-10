@@ -15,7 +15,6 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-
 public class DomainDAOImpl implements CanonicalDomainDAO {
 
     private static final String OK = "Ok";

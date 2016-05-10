@@ -2,6 +2,7 @@ package com.redhat.gpte.services;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
@@ -74,7 +75,15 @@ public class GPTEBaseServiceBean {
     }
     
     public List<CourseCompletion> selectStudentCoursesByStudent(Exchange exchange) {
-    	Integer studentId = (Integer)exchange.getIn().getBody();
+    	Object studentIdObj = exchange.getIn().getBody();
+    	Integer studentId = 0;
+    	if(studentIdObj instanceof String)
+    		studentId = Integer.parseInt((String)studentIdObj);
+    	else
+    		studentId = (Integer)studentIdObj;
+        if(studentId == null || studentId == 0)
+            throw new RuntimeException("selectStudentCoursesByStudent() must pass a studentId");
+
         List<CourseCompletion> sCourses = canonicalDAO.selectPassedStudentCoursesByStudent(studentId);
         if(sCourses == null || sCourses.isEmpty()) {
             logger.warn("selectStudentCoursesByStudent() no student courses found of studentId = "+studentId);
@@ -110,6 +119,11 @@ public class GPTEBaseServiceBean {
         exchange.setException(null);
     }
     
+    public void clearHeaders(Exchange exchange) {
+    	Map<String, Object> headers = exchange.getIn().getHeaders();
+    	headers.clear();
+    }
+    
     public void changeMapToListOfValues(Exchange exchange) {
     	Map mapBody = (Map)exchange.getIn().getBody();
     	exchange.getIn().setBody(mapBody.values());
@@ -143,5 +157,16 @@ public class GPTEBaseServiceBean {
         // update the body
         in.setBody(result.toString());
     }
-    
+
+    public void dumpHeadersAndBody(Exchange exchange) {
+    	StringBuilder sBuilder = new StringBuilder();
+    	sBuilder.append("\nHEADERS:");
+    	Map<String,Object> headers = exchange.getIn().getHeaders();
+    	for(Entry<String,Object> entry : headers.entrySet()) {
+    		sBuilder.append("\n\t"+entry.getKey()+" : "+entry.getValue());
+    	}
+    	sBuilder.append("\nBody:\n\t");
+    	sBuilder.append(exchange.getIn().getBody());
+        logger.info(sBuilder.toString());
+    }
 }
