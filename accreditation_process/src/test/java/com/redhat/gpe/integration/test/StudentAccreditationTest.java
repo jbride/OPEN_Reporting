@@ -29,11 +29,14 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     private static final Logger logger = LoggerFactory.getLogger(StudentAccreditationTest.class);
 
     private static final String DETERMINE_ACCREDITATION_FOR_STUDENT_URI = "direct:determine-accred-for-student";
+    private static final String DETERMINE_ACCREDITATION_FOR_RANGE_URI = "direct:determine-accreds-for-range";
     private static final String PERSIST_NEW_ACCREDITATION_URI = "direct:persist-new-accreditation";
     private static final String PROCESS_NEW_STUDENT_ACCREDS_URI = "accred_process-new-student-accreds-uri";
     private static final String SET_ACCRED_ID_ON_ACCRED_OBJ_URI = "direct:set-accredId-on-accredObj";
     private static final String IDENTIFY_FIRED_RULES_ONLY_HEADER = "IDENTIFY_FIRED_RULES_ONLY";
     private static final String RESPOND_JSON_HEADER = "RESPOND_JSON";
+    private static final String LOW_STUDENT_ID = "LOW_STUDENT_ID";
+    private static final String HIGH_STUDENT_ID = "HIGH_STUDENT_ID";
     
     public StudentAccreditationTest() throws IOException {
         PropertiesSupport.setupProps();
@@ -48,7 +51,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     public void init() {}
 
 
-    //@Ignore
+    @Ignore
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 
@@ -69,7 +72,22 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
         System.out.println("testDeterminAccreditationForStudent() response = "+outE.getIn().getBody());
         
     }
-   
+
+    //@Ignore
+    @Test
+    public void testDetermineAccreditationForStudentRange() throws InterruptedException {
+        Endpoint endpoint = context.getEndpoint(DETERMINE_ACCREDITATION_FOR_RANGE_URI);
+        Exchange exchange = endpoint.createExchange();
+        Message in = exchange.getIn();
+        in.setHeader(IDENTIFY_FIRED_RULES_ONLY_HEADER, "true");
+        in.setHeader(RESPOND_JSON_HEADER, "true");
+        in.setHeader(LOW_STUDENT_ID, "10000");
+        in.setHeader(HIGH_STUDENT_ID, "10100");
+        Exchange outE = template.send(DETERMINE_ACCREDITATION_FOR_RANGE_URI, exchange);
+        System.out.println("testDeterminAccreditationForStudentRange() response = "+outE.getIn().getBody());
+        
+    }
+
 
     /* verification:   select * from StudentAccreditations where accreditationid = 19 and StudentId = 10145;
        cleanup:        delete from StudentAccreditations where accreditationid = 19 and StudentId = 10145;

@@ -105,11 +105,36 @@
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... determine-accreditations" loggingLevel="INFO"/>
         <bean method="dumpKieBase" ref="droolsHelper"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
+        <to uri="direct:determine-accreditations-batch" id="determine-accreditations-batch1" />
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreditations" />
+    </route>
+
+    <route id="determine-accreditations-for-range">
+        <description> 
+            1) Given a range of studentIds, checks for StudentCourses that have yet to be evaluated by the rules engine
+            2) Gets List of StudentCourse objects from database for students with unevaluated student courses
+            3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
+            4) Persists student accreditations to database
+            5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
+        </description> 
+        <from uri="direct:determine-accreds-for-range"/>
+        <log message="@@@@@@@@@@@@@@@       Starting determine-accreditations range: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
+        <bean method="dumpKieBase" ref="droolsHelper"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
+        <to uri="direct:determine-accreditations-batch" id="determine-accreditations-batch2" />
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreditations" />
+    </route>
+
+    <route id="determine-accreditations-batch">
+        <description> 
+        </description> 
+        <from uri="direct:determine-accreditations-batch"/>
+        <log message="determine-accreditations-batch: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
         <split id="loop-for-each-student_with-unprocessed-student-courses">
             <simple>${body}</simple>
             <to uri="direct:determine-accred-for-student" id="determine-accred-for-student" />
         </split>
-        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreditations" />
+        <log message="Done:    determine-accreditations" />
     </route>
 
     <route id="determine-accreditations-for-student">
@@ -117,9 +142,12 @@
             1) Given: Integer studentId , retrieves all StudentCourse objects for that student
             2) If List of StudentCourse objects is > 0, then executes accreditation logic
             3) If accreditation logic returns a non-empty List of Accreditation objects, then this route executes the following:
-            3.a) persists the Accreditation object
-            3.b) sets the processed flag on all StudentCourse objects associated with that student
+              3.a) persists the Accreditation object
+              3.b) sets the processed flag on all StudentCourse objects associated with that student
             4) if header contains RESPOND_JSON == true, then returns json of results
+            5) optional headers:
+                a) IDENTIFY_FIRED_RULES_ONLY    :   true/false  :   if set to true, will only fire the rules without persisting any resultant accreditations
+                b) RESPOND_JSON                 :   true/false  :   if set to true, provides a json response of course completions for this student and rules fired
         </description> 
         <from uri="direct:determine-accred-for-student"/>
         <choice>
@@ -130,8 +158,8 @@
             </when>
             <otherwise><setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader></otherwise>
         </choice>
-        <to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/>
-        <log message="${header.STUDENT_ID} : determine-accred-for-student: TEST_RULES_ONLY=${header.TEST_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="DEBUG"/>
+        <!-- to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/ -->
+        <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="DEBUG"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/> <!-- sets header:  STUDENT_COURSES -->
         <filter>
             <simple>${body.size} > 0</simple>

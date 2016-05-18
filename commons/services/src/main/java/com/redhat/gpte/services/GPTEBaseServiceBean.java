@@ -24,6 +24,8 @@ public class GPTEBaseServiceBean {
     private static final String NUMBER_OF_LINES_TO_SKIP = "NUMBER_OF_LINES_TO_SKIP";
 	protected static final String STUDENT_COURSES_HEADER = "STUDENT_COURSES";
 	protected static final String RULES_FIRED_HEADER = "RULES_FIRED";
+	public static final String LOW_STUDENT_ID = "LOW_STUDENT_ID";
+    public static final String HIGH_STUDENT_ID = "HIGH_STUDENT_ID";
     
     private Logger logger = Logger.getLogger(getClass());
     
@@ -98,8 +100,15 @@ public class GPTEBaseServiceBean {
         return sCourses;
     }
     
-    public List<Integer> selectStudentIdsWithUnProcessedStudentCourses() {
-        List<Integer> studentIds = canonicalDAO.selectStudentIdsWithStudentCoursesByStatus(StudentCourse.UNPROCESSED);
+    public List<Integer> selectStudentIdsWithUnProcessedStudentCourses(Exchange exchange) {
+    	int lowStudentId = 0;
+    	int highStudentId = 0;
+    	if(StringUtils.isNotEmpty((String)exchange.getIn().getHeader(LOW_STUDENT_ID)))
+    		lowStudentId = Integer.parseInt((String)exchange.getIn().getHeader(LOW_STUDENT_ID));
+    	if(StringUtils.isNotEmpty((String)exchange.getIn().getHeader(HIGH_STUDENT_ID)))
+    		highStudentId = Integer.parseInt((String)exchange.getIn().getHeader(HIGH_STUDENT_ID));
+    	
+        List<Integer> studentIds = canonicalDAO.selectStudentIdsWithStudentCoursesByStatus(StudentCourse.UNPROCESSED, lowStudentId, highStudentId);
         if(studentIds == null || studentIds.isEmpty()) {
             logger.info("selectStudentIdsWithUnProcessedStudentCourses() no students found with a StudentCourse with status = "+StudentCourse.UNPROCESSED);
         }

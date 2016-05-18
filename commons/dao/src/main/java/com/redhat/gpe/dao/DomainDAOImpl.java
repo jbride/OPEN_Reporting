@@ -254,10 +254,20 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus) {
+    	return this.selectStudentIdsWithStudentCoursesByStatus(processedStatus, 0, 0);
+    }
+    
+    public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus, int lowStudentId, int highStudentId) {
         StringBuilder sBuilder = new StringBuilder();
-        sBuilder.append("SELECT StudentID FROM StudentCourses WHERE Processed=");
+        sBuilder.append("SELECT sc.StudentID FROM StudentCourses sc, Students s WHERE sc.Processed=");
         sBuilder.append(processedStatus);
-        sBuilder.append(" GROUP BY StudentID");
+        if(lowStudentId > 0) {
+        	sBuilder.append(" and sc.studentId >= "+lowStudentId);
+        }
+        if(highStudentId > 0) {
+        	sBuilder.append(" and sc.studentId <= "+highStudentId);
+        }
+        sBuilder.append(" GROUP BY sc.StudentID");
         List<Integer> studentIds = sbJdbcTemplate.queryForList(sBuilder.toString(), Integer.class);
         return studentIds;
     }

@@ -38,6 +38,7 @@ public interface CanonicalDomainDAO {
     public int updateStudentCourseProcessedByStudent(Student studentObj, int processedValue);
     public int updateStudentCourseProcessedByStudent(Integer studentId, int processedValue);
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus);
+    public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus, int lowStudentId, int highStudentId);
     public List<Integer> selectStudentCourseIdsByStatus(int processedStatus);
     public List<CourseCompletion> selectPassedStudentCoursesByStudent(int studentId);
     public boolean isNewStudentCourseForStudent(StudentCourse sCourse);
