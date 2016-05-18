@@ -80,15 +80,20 @@
     </onException>
 
 
-     <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
-     <rest path="/gpte_accreditation/students/">
-        <get uri="{STUDENT_ID}" produces="application/json" >
+    <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
+    <rest path="/gpte_accreditation/students/">
+        <put uri="{STUDENT_ID}" produces="application/json" >
             <to uri="direct:determine-accred-for-student" />
-        </get>
+        </put>
+        <put uri="batch" produces="application/json" >
+            <to uri="direct:determine-accred-for-student" />
+        </put>
     </rest>
 
-
-
+    <route id="dumpKieBase">
+        <from uri="timer://start?repeatCount=1" />
+        <bean method="dumpKieBase" ref="droolsHelper"/>
+    </route>
 
 
     <!--    *************************************************************************************************   -->
@@ -96,40 +101,43 @@
     <route id="determine-accreditations-for-all">
         <description> 
             1) Periodically checks for StudentCourses that have yet to be evaluated by the rules engine
-            2) Gets List of StudentCourse objects from database for students with unevaluated student courses
+            2) Gets List of StudentCourse objects from database for ALL students with unevaluated student courses
             3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
             4) Persists student accreditations to database
             5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
         </description> 
         <from uri="{{accred_determine-accreditations-for-all-uri}}"/>
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... determine-accreditations" loggingLevel="INFO"/>
-        <bean method="dumpKieBase" ref="droolsHelper"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
-        <to uri="direct:determine-accreditations-batch" id="determine-accreditations-batch1" />
+        <to uri="direct:determine-accreditations-iterate-studentIds" id="determine-accreditations-iterate-studentIds1" />
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreditations" />
     </route>
 
     <route id="determine-accreditations-for-range">
         <description> 
             1) Given a range of studentIds, checks for StudentCourses that have yet to be evaluated by the rules engine
-            2) Gets List of StudentCourse objects from database for students with unevaluated student courses
+               Expects the following headers :
+                   LOW_STUDENT_ID   : int
+                   HIGH_STUDENT_ID  : int
+            2) Gets List of StudentCourse objects from database for students (within the range of studentIds) with unevaluated student courses
             3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
             4) Persists student accreditations to database
             5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
         </description> 
         <from uri="direct:determine-accreds-for-range"/>
         <log message="@@@@@@@@@@@@@@@       Starting determine-accreditations range: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
-        <bean method="dumpKieBase" ref="droolsHelper"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
-        <to uri="direct:determine-accreditations-batch" id="determine-accreditations-batch2" />
+        <to uri="direct:determine-accreditations-iterate-studentIds" id="determine-accreditations-iterate-studentIds2" />
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreditations" />
     </route>
 
-    <route id="determine-accreditations-batch">
+    <route id="determine-accreditations-iterate-studentIds">
         <description> 
+            Iterates through list of studentIds
+            For each studentId, invokes route to identify accreditations
         </description> 
-        <from uri="direct:determine-accreditations-batch"/>
-        <log message="determine-accreditations-batch: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
+        <from uri="direct:determine-accreditations-iterate-studentIds"/>
+        <log message="determine-accreditations-iterate-studentIds: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
         <split id="loop-for-each-student_with-unprocessed-student-courses">
             <simple>${body}</simple>
             <to uri="direct:determine-accred-for-student" id="determine-accred-for-student" />

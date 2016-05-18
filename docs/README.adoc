@@ -13,12 +13,19 @@ Administration Guide
 . Invoke accreditation logic on an existing student whose course completions should lead to an accredition
 +
 -----
+curl -v -X PUT  -H "ACCEPT: application/json" \
+                -H "TEST_RULES_ONLY: true" \
+                -H "RESPOND_JSON: true" \
+                http://$HOSTNAME:9090/gpte_accreditation/students/10387
 -----
 
 . Invoke accreditation logic on a non existant student
 +
 -----
-curl -v -H "ACCEPT: application/json" -H "TEST_RULES_ONLY: true" -H "RESPOND_JSON: true" -X GET http://$HOSTNAME:9090/gpte_accreditation/students/103899
+curl -v -X PUT  -H "ACCEPT: application/json" \
+                -H "TEST_RULES_ONLY: true" \
+                -H "RESPOND_JSON: true" \
+                http://$HOSTNAME:9090/gpte_accreditation/students/103899
 -----
 
 == Overview
