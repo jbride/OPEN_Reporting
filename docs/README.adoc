@@ -105,8 +105,8 @@ cp $PROJECT_HOME/config/maven/settings.xml ~/.m2
 NOTE: Execute all of the following as the `jboss` operating system user.
 
 . Download the following from the Red Hat Support Portal:
-.. *jboss-eap-6.4.4-full-build.zipjboss-eap-6.4.*-full-build.zip*
-.. *fuse-eap-installer-6.2.1.redhat-084.jarfuse-eap-installer-6.2.1.redhat-*.jar*
+.. *jboss-eap-6.4.4-full-build.zip*
+.. *fuse-eap-installer-6.2.1.redhat-084.jar*
 . unzip JBoss EAP into: `/opt/jboss/eap`
 +
 NOTE: For the purpose of this admin guide, the term `$JBOSS_HOME` will refer to the following path: `/opt/jboss/eap/jboss-eap-6.4`.
