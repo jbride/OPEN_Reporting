@@ -263,11 +263,11 @@
 
     <route id="receive-new-accreditation-spreadsheet">
         <description>
-            1)  Executes validation logic on inbound data file
+            1)  Executes validation logic on tsv rules accreditation spreadsheet
             2)  Kicks back data files that do not pass validation logic and sends notification email of problem
             3)  Generates DRL from spreadsheet
         </description>
-        <from uri="{{accred_receive_spreadsheet_input_uri}}" />
+        <from uri="{{accred_receive_tsv_rules_spreadsheet_uri}}" />
         <log message="Received rules spreadsheet.  name= ${header.CamelFileName} : from= ${header.Return-Path}, subject= ${header.subject}" id="log_rules_spreadsheet_receive"/>
         <split id="for-each-spreadsheet-attachment">
             <simple>${body}</simple>

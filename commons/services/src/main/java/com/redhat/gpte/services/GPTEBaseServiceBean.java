@@ -22,9 +22,9 @@ public class GPTEBaseServiceBean {
     
     protected static final String RED_HAT_SUFFIX = "redhat.com";
     private static final String NUMBER_OF_LINES_TO_SKIP = "NUMBER_OF_LINES_TO_SKIP";
-	protected static final String STUDENT_COURSES_HEADER = "STUDENT_COURSES";
-	protected static final String RULES_FIRED_HEADER = "RULES_FIRED";
-	public static final String LOW_STUDENT_ID = "LOW_STUDENT_ID";
+    protected static final String STUDENT_COURSES_HEADER = "STUDENT_COURSES";
+    protected static final String RULES_FIRED_HEADER = "RULES_FIRED";
+    public static final String LOW_STUDENT_ID = "LOW_STUDENT_ID";
     public static final String HIGH_STUDENT_ID = "HIGH_STUDENT_ID";
     
     private Logger logger = Logger.getLogger(getClass());
@@ -77,12 +77,12 @@ public class GPTEBaseServiceBean {
     }
     
     public List<CourseCompletion> selectStudentCoursesByStudent(Exchange exchange) {
-    	Object studentIdObj = exchange.getIn().getBody();
-    	Integer studentId = 0;
-    	if(studentIdObj instanceof String)
-    		studentId = Integer.parseInt((String)studentIdObj);
-    	else
-    		studentId = (Integer)studentIdObj;
+        Object studentIdObj = exchange.getIn().getBody();
+        Integer studentId = 0;
+        if(studentIdObj instanceof String)
+            studentId = Integer.parseInt((String)studentIdObj);
+        else
+            studentId = (Integer)studentIdObj;
         if(studentId == null || studentId == 0)
             throw new RuntimeException("selectStudentCoursesByStudent() must pass a studentId");
 
@@ -101,13 +101,13 @@ public class GPTEBaseServiceBean {
     }
     
     public List<Integer> selectStudentIdsWithUnProcessedStudentCourses(Exchange exchange) {
-    	int lowStudentId = 0;
-    	int highStudentId = 0;
-    	if(StringUtils.isNotEmpty((String)exchange.getIn().getHeader(LOW_STUDENT_ID)))
-    		lowStudentId = Integer.parseInt((String)exchange.getIn().getHeader(LOW_STUDENT_ID));
-    	if(StringUtils.isNotEmpty((String)exchange.getIn().getHeader(HIGH_STUDENT_ID)))
-    		highStudentId = Integer.parseInt((String)exchange.getIn().getHeader(HIGH_STUDENT_ID));
-    	
+        int lowStudentId = 0;
+        int highStudentId = 0;
+        if(StringUtils.isNotEmpty((String)exchange.getIn().getHeader(LOW_STUDENT_ID)))
+            lowStudentId = Integer.parseInt((String)exchange.getIn().getHeader(LOW_STUDENT_ID));
+        if(StringUtils.isNotEmpty((String)exchange.getIn().getHeader(HIGH_STUDENT_ID)))
+            highStudentId = Integer.parseInt((String)exchange.getIn().getHeader(HIGH_STUDENT_ID));
+        
         List<Integer> studentIds = canonicalDAO.selectStudentIdsWithStudentCoursesByStatus(StudentCourse.UNPROCESSED, lowStudentId, highStudentId);
         if(studentIds == null || studentIds.isEmpty()) {
             logger.info("selectStudentIdsWithUnProcessedStudentCourses() no students found with a StudentCourse with status = "+StudentCourse.UNPROCESSED);
@@ -129,13 +129,13 @@ public class GPTEBaseServiceBean {
     }
     
     public void clearHeaders(Exchange exchange) {
-    	Map<String, Object> headers = exchange.getIn().getHeaders();
-    	headers.clear();
+        Map<String, Object> headers = exchange.getIn().getHeaders();
+        headers.clear();
     }
     
     public void changeMapToListOfValues(Exchange exchange) {
-    	Map mapBody = (Map)exchange.getIn().getBody();
-    	exchange.getIn().setBody(mapBody.values());
+        Map mapBody = (Map)exchange.getIn().getBody();
+        exchange.getIn().setBody(mapBody.values());
     }
     
     public void removeHeaderLinesFromSpreadsheet(Exchange exchange) {
@@ -168,14 +168,14 @@ public class GPTEBaseServiceBean {
     }
 
     public void dumpHeadersAndBody(Exchange exchange) {
-    	StringBuilder sBuilder = new StringBuilder();
-    	sBuilder.append("\nHEADERS:");
-    	Map<String,Object> headers = exchange.getIn().getHeaders();
-    	for(Entry<String,Object> entry : headers.entrySet()) {
-    		sBuilder.append("\n\t"+entry.getKey()+" : "+entry.getValue());
-    	}
-    	sBuilder.append("\nBody:\n\t");
-    	sBuilder.append(exchange.getIn().getBody());
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append("\nHEADERS:");
+        Map<String,Object> headers = exchange.getIn().getHeaders();
+        for(Entry<String,Object> entry : headers.entrySet()) {
+            sBuilder.append("\n\t"+entry.getKey()+" : "+entry.getValue());
+        }
+        sBuilder.append("\nBody:\n\t");
+        sBuilder.append(exchange.getIn().getBody());
         logger.info(sBuilder.toString());
     }
 }

@@ -1,33 +1,43 @@
 # Purpose:  Run Accreditation Process as a standalone java application
 
-# Usage
-#   ./bin/accreditation_process_startup.sh -env=dev -f          :   start accred process in the foreground using dev environment properties
-#   ./bin/accreditation_process_startup.sh -env=test -f -d      :   start accred process in the foreground using test environment properties and Java debugger enabled
-#   ./bin/accreditation_process_startup.sh -env=prod            :   start accred process in the background using prod environment properties
-
 for var in $@
 do
     case "$var" in
-        -u) UNDEPLOY=true ;;
         -f) FOREGROUND=true ;;
         -d) DEBUG=true ;;
+        --help) HELP=true ;;
         -env=*) ENVIRONMENT=`echo $var | cut -f2 -d\=` ;;
     esac
 done
-
 
 ACCREDITATION_PROCESS_HOME=accreditation_process
 DEPS_DIR=target/dependencies
 CLASSES_DIR=target/classes
 CAMEL_CONTEXT_PATH="spring/accreditation-camel-context.xml"
-PROPS_FILE_LOCATION="$ACCREDITATION_HOME../properties/$ENVIRONMENT.properties"
-OUTPUT_LOG_FILE=/opt/jboss/eap/jboss-eap-6.4/standalone/log/accreditation_process.log
+PROPS_FILE_LOCATION="../properties/$ENVIRONMENT.properties"
+OUTPUT_LOG_FILE=/tmp/accreditation_process.log
+
+function help() {
+    
+    echo -en "\n\nOPTIONS:";
+    echo -en "\n\t-env=[dev, test, prod]        REQUIRED: specify environment specific java system properties (as per properties directory at the root of this project)"
+    echo -en "\n\t-f                            run operating system process in foreground; default = false"
+    echo -en "\n\t                                if process is run in background, then log will be directored to: $OUTPUT_LOG_FILE"
+    echo -en "\n\t-d                            enable Java debugger; default = false"
+    echo -en "\n\t--help                        this help manual"
+    echo -en "\n\nEXAMPLES:";
+    echo -en "\n\t./bin/accreditation_process_startup.sh -env=dev -f          :   start accred process in the foreground using dev environment properties"
+    echo -en "\n\t./bin/accreditation_process_startup.sh -env=test -f -d      :   start accred process in the foreground using test environment properties and Java debugger enabled"
+    echo -en "\n\t./bin/accreditation_process_startup.sh -env=prod            :   start accred process in the background using prod environment properties\n\n"
+}
+
 
 function checkPreReqs() {
 
     if [[ ! $(ls -A .projectRoot) ]];
     then
         echo -en "\nExecute this from the root directory of this project\n\n"
+        help
         exit 1;
     else
         echo -en "\nExecuting from correct directory: `pwd` \n\n"
@@ -35,6 +45,7 @@ function checkPreReqs() {
 
     if [ "x$ENVIRONMENT" == "x" ]; then
         echo -en "must pass parameter: -env=<environment> . \n\n"
+        help
         exit 1;
     fi
 
@@ -70,5 +81,9 @@ function buildAndStart() {
     fi
 }
 
-checkPreReqs
-buildAndStart
+if [ ! -z "$HELP" ]; then
+    help
+else
+    checkPreReqs
+    buildAndStart
+fi

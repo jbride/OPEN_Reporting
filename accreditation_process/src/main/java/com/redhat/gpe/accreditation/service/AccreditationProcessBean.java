@@ -63,8 +63,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String LMS_REFRESH_STORED_PROC = "call lms_transactional.refresh_lms_reporting";
     private static final String OPEN_PAREN = "{";
     private static final String CLOSED_PAREN = "}";
-	private static final Object OPEN_BRACKET = "[";
-	private static final Object CLOSED_BRACKET = "]";
+    private static final Object OPEN_BRACKET = "[";
+    private static final Object CLOSED_BRACKET = "]";
 
     private Logger logger = Logger.getLogger(getClass());
     
@@ -559,8 +559,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         List<CourseCompletion> studentCourses = (List<CourseCompletion>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
         JSONObject jObject = new JSONObject();
         if(studentCourses != null) {
-        	
-        	// 1)  add email
+            
+            // 1)  add email
             CourseCompletion firstCCObj = studentCourses.get(0);
             Student studentObj = firstCCObj.getStudent();
             jObject.put("email", studentObj.getEmail());
@@ -568,7 +568,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             // 2)  add List of CourseCompletion names
             List<String> courseCompletions = new ArrayList<String>();
             for(CourseCompletion cc : studentCourses){
-            	courseCompletions.add(cc.getCourseName());
+                courseCompletions.add(cc.getCourseName());
             }
             jObject.put("courseCompletions", courseCompletions);
         
@@ -576,11 +576,11 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             List<Accreditation> accreds = (List<Accreditation>)exchange.getIn().getHeader(RULES_FIRED_HEADER);
             List<String> rulesFired = new ArrayList<String>();
             for(Accreditation aObj : accreds){
-        	    rulesFired.add(aObj.getRuleFired());
+                rulesFired.add(aObj.getRuleFired());
             }
             jObject.put("accredRulesFired", rulesFired);
         } else {
-        	jObject.put("email", "Student not found");
+            jObject.put("email", "Student not found");
         }
         
         exchange.getIn().setBody(jObject);

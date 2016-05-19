@@ -212,12 +212,12 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public List<Course> listCanonicalCourses() {
-    	StringBuilder sBuilder = new StringBuilder("select ");
-    	sBuilder.append(Course.FROM_CLAUSE);
-    	sBuilder.append(" from Courses c");
-		List<Course> courses = sbJdbcTemplate.query(sBuilder.toString(), new CourseRowMapper());
-		return courses;
-	}
+        StringBuilder sBuilder = new StringBuilder("select ");
+        sBuilder.append(Course.FROM_CLAUSE);
+        sBuilder.append(" from Courses c");
+        List<Course> courses = sbJdbcTemplate.query(sBuilder.toString(), new CourseRowMapper());
+        return courses;
+    }
     
 /* ******************************************************************************* */
     
@@ -241,7 +241,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public int updateStudentCourseProcessedByStudent(Student studentObj, int processedValue) {
-    	return this.updateStudentCourseProcessedByStudent(studentObj.getStudentid(), processedValue);
+        return this.updateStudentCourseProcessedByStudent(studentObj.getStudentid(), processedValue);
     }
 
     public int updateStudentCourseProcessedByStudent(Integer studentId, int processedValue) {
@@ -254,7 +254,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus) {
-    	return this.selectStudentIdsWithStudentCoursesByStatus(processedStatus, 0, 0);
+        return this.selectStudentIdsWithStudentCoursesByStatus(processedStatus, 0, 0);
     }
     
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus, int lowStudentId, int highStudentId) {
@@ -262,10 +262,10 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("SELECT sc.StudentID FROM StudentCourses sc, Students s WHERE sc.Processed=");
         sBuilder.append(processedStatus);
         if(lowStudentId > 0) {
-        	sBuilder.append(" and sc.studentId >= "+lowStudentId);
+            sBuilder.append(" and sc.studentId >= "+lowStudentId);
         }
         if(highStudentId > 0) {
-        	sBuilder.append(" and sc.studentId <= "+highStudentId);
+            sBuilder.append(" and sc.studentId <= "+highStudentId);
         }
         sBuilder.append(" GROUP BY sc.StudentID");
         List<Integer> studentIds = sbJdbcTemplate.queryForList(sBuilder.toString(), Integer.class);
@@ -372,7 +372,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sbJdbcTemplate.update(storedProcCall);
     }
 
-	
+    
     
 /*****************************************************/
     
