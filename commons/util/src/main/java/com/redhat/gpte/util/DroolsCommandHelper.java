@@ -94,13 +94,13 @@ public class DroolsCommandHelper implements ApplicationContextAware {
         StringBuilder sBuilder = new StringBuilder(" : # of kPackages = "+ kPackages.size());
         int numRules = 0;
         for(KiePackage kPackage : kPackages) {
-        	Collection<Rule> rules = kPackage.getRules();
-        	if(rules.size() == 0)
-        		sBuilder.append("\n\tNo rules for package = "+kPackage.getName());
-        	for(Rule rObj : rules) {
-        		sBuilder.append("\n\tpackage = "+kPackage.getName()+" : rule = "+rObj.getName());
-        		numRules++;
-        	}
+            Collection<Rule> rules = kPackage.getRules();
+            if(rules.size() == 0)
+                sBuilder.append("\n\tNo rules for package = "+kPackage.getName());
+            for(Rule rObj : rules) {
+                sBuilder.append("\n\tpackage = "+kPackage.getName()+" : rule = "+rObj.getName());
+                numRules++;
+            }
         }
         logger.info("dumpKieBase() # of rules = "+numRules+sBuilder.toString());
     }

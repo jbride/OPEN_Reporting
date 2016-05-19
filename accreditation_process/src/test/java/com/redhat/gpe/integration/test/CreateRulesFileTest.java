@@ -22,7 +22,7 @@ import java.util.List;
 public class CreateRulesFileTest extends CamelSpringTestSupport {
 
     private static final String CREATE_DRL_FROM_RULES_SPREADSHEET_URI = "direct:create-drl-from-rules-spreadsheet";
-	private static final String HEADER_NAME_FILE = "CamelFileName";
+    private static final String HEADER_NAME_FILE = "CamelFileName";
 
     public CreateRulesFileTest() throws IOException {
         PropertiesSupport.setupProps();
@@ -39,7 +39,7 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
     @Ignore
     @Test
     public void testCreate1CourseDRLFile() throws IOException {
-    	String TEST_RULE_FILE_NAME = "TEST_1Course_CI_ACCREDITATION_RULES.drl";
+        String TEST_RULE_FILE_NAME = "TEST_1Course_CI_ACCREDITATION_RULES.drl";
         Endpoint endpoint = context.getEndpoint(CREATE_DRL_FROM_RULES_SPREADSHEET_URI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
@@ -56,7 +56,7 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
     @Test
     public void testCreate2CourseDRLFile() throws IOException {
 
-    	String TEST_RULE_FILE_NAME = "TEST_2Course_CI_ACCREDITATION_RULES.drl";
+        String TEST_RULE_FILE_NAME = "TEST_2Course_CI_ACCREDITATION_RULES.drl";
         Endpoint endpoint = context.getEndpoint(CREATE_DRL_FROM_RULES_SPREADSHEET_URI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
@@ -73,7 +73,7 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
     @Test
     public void testCreate3CourseDRLFile() throws IOException {
 
-    	String TEST_RULE_FILE_NAME = "TEST_3Course_CI_ACCREDITATION_RULES.drl";
+        String TEST_RULE_FILE_NAME = "TEST_3Course_CI_ACCREDITATION_RULES.drl";
         Endpoint endpoint = context.getEndpoint(CREATE_DRL_FROM_RULES_SPREADSHEET_URI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
@@ -90,7 +90,7 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
     @Test
     public void testCreate4CourseDRLFile() throws IOException {
 
-    	String TEST_RULE_FILE_NAME = "TEST_4Course_CI_ACCREDITATION_RULES.drl";
+        String TEST_RULE_FILE_NAME = "TEST_4Course_CI_ACCREDITATION_RULES.drl";
         Endpoint endpoint = context.getEndpoint(CREATE_DRL_FROM_RULES_SPREADSHEET_URI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
@@ -106,26 +106,26 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
     
     
     private void addRule(List<SpreadsheetRule> sRules, int numOfRules){
-    	SpreadsheetRule rule = new SpreadsheetRule();
-    	rule.setAccredName(numOfRules+"Red Hat Delivery Specialist - Cloud Management");
-    	rule.setBeginDate("01-Feb-2014");
-    	for(int x=1; x<=numOfRules; x++ ){
-    		if(x == 1)
-    			rule.setCourse1(x+"CloudForms FASTRAX");
-    		else if (x == 2)
-    			rule.setCourse2(x+"CloudForms FASTRAX");
-    		else if (x == 3)
-    			rule.setCourse3(x+"CloudForms FASTRAX");
-    		else if (x == 4)
-    			rule.setCourse4(x+"CloudForms FASTRAX");
-    		else if (x == 5)
-    			rule.setCourse5(x+"CloudForms FASTRAX");
-    		else if (x == 6)
-    			rule.setCourse6(x+"CloudForms FASTRAX");
-    		else if (x == 7)
-    			rule.setCourse7(x+"CloudForms FASTRAX");    		
-    	}
-    	sRules.add(rule);
-    	
+        SpreadsheetRule rule = new SpreadsheetRule();
+        rule.setAccredName(numOfRules+"Red Hat Delivery Specialist - Cloud Management");
+        rule.setBeginDate("01-Feb-2014");
+        for(int x=1; x<=numOfRules; x++ ){
+            if(x == 1)
+                rule.setCourse1(x+"CloudForms FASTRAX");
+            else if (x == 2)
+                rule.setCourse2(x+"CloudForms FASTRAX");
+            else if (x == 3)
+                rule.setCourse3(x+"CloudForms FASTRAX");
+            else if (x == 4)
+                rule.setCourse4(x+"CloudForms FASTRAX");
+            else if (x == 5)
+                rule.setCourse5(x+"CloudForms FASTRAX");
+            else if (x == 6)
+                rule.setCourse6(x+"CloudForms FASTRAX");
+            else if (x == 7)
+                rule.setCourse7(x+"CloudForms FASTRAX");            
+        }
+        sRules.add(rule);
+        
     }
 }

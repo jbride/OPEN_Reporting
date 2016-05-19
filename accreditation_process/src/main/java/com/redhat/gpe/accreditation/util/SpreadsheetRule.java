@@ -59,23 +59,23 @@ public class SpreadsheetRule implements java.io.Serializable {
     private int spreadsheetRowNumber;
     
 
-	public SpreadsheetRule() {
+    public SpreadsheetRule() {
     }
-	
-	public String getRuleName() {
-		return ruleName;
-	}
-	
-	public void setRuleName(String ruleName) {
-		this.ruleName = ruleName;
-	}
-	
-	/* Generate a unique rule name.
-	 *   The accreditation name is not unique in a spreadsheet
-	 */
-	public void generateRuleName(int rowNumber) {
-		ruleName = rowNumber+"_"+accredName;
-	}
+    
+    public String getRuleName() {
+        return ruleName;
+    }
+    
+    public void setRuleName(String ruleName) {
+        this.ruleName = ruleName;
+    }
+    
+    /* Generate a unique rule name.
+     *   The accreditation name is not unique in a spreadsheet
+     */
+    public void generateRuleName(int rowNumber) {
+        ruleName = rowNumber+"_"+accredName;
+    }
 
     public String getBeginDate() {
         return beginDate;
@@ -173,13 +173,13 @@ public class SpreadsheetRule implements java.io.Serializable {
                 + ", course7=" + course7 + ", accredName=" + accredName + "]";
     }
 
-	public int getSpreadsheetRowNumber() {
-		return spreadsheetRowNumber;
-	}
+    public int getSpreadsheetRowNumber() {
+        return spreadsheetRowNumber;
+    }
 
-	public void setSpreadsheetRowNumber(int spreadsheetRowNumber) {
-		this.spreadsheetRowNumber = spreadsheetRowNumber;
-	}
+    public void setSpreadsheetRowNumber(int spreadsheetRowNumber) {
+        this.spreadsheetRowNumber = spreadsheetRowNumber;
+    }
     
 }
 

@@ -20,22 +20,22 @@ public class ReportOnCoursesResultsAggregator implements Service, TimeoutAwareAg
     
     public Exchange aggregate(Exchange oldExchange, Exchange newExchange) {
         
-    	// 1)  generate ruleName based on spreadsheet row number
-    	int rNumber = 4;  // there are 3 rows of headers
-    	List<SpreadsheetRule> latestRules = (List<SpreadsheetRule>)newExchange.getIn().getBody();
-    	for(SpreadsheetRule sRule : latestRules) {
-    		sRule.generateRuleName(rNumber);
-    		rNumber++;
-    	}
-    	
-    	
-    	// 2) merge new spreadsheet rules into list of old spreadsheet rules
+        // 1)  generate ruleName based on spreadsheet row number
+        int rNumber = 4;  // there are 3 rows of headers
+        List<SpreadsheetRule> latestRules = (List<SpreadsheetRule>)newExchange.getIn().getBody();
+        for(SpreadsheetRule sRule : latestRules) {
+            sRule.generateRuleName(rNumber);
+            rNumber++;
+        }
+        
+        
+        // 2) merge new spreadsheet rules into list of old spreadsheet rules
         if( oldExchange == null ) {
             oldExchange = new DefaultExchange(newExchange);
             oldExchange.getIn().setBody(latestRules);
         }else {
-        	List<SpreadsheetRule> oldRules = (List<SpreadsheetRule>) oldExchange.getIn().getBody();
-        	oldRules.addAll(latestRules);
+            List<SpreadsheetRule> oldRules = (List<SpreadsheetRule>) oldExchange.getIn().getBody();
+            oldRules.addAll(latestRules);
         }
         List<SpreadsheetRule> oldRules = (List<SpreadsheetRule>) oldExchange.getIn().getBody();
         
@@ -51,8 +51,8 @@ public class ReportOnCoursesResultsAggregator implements Service, TimeoutAwareAg
         logger.info("stop()");
     }
 
-	public void timeout(Exchange oldExchange, int arg1, int arg2, long arg3) {
-		List<SpreadsheetRule> oldRules = (List<SpreadsheetRule>) oldExchange.getIn().getBody();
-		logger.info("timeout() # of aggregated rules = "+oldRules.size());
-	}
+    public void timeout(Exchange oldExchange, int arg1, int arg2, long arg3) {
+        List<SpreadsheetRule> oldRules = (List<SpreadsheetRule>) oldExchange.getIn().getBody();
+        logger.info("timeout() # of aggregated rules = "+oldRules.size());
+    }
 }

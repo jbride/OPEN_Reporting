@@ -36,13 +36,13 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String SUMTOTAL_FIRST_LINE = "Full Name,User Number,Email,Text 3,User Primary Job,User Primary Organization";
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,Dokeos,USERID,SSO,Role";
-    private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition	Condition";
+    private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition    Condition";
     private static final String DOKEOS = "dokeos_cc";
     private static final String SUMTOTAL = "sumtotal_cc";
     private static final String PARTNER = "partner_cc";
     private static final String STUDENT_REG = "student_registration";
-	private static final Object RULES_SPREADSHEET = "rules_spreadsheet";
-	private static final String ACCRED_RULES_SPREADSHEET_INBOX_PATH = "accred_rules_spreadsheet_inbox_path";
+    private static final Object RULES_SPREADSHEET = "rules_spreadsheet";
+    private static final String ACCRED_RULES_SPREADSHEET_INBOX_PATH = "accred_rules_spreadsheet_inbox_path";
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -109,31 +109,31 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     }
     
     public void writeRulesSpreadsheetsToDisk(Exchange exchange) throws IOException {
-    	String ss_inbox_path = System.getProperty(ACCRED_RULES_SPREADSHEET_INBOX_PATH);
-    	if(StringUtils.isEmpty(ss_inbox_path))
-    		throw new RuntimeException("Need to define the following system property: "+ACCRED_RULES_SPREADSHEET_INBOX_PATH);
-    	
-    	Map<String,String> attachments = (Map<String,String>) exchange.getIn().getBody();
-    	if(attachments.size() == 0)
-    		throw new RuntimeException("No rule spreadsheet attachments");
-    	
-    	File outDir = new File(ss_inbox_path);
-    	if(!outDir.exists())
-    		outDir.mkdirs();
-    	
-    	for(Entry<String, String> attachment : attachments.entrySet()) {
-    		FileOutputStream foStream = null;
-    		try {
-    			File outFile = new File(ss_inbox_path, attachment.getKey());
-    			foStream = new FileOutputStream(outFile);
-    			foStream.write(attachment.getValue().getBytes());
-    			foStream.flush();
-    			logger.info("writeRulesSpreadsheetsToDisk() just wrote rule spreadsheet: "+outFile.getAbsolutePath());
-    		}finally {
-    			if(foStream != null)
-    				foStream.close();
-    		}
-    	}
+        String ss_inbox_path = System.getProperty(ACCRED_RULES_SPREADSHEET_INBOX_PATH);
+        if(StringUtils.isEmpty(ss_inbox_path))
+            throw new RuntimeException("Need to define the following system property: "+ACCRED_RULES_SPREADSHEET_INBOX_PATH);
+        
+        Map<String,String> attachments = (Map<String,String>) exchange.getIn().getBody();
+        if(attachments.size() == 0)
+            throw new RuntimeException("No rule spreadsheet attachments");
+        
+        File outDir = new File(ss_inbox_path);
+        if(!outDir.exists())
+            outDir.mkdirs();
+        
+        for(Entry<String, String> attachment : attachments.entrySet()) {
+            FileOutputStream foStream = null;
+            try {
+                File outFile = new File(ss_inbox_path, attachment.getKey());
+                foStream = new FileOutputStream(outFile);
+                foStream.write(attachment.getValue().getBytes());
+                foStream.flush();
+                logger.info("writeRulesSpreadsheetsToDisk() just wrote rule spreadsheet: "+outFile.getAbsolutePath());
+            }finally {
+                if(foStream != null)
+                    foStream.close();
+            }
+        }
     }
     
     public void determineAttachmentType(Exchange exchange) {
@@ -151,7 +151,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         }else if(firstRow.contains(STUDENT_REG_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, STUDENT_REG);
         }else if(firstRow.contains(RULES_SPREADSHEET_FIRST_LINE)){
-        	exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
+            exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
         }else {
             throw new RuntimeException(ExceptionCodes.GPTE_E_1000+ " firstLine of attachment ="+firstRow);
         }
