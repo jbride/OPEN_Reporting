@@ -1,1 +1,0 @@
-mysql -u skills -p skills_tracker -e "<insert your sql>" | tr '\t' ',' > my-output-file.csv

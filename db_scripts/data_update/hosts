@@ -1,0 +1,5 @@
+[mysqldev]
+docker1.ose.opentlc.com
+
+[mysqlprod]
+forge.opentlc.com
