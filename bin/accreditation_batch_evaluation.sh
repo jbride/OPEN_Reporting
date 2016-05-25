@@ -1,5 +1,8 @@
 #!/bin/bash
 # Purpose:  Determine all StudentAccreditations from a fresh lms_transactional database of existing student courses
+#
+# Dependencies:
+#  1)  accreditation-process JVM must be running on same machine and its rest-dsl endpoint available at:  http://$HOSTNAME:9090/gpte_accreditation/students/batch
 
 for var in $@
 do
