@@ -1,12 +1,13 @@
 remote_bk_dir: /tmp/mysqlbackup
-local_bk_dir: ~/mysqlbackup/
+local_bk_dir: /tmp/mysqlbackup_local/
 remote_user_dev: root
-remote_user_prod: stauilrh 
+remote_user_prod: jbride-redhat.com
 db_host: localhost
 db_user: root
 db_pass: c-9XSHln8hJ_UH9YvNOgc9mH
 databases: 
-   - lms
-   - dashbuilder
-your_name: Samuel Tauil
+   - lms_transactional
+#  - lms_reporting
+#  - dashbuilder
+your_name: Samu
 your_email: stauil@redhat.com

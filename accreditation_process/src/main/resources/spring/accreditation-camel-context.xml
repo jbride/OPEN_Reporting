@@ -82,10 +82,10 @@
 
     <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
     <rest path="/gpte_accreditation/students/">
-        <put uri="{STUDENT_ID}" produces="application/json" >
-            <to uri="direct:determine-accred-for-student" />
-        </put>
         <put uri="batch" produces="application/json" >
+            <to uri="direct:determine-accreds-for-range"/>
+        </put>
+        <put uri="{STUDENT_ID}" produces="application/json" >
             <to uri="direct:determine-accred-for-student" />
         </put>
     </rest>
@@ -100,8 +100,8 @@
     <!--    *************                        ACCREDITATION LOGIC                            *************   -->
     <route id="determine-accreditations-for-all">
         <description> 
-            1) Periodically checks for StudentCourses that have yet to be evaluated by the rules engine
-            2) Gets List of StudentCourse objects from database for ALL students with unevaluated student courses
+            1) Periodically checks for *ALL* StudentCourses that have yet to be evaluated by the rules engine
+            2) Gets List of StudentCourse objects from database for *ALL* students with unevaluated student courses
             3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
             4) Persists student accreditations to database
             5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED

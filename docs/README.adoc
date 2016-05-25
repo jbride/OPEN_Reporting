@@ -28,6 +28,17 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte_accreditation/students/103899
 -----
 
+. Invoke accreditation logic on all students whose studentid > 10000 and < 11000
++
+-----
+curl -v -X PUT  -H "ACCEPT: application/json" \
+                -H "TEST_RULES_ONLY: true" \
+                -H "RESPOND_JSON: true" \
+                -H "LOW_STUDENT_ID: 10000" \
+                -H "HIGH_STUDENT_ID: 11000" \
+                http://$HOSTNAME:9090/gpte_accreditation/students/batch
+-----
+
 == Overview
 == Administration
 
