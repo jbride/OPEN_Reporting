@@ -79,7 +79,7 @@ function determineBatchAccreditations() {
 
 function resetData() {
     echo -en "\n\nresetData() db userId = $lms_transactional_username\n";
-    mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'delete from StudentAccreditations;'
+    mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'truncate table StudentAccreditations;'
     mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'update StudentCourses set processed=0;'
 }
 

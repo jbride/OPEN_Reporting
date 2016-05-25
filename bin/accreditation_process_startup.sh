@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Purpose:  Run Accreditation Process as a standalone java application
 
 for var in $@
@@ -10,11 +12,16 @@ do
     esac
 done
 
+DIRNAME=`dirname "$0"`
+PROGNAME=`basename "$0"`
+RESOLVED_PROJECT_HOME=`cd "$DIRNAME/.."; pwd`
+cd $RESOLVED_PROJECT_HOME
+
 ACCREDITATION_PROCESS_HOME=accreditation_process
 DEPS_DIR=target/dependencies
 CLASSES_DIR=target/classes
 CAMEL_CONTEXT_PATH="spring/accreditation-camel-context.xml"
-PROPS_FILE_LOCATION="../properties/$ENVIRONMENT.properties"
+PROPS_FILE_LOCATION="$RESOLVED_PROJECT_HOME/properties/$ENVIRONMENT.properties"
 OUTPUT_LOG_FILE=/tmp/accreditation_process.log
 
 function help() {
@@ -33,6 +40,9 @@ function help() {
 
 
 function checkPreReqs() {
+
+    echo -en "\n\nDIRNAME = $DIRNAME : PROGNAME = $PROGNAME : RESOLVED_PROJECT_HOME = $RESOLVED_PROJECT_HOME\n"
+    pwd
 
     if [[ ! $(ls -A .projectRoot) ]];
     then
