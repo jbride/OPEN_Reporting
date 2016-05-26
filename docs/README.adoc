@@ -182,6 +182,12 @@ sudo systemctl start gpte-integration.service
 sudo journalctl -u gpte-integration -f
 -----
 
+===== Accredition Process Service
+
+-----
+sudo systemctl restart accred-process.service
+-----
+
 . Gain access to `JBoss Command Line Interface`:
 +
 -----
