@@ -1,3 +1,5 @@
+#!/bin/sh
+
 # Purpose:  Run Accreditation Process as a standalone java application
 
 for var in $@
@@ -7,14 +9,20 @@ do
         -d) DEBUG=true ;;
         --help) HELP=true ;;
         -env=*) ENVIRONMENT=`echo $var | cut -f2 -d\=` ;;
+        stop) STOP=true ;;
     esac
 done
 
-ACCREDITATION_PROCESS_HOME=accreditation_process
-DEPS_DIR=target/dependencies
-CLASSES_DIR=target/classes
+DIRNAME=`dirname "$0"`
+PROGNAME=`basename "$0"`
+RESOLVED_ROOT_PROJECT_HOME=`cd "$DIRNAME/.."; pwd`
+cd $RESOLVED_ROOT_PROJECT_HOME
+
+PROPS_FILE_LOCATION="$RESOLVED_ROOT_PROJECT_HOME/properties/$ENVIRONMENT.properties"
+ACCREDITATION_PROCESS_HOME=$RESOLVED_ROOT_PROJECT_HOME/accreditation_process
+DEPS_DIR=$ACCREDITATION_PROCESS_HOME/target/dependencies
+CLASSES_DIR=$ACCREDITATION_PROCESS_HOME/target/classes
 CAMEL_CONTEXT_PATH="spring/accreditation-camel-context.xml"
-PROPS_FILE_LOCATION="../properties/$ENVIRONMENT.properties"
 OUTPUT_LOG_FILE=/tmp/accreditation_process.log
 
 function help() {
@@ -25,6 +33,7 @@ function help() {
     echo -en "\n\t                                if process is run in background, then log will be directored to: $OUTPUT_LOG_FILE"
     echo -en "\n\t-d                            enable Java debugger; default = false"
     echo -en "\n\t--help                        this help manual"
+    echo -en "\n\tstop                          stop an existing accredition JVM "
     echo -en "\n\nEXAMPLES:";
     echo -en "\n\t./bin/accreditation_process_startup.sh -env=dev -f          :   start accred process in the foreground using dev environment properties"
     echo -en "\n\t./bin/accreditation_process_startup.sh -env=test -f -d      :   start accred process in the foreground using test environment properties and Java debugger enabled"
@@ -33,6 +42,9 @@ function help() {
 
 
 function checkPreReqs() {
+
+    echo -en "\n\nDIRNAME = $DIRNAME : PROGNAME = $PROGNAME : RESOLVED_ROOT_PROJECT_HOME = $RESOLVED_ROOT_PROJECT_HOME\n"
+    pwd
 
     if [[ ! $(ls -A .projectRoot) ]];
     then
@@ -77,12 +89,21 @@ function buildAndStart() {
         java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap
     else
         echo -en "\nStarting accreditation_process.  Check logs at $OUTPUT_LOG_FILE\n\n"
-        nohup java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap > $OUTPUT_LOG_FILE 2>&1 &
+        #nohup java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap > $OUTPUT_LOG_FILE 2>&1 &
+        java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap
     fi
+}
+
+function stop() {
+    processName="com.redhat.gpe.accreditation.util.BootStrap"
+    echo -en "\nstopping process with name: $processName \n";
+    pkill -9 -f $processName
 }
 
 if [ ! -z "$HELP" ]; then
     help
+elif [ ! -z "$STOP" ]; then
+    stop
 else
     checkPreReqs
     buildAndStart

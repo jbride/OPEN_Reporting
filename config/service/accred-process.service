@@ -1,0 +1,13 @@
+[Unit]
+Description=OPEN Reporting Accred Process
+After=network.target
+
+[Service]
+ExecStart=/opt/OPEN_Reporting/bin/accreditation_process_startup.sh -env=dev -f
+ExecStop=/opt/OPEN_Reporting/bin/accreditation_process_startup.sh stop
+StandardOutput=journal
+SyslogIdentifier=accredprocess
+User=jboss
+
+[Install]
+WantedBy=multi-user.target

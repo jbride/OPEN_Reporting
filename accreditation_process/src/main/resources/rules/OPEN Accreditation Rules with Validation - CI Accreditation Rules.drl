@@ -17,7 +17,7 @@ global ArrayList accreditationList
 rule "4_Red Hat Sales Engineer Specialist - Cloud Management_with_1_course"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "CloudForms 4 FASTRAX")
+    $cc1:CourseCompletion(courseName == "CloudForms FASTRAX")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jan-2014", "1-Jul-2014", $cc1))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1);
@@ -40,7 +40,7 @@ rule "5_Red Hat Sales Engineer Specialist - Cloud Management_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Cloud Management Solution for Salesperson")
-    $cc2:CourseCompletion(this != $cc1, courseName == "CloudForms 4 FASTRAX")
+    $cc2:CourseCompletion(this != $cc1, courseName == "CloudForms FASTRAX")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jul-2014", "1-Aug-2016", $cc1, $cc2))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2);
@@ -691,7 +691,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "33_Red Hat Delivery Specialist - Platform as a Service_with_2_courses"
+rule "33_Red Hat Delivery Specialist - PaaS Development_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "OpenShift 3 FASTRAX")
@@ -701,7 +701,7 @@ then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2);
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("Red Hat Delivery Specialist - Platform as a Service");
+    accreditation.setAccreditationName("Red Hat Delivery Specialist - PaaS Development");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
@@ -714,7 +714,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "34_Red Hat Delivery Specialist - Advanced DevOps_with_4_courses"
+rule "34_Red Hat Delivery Specialist - Advanced Platform as a Service_with_4_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "OpenShift 3 FASTRAX")
@@ -726,7 +726,7 @@ then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4 );
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("Red Hat Delivery Specialist - Advanced DevOps");
+    accreditation.setAccreditationName("Red Hat Delivery Specialist - Advanced Platform as a Service");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
