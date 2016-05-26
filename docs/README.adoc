@@ -42,16 +42,8 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 == Overview
 == Administration
 
-=== Execute Rules Spreadsheet Validation
+=== Execute Rules Spreadsheet Validation and Parsing to DRL
 
-. Download `DCI`, `MW` and `CI` tabs from {rulesspreadsheet}
-.. For all three spreadsheet tabs, navigate to `File -> Download As -> Tab Separated Value (.tsv, current sheet)
-.. Save all three spreadsheets to your local file system, ie:  $HOME/Downloads
-. Secure copy latest *.tsv files to `docker1.ose.opentlc.com`
-+
------
-scp $HOME/Downloads/*.tsv jboss@docker1.ose.opentlc.com:/tmp/gpte/inbox-for-rules-spreadsheets/
------
 . SSH into docker1 as the `jboss` operating system user:
 +
 -----
@@ -69,7 +61,15 @@ cd /opt/OPEN_Reporting
 .. start JVM
 +
 -----
-./bin/accreditation_process_startup.sh -f -env=test
+./bin/accreditation_process_startup.sh -env=test -f
+-----
+. Download `DCI`, `MW` and `CI` tabs from {rulesspreadsheet}
+.. For all three spreadsheet tabs, navigate to `File -> Download As -> Tab Separated Value (.tsv, current sheet)
+.. Save all three spreadsheets to your local file system, ie:  $HOME/Downloads
+. Secure copy latest *.tsv files to `docker1.ose.opentlc.com`
++
+-----
+scp $HOME/Downloads/*.tsv jboss@docker1.ose.opentlc.com:/opt/OPEN_Reporting/accreditation_process/src/test/resources/rules-spreadsheet/
 -----
 
 === Operating System
@@ -180,6 +180,7 @@ sudo systemctl start gpte-integration.service
 +
 -----
 sudo journalctl -u gpte-integration -f
+sudo journalctl -u accredprocess -f
 -----
 
 . Gain access to `JBoss Command Line Interface`:
