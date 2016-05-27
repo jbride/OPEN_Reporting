@@ -16,11 +16,6 @@
 
     <version.gpte.ops.project>1.0</version.gpte.ops.project>
 
-    <!-- cli.port>10115</cli.port -->
-    <!-- wildfly 9 / eap7 with port-offset of 125 -->
-    <cli.port>10124</cli.port>
-    <!-- EAP 6.4 with port-offset of 125 -->
-
     <environment>test</environment>
   </properties>
   <modules>

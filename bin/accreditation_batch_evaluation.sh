@@ -103,7 +103,6 @@ function readPropertiesFile() {
     echo "$PROPS_FILE_LOCATION not found."
   fi
 
-
 }
 
 
