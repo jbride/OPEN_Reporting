@@ -7,7 +7,8 @@ do
     case "$var" in
         -f) FOREGROUND=true ;;
         -d) DEBUG=true ;;
-        --help) HELP=true ;;
+        -help) HELP=true ;;
+        -h) HELP=true ;;
         -env=*) ENVIRONMENT=`echo $var | cut -f2 -d\=` ;;
         stop) STOP=true ;;
     esac
@@ -32,7 +33,7 @@ function help() {
     echo -en "\n\t-f                            run operating system process in foreground; default = false"
     echo -en "\n\t                                if process is run in background, then log will be directored to: $OUTPUT_LOG_FILE"
     echo -en "\n\t-d                            enable Java debugger; default = false"
-    echo -en "\n\t--help                        this help manual"
+    echo -en "\n\t-help                        this help manual"
     echo -en "\n\tstop                          stop an existing accredition JVM "
     echo -en "\n\nEXAMPLES:";
     echo -en "\n\t./bin/accreditation_process_startup.sh -env=dev -f          :   start accred process in the foreground using dev environment properties"

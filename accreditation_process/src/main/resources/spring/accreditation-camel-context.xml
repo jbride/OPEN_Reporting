@@ -437,7 +437,7 @@
                     <simple>${body.email}</simple>
                 </setHeader>
                 <to uri="velocity:emailTemplates/email-student-create-sb-account.vm"/>
-                <to uri="smtps://smtp.gmail.com?username={{sb_email_username}}&amp;password={{sb_email_password}}" id="send_email_to_student"/>
+                <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email_to_student"/>
                 <log message="${header.to} : Sent email to: ${header.to}"/>
             </otherwise>
         </choice>
@@ -477,7 +477,7 @@
         </choice>
         <filter>
             <constant>{{sb_enable_all_emails}}</constant>
-            <to uri="smtps://smtp.gmail.com?username={{sb_email_username}}&amp;password={{sb_email_password}}" id="send_email"/>
+            <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
             <log message="Sent reply email to: ${header.to}"/>
         </filter>
     </route>

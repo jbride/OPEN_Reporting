@@ -20,12 +20,12 @@ import com.redhat.gpte.util.PropertiesSupport;
  */
 public class SMTPTest extends CamelSpringTestSupport {
     
-    private static final String EMAIL_USERNAME = "sb_email_username";
-    private static final String EMAIL_PASSOWRD = "sb_email_password";
+    private static final String EMAIL_USERNAME = "gpte_email_username";
+    private static final String EMAIL_PASSOWRD = "gpte_email_password";
     private static final String RECIPIENT_EMAIL = "admin_email";
     private static final String SEND_RESPONSE_EMAIL_URI = "cc_sb_send_response_email_uri";
-    private static final String SMTP_SERVER = "sb_smtp_server";
-    private static final String SMTP_PORT = "sb_smtp_port";
+    private static final String SMTP_SERVER = "gpte_smtp_server";
+    private static final String SMTP_PORT = "gpte_smtp_port";
     private static final String RETURN_PATH = "Return-Path";
     
     private String userId = null;

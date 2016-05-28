@@ -6,15 +6,14 @@
 # Pre-res
 #   1)  Ensure that JBoss EAP 6.4 is running with specified port-offset
 
-# Usage
-#   Deploy all:    ./bin/deploy_all.sh -env=dev
-#   UnDeploy all:  ./bin/deploy_all.sh -u
 
 for var in $@
 do
     case "$var" in
         -u) UNDEPLOY=true ;;
         -env=*) ENVIRONMENT=`echo $var | cut -f2 -d\=` ;;
+        -h) HELP=true ;;
+        -help) HELP=true ;;
     esac
 done
 
@@ -24,6 +23,14 @@ RESOLVED_ROOT_PROJECT_HOME=`cd "$DIRNAME/.."; pwd`
 cd $RESOLVED_ROOT_PROJECT_HOME
 
 PROPS_FILE_LOCATION="properties/$ENVIRONMENT.properties"
+
+function help() {
+    echo -en "\n\nOPTIONS:";
+    echo -en "\n\t-env=[dev, test, prod]        REQUIRED: specify environment specific java system properties (as per properties directory at the root of this project)"
+    echo -en "\n\t-u                            undeploy subproject artifacts from JBoss runtime"
+    echo -en "\n\t-h                            this help manual\n\n"
+}
+
 
 function readPropertiesFile() {
 
@@ -71,14 +78,12 @@ function ensurePreReqs() {
         echo -en "\nExecuting from correct directory: `pwd` \n\n"
     fi
 
-    if [ "x$UNDEPLOY" == "x" ]; then
-        if [ "x$ENVIRONMENT" == "x" ]; then
+    if [ "x$ENVIRONMENT" == "x" ]; then
             echo -en "must pass parameter: -env=<environment> . \n\n"
+            help
             exit 1;
-        fi
     fi
 
-    checkRemotePort
 }
 
 
@@ -130,8 +135,13 @@ function deploySReg() {
     fi
 }
 
-readPropertiesFile
-ensurePreReqs
-deployCC
-deployUP
-deploySReg
+if [ ! -z "$HELP" ]; then
+    help
+else
+    ensurePreReqs
+    readPropertiesFile
+    checkRemotePort
+    #deployCC
+    #deploySReg
+    deployUP
+fi

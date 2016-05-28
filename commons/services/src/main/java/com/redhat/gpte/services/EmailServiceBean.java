@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.HashSet;
 
 import javax.activation.DataHandler;
 
@@ -26,7 +28,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
 
     public static final String ATTACHMENTS_ARE_VALID = "Attachments are valid.";
     private static final String RETURN_PATH = "Return-Path";
-    private static final String RED_HAT_SUFFIX = "redhat.com";
+    private static final String GPTE_VALID_EMAIL_SUFFIXES = "gpte_valid_email_suffixes";
     private static final String ADMIN_EMAIL = "admin_email";
     private static final String DELIMITER = ",";
     private static final String CSV_SUFFIX = ".csv";
@@ -47,12 +49,21 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private Logger logger = Logger.getLogger(getClass());
 
     private String adminEmail;
+    private Set<String> validEmailSuffixes;
 
     public EmailServiceBean() {
         
         adminEmail = System.getProperty(ADMIN_EMAIL);
         if(StringUtils.isEmpty(adminEmail))
             throw new RuntimeException("Must define a system property of: "+ADMIN_EMAIL);
+
+        String vSuffixes = System.getProperty(GPTE_VALID_EMAIL_SUFFIXES);
+        if(StringUtils.isEmpty(vSuffixes)) {
+            throw new RuntimeException("Must define a system property of: "+GPTE_VALID_EMAIL_SUFFIXES);
+        }else {
+            String[] vEmailsSuffixArray = vSuffixes.split(",");
+            validEmailSuffixes = new HashSet<String>(Arrays.asList(vEmailsSuffixArray));
+        }
     }
 
     public boolean isValidCamelMessage(Exchange exchange) throws AttachmentValidationException {
@@ -61,11 +72,12 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         // make sure return email exists, it is from redhat.com and email has csv attachment(s)
         // Do not throw AttachmentValidationException as this would be expensive to handle if originating from DDoS attack
         String fromEmail = cleanEmailAddress(in.getHeader(RETURN_PATH, String.class));
+        String fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1);
         if(StringUtils.isEmpty(fromEmail)) {
             logger.error("isValidCamelMessage() no return email address provided");
             return false;
-        } else if (fromEmail.indexOf(RED_HAT_SUFFIX) == -1)  {
-            logger.error("isValidCamelMessage() email address is invalid (must origin from *@redhat.com) : "+fromEmail);
+        } else if (!validEmailSuffixes.contains(fromEmailSuffix))  {
+            logger.error("isValidCamelMessage() email address is invalid (must origin from *@redhat.com) : "+fromEmailSuffix);
             return false;
         }
         
