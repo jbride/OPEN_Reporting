@@ -60,7 +60,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         try {
             course = canonicalDAO.getCourseByCourseName(stCC.getActivityName(), null);
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            throw new RuntimeException("Unable to locate a course with the following course name: "+stCC.getActivityName());
+            throw new RuntimeException("Unable to locate a course with the following course name: \""+stCC.getActivityName()+"\"");
         }
         Language language = new Language();
         language.setLanguageid(ENGLISH);
@@ -90,6 +90,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             throw new RuntimeException(ExceptionCodes.GPTE_CC1001+dokeosCourseCompletion.toString());
         
         logger.info(dokeosCourseCompletion.getEmail()+" : converting from dokeos course completion to canonical StudentCourse");
+
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/37
+        dokeosCourseCompletion.pruneQuizName();
         
         // If student not found, throws: org.springframework.dao.EmptyResultDataAccessException
         Student student = canonicalDAO.getStudentByEmail(dokeosCourseCompletion.getEmail());
@@ -98,7 +101,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         try {
             course = canonicalDAO.getCourseByCourseName(dokeosCourseCompletion.getQuizName(), DokeosCourseCompletion.COURSE_COMPLETION_MAPPING_NAME);
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            throw new RuntimeException("Unable to locate a course with the following course name: "+dokeosCourseCompletion.getQuizName());
+            throw new RuntimeException("Unable to locate a course with the following course name: \""+dokeosCourseCompletion.getQuizName()+"\"");
         }
         Language language = new Language();
         language.setLanguageid(ENGLISH);

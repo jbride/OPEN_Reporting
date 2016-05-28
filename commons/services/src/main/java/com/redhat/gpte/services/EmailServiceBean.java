@@ -34,7 +34,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String CSV_SUFFIX = ".csv";
     private static final String TSV_SUFFIX = ".tsv";
     private static final String ATTACHMENT_TYPE = "ATTACHMENT_TYPE";
-    private static final String DOKOES_FIRST_LINE = "Fullname;Email;Quiz name;Score;Date;Time;";
+    private static final String DOKOES_FIRST_LINE = "Fullname;Email;Exam name;Score;Date;Time";
     private static final String SUMTOTAL_FIRST_LINE = "Full Name,User Number,Email,Text 3,User Primary Job,User Primary Organization";
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,Dokeos,USERID,SSO,Role";

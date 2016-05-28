@@ -141,7 +141,7 @@ else
     ensurePreReqs
     readPropertiesFile
     checkRemotePort
-    #deployCC
-    #deploySReg
+    deployCC
+    deploySReg
     deployUP
 fi

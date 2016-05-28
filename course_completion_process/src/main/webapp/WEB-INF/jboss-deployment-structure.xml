@@ -10,6 +10,12 @@
       <!-- https://github.com/redhat-gpe/OPEN_Admin/issues/123 -->
       <module name="org.springframework.spring" export="true" meta-inf="export" />
 
+      <!-- Support bindy annotations in domain model
+           Also need to add the following dependency to the bindy module $JBOSS_HOME/modules/system/layers/fuse/org/apache/camel/component/bindy/main/module.xml
+            <module name="javax.annotation.api" export="true" />
+      -->
+      <module name="org.apache.camel.component.bindy" export="true" meta-inf="export" />
+
     </dependencies>
   </deployment>
 </jboss-deployment-structure>

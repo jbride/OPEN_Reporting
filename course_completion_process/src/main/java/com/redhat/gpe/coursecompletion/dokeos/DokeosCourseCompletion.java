@@ -10,7 +10,12 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     
     private static final long serialVersionUID = 1L;
     public static final SimpleDateFormat dokeosSDF = new SimpleDateFormat("MM-dd-yy");
-    public static final String COURSE_COMPLETION_MAPPING_NAME = "dokeos";
+    public static final String DOKEOS_SUFFIX = " Final Assessment";
+
+    // https://github.com/redhat-gpe/OPEN_Reporting/issues/37
+    // Dokes exam names are now identical to canonical course names;  no need to use mapping table
+    //public static final String COURSE_COMPLETION_MAPPING_NAME = "dokeos";
+    public static final String COURSE_COMPLETION_MAPPING_NAME = null;
 
     private static final String COMMA = ",";
 
@@ -32,7 +37,7 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     @DataField(pos=6)
     private String time;
     
-    @DataField(pos=7)
+    //@DataField(pos=7)
     private String empty;
     
     
@@ -66,6 +71,11 @@ public class DokeosCourseCompletion implements java.io.Serializable {
 
     public void setQuizName(String quizName) {
         this.quizName = quizName;
+    }
+
+    public void pruneQuizName() {
+        String prunedQuizName = quizName.substring(0, quizName.indexOf(DOKEOS_SUFFIX));
+        this.quizName = prunedQuizName;
     }
 
 
