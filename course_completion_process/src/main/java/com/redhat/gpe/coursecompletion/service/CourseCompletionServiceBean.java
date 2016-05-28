@@ -30,8 +30,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         int companyId = 0;
         if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0)
             companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
-        else 
+        else {
+            // TO-DO:  https://github.com/redhat-gpe/OPEN_Reporting/issues/40
             throw new RuntimeException(ExceptionCodes.GPTE_CC1000+studentEmail);
+        }
         
         Student studentObj = new Student();
         studentObj.setEmail(studentEmail);
