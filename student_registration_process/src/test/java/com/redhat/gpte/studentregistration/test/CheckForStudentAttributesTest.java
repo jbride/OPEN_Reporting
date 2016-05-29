@@ -62,7 +62,7 @@ public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
         in.setBody(studentIn);
         exchange = template.send(GET_STUDENT_ATTRIBUTES_FROM_IPA_URI, exchange);
         Student studentOut = (Student)exchange.getIn().getBody();
-        System.out.println("email = "+email+" ; companyName = "+studentOut.getCompanyName());
+        System.out.println("testGetStudentAttributesFromIPATest() email = "+email+" ; companyName = "+studentOut.getCompanyName());
 
     }
 }

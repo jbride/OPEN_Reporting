@@ -170,10 +170,10 @@ public class LDAPServiceBean {
                                         Student.Geos.valueOf(student.getRegion());
                                     }
                                 }else if(attributeValue.startsWith(PARTNER_ATTRIBUTE_PREFIX)) {
-                                    String partnerValue = attributeValue.substring(3, attributeValue.indexOf(PARTNER_ATTRIBUTE_SUFFIX));
-                                	if(NULL_STRING.equals(partnerValue))
+                                	if(NULL_STRING.equals(attributeValue))
                                 		logger.warn(student.getEmail()+" : null partner name from LDAP");
                                 	else {
+                                		String partnerValue = attributeValue.substring(17, attributeValue.indexOf(PARTNER_ATTRIBUTE_SUFFIX));
                                 		student.setCompanyName(partnerValue);
                                 	}
                                 }
