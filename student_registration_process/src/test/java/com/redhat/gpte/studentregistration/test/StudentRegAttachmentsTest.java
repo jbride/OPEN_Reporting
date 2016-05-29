@@ -61,7 +61,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
 
     @Override
     protected AbstractApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("/spring/user-registration-camel-context.xml");
+        return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
     
     @Ignore
