@@ -46,10 +46,12 @@ public class LDAPServiceBean {
     private static final String CLOSE_PAREN = ")";
     private static final String TITLE_ATTRIBUTE = "title";
     private static final String GEO_ATTRIBUTE_PREFIX = "cn=rhpds-geo-";
+    private static final String PARTNER_ATTRIBUTE_PREFIX = "cn=rhpds-partner";
     public static final int GPTE_QUERY_SIZE_LIMIT = 2000;
     public static final String GPSETRAINING_WILDCARD = "gpsetraining*";
     private static final String MEMBEROF_ATTRIBUTE = "memberOf";
     private static final String GEO_ATTRIBUTE_SUFFIX = ",cn=groups,cn=accounts,dc=opentlc,dc=com";
+    private static final String PARTNER_ATTRIBUTE_SUFFIX = ",cn=groups,cn=accounts,dc=opentlc,dc=com";
     private static final String SOURCE_OF_PROBLEM = "\n\tSource of problem:\t";
     private static final char AMPERSAND = '@';
     private static final char DASH = '-';
@@ -167,6 +169,13 @@ public class LDAPServiceBean {
                                         student.setRegion(geoValue);
                                         Student.Geos.valueOf(student.getRegion());
                                     }
+                                }else if(attributeValue.startsWith(PARTNER_ATTRIBUTE_PREFIX)) {
+                                    String partnerValue = attributeValue.substring(3, attributeValue.indexOf(PARTNER_ATTRIBUTE_SUFFIX));
+                                	if(NULL_STRING.equals(partnerValue))
+                                		logger.warn(student.getEmail()+" : null partner name from LDAP");
+                                	else {
+                                		student.setCompanyName(partnerValue);
+                                	}
                                 }
                             }
                         }
@@ -293,6 +302,9 @@ public class LDAPServiceBean {
         }catch(AuthenticationException x) {
             logger.error("init() unable to connect to: "+providerUrl+" using user="+securityPrincipal);
             throw x;
+        }catch(javax.naming.CommunicationException x) {
+        	logger.error("init() unable to connect to: "+providerUrl+" using user="+securityPrincipal);
+        	throw x;
         }
     }
     

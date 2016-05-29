@@ -53,6 +53,9 @@ public class Student implements Serializable {
     private String  region;
     private String  subregion;
     private String  country;
+    
+    // https://github.com/redhat-gpe/OPEN_Reporting/issues/40
+    private transient String companyName;
 
     /* smangan: 22 Feb 2016
      * probably a good idea to maintain it in Students as well so that we can more easily feed it back to SalesForce. 
@@ -223,7 +226,15 @@ public class Student implements Serializable {
         this.deActivationDate = deActivationDate;
     }
 
-    @Override
+    public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	@Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
                 + ", firstname=" + firstname + ", lastname=" + lastname
