@@ -86,6 +86,45 @@ function ensurePreReqs() {
 
 }
 
+function deployJBossModules() {
+    gpteModulePath=$jboss_home/modules/system/layers/base/com/redhat/gpte/main
+    echo -en "deployJBossModules() \n\n"
+    if [ "$UNDEPLOY" != true ];
+    then
+        # 0) ensure fuse on jboss eap installation exists
+        if [[ ! $(ls $jboss_home/modules/system/layers/fuse) ]];
+        then
+            echo -en "\nNot able to find fuse on jboss eap installation at: $jboss_home\n\n"
+            exit 1
+        else
+            echo -en "\nfuse on jboss eap installation found at: $jboss_home\n\n"
+        fi
+
+        # 1) build gpte commons subprojects
+        cd $RESOLVED_ROOT_PROJECT_HOME/commons
+        mvn clean install -DskipTests
+        cd $RESOLVED_ROOT_PROJECT_HOME
+
+        # 2) prep JBOSS Modules
+        #echo "layers=fuse,soa,gpte" > $jboss_home/modules/layers.conf
+        rm -rf $gpteModulePath
+        # cp $jboss_home/modules/system/layers/fuse/org/apache/commons/lang3/main/commons-lang3-3.2.1.jar $jboss_home/modules/system/layers/base/com/redhat/gpte/main  # org.apache.commons.lang3.StringUtils
+
+        # 3) copy module.xml files
+        cp -r config/modules/ $jboss_home/
+
+        # 4) copy gpte libraries
+        cp commons/domain/target/gpte-*.jar $gpteModulePath
+        #cp commons/dao/target/gpte-*.jar $gpteModulePath
+        #cp commons/services/target/gpte-*.jar $gpteModulePath
+
+        # 5) reload JBoss EAP
+        $jboss_home/bin/jboss-cli.sh --connect --controller=localhost:10124 :reload
+
+        sleep 5 
+    fi
+}
+
 
 function deployCC() {
     echo -en "deployCC() \n\n"
@@ -141,7 +180,8 @@ else
     ensurePreReqs
     readPropertiesFile
     checkRemotePort
+    deployJBossModules
     deployCC
-    deploySReg
-    deployUP
+    #deploySReg
+    #deployUP
 fi

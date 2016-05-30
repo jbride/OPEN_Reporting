@@ -7,6 +7,8 @@
       <module name="org.apache.commons.lang3"/>
       <module name="org.apache.commons.io"/>
 
+      <module name="com.redhat.gpte" export="true" meta-inf="export" />
+
       <!-- https://github.com/redhat-gpe/OPEN_Admin/issues/123 -->
       <module name="org.springframework.spring" export="true" meta-inf="export" />
 

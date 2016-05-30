@@ -35,38 +35,43 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
 /* ***********      Student    ************************ */
     public void insertNewStudentGivenDokeosCourseCompletion(Exchange exchange) throws Exception {
-    	DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion) exchange.getIn().getBody();
+        DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion) exchange.getIn().getBody();
         String studentEmail = dokeosCourseCompletion.getEmail();
         int companyId = 0;
         if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0)
             companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
         else {
             // TO-DO:  https://github.com/redhat-gpe/OPEN_Reporting/issues/40
-        	CamelContext cContext = exchange.getContext();
-        	Student studentIn = new Student();
-        	studentIn.setEmail(studentEmail);
-        	Endpoint endpoint = cContext.getEndpoint(GET_STUDENT_ATTRIBUTES_FROM_IPA_URI);
+            CamelContext cContext = exchange.getContext();
+            Student studentIn = new Student();
+            studentIn.setEmail(studentEmail);
+            Endpoint endpoint = cContext.getEndpoint(GET_STUDENT_ATTRIBUTES_FROM_IPA_URI);
             exchange.setPattern(ExchangePattern.InOut);
             Message in = exchange.getIn();
             in.setBody(studentIn);
             Producer producer = null;
             Exchange getCompanyExchange = null;
+            Student studentOut = null;
             try {
                 producer = endpoint.createProducer();
                 producer.start();
                 getCompanyExchange = producer.createExchange();
+                getCompanyExchange.setPattern(ExchangePattern.InOut);
                 getCompanyExchange.getIn().setBody(studentIn);
                 producer.process(getCompanyExchange);
-                Student studentOut = (Student)getCompanyExchange.getIn().getBody();
+                studentOut = (Student)getCompanyExchange.getIn().getBody();
                 logger.info(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() about to identify companyId using companyname = "+studentOut.getCompanyName());
                 if(StringUtils.isNotEmpty(studentOut.getCompanyName())){
-                	companyId = this.getCompanyID(studentOut.getCompanyName());
+                    companyId = this.getCompanyID(studentOut.getCompanyName());
                 }else {
-                	throw new RuntimeException(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() not able to identify company information for this student");
+                    throw new RuntimeException(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() not able to identify company information for this student");
                 }
+            } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+                logger.error(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() no company name found with name = "+studentOut.getCompanyName());
+                throw x;
             } finally {
                 try {
-                	if(producer != null)
+                    if(producer != null)
                         producer.stop();
                 } catch(Exception y) {
                     y.printStackTrace();

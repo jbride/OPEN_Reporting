@@ -70,6 +70,7 @@
         <groupId>com.redhat.gpte.ops</groupId>
         <artifactId>gpte-domain</artifactId>
         <version>${version.gpte.ops.project}</version>
+        <scope>provided</scope>
       </dependency>
       <dependency>
         <groupId>com.redhat.gpte.ops</groupId>

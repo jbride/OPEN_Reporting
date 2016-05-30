@@ -23,6 +23,10 @@
   <dependencies>
     <dependency>
       <groupId>com.redhat.gpte.ops</groupId>
+      <artifactId>gpte-dao</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.redhat.gpte.ops</groupId>
       <artifactId>gpte-services</artifactId>
     </dependency>
     <dependency>
