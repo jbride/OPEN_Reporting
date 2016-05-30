@@ -25,6 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.redhat.gpe.domain.canonical.Student;
+import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
 import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
 
@@ -34,7 +35,7 @@ import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
  * Other alternative java based LDAP tools to consider listed here:  http://directory.apache.org/api/java-api.html
  */
 @SuppressWarnings("restriction")
-public class LDAPServiceBean {
+public class LDAPServiceBean extends GPTEBaseServiceBean {
     
     public static final String UID = "uid=";
     public static final String COMMA = ",";

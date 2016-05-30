@@ -81,9 +81,11 @@
     
     <route id="receive-dokeos-course-completions">
         <description>
-            1)  Executes validation logic on inbound Dokeos data file
-            2)  Kicks back data files that do not pass validation logic and sends notification email of problem
-            3)  Persists StudentCourse objects
+            - Accepts list of dokeos course completion spreadsheets
+            - Executes validation logic on inbound Dokeos data file
+            - Kicks back data files that do not pass validation logic and sends notification email of problem
+            - Iterates through course completions in each spreadsheet
+            - Persists course completions (StudentCourse objects)
         </description>
         <from uri="{{cc_receive_dokeos_input_uri}}" />
         <log message="Received Dokeos email. from: ${header.Return-Path}, subject ${header.subject}" id="log_dokeos_receive"/>

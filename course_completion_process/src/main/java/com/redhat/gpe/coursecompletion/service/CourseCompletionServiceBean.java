@@ -6,7 +6,15 @@ import com.redhat.gpe.domain.canonical.*;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.ExceptionCodes;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
+
 import org.apache.camel.Body;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Message;
+import org.apache.camel.Producer;
+import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -20,19 +28,50 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String ENGLISH = "EN_US";
     private static final String SUMTOTAL_COMPLETED = "COMPLETED";
     private static final byte coursePassingValue = 70;
+    public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "vm:get-student-attributes-from-ipa";
 
     private Logger logger = Logger.getLogger(getClass());
     
 
 /* ***********      Student    ************************ */
-    public void insertNewStudentGivenDokeosCourseCompletion(@Body DokeosCourseCompletion dokeosCourseCompletion) {
+    public void insertNewStudentGivenDokeosCourseCompletion(Exchange exchange) throws Exception {
+    	DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion) exchange.getIn().getBody();
         String studentEmail = dokeosCourseCompletion.getEmail();
         int companyId = 0;
         if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0)
             companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
         else {
             // TO-DO:  https://github.com/redhat-gpe/OPEN_Reporting/issues/40
-            throw new RuntimeException(ExceptionCodes.GPTE_CC1000+studentEmail);
+        	CamelContext cContext = exchange.getContext();
+        	Student studentIn = new Student();
+        	studentIn.setEmail(studentEmail);
+        	Endpoint endpoint = cContext.getEndpoint(GET_STUDENT_ATTRIBUTES_FROM_IPA_URI);
+            exchange.setPattern(ExchangePattern.InOut);
+            Message in = exchange.getIn();
+            in.setBody(studentIn);
+            Producer producer = null;
+            Exchange getCompanyExchange = null;
+            try {
+                producer = endpoint.createProducer();
+                producer.start();
+                getCompanyExchange = producer.createExchange();
+                getCompanyExchange.getIn().setBody(studentIn);
+                producer.process(getCompanyExchange);
+                Student studentOut = (Student)getCompanyExchange.getIn().getBody();
+                logger.info(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() about to identify companyId using companyname = "+studentOut.getCompanyName());
+                if(StringUtils.isNotEmpty(studentOut.getCompanyName())){
+                	companyId = this.getCompanyID(studentOut.getCompanyName());
+                }else {
+                	throw new RuntimeException(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() not able to identify company information for this student");
+                }
+            } finally {
+                try {
+                	if(producer != null)
+                        producer.stop();
+                } catch(Exception y) {
+                    y.printStackTrace();
+                }
+            }
         }
         
         Student studentObj = new Student();
