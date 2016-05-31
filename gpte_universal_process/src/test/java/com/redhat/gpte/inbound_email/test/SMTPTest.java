@@ -23,14 +23,12 @@ public class SMTPTest extends CamelSpringTestSupport {
     private static final String EMAIL_USERNAME = "gpte_email_username";
     private static final String EMAIL_PASSOWRD = "gpte_email_password";
     private static final String RECIPIENT_EMAIL = "admin_email";
-    private static final String SEND_RESPONSE_EMAIL_URI = "cc_sb_send_response_email_uri";
     private static final String SMTP_SERVER = "gpte_smtp_server";
     private static final String SMTP_PORT = "gpte_smtp_port";
     private static final String RETURN_PATH = "Return-Path";
     
     private String userId = null;
     private String password = null;
-    private String routeURI = null;
     private String recipientEmail = null;
     private String smtpServer = null;
     private int smtpPort = 0;
@@ -44,11 +42,9 @@ public class SMTPTest extends CamelSpringTestSupport {
     public void init() {
         userId = System.getProperty(EMAIL_USERNAME);
         password = System.getProperty(EMAIL_PASSOWRD);
-        routeURI = System.getProperty(SEND_RESPONSE_EMAIL_URI);
         recipientEmail = System.getProperty(RECIPIENT_EMAIL);
         smtpServer = System.getProperty(SMTP_SERVER);
         smtpPort = Integer.parseInt(System.getProperty(SMTP_PORT));
-        System.out.println("init() userId = "+userId+" : password = "+password+" : routeURI = "+routeURI+" : recipientEmail = "+recipientEmail+" : smtpServer = "+smtpServer+" : smtpPort = "+smtpPort);
     }
 
     @Ignore
@@ -87,9 +83,4 @@ public class SMTPTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/environment-specific-camel-context.xml", "/spring/course-completion-camel-context.xml");
     }
 
-    @Ignore
-    @Test
-    public void testSendReplyEmailRoute() throws InterruptedException {
-        template.sendBodyAndHeader(routeURI, "test", RETURN_PATH, recipientEmail);
-    }
 }

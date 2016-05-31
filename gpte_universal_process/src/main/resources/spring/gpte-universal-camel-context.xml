@@ -113,7 +113,7 @@
             </otherwise>
         </choice>
         <filter>
-            <constant>{{sb_enable_all_emails}}</constant>
+            <constant>{{gpte_enable_all_emails}}</constant>
             <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
             <log message="Sent reply email to: ${header.to}"/>
         </filter>
