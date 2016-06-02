@@ -1,0 +1,84 @@
+---
+- name: dashbuilder/lms backup on dev
+  hosts: mysqldev
+  remote_user: "{{ remote_user_dev }}"
+  vars_files:
+    - vars.yml
+
+  tasks:
+
+      - name: Create Backups folder
+        file: path={{ remote_bk_dir }} state=directory
+        tags:
+          - dump
+
+      - name: Dump databases
+        mysql_db: login_user={{ db_user }} login_host={{ db_host }} login_password={{ db_pass }} name={{ item }} state=dump target={{ remote_bk_dir }}/{{ item }}Db.sql.gz
+        with_items: databases
+        tags:
+          - dump
+
+      - name: Fetch databases backups
+        fetch: src={{ remote_bk_dir }}/{{ item }}Db.sql.gz dest={{ local_bk_dir }}
+        with_items: databases
+        tags:
+          - dump
+
+      - name: Delete temp backup folder from server
+        file: path={{ remote_bk_dir }} state=absent
+        tags:
+          - dump
+
+
+- name: dashbuilder/lms import in production
+  hosts: mysqlprod
+  remote_user: "{{ remote_user_prod }}"
+  vars_files:
+    - vars.yml
+
+  tasks:
+
+      - name: Create Temporary folder
+        file: path={{ remote_bk_dir }} state=directory
+        tags:
+          - import
+
+      - name: Copy database dump files to remote host
+        copy: src={{ local_bk_dir }}docker1.ose.opentlc.com/{{ remote_bk_dir }}/{{ item }}Db.sql.gz dest={{ remote_bk_dir }}
+        with_items: databases
+        tags:
+          - import
+
+      - name: Import data in the database
+        mysql_db: login_user={{ db_user }} login_password={{ db_pass }} name={{ item }} state=import target={{ remote_bk_dir }}/{{ item }}Db.sql.gz
+        with_items: databases
+        tags:
+          - import 
+
+      - name: Delete temp backup folder from server
+        file: path={{ remote_bk_dir }} state=absent
+        tags:
+          - import
+
+      - name: Delete temp backup folder local
+        file: path={{ local_bk_dir }}docker1.ose.opentlc.com/{{ remote_bk_dir }}/{{ item }}Db.sql.gz state=absent
+        with_items: databases
+        tags:
+          - import 
+          - clean         
+
+      - name: Send email notification
+        local_action: mail msg='Databases in {{ ansible_hostname }} have been successfully backed up and imported.'
+                      subject='Ansible Backup/Import Report'
+                      host='smtp.gmail.com'
+                      port=587
+                      username=gpeskillsdev@gmail.com
+                      password='Fusejboss99'
+                      body='These databases have been backed up {{ databases }} and imported successfully.'                      
+                      to='{{ your_name }} <{{ your_email }}>'
+        ignore_errors: true
+        tags:          
+          - notification
+          - import          
+
+...

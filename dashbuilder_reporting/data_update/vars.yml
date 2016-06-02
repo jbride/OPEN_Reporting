@@ -1,0 +1,12 @@
+remote_bk_dir: /tmp/mysqlbackup
+local_bk_dir: ~/mysqlbackup/
+remote_user_dev: root
+remote_user_prod: stauilrh 
+db_host: localhost
+db_user: root
+db_pass: redhat
+databases: 
+   - lms
+   - dashbuilder
+your_name: Samuel Tauil
+your_email: stauil@redhat.com

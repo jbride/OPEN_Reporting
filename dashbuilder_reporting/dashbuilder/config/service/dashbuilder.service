@@ -1,0 +1,14 @@
+[Unit]
+Description=Wildfly Application Server
+Documentation=https://docs.jboss.org/author/display/WFLY8/Documentation
+After=network.target
+
+[Service]
+EnvironmentFile=/etc/wildfly/wildfly.conf
+ExecStart=/opt/jboss/eap/wildfly-8.2.0.Final/bin/standalone.sh
+StandardOutput=journal
+SyslogIdentifier=Wildfly
+User=jboss
+
+[Install]
+WantedBy=multi-user.target
