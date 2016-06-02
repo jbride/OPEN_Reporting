@@ -119,6 +119,9 @@
             <logger category="com.redhat.ge.reporting">
                 <level name="DEBUG"/>
             </logger>
+            <logger category="org.jboss.security">
+                <level name="TRACE"/>
+            </logger>
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
