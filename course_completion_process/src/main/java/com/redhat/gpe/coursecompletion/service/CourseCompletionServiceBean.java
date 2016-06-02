@@ -64,11 +64,18 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 if(StringUtils.isNotEmpty(studentOut.getCompanyName())){
                     companyId = this.getCompanyID(studentOut.getCompanyName());
                 }else {
-                    throw new RuntimeException(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() not able to identify company information for this student");
+                    StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() not able to identify company information for this student");
+                    sBuilder.append("\nCourse completion info as follows:");
+                    sBuilder.append("\n\temail: "+dokeosCourseCompletion.getEmail());
+                    sBuilder.append("\n\tassessmentDate: "+dokeosCourseCompletion.getAssessmentDate());
+                    throw new RuntimeException(sBuilder.toString());
                 }
             } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-                logger.error(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() no company name found with name = "+studentOut.getCompanyName());
-                throw x;
+                StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"insertNewStudentGivenDokeosCourseCompletion() no company name found with name = "+studentOut.getCompanyName());
+                sBuilder.append("\nCourse completion info as follows:");
+                sBuilder.append("\n\temail: "+dokeosCourseCompletion.getEmail());
+                sBuilder.append("\n\tassessmentDate: "+dokeosCourseCompletion.getAssessmentDate());
+                throw new RuntimeException(sBuilder.toString());
             } finally {
                 try {
                     if(producer != null)
@@ -137,17 +144,21 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         
         logger.info(dokeosCourseCompletion.getEmail()+" : converting from dokeos course completion to canonical StudentCourse");
 
-        // https://github.com/redhat-gpe/OPEN_Reporting/issues/37
-        dokeosCourseCompletion.pruneQuizName();
-        
         // If student not found, throws: org.springframework.dao.EmptyResultDataAccessException
         Student student = canonicalDAO.getStudentByEmail(dokeosCourseCompletion.getEmail());
+        
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/37
+        dokeosCourseCompletion.pruneQuizName();
         
         Course course = null;
         try {
             course = canonicalDAO.getCourseByCourseName(dokeosCourseCompletion.getQuizName(), DokeosCourseCompletion.COURSE_COMPLETION_MAPPING_NAME);
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            throw new RuntimeException("Unable to locate a course with the following course name: \""+dokeosCourseCompletion.getQuizName()+"\"");
+            StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"Unable to locate a course with the following course name: \""+dokeosCourseCompletion.getQuizName()+"\"");
+            sBuilder.append("\nCourse completion info as follows:");
+            sBuilder.append("\n\temail: "+dokeosCourseCompletion.getEmail());
+            sBuilder.append("\n\tassessmentDate: "+dokeosCourseCompletion.getAssessmentDate());
+            throw new RuntimeException(sBuilder.toString());
         }
         Language language = new Language();
         language.setLanguageid(ENGLISH);

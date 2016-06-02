@@ -4,6 +4,7 @@ import java.text.SimpleDateFormat;
 
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
+import com.redhat.gpte.services.ExceptionCodes;
 
 @CsvRecord(separator=";", skipFirstLine=true)
 public class DokeosCourseCompletion implements java.io.Serializable {
@@ -74,8 +75,16 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     }
 
     public void pruneQuizName() {
-        String prunedQuizName = quizName.substring(0, quizName.indexOf(DOKEOS_SUFFIX));
-        this.quizName = prunedQuizName;
+        if(quizName.indexOf(DOKEOS_SUFFIX) > 0) {
+            String prunedQuizName = quizName.substring(0, quizName.indexOf(DOKEOS_SUFFIX));
+            this.quizName = prunedQuizName;
+        } else {
+            StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"The following course evaluation name does not follow convention: \""+quizName+"\" . Eval name must have a suffix of: "+DOKEOS_SUFFIX);
+            sBuilder.append("\nCourse completion info as follows:");
+            sBuilder.append("\n\temail: "+email);
+            sBuilder.append("\n\tassessmentDate: "+assessmentDate);
+            throw new RuntimeException(sBuilder.toString());
+        }
     }
 
 
