@@ -86,6 +86,7 @@
             - Kicks back data files that do not pass validation logic and sends notification email of problem
             - Iterates through course completions in each spreadsheet
             - Persists course completions (StudentCourse objects)
+            - Because course completions are now originating from rh.dokeos.com in an automated manner, no longer will send receipt of confirmation.
         </description>
         <from uri="{{cc_receive_dokeos_input_uri}}" />
         <log message="Received Dokeos email. from: ${header.Return-Path}, subject ${header.subject}" id="log_dokeos_receive"/>
@@ -116,8 +117,8 @@
                     <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
                 </split>
             </split>
-            <setBody><constant>Course Completion Process:  Dokeos Email with attachments received and validated</constant></setBody>
-            <to uri="seda:send-email"/>
+            <!-- setBody><constant>Course Completion Process:  Dokeos Email with attachments received and validated</constant></setBody>
+            <to uri="seda:send-email"/ -->
     </route>
 
     <route id="receive-partner-course-completions">
@@ -135,8 +136,11 @@
         <choice id="if-passing-score">
             <when>
                 <simple>${body.assessmentScore} >= 70</simple>
-                <log message="${body.student.email} : Adding student course to db: ${body.course.coursename}"/>
-                <to uri="bean:cCompletionServiceBean?method=addStudentCourseToDB" id="add-course-completion-to-db"/>
+                <when>
+                    <simple>{{cc_persist_student_accreditation}} == true</simple>
+                    <log message="${body.student.email} : Adding student course to db: '${body.course.coursename}'"/>
+                    <to uri="bean:cCompletionServiceBean?method=addStudentCourseToDB" id="add-course-completion-to-db"/>
+                </when>
             </when>
             <otherwise>
                 <log message="${body.student.email} : Will not persist student course due to non-passing score: ${body.courseName}" id="log_student_course_not_passed"/>
@@ -147,7 +151,6 @@
     <route id="send-email">
         <from uri="seda:send-email"/>
         <removeHeaders pattern="*" excludePattern="Return-Path"/>
-        <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
         <setHeader headerName="From">
             <constant>GPTE Course Completions &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
@@ -155,6 +158,7 @@
         <choice id="if-exception-exists">
             <when>
                 <simple>${exception.message} != null</simple>
+                <setHeader headerName="to"><constant>{{admin_email}}</constant></setHeader>
                 <setHeader headerName="Subject">
                     <constant>GPTE Course Completion Service ({{jboss.host.name}}): Problem processing data</constant>
                 </setHeader>
@@ -165,6 +169,7 @@
                 <to uri="velocity:emailTemplates/problem-reply-email.vm"/>
             </when>
             <otherwise>
+                <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
                 <setHeader headerName="Subject">
                     <constant>GPTE Course Completion Service ({{jboss.host.name}}): Success</constant>
                 </setHeader>
