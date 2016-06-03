@@ -28,22 +28,22 @@ public class GELoggedUserCommand extends AbstractCommand {
         log.debug("execute() commandName = "+commandName);
 
         if (LOGGED_USER_PARTNER.equals(commandName)) {
-        	// The following data provider triggers this code block:
+            // The following data provider triggers this code block:
                 // select s.email, s.region, s.subregion, s.country, s.partnertype, sa.accreditation, sa.enddate from Students s, StudentAccreditations sa where s.email=sa.email and { logged_user_partner, COMPANY};
-        	StringBuilder sBuilder = new StringBuilder();
-        	sBuilder.append(this.ORGANIZATION_FIELD);
-        	sBuilder.append(this.EQUALS);
-        	sBuilder.append(userCtx.getPartnerId());
-        	sBuilder.append("\"");
-        	return sBuilder.toString();
+            StringBuilder sBuilder = new StringBuilder();
+            sBuilder.append(this.ORGANIZATION_FIELD);
+            sBuilder.append(this.EQUALS);
+            sBuilder.append(userCtx.getPartnerId());
+            sBuilder.append("\"");
+            return sBuilder.toString();
         }
         if (LOGGED_USER_GEO.equals(commandName)) {
-        	StringBuilder sBuilder = new StringBuilder();
-        	sBuilder.append(this.GEO_FIELD);
-        	sBuilder.append(this.EQUALS);
-        	sBuilder.append(userCtx.getGeo());
-        	sBuilder.append("\"");
-        	return sBuilder.toString();
+            StringBuilder sBuilder = new StringBuilder();
+            sBuilder.append(this.GEO_FIELD);
+            sBuilder.append(this.EQUALS);
+            sBuilder.append(userCtx.getGeo());
+            sBuilder.append("\"");
+            return sBuilder.toString();
         }
         return null;
     }

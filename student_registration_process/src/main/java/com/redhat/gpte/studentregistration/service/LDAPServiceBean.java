@@ -171,12 +171,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                                         Student.Geos.valueOf(student.getRegion());
                                     }
                                 }else if(attributeValue.startsWith(PARTNER_ATTRIBUTE_PREFIX)) {
-                                	if(NULL_STRING.equals(attributeValue))
-                                		logger.warn(student.getEmail()+" : null partner name from LDAP");
-                                	else {
-                                		String partnerValue = attributeValue.substring(17, attributeValue.indexOf(PARTNER_ATTRIBUTE_SUFFIX));
-                                		student.setCompanyName(partnerValue);
-                                	}
+                                    if(NULL_STRING.equals(attributeValue))
+                                        logger.warn(student.getEmail()+" : null partner name from LDAP");
+                                    else {
+                                        String partnerValue = attributeValue.substring(17, attributeValue.indexOf(PARTNER_ATTRIBUTE_SUFFIX));
+                                        student.setCompanyName(partnerValue);
+                                    }
                                 }
                             }
                         }
@@ -304,8 +304,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             logger.error("init() unable to connect to: "+providerUrl+" using user="+securityPrincipal);
             throw x;
         }catch(javax.naming.CommunicationException x) {
-        	logger.error("init() unable to connect to: "+providerUrl+" using user="+securityPrincipal);
-        	throw x;
+            logger.error("init() unable to connect to: "+providerUrl+" using user="+securityPrincipal);
+            throw x;
         }
     }
     

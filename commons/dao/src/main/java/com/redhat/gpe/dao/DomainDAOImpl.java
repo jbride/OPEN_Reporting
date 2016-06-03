@@ -212,9 +212,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public Course getCourseByCourseId(String courseId) {
-    	StringBuilder sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c ");
-    	sBuilder.append("where c.CourseId = \""+courseId+"\"");
-    	Course courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        StringBuilder sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c ");
+        sBuilder.append("where c.CourseId = \""+courseId+"\"");
+        Course courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
         return courseObj;
     }
     
@@ -353,13 +353,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public int changeStatusOnExpiredStudentAccreditations() {
-    	
-    	StringBuilder sBuilder = new StringBuilder();
-    	sBuilder.append("update StudentAccreditations set accreditationType=\"");
-    	sBuilder.append(StudentAccreditation.Types.Expired);
-    	sBuilder.append("\" where AccreditationDate < DATE_SUB(NOW(),INTERVAL 2 YEAR)");
-    	int expiredCount = sbJdbcTemplate.update(sBuilder.toString());
-    	return expiredCount;
+        
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append("update StudentAccreditations set accreditationType=\"");
+        sBuilder.append(StudentAccreditation.Types.Expired);
+        sBuilder.append("\" where AccreditationDate < DATE_SUB(NOW(),INTERVAL 2 YEAR)");
+        int expiredCount = sbJdbcTemplate.update(sBuilder.toString());
+        return expiredCount;
     }
     
     // Allows for insert or update

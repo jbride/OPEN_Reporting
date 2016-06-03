@@ -227,14 +227,14 @@ public class Student implements Serializable {
     }
 
     public String getCompanyName() {
-		return companyName;
-	}
+        return companyName;
+    }
 
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
 
-	@Override
+    @Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
                 + ", firstname=" + firstname + ", lastname=" + lastname
