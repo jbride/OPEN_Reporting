@@ -19,7 +19,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
     private static final String OK = "Ok";
     private static final String EQUAL="=?,";
-            private static final String EMP_NOT_FOUND_IN_SB = "Student not found in Skills Base";
+    private static final String EMP_NOT_FOUND_IN_SB = "Student not found in Skills Base";
     private int rht_company_id = 0;
 
     private Logger logger = Logger.getLogger(getClass());
@@ -211,6 +211,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         
     }
     
+    public Course getCourseByCourseId(String courseId) {
+    	StringBuilder sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c ");
+    	sBuilder.append("where c.CourseId = \""+courseId+"\"");
+    	Course courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        return courseObj;
+    }
+    
     public List<Course> listCanonicalCourses() {
         StringBuilder sBuilder = new StringBuilder("select ");
         sBuilder.append(Course.FROM_CLAUSE);
@@ -332,7 +339,6 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     
     
-    
 /* *******************    StudentAccreditation    ************************************************ */
     
     public List<Accreditation> selectUnprocessedStudentAccreditationsByProcessStatus(int processedStatus) {
@@ -344,6 +350,16 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("AND sa.CourseID = c.CourseID");
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
         return sAccreds;
+    }
+    
+    public int changeStatusOnExpiredStudentAccreditations() {
+    	
+    	StringBuilder sBuilder = new StringBuilder();
+    	sBuilder.append("update StudentAccreditations set accreditationType=\"");
+    	sBuilder.append(StudentAccreditation.Types.Expired);
+    	sBuilder.append("\" where AccreditationDate < DATE_SUB(NOW(),INTERVAL 2 YEAR)");
+    	int expiredCount = sbJdbcTemplate.update(sBuilder.toString());
+    	return expiredCount;
     }
     
     // Allows for insert or update

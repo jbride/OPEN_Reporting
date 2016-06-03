@@ -34,56 +34,43 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     @DataField(pos=1)
     private String fullName;
     
-    @DataField(pos=2)
     private String userNumber;
 
-
-    @DataField(pos=3)
+    @DataField(pos=2)
     private String email;
     
-    @DataField(pos=4)
     private String text3;
 
-    @DataField(pos=5)
     private String primaryJob;
 
-    @DataField(pos=6)
     private String organization;
 
-    @DataField(pos=7)
     private String domain;
     
-    @DataField(pos=8)
     private String country;
     
-    @DataField(pos=9)
     private boolean isActive;
     
-    @DataField(pos=10)
+    @DataField(pos=3)
     private String activityLabel;
 
-    @DataField(pos=11)
+    @DataField(pos=4)
     private String activityName;
     
-    @DataField(pos=12)
+    @DataField(pos=5)
     private String activityCode;
     
-    @DataField(pos=13)
     private boolean isCertification;
     
-    @DataField(pos=14)
     private String attendanceStatus;
     
-    @DataField(pos=15)
     private String completionStatus;
 
-    @DataField(pos=16, pattern="MMM dd, yyyy")
     private Date attemptStartDate = new Date();
     
-    @DataField(pos=17, pattern="MMM dd, yyyy")
+    @DataField(pos=6, pattern="MMM dd, yyyy")
     private Date attemptEndDate = new Date();
     
-    @DataField(pos=18)
     private String text4;
     
     public SumtotalCourseCompletion() {

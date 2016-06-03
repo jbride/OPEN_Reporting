@@ -18,6 +18,14 @@ import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
@@ -29,8 +37,32 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String SUMTOTAL_COMPLETED = "COMPLETED";
     private static final byte coursePassingValue = 70;
     public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "vm:get-student-attributes-from-ipa";
+	private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
+	private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte_course_issues.txt";
 
     private Logger logger = Logger.getLogger(getClass());
+	private boolean cc_append_course_issues_to_file = false;
+	private File courseIssuesFile = null;
+	
+	public CourseCompletionServiceBean() throws IOException {
+		String x = System.getProperty(CC_APPEND_COURSE_ISSUES_TO_FILE);
+		if(StringUtils.isNotEmpty(x)){
+			cc_append_course_issues_to_file = Boolean.parseBoolean(x);
+			courseIssuesFile = new File(COURSE_ISSUES_OUTPUT);
+			courseIssuesFile.createNewFile();
+			FileOutputStream fStream = null;
+    		try {
+    			fStream = new FileOutputStream(courseIssuesFile);
+    			String output = "CourseId,CourseName";
+    			fStream.write(output.getBytes());
+    			fStream.flush();
+    		} finally {
+    			if(fStream != null)
+    				fStream.close();
+    		}
+			logger.info("CourseCompletionServiceBean:  cc_append_course_issues_to_file = "+cc_append_course_issues_to_file +" : "+courseIssuesFile.getAbsolutePath());
+		}
+	}
     
 
 /* ***********      Student    ************************ */
@@ -93,14 +125,15 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         studentObj.setCompanyid(companyId);
         canonicalDAO.updateStudent(studentObj);
     } 
-/********************************************************************/
+/**
+ * @throws IOException ******************************************************************/
     
     
     
 
 /* **************       Student Courses        ********************** */
     
-    public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) {
+    public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException {
         
         logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse");
         Student student = null;
@@ -111,9 +144,13 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         }
         Course course = null;
         try {
-            course = canonicalDAO.getCourseByCourseName(stCC.getActivityName(), null);
+            course = canonicalDAO.getCourseByCourseId(stCC.getActivityCode());
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            throw new RuntimeException("Unable to locate a course with the following course name: \""+stCC.getActivityName()+"\"");
+        	if(cc_append_course_issues_to_file ) {
+        		String output = "\n"+stCC.getActivityCode()+","+stCC.getActivityName();
+        		Files.write(Paths.get(courseIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
+        	}
+            throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
         }
         Language language = new Language();
         language.setLanguageid(ENGLISH);
