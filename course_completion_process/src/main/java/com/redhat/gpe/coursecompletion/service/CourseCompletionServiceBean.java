@@ -14,14 +14,11 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.apache.camel.Producer;
-import org.apache.camel.builder.RouteBuilder;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -29,6 +26,8 @@ import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
@@ -43,6 +42,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
     private File courseIssuesFile = null;
+    private Map<String, Course> courseMapTempCache = new HashMap<String, Course>();  // <mappedCourseId, Course obj>
     
     public CourseCompletionServiceBean() throws IOException {
         String x = System.getProperty(CC_APPEND_COURSE_ISSUES_TO_FILE);
@@ -136,21 +136,32 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException {
         
         logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse");
+        Course course = null;
+        if(courseMapTempCache.containsKey(stCC.getActivityCode())){
+            course = courseMapTempCache.get(stCC.getActivityCode());
+            if(course == null) {
+                throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
+            }
+        } else {
+            
+            try {
+                course = canonicalDAO.getCourseByCourseId(stCC.getActivityCode());
+                this.courseMapTempCache.put(stCC.getActivityCode(), course);
+            } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+                courseMapTempCache.put(stCC.getActivityCode(), null);
+                if(cc_append_course_issues_to_file ) {
+                    String output = "\n"+stCC.getActivityCode()+","+stCC.getActivityName();
+                    Files.write(Paths.get(courseIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
+                }
+                throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
+            }
+        }
+        
         Student student = null;
         try {
             student = canonicalDAO.getStudentByEmail(stCC.getEmail());
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
             throw new RuntimeException("Unable to locate a student with the following email: "+stCC.getEmail());
-        }
-        Course course = null;
-        try {
-            course = canonicalDAO.getCourseByCourseId(stCC.getActivityCode());
-        } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            if(cc_append_course_issues_to_file ) {
-                String output = "\n"+stCC.getActivityCode()+","+stCC.getActivityName();
-                Files.write(Paths.get(courseIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
-            }
-            throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
         }
         Language language = new Language();
         language.setLanguageid(ENGLISH);

@@ -211,10 +211,24 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         
     }
     
+    // Given a courseId, retrieves a Course object
+    // Initially checks Courses tables.  If not found then checks CourseMappings table
     public Course getCourseByCourseId(String courseId) {
-        StringBuilder sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c ");
-        sBuilder.append("where c.CourseId = \""+courseId+"\"");
-        Course courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        Course courseObj = null;
+        StringBuilder sBuilder = null;
+        try {
+            // 1)  First attempt: retrieve from Courses table  
+            sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c ");
+            sBuilder.append("where c.CourseId = \""+courseId+"\"");
+            courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        } catch(org.springframework.dao.EmptyResultDataAccessException x){
+            
+            // 2) Second attempt:  retreive from CourseMappings table
+            sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c, CourseMappings cm ");
+            sBuilder.append("where cm.CourseId = c.CourseId ");
+            sBuilder.append("and (cm.oldCourseCode=\""+courseId+"\" or cm.newCourseCode=\""+courseId+"\")");
+            courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        }
         return courseObj;
     }
     
