@@ -248,14 +248,13 @@
                 <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
                 <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
                 <to uri="direct:skills-base-webservice" id="call-SkillsBase-ws"/>
+                <to uri="direct:update-pathgather-with-accreditation" id="call-pathgather" />
                 <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
             </filter>
         </split>
         <log message="####################      done" loggingLevel="INFO"/>
     </route>
     <!--    *************************************************************************************************   -->
-
-
 
 
     <!--    *************************************************************************************************   -->
@@ -386,7 +385,7 @@
     <!--    *************                       SkillsBase                                      *************   -->
     <route id="skills-base-webservice">
         <description>
-            Expects the following payload:  DenormalizedStudentAccreditation
+            Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
             Responsible for updating SkillsBase web service with StudentAccreditation
             Emails Student to encourage them to create a SkillsBase account if student has not already done so
         </description>
@@ -444,6 +443,19 @@
     </route>
     <!--    *************************************************************************************************   -->
 
+
+    <!--    *************************************************************************************************   -->
+    <!--    *************                       Pathgather                                      *************   -->
+    <route id="update-pathgather-with-accreditation" >
+        <description>
+            1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
+            2) Responsible for ?????
+        </description>
+        <from uri="direct:update-pathgather-with-accreditation" />
+        <log message="******** Invoking pathgatherer     done" loggingLevel="INFO"/>
+    </route>
+
+    <!--    *************************************************************************************************   -->
 
 
 
