@@ -248,9 +248,9 @@ image::skillsbase_integration/doc/images/gmail_settings.png[]
 
 -----
 mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
-mysql -u lms_trans -plms_trans lms_transactional < db_scripts/data_load/lms_transactional_data.sql
+mysql -u lms_trans -plms_trans lms_transactional < db_scripts/lms_transactional_data.sql
 delete from lms_transactional.Students where StudentID > 10399
-mysqldump --no-create-db --no-create-info -u lms_trans -p'lms_trans' lms_transactional > db_scripts/data_load/lms_transactional_data.sql
+mysqldump --no-create-db --no-create-info -u lms_trans -p'lms_trans' lms_transactional > db_scripts/lms_transactional_data.sql
 -----
 
 === Configure, build and deploy
