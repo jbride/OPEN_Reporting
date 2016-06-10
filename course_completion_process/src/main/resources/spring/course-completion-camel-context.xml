@@ -137,7 +137,7 @@
             <when>
                 <simple>${body.assessmentScore} >= 70</simple>
                 <when>
-                    <simple>{{cc_persist_student_accreditation}} == true</simple>
+                    <simple>{{cc_persist_student_course}} == true</simple>
                     <log message="${body.student.email} : Adding student course to db: '${body.course.coursename}'"/>
                     <to uri="bean:cCompletionServiceBean?method=addStudentCourseToDB" id="add-course-completion-to-db"/>
                 </when>

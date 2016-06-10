@@ -51,7 +51,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     public void init() {}
 
 
-    @Ignore
+    //@Ignore
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 
@@ -66,14 +66,14 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
         Exchange exchange = endpoint.createExchange();
         Message in = exchange.getIn();
         in.setBody(studentId);
-        in.setHeader(IDENTIFY_FIRED_RULES_ONLY_HEADER, "true");
+        in.setHeader(IDENTIFY_FIRED_RULES_ONLY_HEADER, "false");
         in.setHeader(RESPOND_JSON_HEADER, "true");
         Exchange outE = template.send(DETERMINE_ACCREDITATION_FOR_STUDENT_URI, exchange);
         System.out.println("testDeterminAccreditationForStudent() response = "+outE.getIn().getBody());
         
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testDetermineAccreditationForStudentRange() throws InterruptedException {
         Endpoint endpoint = context.getEndpoint(DETERMINE_ACCREDITATION_FOR_RANGE_URI);

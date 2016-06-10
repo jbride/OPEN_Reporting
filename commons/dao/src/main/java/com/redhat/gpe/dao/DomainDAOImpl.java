@@ -357,7 +357,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     public List<Accreditation> selectUnprocessedStudentAccreditationsByProcessStatus(int processedStatus) {
         StringBuilder sBuilder = new StringBuilder();
-        sBuilder.append("SELECT "+Student.FROM_CLAUSE+","+AccreditationDefinition.WHERE_CLAUSE+","+StudentAccreditation.WHERE_CLAUSE+","+Course.FROM_CLAUSE+" "); 
+        sBuilder.append("SELECT "+Student.FROM_CLAUSE+","+AccreditationDefinition.FROM_CLAUSE+","+StudentAccreditation.FROM_CLAUSE+","+Course.FROM_CLAUSE+" "); 
         sBuilder.append("FROM Students s, AccreditationDefinitions a, StudentAccreditations sa, Courses c ");
         sBuilder.append("WHERE sa.StudentID = s.StudentID ");
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
@@ -379,8 +379,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     // Allows for insert or update
     public void addStudentAccreditation(StudentAccreditation sAccredObj) {
         
-        StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?) ");
-        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed)");
+        StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?) ");
+        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");
                 
         int updateCount = sbJdbcTemplate.update(sBuilder.toString(),
                 sAccredObj.getStudentid(), 
@@ -388,7 +388,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 sAccredObj.getAccreditationdate(),
                 sAccredObj.getAccreditationtype(),
                 sAccredObj.getCourseid(),
-                sAccredObj.getProcessed()
+                sAccredObj.getProcessed(),
+                sAccredObj.getRuleFired()
                 );
         logger.debug("addStudentAccreditation() added the following # of records = "+updateCount);
     }

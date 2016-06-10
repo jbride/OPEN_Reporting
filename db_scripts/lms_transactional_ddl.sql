@@ -121,7 +121,7 @@ CREATE TABLE `StudentAccreditations` (
   `AccreditationType` varchar(20) NOT NULL,
   `CourseID` varchar(50) NOT NULL,
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
-  `RuleFired` varchar(50) NOT NULL,
+  `RuleFired` varchar(100) NOT NULL,
   PRIMARY KEY (`StudentID`,`AccreditationID`),
   KEY `IDX_StudentAccreditations_Students` (`StudentID`),
   KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),

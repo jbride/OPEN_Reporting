@@ -24,7 +24,7 @@ public class StudentAccreditation implements Serializable {
     public static final int PROCESSED_SKILLS_BASE_ONLY = 1;
     public static final int PROCESSED_SALESFORCE_ONLY = 2;
     public static final int PROCESSED_ALL = 10;
-    public static final String WHERE_CLAUSE = "sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed";
+    public static final String FROM_CLAUSE = "sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed,sa.RulesFired";
 
     private Integer   studentid;
     private Integer   accreditationid;
@@ -38,6 +38,8 @@ public class StudentAccreditation implements Serializable {
      */
     private String    courseid;
     private short     processed = UNPROCESSED;
+    
+    private String ruleFired;
     
     public java.util.Date determineExperitionDate() {
         Calendar cal = Calendar.getInstance();
@@ -125,7 +127,15 @@ public class StudentAccreditation implements Serializable {
         this.processed = processed;
     }
 
-    @Override
+    public String getRuleFired() {
+		return ruleFired;
+	}
+
+	public void setRuleFired(String ruleFired) {
+		this.ruleFired = ruleFired;
+	}
+
+	@Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Studentaccreditations (");
 

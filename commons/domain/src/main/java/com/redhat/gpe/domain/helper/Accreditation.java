@@ -42,6 +42,7 @@ public class Accreditation {
     }
     public void setRuleFired(String x) {
         ruleFired = x;
+        this.studentAccred.setRuleFired(x);
     }
     public AccreditationDefinition getAccreditation() {
         return accreditationDefinition;
