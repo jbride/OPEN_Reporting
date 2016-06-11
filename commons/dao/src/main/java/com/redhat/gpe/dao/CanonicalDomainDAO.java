@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Course;
+import com.redhat.gpe.domain.canonical.Language;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentCourse;
 import com.redhat.gpe.domain.canonical.StudentAccreditation;
@@ -49,6 +50,9 @@ public interface CanonicalDomainDAO {
     public int getAccreditationIdGivenName(String accredName);
     public List<Accreditation> selectUnprocessedStudentAccreditationsByProcessStatus(int processed);
     public void addStudentAccreditation(StudentAccreditation sAccredObj);
+    
+    /* ******* Languages  ********* */
+    public List<Language> getLanguages();
     
     /* ****** Stored Procedures  *******/
     public void triggerStoredProcedure(String storedProcCall);

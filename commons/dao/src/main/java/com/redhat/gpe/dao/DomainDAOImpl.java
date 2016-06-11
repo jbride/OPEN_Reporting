@@ -396,6 +396,17 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 /* ******************************************************************************* */
     
     
+    
+/* ************			Language		*************  */
+    public List<Language> getLanguages() {
+    	StringBuilder sBuilder = new StringBuilder("select "+Language.FROM_CLAUSE+ " from Languages l");
+    	List<Language> langs = sbJdbcTemplate.query(sBuilder.toString(), new LanguagesRowMapper());    	
+    	return langs;
+    }
+/*******************************************************/
+    
+    
+    
 /* **************        Reporting  ***************** */
     
     public void triggerStoredProcedure(String storedProcCall) {

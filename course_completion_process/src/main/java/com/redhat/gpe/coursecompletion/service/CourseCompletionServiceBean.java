@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
@@ -44,6 +45,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private File courseIssuesFile = null;
     private Map<String, Course> courseMapTempCache = new HashMap<String, Course>();  // <mappedCourseId, Course obj>
     
+    private static Object synchObj = new Object();
+    private static final String underscoreFilter="_$";
+    private static final String dashFilter="-$";
+    private static String langFilter;
+    
+   
     public CourseCompletionServiceBean() throws IOException {
         String x = System.getProperty(CC_APPEND_COURSE_ISSUES_TO_FILE);
         if(StringUtils.isNotEmpty(x)){
@@ -61,7 +68,34 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     fStream.close();
             }
             logger.info("CourseCompletionServiceBean:  cc_append_course_issues_to_file = "+cc_append_course_issues_to_file +" : "+courseIssuesFile.getAbsolutePath());
+            
         }
+        
+    }
+    
+    public void setLangFilter() {
+    	if(langFilter == null) {
+    		synchronized(synchObj) {
+    			if(langFilter == null) {
+    				List<Language> langs = canonicalDAO.getLanguages();
+    				StringBuilder sBuilder = new StringBuilder();
+    				sBuilder.append("(");
+    				int y = 0;
+    				for(Language lang : langs){
+    					sBuilder.append(lang.getLanguageid());
+    					if(y < langs.size() - 1) {
+    						sBuilder.append("|");
+    						y++;
+    					}else {
+    						break;
+    					}
+    				}
+    				sBuilder.append(")");
+    				langFilter = sBuilder.toString();
+    				logger.info("setLangFilter(): langFilter = "+langFilter);
+    			}
+    		}
+    	}
     }
     
 
@@ -136,7 +170,18 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException {
         
         logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse");
+        if(StringUtils.isEmpty(this.langFilter)){
+        	this.setLangFilter();
+        }
         Course course = null;
+        
+        String aCode = stCC.getActivityCode();
+        aCode = aCode.replaceAll(this.langFilter, "");
+        aCode = aCode.replaceAll(this.underscoreFilter, "");
+        aCode = aCode.replaceAll(this.dashFilter, "");
+        stCC.setActivityCode(aCode);
+        logger.info("convertSumtotalCourseCompletionToStudentCourse() aCode = "+stCC.getActivityCode());
+        
         if(courseMapTempCache.containsKey(stCC.getActivityCode())){
             course = courseMapTempCache.get(stCC.getActivityCode());
             if(course == null) {
