@@ -38,7 +38,7 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     @DataField(pos=6)
     private String time;
     
-    //@DataField(pos=7)
+    @DataField(pos=7, required=false)
     private String empty;
     
     

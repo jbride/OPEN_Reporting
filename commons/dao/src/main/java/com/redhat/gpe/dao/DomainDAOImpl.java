@@ -379,7 +379,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     // Allows for insert or update
     public void addStudentAccreditation(StudentAccreditation sAccredObj) {
         
-        StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?) ");
+        StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?,null) ");
         sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");
                 
         int updateCount = sbJdbcTemplate.update(sBuilder.toString(),
