@@ -72,7 +72,9 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         // make sure return email exists, it is from redhat.com and email has csv attachment(s)
         // Do not throw AttachmentValidationException as this would be expensive to handle if originating from DDoS attack
         String fromEmail = cleanEmailAddress(in.getHeader(RETURN_PATH, String.class));
-        String fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1);
+        logger.debug("fromEmail = "+fromEmail);
+        String fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1, fromEmail.indexOf(".com")+4);
+        fromEmailSuffix = fromEmailSuffix.replace(">", "");
         if(StringUtils.isEmpty(fromEmail)) {
             logger.error("isValidCamelMessage() no return email address provided");
             return false;
