@@ -17,6 +17,7 @@ public interface CanonicalDomainDAO {
     /* *******   Company   *********/
     public int updateCompany(Company companyObj);
     public int getCompanyID(String companyName);
+    public Company getCompanyGivenLdapId(String ldapId);
 
     /* *******  Students  ********/
     public Student getStudentByEmail(String email);

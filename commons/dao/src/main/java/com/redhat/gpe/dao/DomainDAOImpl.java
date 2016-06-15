@@ -39,12 +39,14 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     public int updateCompany(Company companyObj) {
         int updatedCount = 0;
         if(companyObj.getCompanyid() == 0) {
-            StringBuilder sql = new StringBuilder("insert into Companies values (null,?,?,?,?) ");
+            StringBuilder sql = new StringBuilder("insert into Companies values (null,?,?,?,?,?) ");
             updatedCount = sbJdbcTemplate.update(sql.toString(), 
                     companyObj.getAccountid(), 
                     companyObj.getCompanyname(),
                     companyObj.getPartnertype(),
-                    companyObj.getPartnertier());
+                    companyObj.getPartnertier(),
+                    companyObj.getLdapId()
+            );
         }else {
             StringBuilder sBuilder = new StringBuilder("update Companies set ");
             sBuilder.append(Company.ACCOUNT_ID+EQUAL+Company.COMPANY_NAME+EQUAL+Company.PARTNER_TYPE+EQUAL+Company.PARTNER_TIER+"=? ");
@@ -53,7 +55,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 companyObj.getAccountid(),
                 companyObj.getCompanyname(),
                 companyObj.getPartnertype(),
-                companyObj.getPartnertier()
+                companyObj.getPartnertier(),
+                companyObj.getLdapId()
                 });
         }
         return updatedCount;
@@ -69,7 +72,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             rht_company_id = companyId;
         return companyId;
     }
-    
+
+    public Company getCompanyGivenLdapId(String ldapId) {
+        StringBuilder sBuilder = new StringBuilder("select * from Companies c where ldapId = \""+ldapId+"\"");
+        Company companyObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CompanyRowMapper());
+        return companyObj;
+    }
+   
    
     /* ****************************************************************************** */
     

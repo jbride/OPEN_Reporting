@@ -1,5 +1,7 @@
 package com.redhat.gpe.coursecompletion.sumtotal;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
@@ -28,8 +30,11 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     public static final String ATTEMPT_START_DATE="attemptStartDate";
     public static final String ATTEMPT_END_DATE="attemptEndDate";
     public static final String TEXT4="text4";
+    public static final DateFormat dfObj = new SimpleDateFormat("MMM dd, yyyy");
 
     public static final String COURSE_COMPLETION_MAPPING_NAME = "sumtotal";
+
+	private static final String COMMA = ",";
 
     @DataField(pos=1)
     private String fullName;
@@ -223,6 +228,25 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     public static SumtotalCourseCompletion createSumtotalCourseCompletion(String[] line) {
         SumtotalCourseCompletion sAssessment = new SumtotalCourseCompletion();
         return sAssessment;
+    }
+    
+    public String getFirstName(){
+    	if(fullName == null && fullName.indexOf(COMMA) > 0) {
+    		return fullName.substring(0, fullName.indexOf(COMMA));
+    	}else {
+    		return null;
+    	}
+    }
+    public String getLastName() {
+    	if(fullName == null && fullName.indexOf(COMMA) > 0){
+    		return fullName.substring(fullName.indexOf(COMMA));
+    	}else {
+    		return fullName;
+    	}
+    }
+    
+    public String getAttemptEndDateString(){
+    	return dfObj.format(this.attemptEndDate);
     }
     
     @Override

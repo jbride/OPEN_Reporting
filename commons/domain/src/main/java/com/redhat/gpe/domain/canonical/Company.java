@@ -20,13 +20,15 @@ public class Company implements Serializable {
     public static final String COMPANY_NAME = "companyname";
     public static final String PARTNER_TYPE = "partnertype";
     public static final String PARTNER_TIER = "partnertier";
-    public static final String FROM_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier ";
+    public static final String LDAP_ID = "ldapId";
+    public static final String FROM_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID ";
 
     private Integer companyid = 0;
     private String  accountid;
     private String  companyname;
     private String  partnertype;
     private String  partnertier;
+    private String  ldapId;
 
     public Company() {}
 
@@ -36,6 +38,7 @@ public class Company implements Serializable {
         this.companyname = value.companyname;
         this.partnertype = value.partnertype;
         this.partnertier = value.partnertier;
+        this.ldapId = value.ldapId;
     }
 
     public Company(
@@ -43,13 +46,15 @@ public class Company implements Serializable {
         String  accountid,
         String  companyname,
         String  partnertype,
-        String  partnertier
+        String  partnertier,
+        String  ldapId
     ) {
         this.companyid = companyid;
         this.accountid = accountid;
         this.companyname = companyname;
         this.partnertype = partnertype;
         this.partnertier = partnertier;
+        this.ldapId = ldapId;
     }
 
     public Integer getCompanyid() {
@@ -90,6 +95,13 @@ public class Company implements Serializable {
 
     public void setPartnertier(String partnertier) {
         this.partnertier = partnertier;
+    }
+
+    public String getLdapId() {
+        return this.ldapId;
+    }
+    public void setLdapId(String x) {
+        ldapId = x;
     }
 
     @Override

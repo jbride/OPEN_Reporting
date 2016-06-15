@@ -49,6 +49,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String underscoreFilter="_$";
     private static final String dashFilter="-$";
     private static String langFilter;
+    private static int rhtCompanyId = 0;
     
    
     public CourseCompletionServiceBean() throws IOException {
@@ -100,14 +101,40 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     
 
 /* ***********      Student    ************************ */
+    public void insertNewStudentGivenSumtotalCourseCompletion(Exchange exchange) throws Exception {
+    	SumtotalCourseCompletion stCourseCompletion = (SumtotalCourseCompletion)exchange.getIn().getBody();
+    	String studentEmail = stCourseCompletion.getEmail();
+    	String ccDate = stCourseCompletion.getAttemptEndDateString();
+    	String firstName = stCourseCompletion.getFirstName();
+    	String lastName = stCourseCompletion.getLastName();
+    	insertNewStudent(exchange, studentEmail, ccDate, firstName, lastName);
+    }
+    
     public void insertNewStudentGivenDokeosCourseCompletion(Exchange exchange) throws Exception {
+    	
         DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion) exchange.getIn().getBody();
         String studentEmail = dokeosCourseCompletion.getEmail();
+        String ccDate = dokeosCourseCompletion.getAssessmentDate();
+        String firstName = dokeosCourseCompletion.calculateFirstName();
+        String lastName = dokeosCourseCompletion.calculateLastName();
+        insertNewStudent(exchange,studentEmail, ccDate, firstName, lastName );
+    }
+    
+    private void insertNewStudent(Exchange exchange, String studentEmail, String courseCompletionDate, String firstName, String lastName) throws Exception {
         int companyId = 0;
+        
+        // 1)  Determine a companyId that the student is affiliated with
         if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0)
-            companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
+        	
+        	// 1.1) If RHT student, then identify (and cache) companyId for Red Hat
+        	if(this.rhtCompanyId == 0)
+        		companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
+        	else
+        		companyId = this.rhtCompanyId;
         else {
             // TO-DO:  https://github.com/redhat-gpe/OPEN_Reporting/issues/40
+        	
+        	// 1.2)  If not RHT student, then query GPTE LDAP for student info (to include company name)
             CamelContext cContext = exchange.getContext();
             Student studentIn = new Student();
             studentIn.setEmail(studentEmail);
@@ -126,22 +153,36 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 getCompanyExchange.getIn().setBody(studentIn);
                 producer.process(getCompanyExchange);
                 studentOut = (Student)getCompanyExchange.getIn().getBody();
-                logger.info(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() about to identify companyId using companyname = "+studentOut.getCompanyName());
+                String ldapCompanyName = studentOut.getCompanyName();
+                logger.info(studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() about to identify companyId using companyname = "+ldapCompanyName);
                 if(StringUtils.isNotEmpty(studentOut.getCompanyName())){
-                    companyId = this.getCompanyID(studentOut.getCompanyName());
+                    try {
+                    	
+                    	// 1.3)  Determine if company name retrieved from LDAP has already been persisted in the Companies table
+                        Company companyFromLdap = this.canonicalDAO.getCompanyGivenLdapId(ldapCompanyName);
+                        companyId = companyFromLdap.getCompanyid();
+                    } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+                    	
+                    	// 1.4)  Company (as per company name retrieved from LDAP) has not yet been persisted in the Companies table
+                    	//       Create and persist a new Company
+                        StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"insertNewStudentGivenDokeosCourseCompletion() no company name found with name = "+ldapCompanyName);
+                        sBuilder.append("\nCourse completion info as follows:");
+                        sBuilder.append("\n\temail: "+studentEmail);
+                        sBuilder.append("\n\tassessmentDate: "+courseCompletionDate);
+                        logger.warn(sBuilder.toString());
+
+                        Company companyObj = new Company();
+                        companyObj.setCompanyname(ldapCompanyName);
+                        companyObj.setLdapId(ldapCompanyName);
+                        companyId = this.canonicalDAO.updateCompany(companyObj);
+                    }
                 }else {
                     StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+studentEmail+" : insertNewStudentGivenDokeosCourseCompletion() not able to identify company information for this student");
                     sBuilder.append("\nCourse completion info as follows:");
-                    sBuilder.append("\n\temail: "+dokeosCourseCompletion.getEmail());
-                    sBuilder.append("\n\tassessmentDate: "+dokeosCourseCompletion.getAssessmentDate());
+                    sBuilder.append("\n\temail: "+studentEmail);
+                    sBuilder.append("\n\tassessmentDate: "+courseCompletionDate);
                     throw new RuntimeException(sBuilder.toString());
                 }
-            } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-                StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"insertNewStudentGivenDokeosCourseCompletion() no company name found with name = "+studentOut.getCompanyName());
-                sBuilder.append("\nCourse completion info as follows:");
-                sBuilder.append("\n\temail: "+dokeosCourseCompletion.getEmail());
-                sBuilder.append("\n\tassessmentDate: "+dokeosCourseCompletion.getAssessmentDate());
-                throw new RuntimeException(sBuilder.toString());
             } finally {
                 try {
                     if(producer != null)
@@ -152,10 +193,11 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             }
         }
         
+        // 2)  Create and persist student
         Student studentObj = new Student();
         studentObj.setEmail(studentEmail);
-        studentObj.setFirstname(dokeosCourseCompletion.calculateFirstName());
-        studentObj.setLastname(dokeosCourseCompletion.calculateLastName());
+        studentObj.setFirstname(firstName);
+        studentObj.setLastname(lastName);
         studentObj.setCompanyid(companyId);
         canonicalDAO.updateStudent(studentObj);
     } 
@@ -169,26 +211,29 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     
     public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException {
         
-        logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse");
+        
+        // 1)  Identify student
+        Student student = canonicalDAO.getStudentByEmail(stCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
+        
+        
+        // 2)  Identify canonical course name given a sumtotal "activity code"
         if(StringUtils.isEmpty(this.langFilter)){
         	this.setLangFilter();
         }
-        Course course = null;
-        
         String aCode = stCC.getActivityCode();
         aCode = aCode.replaceAll(this.langFilter, "");
         aCode = aCode.replaceAll(this.underscoreFilter, "");
         aCode = aCode.replaceAll(this.dashFilter, "");
         stCC.setActivityCode(aCode);
-        logger.info("convertSumtotalCourseCompletionToStudentCourse() aCode = "+stCC.getActivityCode());
+        logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse. ActivityCode = "+stCC.getActivityCode());
         
+        Course course = null;
         if(courseMapTempCache.containsKey(stCC.getActivityCode())){
             course = courseMapTempCache.get(stCC.getActivityCode());
             if(course == null) {
                 throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
             }
         } else {
-            
             try {
                 course = canonicalDAO.getCourseByCourseId(stCC.getActivityCode());
                 this.courseMapTempCache.put(stCC.getActivityCode(), course);
@@ -202,12 +247,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             }
         }
         
-        Student student = null;
-        try {
-            student = canonicalDAO.getStudentByEmail(stCC.getEmail());
-        } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            throw new RuntimeException("Unable to locate a student with the following email: "+stCC.getEmail());
-        }
+        // 3)  Create StudentCourse object
         Language language = new Language();
         language.setLanguageid(ENGLISH);
         StudentCourse sCourse = new StudentCourse();
@@ -227,6 +267,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         }
         sCourse.setAssessmentresult(dSuccess);
         
+        // 4)  Transform into canonical CourseCompletion
         CourseCompletion dStudentCourse = new CourseCompletion(student, course, language, sCourse);
         return dStudentCourse;
     }
