@@ -49,11 +49,13 @@ CREATE TABLE `Companies` (
   `CompanyName` varchar(100) NOT NULL,
   `PartnerType` varchar(50) DEFAULT NULL,
   `PartnerTier` varchar(50) DEFAULT NULL,
+  `LdapID` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`CompanyID`),
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),
   KEY `IDX_AccountID` (`AccountID`),
   KEY `IDX_PartnerType` (`PartnerType`),
-  KEY `IDX_PartnerTier` (`PartnerTier`)
+  KEY `IDX_PartnerTier` (`PartnerTier`),
+  KEY `IDX_LdapID` (`LdapID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=26383 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -122,6 +124,7 @@ CREATE TABLE `StudentAccreditations` (
   `CourseID` varchar(50) NOT NULL,
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
   `RuleFired` varchar(100) NOT NULL,
+  `CreateDate` datetime DEFAULT NULL,
   PRIMARY KEY (`StudentID`,`AccreditationID`),
   KEY `IDX_StudentAccreditations_Students` (`StudentID`),
   KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),
