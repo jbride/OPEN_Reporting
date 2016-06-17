@@ -339,9 +339,12 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sCoursesCopy.addAll(sCourses);
         for(CourseCompletion ccObj : sCoursesCopy) {
         	if(courseSet.contains(ccObj.getCourseId())) {
-        		int dupeIndex = sCoursesCopy.indexOf(ccObj);
-        		sCourses.remove(dupeIndex);
-        		logger.info(ccObj.getStudent().getEmail()+" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName()+" : "+sdfObj.format(ccObj.getAssessmentDate())); 
+        		boolean courseRemoved = sCourses.remove(ccObj);
+        		sBuilder = new StringBuilder();
+        		sBuilder.append(ccObj.getStudent().getEmail());
+        		sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName());
+        		sBuilder.append(" : "+sdfObj.format(ccObj.getAssessmentDate())+" : removed = "+courseRemoved);
+        		logger.info(sBuilder.toString());
         	}else {
         		courseSet.add(ccObj.getCourseId());
         	}
