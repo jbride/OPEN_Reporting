@@ -71,18 +71,18 @@
                 <split id="for-each-sumtotal-student-course">
                     <simple>${body}</simple>
                     <doTry>
-                        <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="dokeos-convert"/>
+                        <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="sumtotal-convert"/>
                         <doCatch>
                             <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
                             <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
-                            <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenSumtotalCourseCompletion" id="update-dokeos-student"/>
-                            <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="dokeos-re-attempt-to-convert"/>
+                            <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenSumtotalCourseCompletion" id="update-sumtotal-student"/>
+                            <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="sumtotal-re-attempt-to-convert"/>
                         </doCatch>
                     </doTry>
                     <to uri="direct:add-student-course-to-db" id="cc_add-sumtotal-student-course-to-db" />
                 </split>
             </split>
-            <setBody><constant>Course Completion Process:  Dokeos Email with attachments received and validated</constant></setBody>
+            <setBody><constant>Course Completion Process:  Sumtotal Email with attachments received and validated</constant></setBody>
             <to uri="seda:send-email"/>
     </route>
 

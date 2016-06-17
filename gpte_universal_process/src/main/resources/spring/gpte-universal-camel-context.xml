@@ -46,14 +46,26 @@
         <to uri="vm:send-email"/>
     </onException>
 
-    <route id="receive-gpte-operation-files">
-        <description>
-        </description>
+    <route id="receive-gpte-operation-files-via-email">
         <from uri="{{gpte_receive_ops_files_uri}}"/>
         <log message="Received file from: ${header.Return-Path}, subject ${header.subject}" id="log_receive_file"/>
         <filter>
             <method ref="emailServiceBean" method="isValidCamelMessage"></method>
             <to uri="bean:emailServiceBean?method=moveAttachmentsToBody" />
+            <to uri="direct:receive-gpte-operation-files" />
+        </filter>
+    </route>
+
+    <route id="receive-gpte-operation-files-via-file">
+        <from uri="file:/tmp/gpte/inbox-for-emails/?noop=false"/>
+        <to uri="bean:emailServiceBean?method=changeFileBodyToMapBody" />
+        <to uri="direct:receive-gpte-operation-files" />
+    </route>
+
+    <route id="receive-gpte-operation-files">
+        <description>
+        </description>
+        <from uri="direct:receive-gpte-operation-files"/>
             <to uri="bean:emailServiceBean?method=determineAttachmentType" />
             <choice>
                 <when>
@@ -76,7 +88,6 @@
                     <throwException ref="invalidTypeEx" />
                 </otherwise>
             </choice>
-        </filter>
     </route>
 
     <route id="trigger_lms_reporting_stored_proc">

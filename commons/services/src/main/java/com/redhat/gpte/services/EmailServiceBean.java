@@ -19,6 +19,7 @@ import javax.activation.DataHandler;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
@@ -35,7 +36,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String TSV_SUFFIX = ".tsv";
     private static final String ATTACHMENT_TYPE = "ATTACHMENT_TYPE";
     private static final String DOKOES_FIRST_LINE = "Fullname;Email;Exam name;Score;Date;Time";
-    private static final String SUMTOTAL_FIRST_LINE = "Full Name,User Number,Email,Text 3,User Primary Job,User Primary Organization";
+    private static final String SUMTOTAL_FIRST_LINE = "Full Name,Email,Activity Label,Activity Name,Activity Code,Attempt End Date";
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,Dokeos,USERID,SSO,Role";
     private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition    Condition";
@@ -72,14 +73,19 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         // make sure return email exists, it is from redhat.com and email has csv attachment(s)
         // Do not throw AttachmentValidationException as this would be expensive to handle if originating from DDoS attack
         String fromEmail = cleanEmailAddress(in.getHeader(RETURN_PATH, String.class));
-        logger.debug("fromEmail = "+fromEmail);
-        String fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1, fromEmail.indexOf(".com")+4);
-        fromEmailSuffix = fromEmailSuffix.replace(">", "");
-        if(StringUtils.isEmpty(fromEmail)) {
-            logger.error("isValidCamelMessage() no return email address provided");
-            return false;
-        } else if (!validEmailSuffixes.contains(fromEmailSuffix))  {
-            logger.error("isValidCamelMessage() email address is invalid (must origin from *@redhat.com) : "+fromEmailSuffix);
+        if(fromEmail != null) {
+            logger.debug("fromEmail = "+fromEmail);
+            String fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1, fromEmail.indexOf(".com")+4);
+            fromEmailSuffix = fromEmailSuffix.replace(">", "");
+            if(StringUtils.isEmpty(fromEmail)) {
+                logger.error("isValidCamelMessage() no return email address provided");
+                return false;
+            } else if (!validEmailSuffixes.contains(fromEmailSuffix))  {
+                logger.error("isValidCamelMessage() email address is invalid (must origin from *@redhat.com) : "+fromEmailSuffix);
+                return false;
+            }
+        } else {
+            logger.error("isValidCamelMessage() email address path header not found");
             return false;
         }
         
@@ -121,6 +127,16 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         }
         exchange.getIn().setBody(attachmentMap);
     }
+
+    public void changeFileBodyToMapBody(Exchange exchange) throws Exception {
+        Map<String,String> attachmentMap = new HashMap<String,String>();
+        org.apache.camel.component.file.GenericFile gFile = (org.apache.camel.component.file.GenericFile)exchange.getIn().getBody();
+        File fileBody = (File)gFile.getBody();
+        String stringBody = FileUtils.readFileToString(fileBody);
+
+        attachmentMap.put(gFile.getFileName(), stringBody);
+        exchange.getIn().setBody(attachmentMap);
+    }
     
     public void writeRulesSpreadsheetsToDisk(Exchange exchange) throws IOException {
         String ss_inbox_path = System.getProperty(ACCRED_RULES_SPREADSHEET_INBOX_PATH);
@@ -149,6 +165,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             }
         }
     }
+
     
     public void determineAttachmentType(Exchange exchange) {
         Map<String,String> attachmentMap =  (Map<String,String>)exchange.getIn().getBody();

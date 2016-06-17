@@ -90,8 +90,7 @@ function buildAndStart() {
         java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap
     else
         echo -en "\nStarting accreditation_process.  Check logs at $OUTPUT_LOG_FILE\n\n"
-        #nohup java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap > $OUTPUT_LOG_FILE 2>&1 &
-        java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap
+        nohup java -classpath $DEPS_DIR/*:$CLASSES_DIR $JAVA_OPTS -Dcamel_context_path=$CAMEL_CONTEXT_PATH -Dprops_file_location=$PROPS_FILE_LOCATION com.redhat.gpe.accreditation.util.BootStrap > $OUTPUT_LOG_FILE 2>&1 &
     fi
 }
 
