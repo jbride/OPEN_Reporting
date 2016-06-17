@@ -9,6 +9,7 @@
     <module name="javax.transaction.api"/>
     <module name="javax.annotation.api" export="true" />
     <module name="org.jboss.log4j.logmanager"/>
+    <module name="org.apache.camel.component.bindy" export="true" />
 
   </dependencies>
 </module>
