@@ -45,17 +45,18 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     public int updateCompany(Company companyObj) {
         int updatedCount = 0;
         if(companyObj.getCompanyid() == 0) {
-            StringBuilder sql = new StringBuilder("insert into Companies values (null,?,?,?,?,?) ");
+            StringBuilder sql = new StringBuilder("insert into Companies values (null,?,?,?,?,?,?) ");
             updatedCount = sbJdbcTemplate.update(sql.toString(), 
                     companyObj.getAccountid(), 
                     companyObj.getCompanyname(),
                     companyObj.getPartnertype(),
                     companyObj.getPartnertier(),
-                    companyObj.getLdapId()
+                    companyObj.getLdapId(),
+                    null
             );
         }else {
             StringBuilder sBuilder = new StringBuilder("update Companies set ");
-            sBuilder.append(Company.ACCOUNT_ID+EQUAL+Company.COMPANY_NAME+EQUAL+Company.PARTNER_TYPE+EQUAL+Company.PARTNER_TIER+"=? ");
+            sBuilder.append(Company.ACCOUNT_ID+EQUAL+Company.COMPANY_NAME+EQUAL+Company.PARTNER_TYPE+EQUAL+Company.PARTNER_TIER+EQUAL+Company.LDAP_ID+"=? ");
             sBuilder.append("where companyID="+companyObj.getCompanyid());
             sbJdbcTemplate.update(sBuilder.toString(), new Object[] {
                 companyObj.getAccountid(),
@@ -119,7 +120,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             throw new RuntimeException("updateStudent() passed null student");
         
         if(studentObj.getStudentid() == 0) {
-            StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
+            StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
             sbJdbcTemplate.update(sBuilder.toString(), 
                     studentObj.getEmail().toLowerCase(), 
                     studentObj.getFirstname(),
@@ -136,7 +137,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getSkillsbaseStatus(),
                     studentObj.getIpaStatus(),
                     studentObj.getActivationDate(),
-                    studentObj.getDeActivationDate()
+                    studentObj.getDeActivationDate(),
+                    null
                     );
         } else {
             StringBuilder sBuilder = new StringBuilder("update Students set ");

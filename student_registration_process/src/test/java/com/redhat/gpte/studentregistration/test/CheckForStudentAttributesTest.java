@@ -48,7 +48,7 @@ public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
         template.sendBody(new Object());
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testGetStudentAttributesFromIPATest() throws InterruptedException {
         String email = "junxian.xu@yun-idc.com";
