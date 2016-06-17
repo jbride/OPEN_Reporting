@@ -17,3 +17,4 @@ LMSClass/
 build.metadata
 .metadata
 target/
+.camel/
