@@ -32,6 +32,7 @@ CREATE TABLE `AccreditationDefinitions` (
   `Track` varchar(42) DEFAULT NULL,
   `Proficiency` varchar(30) DEFAULT NULL,
   `AccreditationExportID` varchar(30) DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`AccreditationID`)
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -50,6 +51,7 @@ CREATE TABLE `Companies` (
   `PartnerType` varchar(50) DEFAULT NULL,
   `PartnerTier` varchar(50) DEFAULT NULL,
   `LdapID` varchar(50) DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CompanyID`),
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),
   KEY `IDX_AccountID` (`AccountID`),
@@ -71,6 +73,7 @@ CREATE TABLE `CourseMappings` (
   `NewCourseCode` varchar(50) DEFAULT NULL,
   `CourseID` varchar(50) NOT NULL,
   `Source` varchar(20) DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`OldCourseCode`),
   KEY `IDX_NewCourseCode` (`NewCourseCode`),
   KEY `IDX_Source` (`Source`),
@@ -89,6 +92,7 @@ DROP TABLE IF EXISTS `Courses`;
 CREATE TABLE `Courses` (
   `CourseID` varchar(50) NOT NULL DEFAULT '',
   `CourseName` varchar(200) DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CourseID`),
   KEY `IDX_CourseName` (`CourseName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -104,6 +108,7 @@ DROP TABLE IF EXISTS `Languages`;
 CREATE TABLE `Languages` (
   `LanguageID` varchar(5) NOT NULL,
   `LanguageName` varchar(100) DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`LanguageID`),
   UNIQUE KEY `IDX_LanguageName` (`LanguageName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -124,7 +129,7 @@ CREATE TABLE `StudentAccreditations` (
   `CourseID` varchar(50) NOT NULL,
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
   `RuleFired` varchar(100) NOT NULL,
-  `CreateDate` datetime DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`StudentID`,`AccreditationID`),
   KEY `IDX_StudentAccreditations_Students` (`StudentID`),
   KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),
@@ -154,6 +159,7 @@ CREATE TABLE `StudentCourses` (
   `AssessmentResult` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `AssessmentScore` tinyint(4) NOT NULL DEFAULT '100',
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`StudentCourseID`),
   KEY `IDX_StudentCourses_Students` (`StudentID`),
   KEY `IDX_StudentCourses_Courses` (`CourseID`),
@@ -177,6 +183,7 @@ CREATE TABLE `StudentMappings` (
   `OldEmail` varchar(100) NOT NULL DEFAULT '',
   `NewEmail` varchar(100) DEFAULT NULL,
   `StudentID` int(11) DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`OldEmail`),
   KEY `IDX_NewEmail` (`NewEmail`),
   KEY `IDX_StudentID` (`StudentID`),
@@ -209,6 +216,7 @@ CREATE TABLE `Students` (
   `IpaStatus` tinyint(1) NOT NULL DEFAULT '0',
   `ActivationDate` datetime DEFAULT NULL,
   `DeActivationDate` datetime DEFAULT NULL,
+  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`StudentID`),
   KEY `IDX_Email` (`Email`),
   KEY `IDX_FirstName` (`FirstName`),
