@@ -11,7 +11,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 
@@ -21,6 +25,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     private static final String EQUAL="=?,";
     private static final String EMP_NOT_FOUND_IN_SB = "Student not found in Skills Base";
     private int rht_company_id = 0;
+    private static final DateFormat sdfObj = new SimpleDateFormat("MMM dd, yyyy");
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -253,7 +258,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     
     
-/* *****************        Student Course        **********************************/
+/* *****************        Student Courses        **********************************/
     
 
     public void addStudentCourse(StudentCourse cCompletion) {
@@ -326,6 +331,18 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("ORDER By sc.AssessmentDate DESC");
         logger.debug("selectStudentCoursesByStudent() query = " + sBuilder.toString());
         List<CourseCompletion> sCourses = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentCourseRowMapper());
+        
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/48
+        Set<String> courseSet = new HashSet<String>();
+        for(CourseCompletion ccObj : sCourses) {
+        	if(courseSet.contains(ccObj.getCourseId())) {
+        		sCourses.remove(ccObj);
+        		logger.info(ccObj.getStudent().getEmail()+" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName()+" : "+sdfObj.format(ccObj.getAssessmentDate())); 
+        	}else {
+        		courseSet.add(ccObj.getCourseId());
+        	}
+        }
+        
         return sCourses;
     }
 
