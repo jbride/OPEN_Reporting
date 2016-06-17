@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -334,9 +335,12 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         
         // https://github.com/redhat-gpe/OPEN_Reporting/issues/48
         Set<String> courseSet = new HashSet<String>();
-        for(CourseCompletion ccObj : sCourses) {
+        List<CourseCompletion> sCoursesCopy = new ArrayList<CourseCompletion>();
+        sCoursesCopy.addAll(sCourses);
+        for(CourseCompletion ccObj : sCoursesCopy) {
         	if(courseSet.contains(ccObj.getCourseId())) {
-        		sCourses.remove(ccObj);
+        		int dupeIndex = sCoursesCopy.indexOf(ccObj);
+        		sCourses.remove(dupeIndex);
         		logger.info(ccObj.getStudent().getEmail()+" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName()+" : "+sdfObj.format(ccObj.getAssessmentDate())); 
         	}else {
         		courseSet.add(ccObj.getCourseId());
