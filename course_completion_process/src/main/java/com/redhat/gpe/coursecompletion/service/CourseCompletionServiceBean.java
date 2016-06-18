@@ -38,7 +38,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final byte coursePassingValue = 70;
     public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "vm:get-student-attributes-from-ipa";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
-    private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte_course_issues.txt";
+    private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte/gpte_course_issues.txt";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
@@ -61,7 +61,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             FileOutputStream fStream = null;
             try {
                 fStream = new FileOutputStream(courseIssuesFile);
-                String output = "CourseId,CourseName";
+                String output = "Activity Code,Activity Name";
                 fStream.write(output.getBytes());
                 fStream.flush();
             } finally {
@@ -84,6 +84,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     int y = 0;
                     for(Language lang : langs){
                         sBuilder.append(lang.getLanguageid());
+                        sBuilder.append("$");
                         if(y < langs.size() - 1) {
                             sBuilder.append("|");
                             y++;
