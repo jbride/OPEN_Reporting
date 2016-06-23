@@ -70,12 +70,12 @@ DROP TABLE IF EXISTS `CourseMappings`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `CourseMappings` (
   `OldCourseCode` varchar(50) NOT NULL,
-  `NewCourseCode` varchar(50) DEFAULT NULL,
+  `OldCourseId` varchar(50) DEFAULT NULL,
   `CourseID` varchar(50) NOT NULL,
   `Source` varchar(20) DEFAULT NULL,
   `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`OldCourseCode`),
-  KEY `IDX_NewCourseCode` (`NewCourseCode`),
+  KEY `IDX_OldCourseId` (`OldCourseId`),
   KEY `IDX_Source` (`Source`),
   KEY `FK_CourseMappings_Courses` (`CourseID`),
   CONSTRAINT `FK_CourseMappings_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE
