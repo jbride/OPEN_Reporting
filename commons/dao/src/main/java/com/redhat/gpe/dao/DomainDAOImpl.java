@@ -216,9 +216,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append("where c.CourseName = \""+courseName+"\"");
         }else {
             sBuilder.append(", CourseMappings cm ");
-            sBuilder.append("where c.CourseID = cm.CourseID and cm.Source=\"");
-            sBuilder.append(sourceName);
-            sBuilder.append("\" and cm.OldCourseCode=\"");
+            sBuilder.append("where c.CourseID = cm.CourseID and cm.OldCourseId=\"");
             sBuilder.append(courseName);
             sBuilder.append("\"");
         }
@@ -243,7 +241,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             // 2) Second attempt:  retreive from CourseMappings table
             sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c, CourseMappings cm ");
             sBuilder.append("where cm.CourseId = c.CourseId ");
-            sBuilder.append("and (cm.oldCourseCode=\""+courseId+"\" or cm.newCourseCode=\""+courseId+"\")");
+            sBuilder.append("and cm.oldCourseId=\""+courseId+"\"");
             courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
         }
         return courseObj;
