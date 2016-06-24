@@ -134,7 +134,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         String ccDate = stCourseCompletion.getAttemptEndDateString();
         String firstName = stCourseCompletion.getFirstName();
         String lastName = stCourseCompletion.getLastName();
-        insertNewStudent(exchange, studentEmail, ccDate, firstName, lastName);
+        insertNewStudent(exchange, studentEmail, ccDate, firstName, lastName, stCourseCompletion.getActivityCode());
     }
     
     public void insertNewStudentGivenDokeosCourseCompletion(Exchange exchange) throws Exception {
@@ -144,10 +144,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         String ccDate = dokeosCourseCompletion.getAssessmentDate();
         String firstName = dokeosCourseCompletion.calculateFirstName();
         String lastName = dokeosCourseCompletion.calculateLastName();
-        insertNewStudent(exchange,studentEmail, ccDate, firstName, lastName );
+        insertNewStudent(exchange,studentEmail, ccDate, firstName, lastName, dokeosCourseCompletion.getQuizName() );
     }
     
-    private void insertNewStudent(Exchange exchange, String studentEmail, String courseCompletionDate, String firstName, String lastName) throws Exception {
+    private void insertNewStudent(Exchange exchange, String studentEmail, String courseCompletionDate, String firstName, String lastName, String courseName) throws Exception {
         int companyId = 0;
 
         // 0)  Exchange should return from this function with the same body it came in with
@@ -206,7 +206,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     }
                 }else {
                     if(cc_append_student_issues_to_file ) {
-                        String output = "\n"+studentEmail+","+courseCompletionDate;
+                        String output = "\n"+studentEmail+","+courseName+","+courseCompletionDate;
                         Files.write(Paths.get(studentIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
                     }
                     StringBuilder sBuilder = new StringBuilder("insertNewStudent() not able to identify company information for this student");
