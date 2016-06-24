@@ -39,10 +39,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "vm:get-student-attributes-from-ipa";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
     private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte/gpte_course_issues.txt";
+    private static final String CC_APPEND_STUDENT_ISSUES_TO_FILE = "cc_append_student_issues_to_file";
+    private static final String STUDENT_ISSUES_OUTPUT = "/tmp/gpte/gpte_student_issues.txt";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
+    private boolean cc_append_student_issues_to_file = false;
     private File courseIssuesFile = null;
+    private File studentIssuesFile = null;
     private Map<String, Course> courseMapTempCache = new HashMap<String, Course>();  // <mappedCourseId, Course obj>
     
     private static Object synchObj = new Object();
@@ -56,20 +60,42 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         String x = System.getProperty(CC_APPEND_COURSE_ISSUES_TO_FILE);
         if(StringUtils.isNotEmpty(x)){
             cc_append_course_issues_to_file = Boolean.parseBoolean(x);
-            courseIssuesFile = new File(COURSE_ISSUES_OUTPUT);
-            courseIssuesFile.createNewFile();
-            FileOutputStream fStream = null;
-            try {
-                fStream = new FileOutputStream(courseIssuesFile);
-                String output = "Activity Code,Activity Name";
-                fStream.write(output.getBytes());
-                fStream.flush();
-            } finally {
-                if(fStream != null)
-                    fStream.close();
+            if(cc_append_course_issues_to_file) {
+            	courseIssuesFile = new File(COURSE_ISSUES_OUTPUT);
+            	courseIssuesFile.createNewFile();
+            	FileOutputStream fStream = null;
+            	try {
+            		fStream = new FileOutputStream(courseIssuesFile);
+            		String output = "Activity Code,Activity Name";
+            		fStream.write(output.getBytes());
+            		fStream.flush();
+            	} finally {
+            		if(fStream != null)
+            			fStream.close();
+            	}
+            	logger.info("CourseCompletionServiceBean: appending course issues to: "+courseIssuesFile.getAbsolutePath());
             }
-            logger.info("CourseCompletionServiceBean:  cc_append_course_issues_to_file = "+cc_append_course_issues_to_file +" : "+courseIssuesFile.getAbsolutePath());
             
+        }
+        
+        x = System.getProperty(CC_APPEND_STUDENT_ISSUES_TO_FILE);
+        if(StringUtils.isNotEmpty(x)){
+        	this.cc_append_student_issues_to_file = Boolean.parseBoolean(x);
+        	if(cc_append_student_issues_to_file) {
+        		studentIssuesFile = new File(STUDENT_ISSUES_OUTPUT);
+        		studentIssuesFile.createNewFile();
+        		FileOutputStream fStream = null;
+            	try {
+            		fStream = new FileOutputStream(studentIssuesFile);
+            		String output = "Email,CourseCompletionDate";
+            		fStream.write(output.getBytes());
+            		fStream.flush();
+            	} finally {
+            		if(fStream != null)
+            			fStream.close();
+            	}
+            	logger.info("CourseCompletionServiceBean:  appending student issues to: "+studentIssuesFile.getAbsolutePath());
+        	}
         }
         
     }
@@ -179,6 +205,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                         companyId = this.canonicalDAO.updateCompany(companyObj);
                     }
                 }else {
+                	if(cc_append_student_issues_to_file ) {
+                        String output = "\n"+studentEmail+","+courseCompletionDate;
+                        Files.write(Paths.get(studentIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
+                    }
                     StringBuilder sBuilder = new StringBuilder("insertNewStudent() not able to identify company information for this student");
                     sBuilder.append("\nCourse completion info as follows:");
                     sBuilder.append("\n\temail: "+studentEmail);
