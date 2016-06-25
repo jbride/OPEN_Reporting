@@ -1,10 +1,12 @@
 package com.redhat.gpte.studentregistration.service;
 
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.naming.AuthenticationException;
@@ -24,6 +26,7 @@ import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
@@ -66,6 +69,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     
     // Data structure of userIds that have been verified to exist in LDAP
     private Set<String> verifiedUsers = new HashSet<String>();
+    
+    private Map<String,Integer> verifiedCompanies = new HashMap<String,Integer>();
 
     public LDAPServiceBean() {
         logger.info("LDAPServiceBean()  starting .... ");
@@ -108,10 +113,68 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         }*/
     }
     
+    public String transformToCanonicaCompanyName(String companyName) {
+    	return companyName;
+    }
     
+    /*
+     * Accepts a Student object (with companyName field populated) in body of Exchange message
+     * Populates companyId on student obj
+     * Persists a new company if doesn't already exist
+     */
+    public void getStudentCompanyInfo(Exchange exchange) {
+    	Student student = (Student)exchange.getIn().getBody();
+        String companyName = student.getCompanyName();
+        Integer companyId = 0;
+        if(StringUtils.isEmpty(companyName))
+        	return;
+        
+        // 1) transform to canonical company name
+        companyName = this.transformToCanonicaCompanyName(companyName);
+        
+        // 2) if companyId already cached, then use it to set on student without any further lookups
+        if(this.verifiedCompanies.containsKey(companyName)){
+        	companyId = this.verifiedCompanies.get(companyName);
+        }else {
+        	try {
+
+        		// 3)  Determine if company (given company name) has already been persisted in the Companies table
+        		companyId = this.canonicalDAO.getCompanyID(companyName);
+        		this.verifiedCompanies.put(companyName, companyId);
+        	} catch(org.springframework.dao.EmptyResultDataAccessException x) {
+
+        		// 4)  Company (as per company name retrieved from LDAP) has not yet been persisted in the Companies table
+        		//       Create and persist a new Company
+
+        		Company companyObj = new Company();
+        		companyObj.setCompanyname(companyName);
+        		companyObj.setLdapId(companyName);
+        		companyId = this.canonicalDAO.updateCompany(companyObj);
+
+        		StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() just persisted new company ");
+        		sBuilder.append("\n\temail: "+student.getEmail());
+        		sBuilder.append("\n\tcompany: "+companyName);
+        		sBuilder.append("\n\tcompanyId: "+companyId);
+        		logger.info(sBuilder.toString());
+
+        		this.verifiedCompanies.put(companyName, companyId);
+        	}
+        }
+        
+        // 5) set companyId on student obj
+        student.setCompanyid(companyId);
+    	
+    }
+    
+    
+    /*
+     * Accepts a Student object in body of Exchange message.
+     * Queries LDAP and populates the same student object with attributes such as companyName, role and geo
+     */
     public void getStudentAttributesFromLDAP(Exchange exchange) {
         
         Student student = (Student)exchange.getIn().getBody();
+        String companyName = student.getCompanyName();
         
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append(OPEN_PAREN);

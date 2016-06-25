@@ -36,7 +36,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String ENGLISH = "EN_US";
     private static final String SUMTOTAL_COMPLETED = "COMPLETED";
     private static final byte coursePassingValue = 70;
-    public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "vm:get-student-attributes-from-ipa";
+    public static final String GET_STUDENT_COMPANY_INFO_URI = "vm:get-student-company-info";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
     private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte/gpte_course_issues.txt";
     private static final String CC_APPEND_STUDENT_ISSUES_TO_FILE = "cc_append_student_issues_to_file";
@@ -87,7 +87,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 FileOutputStream fStream = null;
                 try {
                     fStream = new FileOutputStream(studentIssuesFile);
-                    String output = "Email,CourseCompletionDate";
+                    String output = "Email,CompanyName";
                     fStream.write(output.getBytes());
                     fStream.flush();
                 } finally {
@@ -130,51 +130,50 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 /* ***********      Student    ************************ */
     public void insertNewStudentGivenSumtotalCourseCompletion(Exchange exchange) throws Exception {
         SumtotalCourseCompletion stCourseCompletion = (SumtotalCourseCompletion)exchange.getIn().getBody();
-        String studentEmail = stCourseCompletion.getEmail();
-        String ccDate = stCourseCompletion.getAttemptEndDateString();
-        String firstName = stCourseCompletion.getFirstName();
-        String lastName = stCourseCompletion.getLastName();
-        insertNewStudent(exchange, studentEmail, ccDate, firstName, lastName, stCourseCompletion.getActivityCode());
+        Student sObj = new Student();
+        sObj.setEmail(stCourseCompletion.getEmail());
+        sObj.setFirstname(stCourseCompletion.getFirstName());
+        sObj.setLastname(stCourseCompletion.getLastName());
+        sObj.setCompanyName(null);
+        insertNewStudent(exchange, sObj);
     }
     
     public void insertNewStudentGivenDokeosCourseCompletion(Exchange exchange) throws Exception {
         
         DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion) exchange.getIn().getBody();
-        String studentEmail = dokeosCourseCompletion.getEmail();
-        String ccDate = dokeosCourseCompletion.getAssessmentDate();
-        String firstName = dokeosCourseCompletion.calculateFirstName();
-        String lastName = dokeosCourseCompletion.calculateLastName();
-        insertNewStudent(exchange,studentEmail, ccDate, firstName, lastName, dokeosCourseCompletion.getQuizName() );
+        Student sObj = new Student();
+        sObj.setEmail(dokeosCourseCompletion.getEmail());
+        sObj.setFirstname(dokeosCourseCompletion.calculateFirstName());
+        sObj.setLastname(dokeosCourseCompletion.calculateLastName());
+        insertNewStudent(exchange, sObj);
     }
     
-    private void insertNewStudent(Exchange exchange, String studentEmail, String courseCompletionDate, String firstName, String lastName, String courseName) throws Exception {
+    private void insertNewStudent(Exchange exchange, Student studentIn) throws Exception {
         int companyId = 0;
+        String studentEmail = studentIn.getEmail();
 
         // 0)  Exchange should return from this function with the same body it came in with
-        Object eBody = exchange.getIn().getBody();
+        Object origBody = exchange.getIn().getBody();
         
         // 1)  Determine a companyId that the student is affiliated with
-        if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0)
+        if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0) {
             
             // 1.1) If RHT student, then identify (and cache) companyId for Red Hat
             if(this.rhtCompanyId == 0)
                 companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
             else
                 companyId = this.rhtCompanyId;
-        else {
+        } else {
             // TO-DO:  https://github.com/redhat-gpe/OPEN_Reporting/issues/40
             
             // 1.2)  If not RHT student, then query GPTE LDAP for student info (to include company name)
             CamelContext cContext = exchange.getContext();
-            Student studentIn = new Student();
-            studentIn.setEmail(studentEmail);
-            Endpoint endpoint = cContext.getEndpoint(GET_STUDENT_ATTRIBUTES_FROM_IPA_URI);
+            Endpoint endpoint = cContext.getEndpoint(GET_STUDENT_COMPANY_INFO_URI);
             exchange.setPattern(ExchangePattern.InOut);
             Message in = exchange.getIn();
             in.setBody(studentIn);
             Producer producer = null;
             Exchange getCompanyExchange = null;
-            Student studentOut = null;
             try {
                 producer = endpoint.createProducer();
                 producer.start();
@@ -182,37 +181,20 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 getCompanyExchange.setPattern(ExchangePattern.InOut);
                 getCompanyExchange.getIn().setBody(studentIn);
                 producer.process(getCompanyExchange);
-                studentOut = (Student)getCompanyExchange.getIn().getBody();
-                String ldapCompanyName = studentOut.getCompanyName();
-                logger.info(studentEmail+" : insertNewStudent() about to identify companyId using companyname = "+ldapCompanyName);
-                if(StringUtils.isNotEmpty(studentOut.getCompanyName())){
-                    try {
-                        
-                        // 1.3)  Determine if company name retrieved from LDAP has already been persisted in the Companies table
-                        companyId = this.canonicalDAO.getCompanyID(ldapCompanyName);
-                    } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-                        
-                        // 1.4)  Company (as per company name retrieved from LDAP) has not yet been persisted in the Companies table
-                        //       Create and persist a new Company
-                        StringBuilder sBuilder = new StringBuilder("insertNewStudent() Will now persist new company from info retrieved from ldap: ");
-                        sBuilder.append("\n\temail: "+studentEmail);
-                        sBuilder.append("\n\tcompany: "+ldapCompanyName);
-                        logger.info(sBuilder.toString());
-
-                        Company companyObj = new Company();
-                        companyObj.setCompanyname(ldapCompanyName);
-                        companyObj.setLdapId(ldapCompanyName);
-                        companyId = this.canonicalDAO.updateCompany(companyObj);
-                    }
-                }else {
+                Student studentOut = (Student)getCompanyExchange.getIn().getBody();
+                
+                //1.3 setCompanyId (used downstream to persist student) from response from remote service 
+                companyId = studentOut.getCompanyid();
+                
+                if(companyId == 0){
+                  
+                	// 1.4)  Not good.  Not able to identify a companyId for this student
                     if(cc_append_student_issues_to_file ) {
-                        String output = "\n"+studentEmail+","+courseName+","+courseCompletionDate;
+                        String output = "\n"+studentEmail+","+studentIn.getCompanyName();
                         Files.write(Paths.get(studentIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
                     }
-                    StringBuilder sBuilder = new StringBuilder("insertNewStudent() not able to identify company information for this student");
-                    sBuilder.append("\nCourse completion info as follows:");
+                    StringBuilder sBuilder = new StringBuilder("insertNewStudent() not able to identify company information for this student.");
                     sBuilder.append("\n\temail: "+studentEmail);
-                    sBuilder.append("\n\tassessmentDate: "+courseCompletionDate);
                     throw new RuntimeException(sBuilder.toString());
                 }
             } finally {
@@ -225,16 +207,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             }
         }
         
-        // 2)  Create and persist student
-        Student studentObj = new Student();
-        studentObj.setEmail(studentEmail);
-        studentObj.setFirstname(firstName);
-        studentObj.setLastname(lastName);
-        studentObj.setCompanyid(companyId);
-        canonicalDAO.updateStudent(studentObj);
+        // 2)  persist student
+        studentIn.setCompanyid(companyId);
+        canonicalDAO.updateStudent(studentIn);
 
         // reset exchange with original body
-        exchange.getIn().setBody(eBody);
+        exchange.getIn().setBody(origBody);
     } 
 /**
  * @throws IOException ******************************************************************/

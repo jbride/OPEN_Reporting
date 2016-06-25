@@ -53,14 +53,14 @@
         <to uri="seda:send-email"/>
     </onException>
 
-    <route id="get-student-attributes-from-ipa">
+    <route id="get-student-company-info">
         <description>
             1)  Given a Student object (with email populated), queries IPA LDAP for student attributes (parter name, geo, role)
             3)  If student email found, then Student object populated with attributes is returned
             2)  If student email not found, validation exception is thrown
         </description>
-        <from uri="vm:get-student-attributes-from-ipa"/>
-        <to uri="bean:ldapServiceBean?method=getStudentAttributesFromLDAP" id="getStudentAttributesFromLDAP" />
+        <from uri="vm:get-student-company-info"/>
+        <to uri="bean:ldapServiceBean?method=getStudentCompanyInfo" id="getStudentCompanyInfo" />
     </route>
 
     <route id="check-for-RHT-studentAttributes-in-batch">
