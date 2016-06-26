@@ -134,7 +134,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sObj.setEmail(stCourseCompletion.getEmail());
         sObj.setFirstname(stCourseCompletion.getFirstName());
         sObj.setLastname(stCourseCompletion.getLastName());
-        sObj.setCompanyName(null);
+        sObj.setCompanyName(stCourseCompletion.getOrganization());
         insertNewStudent(exchange, sObj);
     }
     

@@ -48,7 +48,6 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     private String primaryJob;
 
-    private String organization;
 
     private String domain;
     
@@ -76,6 +75,15 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     @DataField(pos=6, pattern="MMM dd, yyyy")
     private Date attemptEndDate = new Date();
     
+    
+    // Sumtotal course completion spreadsheet now provides company name from SalesForce
+    // This companyName is included because the information often times is not available in GPTE's IPA LDAP
+    // This is the case for students that are in a Sales track and not a SE / Delivery track (thus student doesn't need a lab environment nor OPENTLC SSO
+    @DataField(pos=7)
+    private String organization;
+    
+    // Tier and type (not currently used)
+    @DataField(pos=8)
     private String text4;
     
     public SumtotalCourseCompletion() {

@@ -40,6 +40,9 @@ import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
 @SuppressWarnings("restriction")
 public class LDAPServiceBean extends GPTEBaseServiceBean {
     
+	public static final String ACCENTURE="accenture";
+    public static final String REDHAT_HYPHENED="red-hat";
+    public static final String REDHAT="redhat";
     public static final String UID = "uid=";
     public static final String COMMA = ",";
     public static final String BASE_CTX_DN = "cn=users,cn=accounts,dc=opentlc,dc=com";
@@ -113,8 +116,28 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         }*/
     }
     
+    /*
+     * NOTE:  not ideal; use sparingly
+     *        LDAP algorithm found here:  https://github.com/redhat-gpe/OPEN_Admin/blob/master/OPENTLC-WWW-Scripts/import_users.rb#L196-L208
+     *        However, even with what appears to be equivalent algorithm here in java, different companyNames get generated
+     */
     public String transformToCanonicaCompanyName(String companyName) {
-    	return companyName;
+    	String tString = companyName.toLowerCase();
+        tString = tString.replaceAll("[ ]{2,}", " "); // Not sure
+        tString = tString.replaceAll(" - ", "-"); // eliminate spaces before and after dashes
+        tString = tString.replaceAll(" ", "-"); //  replace spaces with dash
+        //tString = tString.replaceAll("[^\\p{ASCII}]", ""); //  eliminate all non-ascii characters
+        tString = tString.replaceAll("[^0-9a-z-]", ""); // eliminate all characters with exception alpha numeric and dash
+
+        if(tString.indexOf(REDHAT_HYPHENED) > -1 )
+            tString = REDHAT;
+
+        if(tString.indexOf(ACCENTURE) > -1)
+            tString = ACCENTURE;
+        else if(tString.indexOf(REDHAT) > -1)
+            tString = REDHAT;
+
+        return tString;
     }
     
     /*
@@ -123,46 +146,59 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Persists a new company if doesn't already exist
      */
     public void getStudentCompanyInfo(Exchange exchange) {
-    	Student student = (Student)exchange.getIn().getBody();
-        String companyName = student.getCompanyName();
+    	Student origStudent = (Student)exchange.getIn().getBody();
+        String origCompanyName = origStudent.getCompanyName();
         Integer companyId = 0;
-        if(StringUtils.isEmpty(companyName))
+        if(StringUtils.isEmpty(origCompanyName))
         	return;
         
-        // 1) transform to canonical company name
-        companyName = this.transformToCanonicaCompanyName(companyName);
         
-        // 2) if companyId already cached, then use it to set on student without any further lookups
-        if(this.verifiedCompanies.containsKey(companyName)){
-        	companyId = this.verifiedCompanies.get(companyName);
+        // 1) if companyId already cached, then use it to set on student without any further lookups
+        if(this.verifiedCompanies.containsKey(origCompanyName)){
+        	companyId = this.verifiedCompanies.get(origCompanyName);
         }else {
-        	try {
 
-        		// 3)  Determine if company (given company name) has already been persisted in the Companies table
-        		companyId = this.canonicalDAO.getCompanyID(companyName);
-        		this.verifiedCompanies.put(companyName, companyId);
+        	// 2)  got to ldap first to attempt to get the canonical company name
+        	Student tempStudent = new Student();
+        	tempStudent.setEmail(origStudent.getEmail());
+        	exchange.getIn().setBody(tempStudent);
+        	getStudentAttributesFromLDAP(exchange);
+        	String canonicalCompanyName = tempStudent.getCompanyName();
+        	if(StringUtils.isEmpty(canonicalCompanyName)){
+
+        		// 3)  Not able to identify canonical company name from LDAP;  will need to generate it
+        		canonicalCompanyName = this.transformToCanonicaCompanyName(origCompanyName);
+        	}
+
+        	
+        	try {
+        		// 4)  Determine if company (given canonical company name) has already been persisted in the Companies table
+        		companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+        		this.verifiedCompanies.put(origCompanyName, companyId);
         	} catch(org.springframework.dao.EmptyResultDataAccessException x) {
 
-        		// 4)  Company (as per company name retrieved from LDAP) has not yet been persisted in the Companies table
-        		//       Create and persist a new Company
+        		// 4)  Company (given canonical company name) has not yet been persisted in the Companies table
+        		//     Create and persist a new Company
 
         		Company companyObj = new Company();
-        		companyObj.setCompanyname(companyName);
-        		companyObj.setLdapId(companyName);
+        		companyObj.setCompanyname(canonicalCompanyName);
+        		companyObj.setLdapId(canonicalCompanyName);
         		companyId = this.canonicalDAO.updateCompany(companyObj);
 
         		StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() just persisted new company ");
-        		sBuilder.append("\n\temail: "+student.getEmail());
-        		sBuilder.append("\n\tcompany: "+companyName);
+        		sBuilder.append("\n\temail: "+origStudent.getEmail());
+        		sBuilder.append("\n\tcompany: "+canonicalCompanyName);
         		sBuilder.append("\n\tcompanyId: "+companyId);
         		logger.info(sBuilder.toString());
 
-        		this.verifiedCompanies.put(companyName, companyId);
+        		this.verifiedCompanies.put(origCompanyName, companyId);
         	}
         }
         
         // 5) set companyId on student obj
-        student.setCompanyid(companyId);
+        origStudent.setCompanyid(companyId);
+        
+        exchange.getIn().setBody(origStudent);
     	
     }
     
