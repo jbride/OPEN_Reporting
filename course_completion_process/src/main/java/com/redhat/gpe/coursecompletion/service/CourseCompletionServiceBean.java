@@ -188,7 +188,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 
                 if(companyId == 0){
                   
-                	// 1.4)  Not good.  Not able to identify a companyId for this student
+                    // 1.4)  Not good.  Not able to identify a companyId for this student
                     if(cc_append_student_issues_to_file ) {
                         String output = "\n"+studentEmail+","+studentIn.getCompanyName();
                         Files.write(Paths.get(studentIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);

@@ -34,7 +34,7 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     public static final String COURSE_COMPLETION_MAPPING_NAME = "sumtotal";
 
-	private static final String COMMA = ",";
+    private static final String COMMA = ",";
 
     @DataField(pos=1)
     private String fullName;
@@ -239,22 +239,22 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     }
     
     public String getFirstName(){
-    	if(fullName == null && fullName.indexOf(COMMA) > 0) {
-    		return fullName.substring(0, fullName.indexOf(COMMA));
-    	}else {
-    		return null;
-    	}
+        if(fullName == null && fullName.indexOf(COMMA) > 0) {
+            return fullName.substring(0, fullName.indexOf(COMMA));
+        }else {
+            return null;
+        }
     }
     public String getLastName() {
-    	if(fullName == null && fullName.indexOf(COMMA) > 0){
-    		return fullName.substring(fullName.indexOf(COMMA));
-    	}else {
-    		return fullName;
-    	}
+        if(fullName == null && fullName.indexOf(COMMA) > 0){
+            return fullName.substring(fullName.indexOf(COMMA));
+        }else {
+            return fullName;
+        }
     }
     
     public String getAttemptEndDateString(){
-    	return dfObj.format(this.attemptEndDate);
+        return dfObj.format(this.attemptEndDate);
     }
     
     @Override

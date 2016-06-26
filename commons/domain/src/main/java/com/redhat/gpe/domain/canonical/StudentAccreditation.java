@@ -128,14 +128,14 @@ public class StudentAccreditation implements Serializable {
     }
 
     public String getRuleFired() {
-		return ruleFired;
-	}
+        return ruleFired;
+    }
 
-	public void setRuleFired(String ruleFired) {
-		this.ruleFired = ruleFired;
-	}
+    public void setRuleFired(String ruleFired) {
+        this.ruleFired = ruleFired;
+    }
 
-	@Override
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Studentaccreditations (");
 

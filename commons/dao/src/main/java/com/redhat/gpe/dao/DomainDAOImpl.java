@@ -338,16 +338,16 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         List<CourseCompletion> sCoursesCopy = new ArrayList<CourseCompletion>();
         sCoursesCopy.addAll(sCourses);
         for(CourseCompletion ccObj : sCoursesCopy) {
-        	if(courseSet.contains(ccObj.getCourseId())) {
-        		boolean courseRemoved = sCourses.remove(ccObj);
-        		sBuilder = new StringBuilder();
-        		sBuilder.append(ccObj.getStudent().getEmail());
-        		sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName());
-        		sBuilder.append(" : "+sdfObj.format(ccObj.getAssessmentDate())+" : removed = "+courseRemoved);
-        		logger.info(sBuilder.toString());
-        	}else {
-        		courseSet.add(ccObj.getCourseId());
-        	}
+            if(courseSet.contains(ccObj.getCourseId())) {
+                boolean courseRemoved = sCourses.remove(ccObj);
+                sBuilder = new StringBuilder();
+                sBuilder.append(ccObj.getStudent().getEmail());
+                sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName());
+                sBuilder.append(" : "+sdfObj.format(ccObj.getAssessmentDate())+" : removed = "+courseRemoved);
+                logger.info(sBuilder.toString());
+            }else {
+                courseSet.add(ccObj.getCourseId());
+            }
         }
         
         return sCourses;
@@ -430,11 +430,11 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     
     
-/* ************			Language		*************  */
+/* ************            Language        *************  */
     public List<Language> getLanguages() {
-    	StringBuilder sBuilder = new StringBuilder("select "+Language.FROM_CLAUSE+ " from Languages l");
-    	List<Language> langs = sbJdbcTemplate.query(sBuilder.toString(), new LanguagesRowMapper());    	
-    	return langs;
+        StringBuilder sBuilder = new StringBuilder("select "+Language.FROM_CLAUSE+ " from Languages l");
+        List<Language> langs = sbJdbcTemplate.query(sBuilder.toString(), new LanguagesRowMapper());        
+        return langs;
     }
 /*******************************************************/
     
