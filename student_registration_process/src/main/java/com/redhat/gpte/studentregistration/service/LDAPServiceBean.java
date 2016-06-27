@@ -183,15 +183,25 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 Company companyObj = new Company();
                 companyObj.setCompanyname(canonicalCompanyName);
                 companyObj.setLdapId(canonicalCompanyName);
-                companyId = this.canonicalDAO.updateCompany(companyObj);
 
-                StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() just persisted new company ");
-                sBuilder.append("\n\temail: "+origStudent.getEmail());
-                sBuilder.append("\n\tcompany: "+canonicalCompanyName);
-                sBuilder.append("\n\tcompanyId: "+companyId);
-                logger.info(sBuilder.toString());
+                int updateCount = this.canonicalDAO.updateCompany(companyObj);
+                if(updateCount == 1 ) {
 
-                this.verifiedCompanies.put(origCompanyName, companyId);
+                    companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+                    StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() just persisted new company ");
+                    sBuilder.append("\n\temail: "+origStudent.getEmail());
+                    sBuilder.append("\n\tcompany: "+canonicalCompanyName);
+                    sBuilder.append("\n\tcompanyId: "+companyId);
+                    logger.info(sBuilder.toString());
+
+                    this.verifiedCompanies.put(origCompanyName, companyId);
+                }else {
+                    StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() attempted to persist new company ");
+                    sBuilder.append("\n\temail: "+origStudent.getEmail());
+                    sBuilder.append("\n\tcompany: "+canonicalCompanyName);
+                    sBuilder.append("\n\tupdateCount: "+updateCount);
+                    throw new RuntimeException(sBuilder.toString());
+                }
             }
         }
         
