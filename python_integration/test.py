@@ -18,11 +18,11 @@ query = ("""SELECT StudentAccreditations.AccreditationDate, Students.Email, Cour
 cursor.execute(query)
 
 def results():
-    if cursor:
-        for i in cursor:
-            print("this is a thing: " + i)
-    else:
-        print("nope")
+    # if cursor:
+    #     print(cursor{})
+    for i in cursor:
+        print(i)
+
 
 print("Cursor: {}".format(cursor))
 results()
