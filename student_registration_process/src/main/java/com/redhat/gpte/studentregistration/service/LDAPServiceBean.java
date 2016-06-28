@@ -183,6 +183,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 Company companyObj = new Company();
                 companyObj.setCompanyname(canonicalCompanyName);
                 companyObj.setLdapId(canonicalCompanyName);
+                logger.info("getStudentCompanyInfo() about to persist new company: "+canonicalCompanyName);
 
                 int updateCount = this.canonicalDAO.updateCompany(companyObj);
                 if(updateCount == 1 ) {
