@@ -121,7 +121,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      *        LDAP algorithm found here:  https://github.com/redhat-gpe/OPEN_Admin/blob/master/OPENTLC-WWW-Scripts/import_users.rb#L196-L208
      *        However, even with what appears to be equivalent algorithm here in java, different companyNames get generated
      */
-    public String transformToCanonicaCompanyName(String companyName) {
+    public String transformToCanonicalCompanyName(String companyName) {
         String tString = companyName.toLowerCase();
         tString = tString.replaceAll("[ ]{2,}", " "); // Not sure
         tString = tString.replaceAll(" - ", "-"); // eliminate spaces before and after dashes
@@ -156,7 +156,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             companyId = this.verifiedCompanies.get(origCompanyName);
         }else {
 
-            // 2)  got to ldap first to attempt to get the canonical company name
+            // 2)  go to ldap first to attempt to get the canonical company name
             Student tempStudent = new Student();
             tempStudent.setEmail(origStudent.getEmail());
             exchange.getIn().setBody(tempStudent);
@@ -164,8 +164,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             String canonicalCompanyName = tempStudent.getCompanyName();
             if(StringUtils.isEmpty(canonicalCompanyName)){
 
+                if(StringUtils.isEmpty(origCompanyName)) {
+                    throw new RuntimeException(origStudent.getEmail()+" : Big problem: company info not affiliated with student and no record of student found into IPA LDAP");
+                }
+
                 // 3)  Not able to identify canonical company name from LDAP;  will need to generate it
-                canonicalCompanyName = this.transformToCanonicaCompanyName(origCompanyName);
+                canonicalCompanyName = this.transformToCanonicalCompanyName(origCompanyName);
             }
 
             
