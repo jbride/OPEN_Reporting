@@ -35,7 +35,8 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String CSV_SUFFIX = ".csv";
     private static final String TSV_SUFFIX = ".tsv";
     private static final String ATTACHMENT_TYPE = "ATTACHMENT_TYPE";
-    private static final String DOKOES_FIRST_LINE = "Fullname;Email;Exam name;Score;Date;Time";
+    private static final String DOKEOS_FIRST_LINE = "Fullname;Email;Exam name;Score;Date;Time";
+    private static final String DOKEOS_ASSIGNMENT_FIRST_LINE = "Fullname;Email;Assignment;Score;Date;Time";
     private static final String SUMTOTAL_FIRST_LINE = "Full Name,Email,Activity Label,Activity Name,Activity Code,Attempt End Date";
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,Dokeos,USERID,SSO,Role";
@@ -173,7 +174,9 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         List<String> attachList = new ArrayList<String>(attachCollection);
         String[] rows = attachList.get(0).split("\\r?\\n");
         String firstRow = rows[0];
-        if(firstRow.contains(DOKOES_FIRST_LINE)) {
+        if(firstRow.contains(DOKEOS_FIRST_LINE)) {
+            exchange.getIn().setHeader(ATTACHMENT_TYPE, DOKEOS);
+        }else if(firstRow.contains(DOKEOS_ASSIGNMENT_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, DOKEOS);
         }else if(firstRow.contains(SUMTOTAL_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, SUMTOTAL);
