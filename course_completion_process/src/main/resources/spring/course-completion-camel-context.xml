@@ -117,7 +117,7 @@
                         <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-convert"/>
                         <doCatch>
                             <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
-                            <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
+                            <log message="${body.email} : ${body.quizName} : ${body.assessmentDate} : Not found in Students table.  Will now add" loggingLevel="WARN" />
                             <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenDokeosCourseCompletion" id="update-dokeos-student"/>
                             <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-re-attempt-to-convert"/>
                         </doCatch>

@@ -149,12 +149,10 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         Student origStudent = (Student)exchange.getIn().getBody();
         String origCompanyName = origStudent.getCompanyName();
         Integer companyId = 0;
-        if(StringUtils.isEmpty(origCompanyName))
-            return;
         
         
         // 1) if companyId already cached, then use it to set on student without any further lookups
-        if(this.verifiedCompanies.containsKey(origCompanyName)){
+        if(StringUtils.isNotEmpty(origCompanyName) && this.verifiedCompanies.containsKey(origCompanyName)){
             companyId = this.verifiedCompanies.get(origCompanyName);
         }else {
 

@@ -221,9 +221,18 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append("\" LIMIT 1");
         }
         logger.debug("getCourseByCourseName() query = "+sBuilder.toString());
-        Course courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        Course courseObj = null;
+        try {
+            courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        } catch(org.springframework.dao.EmptyResultDataAccessException x){
+            
+            // 2) Second attempt:  retreive from CourseMappings table
+            sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c, CourseMappings cm ");
+            sBuilder.append("where cm.CourseId = c.CourseId ");
+            sBuilder.append("and cm.oldCourseId=\""+courseName+"\" LIMIT 1");
+            courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
+        }
         return courseObj;
-        
     }
     
     // Given a courseId, retrieves a Course object
