@@ -17,6 +17,8 @@ def get_pg_user_content():
     completed_at_list = [obj for obj in content_objects if not obj['completed_at']]
     return completed_at_list
 
+    # content_objects[0]['content']['name'] is course name
+
 def set_complete():
     """gets incomplete user_content objects and sets the 'completed_at' field \
        with a timestamp string"""
@@ -26,11 +28,13 @@ def set_complete():
         data = {
             "content_id": obj['content_id'],
             "user_email": obj['user_email'],
-            "completed_at": 'now'
+            "user_id": obj['user_id']
+            "completed_at": datetime.now
           }
         # figure this syntax out/post with requests
         requests.post(pg_url, obj, headers=headers)
     return 200
+
 
 def main():
     get_pg_users()
