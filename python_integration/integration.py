@@ -2,6 +2,8 @@ import mysql.connector
 import requests
 import json
 import datetime
+import schedule
+import time
 
 
 def get_new_completions(creds):
@@ -69,4 +71,9 @@ if __name__ == '__main__':
     from config import datawarehouse
     from config import pg_headers
 
+    # schedule.every().day.do(main)
+    #
+    # while True:
+    #     schedule.run_pending()
+    #     time.sleep(1)
     main()
