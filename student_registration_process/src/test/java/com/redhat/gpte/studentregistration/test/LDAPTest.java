@@ -21,10 +21,13 @@ import org.junit.Test;
 
 import com.sun.jndi.ldap.LdapCtx;
 
+import com.redhat.gpte.util.PropertiesSupport;
+
 @SuppressWarnings("restriction")
 public class LDAPTest {
     
     public static final String UID = "uid=";
+    public static final String MAIL = "mail=";
     public static final String COMMA = ",";
     public static final String BASE_CTX_DN = "cn=users,cn=accounts,dc=opentlc,dc=com";
     public static final String IPA_PROVIDER_URL = "ipa.provider.url";
@@ -44,18 +47,22 @@ public class LDAPTest {
     private String providerUrl = null;
     private String securityPrincipal = null;
     private String securityCredentials = null;
-    private int numberTestLDAPLoops = 1;
-    private int sleepDuration = 5000;
     private String testLDAPId = null;
+    private String testEmail = "jbride@redhat.com";
     private Hashtable<String,String> env = new Hashtable<String,String>();
     
     @Before
     @Ignore
-    public void init() {
+    public void init() throws java.io.IOException {
+        PropertiesSupport.setupProps();
+
         providerUrl = System.getProperty(IPA_PROVIDER_URL);
+        if(providerUrl == null)
+            throw new RuntimeException("must pass system property: "+IPA_PROVIDER_URL);
+
         securityPrincipal = System.getProperty(IPA_SECURITY_PRINCIPAL); 
         securityCredentials = System.getProperty(IPA_SECURITY_CREDENTIALS);
-        numberTestLDAPLoops = Integer.parseInt(System.getProperty(NUMBER_TEST_LDAP_LOOPS));
+        
         testLDAPId = System.getProperty(TEST_LDAP_ID);
         
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
@@ -69,12 +76,16 @@ public class LDAPTest {
     @Ignore
     @Test
     public void testLDAPConnectionPool() throws NamingException, InterruptedException {
+
+        int sleepDuration = 5000;
+        int numberTestLDAPLoops = Integer.parseInt(System.getProperty(NUMBER_TEST_LDAP_LOOPS));
+
         StringBuilder sBuilder = new StringBuilder(UID);
         sBuilder.append(testLDAPId);
         sBuilder.append(COMMA);
         sBuilder.append(this.BASE_CTX_DN);
-        System.out.println("testSearch() number of loops = "+this.numberTestLDAPLoops+" : will search on: "+sBuilder.toString());
-        for(int c = 0; c < this.numberTestLDAPLoops; c++) {
+        System.out.println("testSearch() number of loops = "+numberTestLDAPLoops+" : will search on: "+sBuilder.toString());
+        for(int c = 0; c < numberTestLDAPLoops; c++) {
             DirContext ctx = null;
             LdapCtx lookupResult = null;
             
@@ -142,13 +153,13 @@ public class LDAPTest {
         }
     }
     
-    @Ignore
+    //@Ignore
     @Test
-    public void searchName() throws NamingException, InterruptedException {
+    public void searchEmail() throws NamingException, InterruptedException {
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append(this.OPEN_PAREN);
-        sBuilder.append(this.UID);
-        sBuilder.append(testLDAPId);
+        sBuilder.append(this.MAIL);
+        sBuilder.append(testEmail);
         sBuilder.append(this.CLOSE_PAREN);
         System.out.println("searchName()  will search on: "+sBuilder.toString());
     
@@ -163,34 +174,39 @@ public class LDAPTest {
             ctls.setSearchScope(SearchControls.SUBTREE_SCOPE);
             
             listResults = (NamingEnumeration) ctx.search(this.BASE_CTX_DN, sBuilder.toString(), ctls);
+            if(!listResults.hasMore()) {
+               throw new RuntimeException("following mail not found : "+testEmail);
+            }
+
             while (listResults.hasMore()) {
-                   SearchResult si =(SearchResult)listResults.next();
-                   System.out.println("searchName() name = "+si.getName());
-                   Attributes attrs = si.getAttributes();
-                   if (attrs == null) {
-                       System.out.println("   No attributes");
-                       continue;
-                   }
-                   NamingEnumeration ae = attrs.getAll(); 
-                   while (ae.hasMoreElements()) {
-                       Attribute attr =(Attribute)ae.next();
-                       String id = attr.getID();
-                       if(this.TITLE_ATTRIBUTE.equals(id)){
-                           String attValue = (String)attr.get(0);
-                           System.out.println("searchName() "+this.TITLE_ATTRIBUTE+" = "+attValue);
-                       }else if(this.MEMBEROF_ATTRIBUTE.equals(id)) {
-                           Enumeration vals = attr.getAll();
-                           while (vals.hasMoreElements()) {
-                               String attributeValue = (String)vals.nextElement();
-                               if(attributeValue.startsWith(GEO_ATTRIBUTE_PREFIX)){
-                                   String geoValue = attributeValue.substring(13, attributeValue.indexOf(GEO_ATTRIBUTE_SUFFIX));
-                                   System.out.println("searchName() geo attribute; value = " + geoValue);
-                               }
+               SearchResult si =(SearchResult)listResults.next();
+               System.out.println("searchName() name = "+si.getName());
+               Attributes attrs = si.getAttributes();
+               if (attrs == null) {
+                   System.out.println("   No attributes");
+                   continue;
+               }
+               NamingEnumeration ae = attrs.getAll(); 
+
+
+               while (ae.hasMoreElements()) {
+                   Attribute attr =(Attribute)ae.next();
+                   String id = attr.getID();
+                   if(this.TITLE_ATTRIBUTE.equals(id)){
+                       String attValue = (String)attr.get(0);
+                       System.out.println("searchName() "+this.TITLE_ATTRIBUTE+" = "+attValue);
+                   }else if(this.MEMBEROF_ATTRIBUTE.equals(id)) {
+                       Enumeration vals = attr.getAll();
+                       while (vals.hasMoreElements()) {
+                           String attributeValue = (String)vals.nextElement();
+                           if(attributeValue.startsWith(GEO_ATTRIBUTE_PREFIX)){
+                               String geoValue = attributeValue.substring(13, attributeValue.indexOf(GEO_ATTRIBUTE_SUFFIX));
+                               System.out.println("searchName() geo attribute; value = " + geoValue);
                            }
                        }
                    }
-                   
                }
+           }
         }catch(NamingException x) {
             System.out.println("NamingException: "+x.getLocalizedMessage()+" : query = : "+sBuilder.toString());
         } finally {
