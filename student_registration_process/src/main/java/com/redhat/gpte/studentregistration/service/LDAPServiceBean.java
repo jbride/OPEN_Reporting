@@ -43,7 +43,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     public static final String ACCENTURE="accenture";
     public static final String REDHAT_HYPHENED="red-hat";
     public static final String REDHAT="redhat";
-    public static final String UID = "uid=";
+    public static final String MAIL = "mail=";
     public static final String COMMA = ",";
     public static final String BASE_CTX_DN = "cn=users,cn=accounts,dc=opentlc,dc=com";
     public static final String IPA_PROVIDER_URL = "ipa.provider.url";
@@ -158,14 +158,16 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
             // 2)  go to ldap first to attempt to get the canonical company name
             Student tempStudent = new Student();
-            tempStudent.setEmail(origStudent.getEmail());
+            String email = origStudent.getEmail();
+
+            tempStudent.setEmail(email);
             exchange.getIn().setBody(tempStudent);
             getStudentAttributesFromLDAP(exchange);
             String canonicalCompanyName = tempStudent.getCompanyName();
             if(StringUtils.isEmpty(canonicalCompanyName)){
 
                 if(StringUtils.isEmpty(origCompanyName)) {
-                    throw new RuntimeException(origStudent.getEmail()+" : Big problem: company info not affiliated with student and no record of student found into IPA LDAP");
+                    throw new RuntimeException(email+" : Big problem: company info not affiliated with student and no record of student found into IPA LDAP");
                 }
 
                 // 3)  Not able to identify canonical company name from LDAP;  will need to generate it
@@ -227,8 +229,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append(OPEN_PAREN);
-        sBuilder.append(UID);
-        sBuilder.append(this.getOPENTLCIDfromEmail(student.getEmail()));
+        sBuilder.append(MAIL);
+        sBuilder.append(student.getEmail());
         sBuilder.append(CLOSE_PAREN);
         logger.info("getStudentAttributesFromLDAP()  will search on: "+sBuilder.toString());
     
@@ -357,19 +359,19 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         int ldapQCount = 0;
         while (studentIterator.hasNext()) {
             StudentRegistrationBindy tempStudent = studentIterator.next();
-            String studentId = tempStudent.getEmail();
+            String email = tempStudent.getEmail();
             
             // 1)  if student already in temp data structure, then skip
-            if(!verifiedUsers.contains(studentId)) {
+            if(!verifiedUsers.contains(email)) {
                 ldapQCount++;
                 
                 // 2) check if student already registered in LDAP
                 DirContext testCtx = null;
                 LdapCtx lookupResult = null;
-                StringBuilder sBuilder = new StringBuilder(UID);
-                sBuilder.append(studentId);
-                sBuilder.append(COMMA);
-                sBuilder.append(BASE_CTX_DN);
+                StringBuilder sBuilder = new StringBuilder(MAIL);
+                //sBuilder.append(email);
+                //sBuilder.append(COMMA);
+                //sBuilder.append(BASE_CTX_DN);
                 
                 try {
                     testCtx = grabLDAPConnectionFromPool();                    
@@ -380,11 +382,11 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 
                 try {
                     lookupResult = (LdapCtx) testCtx.lookup(sBuilder.toString());
-                    logger.debug("process() found user in ldap "+studentId);
+                    logger.debug("process() found user in ldap "+email);
                     studentIterator.remove();
                     continue;
                 } catch(NamingException x) {
-                    logger.debug("process() did not find user in ldap "+studentId);
+                    logger.debug("process() did not find user in ldap "+email);
                 } finally {
                     try {
                         // Critical that both LDAP result object and the connection are closed
@@ -397,7 +399,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 }
                 
              // 3)  student must be uploaded to LDAP so will not remove from Camel message
-                verifiedUsers.add(studentId);
+                verifiedUsers.add(email);
                 
             } else {
                 studentIterator.remove();
