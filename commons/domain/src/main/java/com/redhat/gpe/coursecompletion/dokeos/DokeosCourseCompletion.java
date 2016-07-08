@@ -133,10 +133,16 @@ public class DokeosCourseCompletion implements java.io.Serializable {
                 + ", assessmentDate=" + assessmentDate + ", time=" + time + "]";
     }
     
-    public String calculateFirstName() {
+    public String calculateFirstName() throws Exception {
+        if(fullname.indexOf(COMMA) < 0 ) 
+            throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
+    
         return this.fullname.substring(fullname.indexOf(COMMA)+1);
     }
-    public String calculateLastName() {
+    public String calculateLastName() throws Exception {
+        if(fullname.indexOf(COMMA) < 0 ) 
+            throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
+
         return this.fullname.substring(0, fullname.indexOf(COMMA));
     }
 }

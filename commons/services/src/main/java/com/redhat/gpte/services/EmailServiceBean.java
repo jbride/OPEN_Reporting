@@ -29,6 +29,8 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
 
     public static final String ATTACHMENTS_ARE_VALID = "Attachments are valid.";
     private static final String RETURN_PATH = "Return-Path";
+    private static final String DATE = "Date";
+    private static final String SUBJECT = "Subject";
     private static final String GPTE_VALID_EMAIL_SUFFIXES = "gpte_valid_email_suffixes";
     private static final String ADMIN_EMAIL = "admin_email";
     private static final String DELIMITER = ",";
@@ -95,7 +97,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         if(attachments.size() == 0) {
             throw new AttachmentValidationException(AttachmentValidationException.NO_ATTACHMENTS_PROVIDED+" Input provided by "+fromEmail);
         } else {
-            logger.info("isValidCamelMessage() # attachments = "+attachments.size());
+            logger.debug("isValidCamelMessage() # attachments = "+attachments.size());
         }
         
         // Ensure email has CSV suffix
@@ -187,7 +189,14 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         }else if(firstRow.contains(RULES_SPREADSHEET_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
         }else {
-            throw new RuntimeException(ExceptionCodes.GPTE_E_1000+ " firstLine of attachment ="+firstRow);
+            String theReturnEmail = (String) exchange.getIn().getHeader(RETURN_PATH);
+            StringBuilder sBuilder  = new StringBuilder();
+            sBuilder.append(ExceptionCodes.GPTE_E_1000);
+            sBuilder.append("\n\tfirstLine of attachment = "+firstRow);
+            sBuilder.append("\n\treturnAddress = "+theReturnEmail);
+            sBuilder.append("\n\tdate = "+(String)exchange.getIn().getHeader(DATE));
+            sBuilder.append("\n\tsubject = "+(String)exchange.getIn().getHeader(SUBJECT));
+            throw new RuntimeException(sBuilder.toString());
         }
         logger.info("determineAttachmentType() attachment type = " + exchange.getIn().getHeader(ATTACHMENT_TYPE));
     }
