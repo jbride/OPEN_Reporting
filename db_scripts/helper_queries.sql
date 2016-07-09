@@ -20,7 +20,7 @@ alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 # select * from Students where email like '%redhat.com%';
 # delete from Students where studentID=42772
 
-# insert into CourseMappings values ("Application Development with EAP6 Final Assessment", null, "MWS-TECH-APD-EXAM-EAP6", "dokeos")
+# insert into CourseMappings values ( "Graphical Data Mapping using JBoss Fuse Data Mapper", "Graphical Data Mapping using JBoss Fuse Data Mapper", "MWS-DEL-ADD-DM-EXAM", "na", NOW()  );
 
 # select c.CourseID, c.CourseName from Courses c, CourseMappings cm where c.CourseID = cm.CourseID and cm.Source="dokeos" and cm.OldCourseCode="Application Development with EAP6 Final Assessment"
 
