@@ -31,7 +31,7 @@ public class TriggerReportingStoredProcTest extends CamelSpringTestSupport {
     }
 
 
-    //@Ignore
+    @Ignore
     @Test
     public void testStoredProc() throws InterruptedException {
         template.setDefaultEndpointUri(REPORTING_STORED_PROC);
