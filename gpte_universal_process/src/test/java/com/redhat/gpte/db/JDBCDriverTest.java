@@ -16,12 +16,11 @@ import com.redhat.gpte.util.PropertiesSupport;
 public class JDBCDriverTest {
 
     @Before
-    @Ignore
     public void init() throws java.io.IOException {
         PropertiesSupport.setupProps();
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void jbdcTest() {
         String className = System.getProperty("lms_transactional_driverClassName");
