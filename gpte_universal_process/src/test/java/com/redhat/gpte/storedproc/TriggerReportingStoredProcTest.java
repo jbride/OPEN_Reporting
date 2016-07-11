@@ -13,7 +13,7 @@ import com.redhat.gpte.util.PropertiesSupport;
 
 public class TriggerReportingStoredProcTest extends CamelSpringTestSupport {
 
-    private static final String REPORTING_STORED_PROC = "direct:trigger_lms_reporting_stored_proc";
+    private static final String REPORTING_STORED_PROC = "direct:up-trigger-lms-reporting-stored-proc";
     
     private String routeURI = null;
     

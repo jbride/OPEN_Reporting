@@ -42,7 +42,7 @@ public class SMTPTest {
         smtpPort = Integer.parseInt(System.getProperty(SMTP_PORT));
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testSMTPServerConnectionAndSend() throws Exception {
 
