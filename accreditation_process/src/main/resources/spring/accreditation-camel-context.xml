@@ -233,6 +233,15 @@
         <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="add-student-accreditation-to-db" />
     </route>
 
+    <route id="check-expired-accreditations">
+        <description>
+        </description>
+        <from uri="{{accred_check_expired_accreds_uri}}"/>
+        <!-- to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="add-student-accreditation-to-db" / -->
+        <log message="#########     Check Expirsed Accreds:  Start" loggingLevel="INFO"/>
+        <log message="#########     Check Expirsed Accreds:  Finish" loggingLevel="INFO"/>
+    </route>
+
     <!--    *************************************************************************************************   -->
 
 
