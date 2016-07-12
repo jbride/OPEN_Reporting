@@ -56,34 +56,34 @@
         <from uri="{{cc_receive_sumtotal_input_uri}}" />
         <log message="Received Sumttotal email. from: ${header.Return-Path}, subject ${header.subject}" id="log_sumtotal_receive"/>
         <to uri="bean:cCompletionServiceBean?method=changeMapToListOfValues" />
-            <split id="for-each-sumtotal-attachment">
+        <split id="for-each-sumtotal-attachment">
+            <simple>${body}</simple>
+            <unmarshal ref="bindySumtotal"/>
+            <doTry>
+                <!--potentially throws this exception:
+                    Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: SumtotalCourseCompletion -->
+                <log message="# sumtotal student courses found in ${header.CamelFileName} : ${body.size}"/>
+                <doCatch>
+                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                    <log message="only 1 sumtotal student course found in ${header.CamelFileName}"/>
+                </doCatch>
+            </doTry>
+            <split id="for-each-sumtotal-student-course">
                 <simple>${body}</simple>
-                <unmarshal ref="bindySumtotal"/>
                 <doTry>
-                    <!--potentially throws this exception:
-                        Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: SumtotalCourseCompletion -->
-                    <log message="# sumtotal student courses found in ${header.CamelFileName} : ${body.size}"/>
+                    <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="sumtotal-convert"/>
                     <doCatch>
-                        <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                        <log message="only 1 sumtotal student course found in ${header.CamelFileName}"/>
+                        <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
+                        <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
+                        <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenSumtotalCourseCompletion" id="update-sumtotal-student"/>
+                        <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="sumtotal-re-attempt-to-convert"/>
                     </doCatch>
                 </doTry>
-                <split id="for-each-sumtotal-student-course">
-                    <simple>${body}</simple>
-                    <doTry>
-                        <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="sumtotal-convert"/>
-                        <doCatch>
-                            <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
-                            <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
-                            <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenSumtotalCourseCompletion" id="update-sumtotal-student"/>
-                            <to uri="bean:cCompletionServiceBean?method=convertSumtotalCourseCompletionToStudentCourse" id="sumtotal-re-attempt-to-convert"/>
-                        </doCatch>
-                    </doTry>
-                    <to uri="direct:add-student-course-to-db" id="cc_add-sumtotal-student-course-to-db" />
-                </split>
+                <to uri="direct:add-student-course-to-db" id="cc_add-sumtotal-student-course-to-db" />
             </split>
-            <setBody><constant>Course Completion Process:  Sumtotal Email with attachments received and validated</constant></setBody>
-            <to uri="seda:send-email"/>
+        </split>
+        <setBody><constant>Course Completion Process:  Sumtotal Email with attachments received and validated</constant></setBody>
+        <to uri="seda:send-email"/>
     </route>
 
     
