@@ -235,11 +235,12 @@
 
     <route id="check-expired-accreditations">
         <description>
+            Changes the value of StudentAccreditations.AccreditationType to Expired on all records whose AccreditationDate > 2 years from date this route is executed
         </description>
         <from uri="{{accred_check_expired_accreds_uri}}"/>
-        <!-- to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="add-student-accreditation-to-db" / -->
         <log message="#########     Check Expirsed Accreds:  Start" loggingLevel="INFO"/>
-        <log message="#########     Check Expirsed Accreds:  Finish" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=changeStatusOnExpiredStudentAccreditations" id="changeStatusOnExpiredStudentAccreds" />
+        <log message="#########     Check Expirsed Accreds:  Finish: # of accreds expired = ${body}" loggingLevel="INFO"/>
     </route>
 
     <!--    *************************************************************************************************   -->

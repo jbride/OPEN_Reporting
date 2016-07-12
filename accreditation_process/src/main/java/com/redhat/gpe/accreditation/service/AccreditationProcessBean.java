@@ -153,6 +153,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             return false;
         }
     }
+    
+    public int changeStatusOnExpiredStudentAccreditations() {
+    	return canonicalDAO.changeStatusOnExpiredStudentAccreditations();
+    }
 /* ************************************************************************************ */
    
     

@@ -50,6 +50,7 @@ public interface CanonicalDomainDAO {
     /* *******  Accreditations  ********/
     public int getAccreditationIdGivenName(String accredName);
     public List<Accreditation> selectUnprocessedStudentAccreditationsByProcessStatus(int processed);
+    public int changeStatusOnExpiredStudentAccreditations();
     public void addStudentAccreditation(StudentAccreditation sAccredObj);
     
     /* ******* Languages  ********* */
