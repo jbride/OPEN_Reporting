@@ -233,27 +233,6 @@
         <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="add-student-accreditation-to-db" />
     </route>
 
-    <route id="process-new-student-accreditations">
-        <description>
-            1)  Periodically checks for student accreditations that have not been processed
-            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SkillsBase with that student accreditation information
-            3)  To-Do: aggregate results and send report
-        </description>
-        <from uri="{{accred_process-new-student-accreds-uri}}"/>
-        <log message="####################      Starting .... process-new-student-accreds" loggingLevel="INFO"/>
-        <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
-        <split id="loop-for-each-student">
-            <simple>${body}</simple>
-            <filter>
-                <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
-                <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
-                <to uri="direct:skills-base-webservice" id="call-SkillsBase-ws"/>
-                <to uri="direct:update-pathgather-with-accreditation" id="call-pathgather" />
-                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
-            </filter>
-        </split>
-        <log message="####################      done" loggingLevel="INFO"/>
-    </route>
     <!--    *************************************************************************************************   -->
 
 
@@ -383,6 +362,29 @@
 
     <!--    *************************************************************************************************   -->
     <!--    *************                       SkillsBase                                      *************   -->
+
+    <route id="process-new-student-accreditations">
+        <description>
+            1)  Periodically checks for student accreditations that have not been processed
+            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SkillsBase with that student accreditation information
+            3)  To-Do: aggregate results and send report
+        </description>
+        <from uri="{{accred_process-new-student-accreds-uri}}"/>
+        <log message="####################      Starting .... process-new-student-accreds" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
+        <split id="loop-for-each-student">
+            <simple>${body}</simple>
+            <filter>
+                <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
+                <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
+                <to uri="direct:skills-base-webservice" id="call-SkillsBase-ws"/>
+                <to uri="direct:update-pathgather-with-accreditation" id="call-pathgather" />
+                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+            </filter>
+        </split>
+        <log message="####################      done" loggingLevel="INFO"/>
+    </route>
+
     <route id="skills-base-webservice">
         <description>
             Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
@@ -442,22 +444,6 @@
         </choice>
     </route>
     <!--    *************************************************************************************************   -->
-
-
-    <!--    *************************************************************************************************   -->
-    <!--    *************                       Pathgather                                      *************   -->
-    <route id="update-pathgather-with-accreditation" >
-        <description>
-            1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
-            2) Responsible for ?????
-        </description>
-        <from uri="direct:update-pathgather-with-accreditation" />
-        <log message="******** Invoking pathgatherer     done" loggingLevel="INFO"/>
-    </route>
-
-    <!--    *************************************************************************************************   -->
-
-
 
 
     <route id="send-email">

@@ -156,6 +156,19 @@
         </choice>
     </route>
 
+    <!--    *************************************************************************************************   -->
+    <!--    *************                       Pathgather                                      *************   -->
+    <route id="update-pathgather-with-accreditation" >
+        <description>
+            1) Expects the following payload:  CourseCompletion
+            2) Responsible for ?????
+        </description>
+        <from uri="direct:update-pathgather-with-accreditation" />
+        <log message="******** Invoking pathgatherer     done" loggingLevel="INFO"/>
+    </route>
+
+    <!--    *************************************************************************************************   -->
+
     <route id="send-email">
         <from uri="seda:send-email"/>
         <removeHeaders pattern="*" excludePattern="Return-Path"/>
