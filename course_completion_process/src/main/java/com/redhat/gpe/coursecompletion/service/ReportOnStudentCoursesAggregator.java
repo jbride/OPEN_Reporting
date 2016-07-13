@@ -1,4 +1,4 @@
-package com.redhat.gpte.studentregistration.service;
+package com.redhat.gpe.coursecompletion.service;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Service;

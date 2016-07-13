@@ -56,6 +56,7 @@
         <from uri="{{cc_receive_sumtotal_input_uri}}" />
         <log message="Received Sumttotal email. from: ${header.Return-Path}, subject ${header.subject}" id="log_sumtotal_receive"/>
         <to uri="bean:cCompletionServiceBean?method=changeMapToListOfValues" />
+        <to uri="bean:cCompletionServiceBean?method=validateSumtotalCourseCompletions" />
         <split id="for-each-sumtotal-attachment">
             <simple>${body}</simple>
             <unmarshal ref="bindySumtotal"/>
@@ -86,7 +87,6 @@
         <to uri="seda:send-email"/>
     </route>
 
-    
     <route id="receive-dokeos-course-completions">
         <description>
             - Accepts list of dokeos course completion spreadsheets
