@@ -6,6 +6,7 @@ import com.redhat.gpe.domain.canonical.*;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.ExceptionCodes;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
+import com.redhat.gpte.services.InvalidCourseException;
 
 import org.apache.camel.Body;
 import org.apache.camel.CamelContext;
@@ -25,10 +26,12 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.sql.Timestamp;
 import java.text.ParseException;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
@@ -41,6 +44,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte/gpte_course_issues.txt";
     private static final String CC_APPEND_STUDENT_ISSUES_TO_FILE = "cc_append_student_issues_to_file";
     private static final String STUDENT_ISSUES_OUTPUT = "/tmp/gpte/gpte_student_issues.txt";
+    private static final String COMMA = ",";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
@@ -222,27 +226,55 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
 /* **************       Student Courses        ********************** */
     
-    public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException {
-        
-        // 1)  Identify student
-        Student student = canonicalDAO.getStudentByEmail(stCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
-        
-        // 2)  Identify canonical course name given a sumtotal "activity code"
+    public void validateSumtotalCourseCompletions(Exchange exchange) throws IOException {
+        Collection<SumtotalCourseCompletion> sCourseCompletions = (Collection<SumtotalCourseCompletion>)exchange.getIn().getBody();
+        StringBuilder eBuilder = new StringBuilder();
+        int i = 2;
+        Collection<SumtotalCourseCompletion> prunedCourseCompletions = new ArrayList<SumtotalCourseCompletion>();
+        for(SumtotalCourseCompletion stCC : sCourseCompletions) {
+            String aCode = stCC.getActivityCode();
+            if(!StringUtils.isEmpty(aCode)) {
+            
+                try {
+                    Course course = getCourseFromSumtotalCompletion(stCC);
+                    prunedCourseCompletions.add(stCC);
+                }catch(InvalidCourseException x) {
+                    eBuilder.append(i);
+                    eBuilder.append(COMMA);
+                    eBuilder.append(stCC.getEmail());
+                    eBuilder.append(COMMA);
+                    eBuilder.append(stCC.getActivityCode());
+                    eBuilder.append("\n");
+                }
+            }
+            i++;
+        }
+        if(eBuilder.length() > 0)
+            throw new RuntimeException(InvalidCourseException.INVALID_COURSE_PREFIX+"\nspreadsheet row #,student email, sumtotal activity code\n"+eBuilder.toString());
+        else {
+            logger.info("validateSumtotalCourseCompletions() all activity codes from the following # of sumtotal course completions are found to have corresponding course Ids in GPTE database: "+prunedCourseCompletions.size());
+            exchange.getIn().setBody(prunedCourseCompletions);
+        }
+    }
+    
+    private Course getCourseFromSumtotalCompletion(SumtotalCourseCompletion stCC) throws IOException, InvalidCourseException {
         if(StringUtils.isEmpty(this.langFilter)){
             this.setLangFilter();
         }
         String aCode = stCC.getActivityCode();
+        if(StringUtils.isEmpty(aCode))
+            throw new InvalidCourseException();
+
         aCode = aCode.replaceAll(this.langFilter, "");
         aCode = aCode.replaceAll(this.underscoreFilter, "");
         aCode = aCode.replaceAll(this.dashFilter, "");
         stCC.setActivityCode(aCode);
-        logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse. ActivityCode = "+stCC.getActivityCode());
         
         Course course = null;
         if(courseMapTempCache.containsKey(stCC.getActivityCode())){
             course = courseMapTempCache.get(stCC.getActivityCode());
             if(course == null) {
-                throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
+                throw new InvalidCourseException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
             }
         } else {
             try {
@@ -254,9 +286,20 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     String output = "\n"+stCC.getActivityCode()+","+stCC.getActivityName();
                     Files.write(Paths.get(courseIssuesFile.getAbsolutePath()), output.getBytes(), StandardOpenOption.APPEND);
                 }
-                throw new RuntimeException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
+                throw new InvalidCourseException("Unable to locate a course with the following course Id: \""+stCC.getActivityCode()+"\"");
             }
         }
+        return course;
+    }
+    
+    public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException, InvalidCourseException {
+        
+        // 1)  Identify student
+        Student student = canonicalDAO.getStudentByEmail(stCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
+        
+        // 2)  Identify canonical course name given a sumtotal "activity code"
+        logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse. ActivityCode = "+stCC.getActivityCode());
+        Course course = getCourseFromSumtotalCompletion(stCC);
         
         // 3)  Create StudentCourse object
         Language language = new Language();
@@ -284,6 +327,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         CourseCompletion dStudentCourse = new CourseCompletion(student, course, language, sCourse);
         return dStudentCourse;
     }
+    
     
     public CourseCompletion convertDokeosCourseCompletionToStudentCourse(@Body DokeosCourseCompletion dokeosCourseCompletion) {
         if(StringUtils.isEmpty(dokeosCourseCompletion.getEmail()))
