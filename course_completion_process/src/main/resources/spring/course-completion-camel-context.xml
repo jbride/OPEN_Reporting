@@ -56,7 +56,6 @@
         <from uri="{{cc_receive_sumtotal_input_uri}}" />
         <log message="Received Sumttotal email. from: ${header.Return-Path}, subject ${header.subject}" id="log_sumtotal_receive"/>
         <to uri="bean:cCompletionServiceBean?method=changeMapToListOfValues" />
-        <to uri="bean:cCompletionServiceBean?method=validateSumtotalCourseCompletions" />
         <split id="for-each-sumtotal-attachment">
             <simple>${body}</simple>
             <unmarshal ref="bindySumtotal"/>
@@ -69,6 +68,7 @@
                     <log message="only 1 sumtotal student course found in ${header.CamelFileName}"/>
                 </doCatch>
             </doTry>
+            <to uri="bean:cCompletionServiceBean?method=validateSumtotalCourseCompletions" />
             <split id="for-each-sumtotal-student-course">
                 <simple>${body}</simple>
                 <doTry>
