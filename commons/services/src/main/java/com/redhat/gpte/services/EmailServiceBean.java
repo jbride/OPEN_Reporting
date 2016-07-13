@@ -207,10 +207,19 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     public void setHeaderToWithSendersEmail(Exchange exchange) {
         Message in = exchange.getIn();
         StringBuilder sBuilder = new StringBuilder(adminEmail);
-        String theReturnEmail = (String) in.getHeader(RETURN_PATH);
-        if(!StringUtils.isEmpty(theReturnEmail)) {
-            sBuilder.append(DELIMITER);
-            sBuilder.append(theReturnEmail);
+        Object inObj = in.getHeader(RETURN_PATH);
+        if(inObj != null){
+            if(inObj instanceof List){
+                List<String> inList = (List<String>)inObj;
+                for(String email : inList){
+                    sBuilder.append(DELIMITER);
+                    sBuilder.append(email);
+                }
+                
+            }else {
+                sBuilder.append(DELIMITER);
+                sBuilder.append((String)inObj);
+            }
         }
         in.setHeader("to", sBuilder.toString());
     }
