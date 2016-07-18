@@ -41,9 +41,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final byte coursePassingValue = 70;
     public static final String GET_STUDENT_COMPANY_INFO_URI = "vm:get-student-company-info";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
-    private static final String COURSE_ISSUES_OUTPUT = "/tmp/gpte/gpte_course_issues.txt";
     private static final String CC_APPEND_STUDENT_ISSUES_TO_FILE = "cc_append_student_issues_to_file";
-    private static final String STUDENT_ISSUES_OUTPUT = "/tmp/gpte/gpte_student_issues.txt";
+    private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte";
+    private static final String COURSE_ISSUES_OUTPUT = "gpte_course_issues.txt";
+    private static final String STUDENT_ISSUES_OUTPUT = "gpte_student_issues.txt";
     private static final String COMMA = ",";
 
     private Logger logger = Logger.getLogger(getClass());
@@ -61,11 +62,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     
    
     public CourseCompletionServiceBean() throws IOException {
+        File courseIssuesDir = new File(COURSE_ISSUES_OUTPUT_DIR);
+        courseIssuesDir.mkdirs();
+
         String x = System.getProperty(CC_APPEND_COURSE_ISSUES_TO_FILE);
         if(StringUtils.isNotEmpty(x)){
             cc_append_course_issues_to_file = Boolean.parseBoolean(x);
             if(cc_append_course_issues_to_file) {
-                courseIssuesFile = new File(COURSE_ISSUES_OUTPUT);
+                courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, COURSE_ISSUES_OUTPUT);
                 courseIssuesFile.createNewFile();
                 FileOutputStream fStream = null;
                 try {
@@ -86,7 +90,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         if(StringUtils.isNotEmpty(x)){
             this.cc_append_student_issues_to_file = Boolean.parseBoolean(x);
             if(cc_append_student_issues_to_file) {
-                studentIssuesFile = new File(STUDENT_ISSUES_OUTPUT);
+                studentIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, STUDENT_ISSUES_OUTPUT);
                 studentIssuesFile.createNewFile();
                 FileOutputStream fStream = null;
                 try {

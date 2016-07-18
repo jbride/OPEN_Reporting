@@ -11,7 +11,10 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     
     private static final long serialVersionUID = 1L;
     public static final SimpleDateFormat dokeosSDF = new SimpleDateFormat("MM-dd-yy");
-    public static final String DOKEOS_SUFFIX = " Final Assessment";
+    public static final String CC_DOKEOS_SUFFIX_PROPERTY = "cc_dokeos_suffixes";
+
+    public static Object lockObject = new Object();
+    public static String[] dokeosSuffixArray;
 
     // https://github.com/redhat-gpe/OPEN_Reporting/issues/37
     // Dokes exam names are now identical to canonical course names;  no need to use mapping table
@@ -43,6 +46,18 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     
     
     public DokeosCourseCompletion() {
+        if(dokeosSuffixArray == null) {
+            synchronized(lockObject) {
+                if(dokeosSuffixArray != null)
+                    return;
+
+                String dProperty = System.getProperty(CC_DOKEOS_SUFFIX_PROPERTY);
+                if(dProperty == null)
+                    throw new RuntimeException("Must pass system property of: "+CC_DOKEOS_SUFFIX_PROPERTY);
+
+                dokeosSuffixArray = dProperty.split(",");
+            }
+        }
     }
     
     public String getFullname() {
@@ -75,16 +90,19 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     }
 
     public void pruneQuizName() {
-        if(quizName.indexOf(DOKEOS_SUFFIX) > 0) {
-            String prunedQuizName = quizName.substring(0, quizName.indexOf(DOKEOS_SUFFIX));
-            this.quizName = prunedQuizName;
-        } else {
-            StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"The following course evaluation name does not follow convention: \""+quizName+"\" . Eval name must have a suffix of: "+DOKEOS_SUFFIX);
-            sBuilder.append("\nCourse completion info as follows:");
-            sBuilder.append("\n\temail: "+email);
-            sBuilder.append("\n\tassessmentDate: "+assessmentDate);
-            throw new RuntimeException(sBuilder.toString());
+        for(String dSuffix : dokeosSuffixArray) {
+            if(quizName.indexOf(dSuffix) > 0) {
+                String prunedQuizName = quizName.substring(0, quizName.indexOf(dSuffix));
+                this.quizName = prunedQuizName;
+                return;
+            }
         }
+
+        StringBuilder sBuilder = new StringBuilder(ExceptionCodes.GPTE_CC1001+"The following course evaluation name does not follow convention: \""+quizName+"\" . Eval name must have a suffix of: "+System.getProperty(CC_DOKEOS_SUFFIX_PROPERTY));
+        sBuilder.append("\nCourse completion info as follows:");
+        sBuilder.append("\n\temail: "+email);
+        sBuilder.append("\n\tassessmentDate: "+assessmentDate);
+        throw new RuntimeException(sBuilder.toString());
     }
 
 
