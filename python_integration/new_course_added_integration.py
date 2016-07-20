@@ -16,10 +16,10 @@ def create_pg_content_obj(course):
     data = {
         'name': course[1],
         'content_type': 'Course',
-        'souce_url': '',
+        'souce_url': 'https://{}'.format(course_id),
         'provider_name': 'Dokeos',
-        'topic_name': '',
-        'custom_id': course[0]
+        'topic_name': 'TBD',
+        # 'custom_id': course[0] topic custom_id
     }
     data = json.dumps(data)
     return data
