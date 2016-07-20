@@ -22,9 +22,9 @@ def get_pg_content_id(course_name):
         content_id = response_as_json['id']
         return content_id
 
-def create_pg_user_content_obj(comp, course_id):
+def create_pg_user_content_obj(comp):
     data = {
-        "content_id": course_id,
+        "content_id": comp[2],
         "user_email": comp[1],
         "completed_at": str(comp[0])
       }
@@ -42,8 +42,7 @@ def main():
     new_completions = get_new_completions(datawarehouse)
     completions_for_posting = []
     for completion in new_completions:
-        completed_course_id = completion[2]
-        new_comp = create_pg_user_content_obj(completion, completed_course_id)
+        new_comp = create_pg_user_content_obj(completion)
         completions_for_posting.append(new_comp)
     for completion in completions_for_posting:
         mark_complete(completion)
