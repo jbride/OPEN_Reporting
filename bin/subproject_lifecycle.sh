@@ -180,8 +180,8 @@ else
     ensurePreReqs
     readPropertiesFile
     checkRemotePort
-    deployJBossModules
-    deployCC
+    #deployJBossModules
+    #deployCC
     #deploySReg
-    #deployUP
+    deployUP
 fi
