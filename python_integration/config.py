@@ -1,12 +1,22 @@
 datawarehouse = {
     'user' : 'root',
-    'password': '',
+    'password': 'pass+word',
     'host' : 'localhost',
     'database' : 'lms_transactional'
     }
 
 pg_headers = {
-    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmYmY4MmI1Yi04ZjA3LTQxZWMtOTI0Ni1mNzkxMDIwMjA4NzUiLCJzY29wZSI6ImFwaSIsImp3dCI6IlF2SDZ0NVptRU9FaUNGN3Rwby9hNGc9PSJ9.gvyPFh1acSL61hflMfJRKemRtbOOL2FwpmNNRcdH7dc',
+    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9. \
+                      eyJhdWQiOiJlOTY3MTk1Ni0yODc3LTRlNmMtYjQxMi1j \
+                      OTg3ZDFhNmIzM2QiLCJzY29wZSI6ImFwaSIsImp3dCI6 \
+                      ImtqRkFid25mT2NLMUlKVmdHSjRrSWc9PSJ9.Od-HCm3 \
+                      dcufh8je-zZsPZgeaMvBSezdPPUW6ySJz11g',
     'Content-Type': 'application/json',
     'Accept': 'application/json',
 }
+
+log_line_end = '_ ' * 30
+
+pathgather_url = 'api.redhat.pathgather.com'
+
+log_path = 'tmp/'
