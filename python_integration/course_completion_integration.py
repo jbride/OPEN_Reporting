@@ -65,7 +65,7 @@ if __name__ == '__main__':
     import logging
 
     main()
-    schedule.every().minute.do(main)
+    schedule.every().hour.do(main)
 
     while True:
         schedule.run_pending()
