@@ -13,15 +13,6 @@ def get_new_completions(creds):
     cursor.execute(query)
     return [i for i in cursor]
 
-def get_pg_content_id(course_name):
-    """returns list of content objects"""
-    pg_url = 'http://api.redhat.prepathgather.com/v1/content/{}'.format(course_name)
-    response = requests.get(pg_url, headers=pg_headers)
-    response_as_json = response.json()
-    if 'id' in response_as_json.keys():
-        content_id = response_as_json['id']
-        return content_id
-
 def create_pg_user_content_obj(comp):
     data = {
         "content_id": comp[2],
@@ -34,28 +25,44 @@ def create_pg_user_content_obj(comp):
 def mark_complete(obj):
     """gets incomplete user_content objects and sets the 'completed_at' field \
        with a timestamp string"""
-    pg_url = 'http://api.redhat.prepathgather.com/v1/user_content/'
+    pg_url = 'http://{}/v1/user_content/'.format(pathgather_url)
     req = requests.post(pg_url, headers=pg_headers, data=obj)
-    print(obj, req.status_code)
+    if req.status_code == 404:
+        logging.error(": " + str(req.status_code) + " " + obj)
+    else:
+        logging.info(": " + str(req.status_code))
+
+def create_log_file():
+    week = date.today().isocalendar()[1]
+    year = date.today().year
+    filename = '{}/{}-week{}.log'.format(log_path, year, week)
+    logging.basicConfig(filename=filename, level=logging.INFO)
+    logging.info('Started')
 
 def main():
+    create_log_file()
     new_completions = get_new_completions(datawarehouse)
-    completions_for_posting = []
-    for completion in new_completions:
-        new_comp = create_pg_user_content_obj(completion)
-        completions_for_posting.append(new_comp)
-    for completion in completions_for_posting:
-        mark_complete(completion)
-
+    if not new_completions:
+        logging.info('Nothing to report' + log_line_end)
+    else:
+        completions_for_posting = []
+        logging.info('Completions for posting: {}'.format(len(new_completions)))
+        for completion in new_completions:
+            new_comp = create_pg_user_content_obj(completion)
+            completions_for_posting.append(new_comp)
+        for completion in completions_for_posting:
+            mark_complete(completion)
+        logging.info("job complete" + log_line_end)
 
 if __name__ == '__main__':
-    from config import datawarehouse
-    from config import pg_headers
+    from config import *
+    from datetime import date
     import mysql.connector
     import requests
     import json
     import schedule
     import time
+    import logging
 
     main()
     schedule.every().hour.do(main)
