@@ -10,7 +10,6 @@ def get_new_completions(creds, query_string):
          ON Courses.CourseID=StudentCourses.CourseID
          WHERE Email LIKE '%redhat.com'
          {}""").format(query_string)
-    print(query)
     cursor.execute(query)
     return [i for i in cursor]
 
