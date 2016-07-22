@@ -45,6 +45,7 @@ public interface CanonicalDomainDAO {
     public List<Integer> selectStudentCourseIdsByStatus(int processedStatus);
     public List<CourseCompletion> selectPassedStudentCoursesByStudent(int studentId);
     public boolean isNewStudentCourseForStudent(StudentCourse sCourse);
+    public int getUniqueStudentCourseCount(String studentId, String courseId, String assessmentDate);
     
     
     /* *******  Accreditations  ********/
