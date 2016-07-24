@@ -99,9 +99,8 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         sCourse.setAssessmentscore((byte) 90);
 
         CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
+
         template.sendBody(scWrapper);
-        
-        //in.setBody(scWrapper);
-        //template.send(PERSIST_STUDENT_COURSE_URI, exchange);
+        template.sendBody(scWrapper);
     }
 }

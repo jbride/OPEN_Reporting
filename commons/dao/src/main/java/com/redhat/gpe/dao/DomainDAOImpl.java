@@ -13,6 +13,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcCall;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -364,8 +365,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
 
     public int getUniqueStudentCourseCount(StudentCourse scObj) {
-        String sql = "select count(*) from StudentCourses where studentId=? and CourseId=? and assessmentDate=?";
-        return sbJdbcTemplate.queryForObject(sql, Integer.class, scObj.getStudentid(), scObj.getCourseid(), scObj.getAssessmentdate());
+    	LocalDate accredDate = scObj.getAssessmentdate().toLocalDateTime().toLocalDate();
+    	String wholeDate = accredDate.getYear()+"-"+accredDate.getMonthValue()+"-"+accredDate.getDayOfMonth();
+    	String dayStart = wholeDate+" 00:00:00";
+    	String dayEnd = wholeDate+" 23:59:59";
+    	//logger.info("getUniqueStudentCourseCount() dayStart = "+dayStart+" : dayEnd = "+dayEnd );
+        String sql = "select count(*) from StudentCourses where studentId=? and CourseId=? and assessmentScore=? and AssessmentDate between ? and ?";
+        return sbJdbcTemplate.queryForObject(sql, Integer.class, scObj.getStudentid(), scObj.getCourseid(), scObj.getAssessmentscore(), dayStart, dayEnd );
     }
 
     public boolean isNewStudentCourseForStudent(StudentCourse theStudent) {
