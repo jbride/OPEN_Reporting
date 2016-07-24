@@ -86,4 +86,22 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         Student studentObj = DomainMockObjectHelper.getMockStudent();
         template.sendBody(studentObj);
     }
+    
+    //@Ignore
+    @Test
+    public void testPersistDuplicateStudentCourse() throws InterruptedException {
+    	template.setDefaultEndpointUri(PERSIST_STUDENT_COURSE_URI);
+
+        Student studentObj = DomainMockObjectHelper.getMockStudent();
+        Course courseObj = DomainMockObjectHelper.getMockCourse();
+        Language langObj = DomainMockObjectHelper.getMockLanguage();
+        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse();
+        sCourse.setAssessmentscore((byte) 90);
+
+        CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
+        template.sendBody(scWrapper);
+        
+        //in.setBody(scWrapper);
+        //template.send(PERSIST_STUDENT_COURSE_URI, exchange);
+    }
 }

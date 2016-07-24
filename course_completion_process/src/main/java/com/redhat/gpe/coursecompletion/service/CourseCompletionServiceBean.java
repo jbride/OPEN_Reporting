@@ -395,8 +395,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     }
     
     public void addStudentCourseToDB(@Body CourseCompletion sCourseWrapper) {
-        StudentCourse studentCourse = sCourseWrapper.getStudentCourse();
-        canonicalDAO.addStudentCourse(studentCourse);
+        StudentCourse scObj = sCourseWrapper.getStudentCourse();
+        if(canonicalDAO.getUniqueStudentCourseCount(scObj) < 1 ) {
+            canonicalDAO.addStudentCourse(scObj);
+        }else {
+            logger.warn("addStudentCourseDB() Student Course already exists with following attributes: "+scObj.getStudentid()+" : " + scObj.getCourseid() +" : "+ scObj.getAssessmentdate());
+        }
     }
     
     public boolean isNewStudentCourseForStudent(@Body StudentCourse sCourse) {

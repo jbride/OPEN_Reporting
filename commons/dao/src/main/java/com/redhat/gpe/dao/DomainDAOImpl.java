@@ -363,9 +363,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return sCourses;
     }
 
-    public int getUniqueStudentCourseCount(String studentId, String courseId, String assessmentDate) {
+    public int getUniqueStudentCourseCount(StudentCourse scObj) {
         String sql = "select count(*) from StudentCourses where studentId=? and CourseId=? and assessmentDate=?";
-        return sbJdbcTemplate.queryForObject(sql, Integer.class, studentId, courseId, assessmentDate);
+        return sbJdbcTemplate.queryForObject(sql, Integer.class, scObj.getStudentid(), scObj.getCourseid(), scObj.getAssessmentdate());
     }
 
     public boolean isNewStudentCourseForStudent(StudentCourse theStudent) {
