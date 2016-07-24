@@ -1,4 +1,4 @@
-def get_new_completions(creds):
+def get_new_completions(creds, query_string):
     """connect to datawarehouse and retrieve new completions"""
     connection = mysql.connector.connect(**creds)
     cursor = connection.cursor()
@@ -9,7 +9,7 @@ def get_new_completions(creds):
          INNER JOIN Courses
          ON Courses.CourseID=StudentCourses.CourseID
          WHERE Email LIKE '%redhat.com'
-         AND StudentCourses.CreateDate > DATE_SUB(NOW(), INTERVAL 1 HOUR)""")
+         {}""").format(query_string)
     cursor.execute(query)
     return [i for i in cursor]
 
@@ -37,11 +37,14 @@ def create_log_file():
     year = date.today().year
     filename = '{}/{}-week{}.log'.format(log_path, year, week)
     logging.basicConfig(filename=filename, level=logging.INFO)
-    logging.info('Started')
 
-def main():
+def main(query):
     create_log_file()
-    new_completions = get_new_completions(datawarehouse)
+    if not query:
+        logging.info('Doing bulk integration')
+    else:
+        logging.info('Doing hourly integration')
+    new_completions = get_new_completions(datawarehouse, query)
     if not new_completions:
         logging.info('Nothing to report' + log_line_end)
     else:
@@ -54,6 +57,17 @@ def main():
             mark_complete(completion)
         logging.info("job complete" + log_line_end)
 
+def prompt_user():
+    user_choice = input("Would you like to begin with a bulk integration? y or n ").lower()
+    if user_choice == 'y':
+        query_string = ''
+        return query_string
+    elif user_choice == 'n':
+        query_string = hourly_query
+        return query_string
+    else:
+        return prompt_user()
+
 if __name__ == '__main__':
     from config import *
     from datetime import date
@@ -64,8 +78,11 @@ if __name__ == '__main__':
     import time
     import logging
 
-    main()
-    schedule.every().hour.do(main)
+    hourly_query = 'AND StudentCourses.CreateDate > DATE_SUB(NOW(), INTERVAL 1 HOUR)'
+    query_string = prompt_user()
+    main(query_string)
+    query_string = hourly_query
+    schedule.every().minute.do(main, query_string)
 
     while True:
         schedule.run_pending()
