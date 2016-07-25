@@ -351,7 +351,7 @@ end
 rule "18_Red Hat Sales Engineer Specialist - Platform_with_4_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "Platform 2.0 for Sales")
+    $cc1:CourseCompletion(courseName == "Platform Essentials for Red Hat Technical Sales Partners")
     $cc2:CourseCompletion(this != $cc1, courseName == "RHN Satellite Sales")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "Red Hat Enterprise Linux 7 Implementation")
     $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, courseName == "Satellite (5) FASTRAX")
@@ -376,7 +376,7 @@ end
 rule "19_Red Hat Sales Engineer Specialist - Platform_with_4_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "Platform 2.0 for Sales")
+    $cc1:CourseCompletion(courseName == "Platform Essentials for Red Hat Technical Sales Partners")
     $cc2:CourseCompletion(this != $cc1, courseName == "RHN Satellite Sales")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "Red Hat Enterprise Linux 7 Implementation")
     $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, courseName == "Red Hat Satellite 6 Implementation")
@@ -455,7 +455,7 @@ end
 rule "22_Red Hat Sales Engineer Specialist - Platform_with_5_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "Platform 2.0 for Sales")
+    $cc1:CourseCompletion(courseName == "Platform Essentials for Red Hat Technical Sales Partners")
     $cc2:CourseCompletion(this != $cc1, courseName == "RHN Satellite Sales")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "RHEL (6) Implementation")
     $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, courseName == "Red Hat Satellite 6 Implementation")
@@ -536,7 +536,7 @@ end
 rule "25_Red Hat Sales Engineer Specialist - Platform_with_4_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "Platform 2.0 for Sales")
+    $cc1:CourseCompletion(courseName == "Platform Essentials for Red Hat Technical Sales Partners")
     $cc2:CourseCompletion(this != $cc1, courseName == "RHN Satellite Sales")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "Red Hat Enterprise Linux 7 Implementation")
     $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, courseName == "Red Hat Satellite 6 FASTRAX")

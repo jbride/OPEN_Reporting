@@ -444,7 +444,7 @@ end
 rule "23_Red Hat Sales Engineer Specialist - PaaS Development_with_2_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "Platform-as-a-Service (PaaS) Solution for Sales")
+    $cc1:CourseCompletion(courseName == "Platform-as-a-Service Solution for Sales Engineer")
     $cc2:CourseCompletion(this != $cc1, courseName == "Enterprise Software Development with OpenShift")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jul-2014", "", $cc1, $cc2))
 then
