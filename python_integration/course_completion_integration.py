@@ -82,7 +82,7 @@ if __name__ == '__main__':
     query_string = prompt_user()
     main(query_string)
     query_string = hourly_query
-    schedule.every().minute.do(main, query_string)
+    schedule.every().hour.do(main, query_string)
 
     while True:
         schedule.run_pending()
