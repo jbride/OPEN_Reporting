@@ -1,13 +1,30 @@
-remote_bk_dir: /tmp/mysqlbackup
-local_bk_dir: /tmp/mysqlbackup_local/
+
+
+# Operating System user vars
+# Used to ssh into various machines
+remote_user_prod: smangan-redhat.com
 remote_user_dev: root
-remote_user_prod: jbride-redhat.com
+
+
+# Mariadb RDBMS connection vars
+# Used to connect to database, once ssh'd into machine (PROD, QA, DEV)  that hosts the RDBMS
 db_host: localhost
 db_user: root
 db_pass: c-9XSHln8hJ_UH9YvNOgc9mH
+
+
+# Mariadb databases to export (from production) and import (into other environments such as QA and DEV)
 databases: 
    - lms_transactional
 #  - lms_reporting
 #  - dashbuilder
-your_name: Samu
-your_email: stauil@redhat.com
+
+
+# Database back vars (both remote and local workstation)
+remote_bk_dir: /tmp/mysqlbackup
+local_bk_dir: /tmp/mysqlbackup_local/
+
+
+# Email vars for status report
+your_name: Scott Mangan
+your_email: smangan@redhat.com

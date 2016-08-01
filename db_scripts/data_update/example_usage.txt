@@ -1,10 +1,10 @@
 # sanity check
-ansible mysqldev -m ping -i . -vvv -u root
-ansible mysqlprod -m ping -i . -vvv -u stauilrh
+# ansible mysqldev -m ping -i . -vvv -u root
+# ansible mysqlprod -m ping -i . -vvv -u jbride-redhat.com
 
 # to test only the notification
-ansible-playbook -i hosts mysql_playbook.yml --tags notification 
+# ansible-playbook -i hosts mysql_playbook.yml --tags notification 
 
 # execution
-ansible-playbook -i hosts mysql_playbook.yml --tags dump
-ansible-playbook -i hosts mysql_playbook.yml --tags import
+# ansible-playbook -i hosts mysql_playbook.yml --tags dump
+# ansible-playbook -i hosts mysql_playbook.yml --tags import

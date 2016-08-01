@@ -1,7 +1,7 @@
 ---
-- name: dashbuilder/lms backup on dev
-  hosts: mysqldev
-  remote_user: "{{ remote_user_dev }}"
+- name: dashbuilder/lms backup on PROD
+  hosts: mysqlprod
+  remote_user: "{{ remote_user_prod }}"
   vars_files:
     - vars.yml
 
@@ -30,9 +30,9 @@
           - dump
 
 
-- name: dashbuilder/lms import in production
-  hosts: mysqlprod
-  remote_user: "{{ remote_user_prod }}"
+- name: dashbuilder/lms import to DEV
+  hosts: mysqldev
+  remote_user: "{{ remote_user_dev }}"
   vars_files:
     - vars.yml
 
@@ -44,7 +44,7 @@
           - import
 
       - name: Copy database dump files to remote host
-        copy: src={{ local_bk_dir }}docker1.ose.opentlc.com/{{ remote_bk_dir }}/{{ item }}Db.sql.gz dest={{ remote_bk_dir }}
+        copy: src={{ local_bk_dir }}forge.opentlc.com/{{ remote_bk_dir }}/{{ item }}Db.sql.gz dest={{ remote_bk_dir }}
         with_items: databases
         tags:
           - import
@@ -61,7 +61,7 @@
           - import
 
       - name: Delete temp backup folder local
-        file: path={{ local_bk_dir }}docker1.ose.opentlc.com/{{ remote_bk_dir }}/{{ item }}Db.sql.gz state=absent
+        file: path={{ local_bk_dir }}forge.opentlc.com/{{ remote_bk_dir }}/{{ item }}Db.sql.gz state=absent
         with_items: databases
         tags:
           - import 
