@@ -3,7 +3,7 @@
 # Operating System user vars
 # Used to ssh into various machines
 remote_user_prod: smangan-redhat.com
-remote_user_dev: root
+remote_user_dev: jboss
 
 
 # Mariadb RDBMS connection vars
