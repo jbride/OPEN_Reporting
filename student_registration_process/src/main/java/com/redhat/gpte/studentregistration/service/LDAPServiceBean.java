@@ -31,6 +31,7 @@ import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
 import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
+import com.redhat.gpte.services.ExceptionCodes;
 
 
 /* 
@@ -71,7 +72,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private Logger logger = Logger.getLogger("LDAPServiceBean");
     
     // Data structure of userIds that have been verified to exist in LDAP
-    private Set<String> verifiedUsers = new HashSet<String>();
+    // private Set<String> verifiedUsers = new HashSet<String>();
     
     private Map<String,Integer> verifiedCompanies = new HashMap<String,Integer>();
 
@@ -143,6 +144,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     /*
      * Accepts a Student object (with companyName field populated) in body of Exchange message
      * Populates companyId on student obj
+     * Populates geo, role and company name attributes on student obj
      * Persists a new company if doesn't already exist
      */
     public void getStudentCompanyInfo(Exchange exchange) {
@@ -256,7 +258,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     SearchResult si =(SearchResult)listResults.next();
                     Attributes attrs = si.getAttributes();
                     if (attrs == null) {
-                        handleValidationException(exchange, "\n\t"+student.getEmail()+" : No attributes for this user");
+                        handleValidationException(exchange, "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1003); // No attributes for this user
                         return;
                     }
                     NamingEnumeration<?> ae = attrs.getAll(); 
@@ -298,12 +300,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     count++;
                 }
             }catch(IllegalArgumentException x ) {
-                String message = "\n\t"+student.getEmail()+" : invalid attributes:   geo = "+student.getRegion() +" : title = "+student.getRoles();
+                String message = "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1002+",  geo = "+student.getRegion() +" , title = "+student.getRoles(); // Invalid attributes from LDAP
                 handleValidationException(exchange, message);
                 return;
             }
             if(count == 0){
-                handleValidationException(exchange, "\n\t"+student.getEmail()+" :not able to locate this user");
+                handleValidationException(exchange, "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1001); // Not able to locate this user in LDAP
             }
         }catch(NamingException x) {
             x.printStackTrace();
@@ -328,14 +330,14 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         StringBuilder exBuilder;
         Object validationExBuilderObj  = exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER);
         if(validationExBuilderObj == null){
-            exBuilder = new StringBuilder(InvalidAttributeException.INVALID_ATTRIBUTE_PREFIX);
+            exBuilder = new StringBuilder();
             exchange.getIn().setHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER, exBuilder);
         } else
             exBuilder = (StringBuilder)validationExBuilderObj;
         
         exBuilder.append(message);
-        exBuilder.append(SOURCE_OF_PROBLEM);
-        exBuilder.append(providerUrl);
+        //exBuilder.append(SOURCE_OF_PROBLEM);
+        //exBuilder.append(providerUrl);
     }
     
     public boolean hasNoExceptionProperty(Exchange exchange) {
@@ -345,7 +347,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         else
             return false;
     }
-    
+   
+/* 
     // Queries for presence of existing student records in IPA LDAP server
     @SuppressWarnings("unchecked")
     public void removeDuplicateStudents(Exchange exchange) throws NamingException {
@@ -369,9 +372,6 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 DirContext testCtx = null;
                 LdapCtx lookupResult = null;
                 StringBuilder sBuilder = new StringBuilder(MAIL);
-                //sBuilder.append(email);
-                //sBuilder.append(COMMA);
-                //sBuilder.append(BASE_CTX_DN);
                 
                 try {
                     testCtx = grabLDAPConnectionFromPool();                    
@@ -408,11 +408,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         }
         logger.info("removeDuplicateStudents() finishing with the following # of students "+students.size()+" : # of dups = "+dupCount+" : # of ldap queries = "+ldapQCount);
     }
+*/
     
     private DirContext grabLDAPConnectionFromPool() throws NamingException {
         try {
             DirContext ctx = new InitialDirContext(env);
-            logger.info("grabLDAPConnectionFromPool() ctx = "+ctx);
+            //logger.debug("grabLDAPConnectionFromPool() ctx = "+ctx);
             return ctx;
         }catch(AuthenticationException x) {
             logger.error("init() unable to connect to: "+providerUrl+" using user="+securityPrincipal);

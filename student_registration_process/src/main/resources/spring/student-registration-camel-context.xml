@@ -50,12 +50,26 @@
 
         <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+        <setBody><simple>${exception.message}</simple></setBody>
         <to uri="seda:send-email"/>
     </onException>
 
+
+    <onException>
+        <description>
+            Catches InvalidAttributeException thrown by: UpdateStudentAttributesResultsAggregator
+        </description>
+        <exception>com.redhat.gpte.studentregistration.util.InvalidAttributeException</exception>
+        <setBody><simple>${exception.message}</simple></setBody>
+        <to uri="{{sr_exception_output_uri}}"/>
+    </onException>
+
+
+
+<!-- *************************          Retrieve Student  LDAP Attributes       ******************************  -->
     <route id="get-student-company-info">
         <description>
-            1)  Given a Student object (with email populated), queries IPA LDAP for student attributes (parter name, geo, role)
+            1)  Given a Student object (with email populated), queries IPA LDAP for student attributes (company name, geo, role)
             3)  If student email found, then Student object populated with attributes is returned
             2)  If student email not found, validation exception is thrown
         </description>
@@ -113,10 +127,20 @@
             <completionPredicate>
                 <simple>${body} contains 'STOP'</simple>
             </completionPredicate>
+
+            <!-- No errors encountered;  send email of successful processing -->
             <setBody><constant>Skills Exchange Integration App:  All Red Hat students updated with LDAP metadata</constant></setBody>
             <to uri="seda:send-email"/>
         </aggregate>
     </route>
+
+<!-- ***********************************************************************************************************  -->
+
+
+
+
+
+<!-- *******************        Sumtotal Student Registration           *****************************************   -->
 
     <route id="receive-sumtotal-student-registrations">
         <description>
@@ -175,11 +199,9 @@
         <log message="*!*!*!*!   Post New Students to IPA ...... Completed" id="log_post_new_students_done"/>
     </route>
 
-    <!--route autoStartup="true" id="update_salesforce_with_student_data">
-        <from uri="{{sr_update_salesforce_with_student_data}}" />
-        <log message="((((((((((    Starting .... update_salesforce_with_student_data" loggingLevel="INFO"/>
-        <log message="((((((((((    Completed .... update_salesforce_with_student_data" loggingLevel="INFO"/>
-    </route -->
+<!--        ***************************************************************************************************         -->
+
+
 
     <route id="persist-student" >
         <from uri="direct:persist-student" />
@@ -224,6 +246,19 @@
             <log message="Sent reply email to: ${header.to}"/>
         </filter>
     </route>
+
+
+
+<!--        *********************           experimental        *******************     -->
+
+    <!--route autoStartup="true" id="update_salesforce_with_student_data">
+        <from uri="{{sr_update_salesforce_with_student_data}}" />
+        <log message="((((((((((    Starting .... update_salesforce_with_student_data" loggingLevel="INFO"/>
+        <log message="((((((((((    Completed .... update_salesforce_with_student_data" loggingLevel="INFO"/>
+    </route -->
+
+<!--    ***************************************************************************     -->
+
 
   </camelContext>
 
