@@ -202,7 +202,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "12_Red Hat Delivery Specialist - Storage_with_1_course"
+rule "12_Red Hat Delivery Specialist - Red Hat Gluster Storage_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Red Hat Gluster Storage 3 Implementation")
@@ -211,7 +211,7 @@ then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1);
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("Red Hat Delivery Specialist - Storage");
+    accreditation.setAccreditationName("Red Hat Delivery Specialist - Red Hat Gluster Storage");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
@@ -930,6 +930,29 @@ then
 
     Accreditation accreditation = new Accreditation();
     accreditation.setAccreditationName("Red Hat Delivery Specialist - RHEL Atomic Host and Containers");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setAccreditationDate(latestCC.getAssessmentDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "43_Red Hat Delivery Specialist - Red Hat Ceph Storage_with_2_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(courseName == "Red Hat Ceph Storage FASTRAX")
+    $cc2:CourseCompletion(this != $cc1, courseName == "Red Hat Ceph Storage Implementation")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "19-May-2016", "", $cc1, $cc2))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2);
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setAccreditationName("Red Hat Delivery Specialist - Red Hat Ceph Storage");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
