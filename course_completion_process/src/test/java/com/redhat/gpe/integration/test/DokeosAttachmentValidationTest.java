@@ -80,7 +80,7 @@ public class DokeosAttachmentValidationTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/course-completion-camel-context.xml");
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void test00ValidAttachment() throws InterruptedException, IOException {
         File inbox_file = new File(INBOX_PATH, GOOD_TEST_FILE);

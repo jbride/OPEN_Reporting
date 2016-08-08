@@ -87,7 +87,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         template.sendBody(studentObj);
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testPersistDuplicateStudentCourse() throws InterruptedException {
     	template.setDefaultEndpointUri(PERSIST_STUDENT_COURSE_URI);

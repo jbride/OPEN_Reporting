@@ -113,16 +113,25 @@
                 </doTry>
                 <split id="for-each-dokeos-course-completion">
                     <simple>${body}</simple>
-                    <doTry>
-                        <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-convert"/>
-                        <doCatch>
-                            <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
-                            <log message="${body.email} : ${body.quizName} : ${body.assessmentDate} : Not found in Students table.  Will now add" loggingLevel="WARN" />
-                            <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenDokeosCourseCompletion" id="update-dokeos-student"/>
-                            <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-re-attempt-to-convert"/>
-                        </doCatch>
-                    </doTry>
-                    <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
+                    <choice id="if-assignment-passing-score">
+                        <when>
+                            <!--simple>${body.quizName} contains 'Assignment'  &amp;&amp; ${body.score} < 100</simple -->
+                        <simple>${body.quizName} contains 'Assignment' &amp;&amp; ${body.scoreInt} &lt; 100</simple>
+                            <log message="${body.email} : Will not persist dokeos student assignment due to non-passing score: ${body.score}" id="log_dokeos_assignment_not_100"/>
+                        </when>
+                        <otherwise>
+                            <doTry>
+                                <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-convert"/>
+                                <doCatch>
+                                    <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
+                                    <log message="${body.email} : ${body.quizName} : ${body.assessmentDate} : Not found in Students table.  Will now add" loggingLevel="WARN" />
+                                    <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenDokeosCourseCompletion" id="update-dokeos-student"/>
+                                    <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-re-attempt-to-convert"/>
+                                </doCatch>
+                            </doTry>
+                            <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
+                        </otherwise>
+                    </choice>
                 </split>
             </split>
             <!-- setBody><constant>Course Completion Process:  Dokeos Email with attachments received and validated</constant></setBody>
@@ -146,7 +155,7 @@
                 <simple>${body.assessmentScore} >= 70</simple>
                 <when>
                     <simple>{{cc_persist_student_course}} == true</simple>
-                    <log message="${body.student.email} : Adding student course to db: '${body.course.coursename}'"/>
+                    <log message="${body.student.email} : Adding student course to db: '${body.course.coursename}' '${body.assessmentScore}'"/>
                     <to uri="bean:cCompletionServiceBean?method=addStudentCourseToDB" id="add-course-completion-to-db"/>
                 </when>
             </when>

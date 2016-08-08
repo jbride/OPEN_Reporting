@@ -12,6 +12,7 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     public static final SimpleDateFormat dokeosSDF = new SimpleDateFormat("MM-dd-yy");
     public static final String CC_DOKEOS_SUFFIX_PROPERTY = "cc_dokeos_suffixes";
+    public static final String PERCENTAGE = "%";
 
     public static Object lockObject = new Object();
     public static String[] dokeosSuffixArray;
@@ -43,6 +44,9 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     
     @DataField(pos=7, required=false)
     private String empty;
+
+    private int scoreInt;
+
     
     
     public DokeosCourseCompletion() {
@@ -162,6 +166,14 @@ public class DokeosCourseCompletion implements java.io.Serializable {
             throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
 
         return this.fullname.substring(0, fullname.indexOf(COMMA));
+    }
+
+    public int getScoreInt() {
+        String tScore = score.substring(0, score.indexOf(PERCENTAGE));
+        return Integer.parseInt(tScore);
+    }
+    public void setScoreInt(int x) {
+        scoreInt = x;
     }
 }
 
