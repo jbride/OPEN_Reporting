@@ -143,6 +143,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sObj.setFirstname(stCourseCompletion.getFirstName());
         sObj.setLastname(stCourseCompletion.getLastName());
         sObj.setCompanyName(stCourseCompletion.getOrganization());
+
+        String uNumber = stCourseCompletion.getUserNumber();
+        if(uNumber.length() > 3 ) {
+            sObj.setSumtotalid(uNumber);
+            sObj.setSalesforcecontactid(uNumber.substring(0,uNumber.length() - 3));
+        }
         insertNewStudent(exchange, sObj);
     }
     

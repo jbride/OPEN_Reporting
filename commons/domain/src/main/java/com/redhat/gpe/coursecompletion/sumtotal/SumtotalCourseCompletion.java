@@ -39,7 +39,6 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     @DataField(pos=1)
     private String fullName;
     
-    private String userNumber;
 
     @DataField(pos=2)
     private String email;
@@ -85,6 +84,9 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     // Tier and type (not currently used)
     @DataField(pos=8)
     private String text4;
+
+    @DataField(pos=9)
+    private String userNumber;
     
     public SumtotalCourseCompletion() {
     }
@@ -103,14 +105,6 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUserNumber() {
-        return userNumber;
-    }
-
-    public void setUserNumber(String userNumber) {
-        this.userNumber = userNumber;
     }
 
     public String getText3() {
@@ -223,6 +217,13 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     public void setText4(String text4) {
         this.text4 = text4;
+    }
+
+    public String getUserNumber() {
+        return userNumber;
+    }
+    public void setUserNumber(String x) {
+        userNumber = x;
     }
 
     public String getOrganization() {

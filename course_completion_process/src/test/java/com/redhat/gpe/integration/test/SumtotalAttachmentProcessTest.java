@@ -30,7 +30,7 @@ public class SumtotalAttachmentProcessTest extends CamelSpringTestSupport {
     public static final String RETURN_PATH = "Return-Path";
     public static final String SUBJECT = "subject";
     public static final String SUMTOTAL_SUBJECT = "New Student Accreditations from Sumtotal";
-    public static final String GOOD_TEST_FILE = "ST completion May2016_DWfeed.csv";
+    public static final String GOOD_TEST_FILE = "ST_completion_July_2016_short.csv";
     //public static final String GOOD_TEST_FILE = "milestone_2.csv";
     public static final String RECEIVE_VALIDATE_INPUT_URI = "cc_receive_sumtotal_input_uri";
     public static final String CAMEL_FILE_NAME = "CamelFileName";
@@ -62,7 +62,7 @@ public class SumtotalAttachmentProcessTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/course-completion-camel-context.xml");
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testAttachmentProcessing() throws InterruptedException, IOException {
         
