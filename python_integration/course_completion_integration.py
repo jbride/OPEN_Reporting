@@ -2,6 +2,15 @@ def get_new_completions(creds, query_string):
     """connect to datawarehouse and retrieve new completions"""
     connection = mysql.connector.connect(**creds)
     cursor = connection.cursor()
+<<<<<<< HEAD
+    query = ("""SELECT StudentCourses.AssessmentDate, Students.Email, StudentCourses.CourseID
+         FROM StudentCourses INNER JOIN Students ON StudentCourses.StudentID=Students.StudentID 
+         WHERE Email LIKE '%redhat.com' 
+         AND StudentCourses.AssessmentResult='Pass' {}""").format(query_string)
+    cursor.execute(query)
+    return [i for i in cursor]
+
+=======
     query = ("""SELECT StudentCourses.AssessmentDate, Students.Email, Courses.CourseID
          FROM StudentCourses
          INNER JOIN Students
@@ -38,6 +47,7 @@ def create_log_file():
     filename = '{}/{}-week{}.log'.format(log_path, year, week)
     logging.basicConfig(filename=filename, level=logging.INFO)
 
+>>>>>>> 302b4c28334a74bc731f6dd214df966dcb7b01d7
 def main(query):
     create_log_file()
     if not query:
@@ -70,6 +80,10 @@ def prompt_user():
 
 if __name__ == '__main__':
     from config import *
+<<<<<<< HEAD
+    from common import *
+=======
+>>>>>>> 302b4c28334a74bc731f6dd214df966dcb7b01d7
     from datetime import date
     import mysql.connector
     import requests
