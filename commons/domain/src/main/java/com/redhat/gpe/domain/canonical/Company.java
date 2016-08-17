@@ -21,7 +21,8 @@ public class Company implements Serializable {
     public static final String PARTNER_TYPE = "partnertype";
     public static final String PARTNER_TIER = "partnertier";
     public static final String LDAP_ID = "ldapId";
-    public static final String FROM_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID ";
+    public static final String SFDC_ID = "sfdcId";
+    public static final String FROM_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID, c.SfdcID ";
 
     private Integer companyid = 0;
     private String  accountid;
@@ -29,6 +30,7 @@ public class Company implements Serializable {
     private String  partnertype;
     private String  partnertier;
     private String  ldapId;
+    private String  sfdcId;
 
     public Company() {}
 
@@ -39,6 +41,7 @@ public class Company implements Serializable {
         this.partnertype = value.partnertype;
         this.partnertier = value.partnertier;
         this.ldapId = value.ldapId;
+        this.sfdcId = value.sfdcId;
     }
 
     public Company(
@@ -47,7 +50,8 @@ public class Company implements Serializable {
         String  companyname,
         String  partnertype,
         String  partnertier,
-        String  ldapId
+        String  ldapId,
+        String sfdcId
     ) {
         this.companyid = companyid;
         this.accountid = accountid;
@@ -55,6 +59,7 @@ public class Company implements Serializable {
         this.partnertype = partnertype;
         this.partnertier = partnertier;
         this.ldapId = ldapId;
+        this.sfdcId = sfdcId;
     }
 
     public Integer getCompanyid() {
@@ -102,6 +107,12 @@ public class Company implements Serializable {
     }
     public void setLdapId(String x) {
         ldapId = x;
+    }
+    public String getSfdcId() {
+    	return this.sfdcId;
+    }
+    public void setSfdcId(String x) {
+    	sfdcId = x;
     }
 
     @Override

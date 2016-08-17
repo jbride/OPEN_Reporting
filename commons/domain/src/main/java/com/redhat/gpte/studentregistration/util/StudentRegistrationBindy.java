@@ -138,7 +138,7 @@ public class StudentRegistrationBindy {
         Company cObj = new Company();
         cObj.setPartnertier(this.getPartnerTier());
         cObj.setPartnertype(this.getPartnerType());
-        //cObj.setSalesForceCompanyId(this.getSfdcCompanyId());
+        cObj.setSfdcId(this.getSfdcCompanyId());
         return cObj;
     }
     

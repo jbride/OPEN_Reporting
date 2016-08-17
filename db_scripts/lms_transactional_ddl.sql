@@ -51,6 +51,7 @@ CREATE TABLE `Companies` (
   `PartnerType` varchar(50) DEFAULT NULL,
   `PartnerTier` varchar(50) DEFAULT NULL,
   `LdapID` varchar(100) DEFAULT NULL,
+  `SfdcID` varchar(18) DEFAULT NULL,
   `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CompanyID`),
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),

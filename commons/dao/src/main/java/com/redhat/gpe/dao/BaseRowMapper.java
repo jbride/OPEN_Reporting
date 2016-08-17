@@ -15,6 +15,7 @@ public class BaseRowMapper {
         cObj.setPartnertype(rs.getString(Company.PARTNER_TYPE));
         cObj.setPartnertier(rs.getString(Company.PARTNER_TIER));
         cObj.setLdapId(rs.getString(Company.LDAP_ID));
+        cObj.setSfdcId(rs.getString(Company.SFDC_ID));
         return cObj;
     }
     
