@@ -168,7 +168,7 @@
                     <to uri="bean:studentRegBean?method=clearException" />
                 </doCatch>
             </doTry>
-            <to uri="bean:ldapServiceBean?method=convertToCanonicalStudents" />
+            <to uri="bean:ldapServiceBean?method=convertStudentRegBindyToCanonicalStudents" />
             <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
             <split id="for-each-new-student-reg">
                 <simple>${body}</simple>

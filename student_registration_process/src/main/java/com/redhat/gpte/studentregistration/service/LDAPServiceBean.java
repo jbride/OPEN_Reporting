@@ -130,7 +130,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     public void getStudentCompanyId(Exchange exchange) {
         Student origStudent = (Student)exchange.getIn().getBody();
         try {
-            this.getStudentCompanyId(origStudent, true, null);
+            this.getStudentCompanyId(origStudent, true, null, false);
         } catch (AttachmentValidationException e) {
             logger.error(e.getMessage());
         }
@@ -138,11 +138,11 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     
     /* Given a student object with no affiliated companyId, executes the following:
      *   1)  determines "canonical company name"  by optionally querying LDAP or generating via local algorithm
-     *   2)  Determines if company (given canonical company name), has already been persisted in Companies table
+     *   2)  Determines if company (given original company name), has already been persisted in Companies table
      *   3)  Creates and persists new company if need be
      *   4)  Populates companyId on student object
      */
-    public void getStudentCompanyId(Student origStudent, boolean queryLdap, Company companyObj) throws AttachmentValidationException {
+    public void getStudentCompanyId(Student origStudent, boolean queryLdap, Company companyObj, boolean alwaysUpdateCompany) throws AttachmentValidationException {
         
         String origCompanyName = origStudent.getCompanyName();
         String email = origStudent.getEmail();
@@ -175,25 +175,35 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 canonicalCompanyName = this.transformToCanonicalCompanyName(origCompanyName);
             }
 
-            try {
-                // 4)  Determine if company (given canonical company name) has already been persisted in the Companies table
-                companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
-            } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-
-                // 5)  Company (given canonical company name) has not yet been persisted in the Companies table
-                //     Create and persist a new Company
-                if(companyObj == null) {
-                    companyObj = new Company();
-                }
-                companyObj.setCompanyname(canonicalCompanyName);
-                companyObj.setLdapId(canonicalCompanyName);
-                updateCompany(companyObj);
-                companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+            // 4)  Create company object (which could optionally be used to persist/update database)
+            if(companyObj == null) {
+                companyObj = new Company();
             }
+            companyObj.setCompanyname(origCompanyName);
+            companyObj.setLdapId(canonicalCompanyName);
+            
+            boolean companyUpdated = false;
+            try {
+                // 5)  determine whether this company already exists in database
+                companyId = this.canonicalDAO.getCompanyID(origCompanyName);
+                companyObj.setCompanyid(companyId);
+            } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+                
+                // 6)  Not in database so insert a new company
+                updateCompany(companyObj);
+                companyId = this.canonicalDAO.getCompanyID(origCompanyName);
+                companyUpdated = true;
+            }
+            
+            if(alwaysUpdateCompany && !companyUpdated) {
+                // 7) OK; always update company in database; at this point, it is guaranteed that a companyId will now exist
+                updateCompany(companyObj);
+            }
+            
             this.verifiedCompanies.put(origCompanyName, companyId);
         }
         
-        // 6) set companyId on student obj
+        // 8) set companyId on student obj
         origStudent.setCompanyid(companyId);
     }
     
@@ -424,7 +434,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     /* Given List<StudentRegistrationBindy>, transforms to Collection<Student>
      * Removes any duplicates that might be in student registration CSV
      */
-    public void convertToCanonicalStudents(Exchange exchange) {
+    public void convertStudentRegBindyToCanonicalStudents(Exchange exchange) {
         Map<String,Student> noDupsStudentMap = new HashMap<String, Student>();
         Map<String, AttachmentValidationException> exceptions = new HashMap<String, AttachmentValidationException>();
         int dupsCounter = 0;
@@ -447,14 +457,14 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
                 dupsCounter++;
             }else {
-            	
-            	// 3) Grab student and company data as parsed by bindy
+                
+                // 3) Grab student and company data as parsed by bindy
                 Student student = sBindy.convertToCanonicalStudent();
                 Company company = sBindy.convertToCanonicalCompany();
                 try {
-                	
-                	// 4) Determine companyId of affiliated company (based on company name provided in bindy)
-                    this.getStudentCompanyId(student, false, company);
+                    
+                    // 4) Determine companyId of affiliated company (based on company name provided in bindy)
+                    this.getStudentCompanyId(student, false, company, true);
                     updateStudentsCounter++;
                 } catch (AttachmentValidationException e) {
                     exceptions.put(sBindy.getEmail(), e);

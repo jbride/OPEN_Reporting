@@ -75,7 +75,7 @@ public class GPTEBaseServiceBean {
     
     public int updateCompany(@Body Company companyObj) {
         int updatedCount = canonicalDAO.updateCompany(companyObj);
-        StringBuilder sBuilder = new StringBuilder("updateCompany() just persisted updates to new company ");
+        StringBuilder sBuilder = new StringBuilder("updateCompany() just persisted updates to company ");
         sBuilder.append("\n\tcompanyName: "+companyObj.getCompanyname());
         sBuilder.append("\n\tupdateCount: "+updatedCount);
         logger.info(sBuilder.toString());
