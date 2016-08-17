@@ -45,7 +45,7 @@ import com.redhat.gpte.services.ExceptionCodes;
 @SuppressWarnings("restriction")
 public class LDAPServiceBean extends GPTEBaseServiceBean {
     
-	private static final String ATTACHMENT_VALIDATION_EXCEPTIONS = "ATTACHMENT_VALIDATION_EXCEPTIONS";
+    private static final String ATTACHMENT_VALIDATION_EXCEPTIONS = "ATTACHMENT_VALIDATION_EXCEPTIONS";
     public static final String MAIL = "mail=";
     public static final String COMMA = ",";
     public static final String BASE_CTX_DN = "cn=users,cn=accounts,dc=opentlc,dc=com";
@@ -128,12 +128,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Persists a new company if doesn't already exist
      */
     public void getStudentCompanyId(Exchange exchange) {
-    	Student origStudent = (Student)exchange.getIn().getBody();
+        Student origStudent = (Student)exchange.getIn().getBody();
         try {
-			this.getStudentCompanyId(origStudent, true, null);
-		} catch (AttachmentValidationException e) {
-			logger.error(e.getMessage());
-		}
+            this.getStudentCompanyId(origStudent, true, null);
+        } catch (AttachmentValidationException e) {
+            logger.error(e.getMessage());
+        }
     }
     
     /* Given a student object with no affiliated companyId, executes the following:
@@ -143,31 +143,31 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      *   4)  Populates companyId on student object
      */
     public void getStudentCompanyId(Student origStudent, boolean queryLdap, Company companyObj) throws AttachmentValidationException {
-    	
+        
         String origCompanyName = origStudent.getCompanyName();
         String email = origStudent.getEmail();
         String canonicalCompanyName  = null;
         Integer companyId = 0;
         
         if(StringUtils.isEmpty(origCompanyName)) {
-        	throw new AttachmentValidationException(email+" : Big problem: company info not affiliated with student");
+            throw new AttachmentValidationException(email+" : Big problem: company info not affiliated with student");
         }
         
         // 1) if companyId already cached, then use it to set on student without any further lookups
         if(this.verifiedCompanies.containsKey(origCompanyName)){
             companyId = this.verifiedCompanies.get(origCompanyName);
         }else {
-        	if(queryLdap) {
-        		// 2)  go to ldap to attempt to get the canonical company name
-        		Student tempStudent = new Student();
-        		tempStudent.setEmail(email);
-        		try {
-        			getStudentAttributesFromLDAP(tempStudent);
-        		} catch (InvalidAttributeException e) {
-        			logger.error(e.getMessage());
-        		}
-        		canonicalCompanyName = tempStudent.getCompanyName();
-        	}
+            if(queryLdap) {
+                // 2)  go to ldap to attempt to get the canonical company name
+                Student tempStudent = new Student();
+                tempStudent.setEmail(email);
+                try {
+                    getStudentAttributesFromLDAP(tempStudent);
+                } catch (InvalidAttributeException e) {
+                    logger.error(e.getMessage());
+                }
+                canonicalCompanyName = tempStudent.getCompanyName();
+            }
             
             if(StringUtils.isEmpty(canonicalCompanyName)){
 
@@ -177,18 +177,18 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
             try {
                 // 4)  Determine if company (given canonical company name) has already been persisted in the Companies table
-            	companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+                companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
             } catch(org.springframework.dao.EmptyResultDataAccessException x) {
 
                 // 5)  Company (given canonical company name) has not yet been persisted in the Companies table
                 //     Create and persist a new Company
-            	if(companyObj == null) {
-            		companyObj = new Company();
-            	}
-            	companyObj.setCompanyname(canonicalCompanyName);
-            	companyObj.setLdapId(canonicalCompanyName);
-            	updateCompany(companyObj);
-            	companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+                if(companyObj == null) {
+                    companyObj = new Company();
+                }
+                companyObj.setCompanyname(canonicalCompanyName);
+                companyObj.setLdapId(canonicalCompanyName);
+                updateCompany(companyObj);
+                companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
             }
             this.verifiedCompanies.put(origCompanyName, companyId);
         }
@@ -202,12 +202,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Queries LDAP and populates the same student object with attributes such as companyName, role and geo
      */
     public void getStudentAttributesFromLDAP(Exchange exchange)  {
-    	Student student = (Student)exchange.getIn().getBody();
-    	try {
-			this.getStudentAttributesFromLDAP(student);
-		} catch (InvalidAttributeException e) {
-			handleValidationException(exchange, e.getMessage());
-		}
+        Student student = (Student)exchange.getIn().getBody();
+        try {
+            this.getStudentAttributesFromLDAP(student);
+        } catch (InvalidAttributeException e) {
+            handleValidationException(exchange, e.getMessage());
+        }
     }
     
     /*
@@ -425,52 +425,52 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Removes any duplicates that might be in student registration CSV
      */
     public void convertToCanonicalStudents(Exchange exchange) {
-    	Map<String,Student> noDupsStudentMap = new HashMap<String, Student>();
-    	Map<String, AttachmentValidationException> exceptions = new HashMap<String, AttachmentValidationException>();
-    	int dupsCounter = 0;
-    	int updateStudentsCounter = 0;
-    	Object body = exchange.getIn().getBody();
-    	List<StudentRegistrationBindy> sBindyList = null;
-    	
-    	
-    	if( body instanceof java.util.List ) {
-    		sBindyList = (List<StudentRegistrationBindy>)exchange.getIn().getBody();
-    	}else {
-    		// If attachment has only one record, create List
-    		sBindyList = new ArrayList<StudentRegistrationBindy>();
-    		sBindyList.add((StudentRegistrationBindy)body);
-    	}
-    	
-    	for(StudentRegistrationBindy sBindy : sBindyList){
-    		if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
-    			dupsCounter++;
-    		}else {
-    			Student student = sBindy.convertToCanonicalStudent();
-    			Company company = sBindy.convertToCanonicalCompany();
-    			try {
-    				this.getStudentCompanyId(student, false, company);
-    				updateStudentsCounter++;
-    			} catch (AttachmentValidationException e) {
-    				exceptions.put(sBindy.getEmail(), e);
-    			}
-    			noDupsStudentMap.put(student.getEmail(), student);
-    		}
-    	}
-    	logger.info("convertToCanonicalStudents() total students = "+noDupsStudentMap.size()+" : updatedStudents = "+updateStudentsCounter+" : dups = "+dupsCounter+" : exceptions = "+exceptions.size());
-    	if(exceptions.size() > 0)
-    		exchange.getIn().setHeader(ATTACHMENT_VALIDATION_EXCEPTIONS, exceptions.values());
-    	exchange.getIn().setBody(noDupsStudentMap.values());
+        Map<String,Student> noDupsStudentMap = new HashMap<String, Student>();
+        Map<String, AttachmentValidationException> exceptions = new HashMap<String, AttachmentValidationException>();
+        int dupsCounter = 0;
+        int updateStudentsCounter = 0;
+        Object body = exchange.getIn().getBody();
+        List<StudentRegistrationBindy> sBindyList = null;
+        
+        
+        if( body instanceof java.util.List ) {
+            sBindyList = (List<StudentRegistrationBindy>)exchange.getIn().getBody();
+        }else {
+            // If attachment has only one record, create List
+            sBindyList = new ArrayList<StudentRegistrationBindy>();
+            sBindyList.add((StudentRegistrationBindy)body);
+        }
+        
+        for(StudentRegistrationBindy sBindy : sBindyList){
+            if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
+                dupsCounter++;
+            }else {
+                Student student = sBindy.convertToCanonicalStudent();
+                Company company = sBindy.convertToCanonicalCompany();
+                try {
+                    this.getStudentCompanyId(student, false, company);
+                    updateStudentsCounter++;
+                } catch (AttachmentValidationException e) {
+                    exceptions.put(sBindy.getEmail(), e);
+                }
+                noDupsStudentMap.put(student.getEmail(), student);
+            }
+        }
+        logger.info("convertToCanonicalStudents() total students = "+noDupsStudentMap.size()+" : updatedStudents = "+updateStudentsCounter+" : dups = "+dupsCounter+" : exceptions = "+exceptions.size());
+        if(exceptions.size() > 0)
+            exchange.getIn().setHeader(ATTACHMENT_VALIDATION_EXCEPTIONS, exceptions.values());
+        exchange.getIn().setBody(noDupsStudentMap.values());
     }
     
     private void handleValidationException(Exchange exchange, String message) {
-    	StringBuilder exBuilder;
-    	Object validationExBuilderObj  = exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER);
-    	if(validationExBuilderObj == null){
-    		exBuilder = new StringBuilder();
-    		exchange.getIn().setHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER, exBuilder);
-    	} else
-    		exBuilder = (StringBuilder)validationExBuilderObj;
-    	
-    	exBuilder.append(message);
+        StringBuilder exBuilder;
+        Object validationExBuilderObj  = exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER);
+        if(validationExBuilderObj == null){
+            exBuilder = new StringBuilder();
+            exchange.getIn().setHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER, exBuilder);
+        } else
+            exBuilder = (StringBuilder)validationExBuilderObj;
+        
+        exBuilder.append(message);
     }
 }

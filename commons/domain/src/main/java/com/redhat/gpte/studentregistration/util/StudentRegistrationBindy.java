@@ -107,19 +107,19 @@ public class StudentRegistrationBindy {
         return name.substring(name.indexOf(NAME_DELIMITER)+1);
     }
     public String getPartnerTier() {
-    	String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
-    	return tString.substring(0, tString.indexOf(PARTNER_DELIMITER));
+        String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+        return tString.substring(0, tString.indexOf(PARTNER_DELIMITER));
     }
     public String getPartnerType() {
-    	String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
-    	return tString.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+        String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+        return tString.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
     }
     public String getSfdcUserId() {
-    	String uNumber = sfdcUserIdCompanyId.substring(0, this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER));
-    	return uNumber.substring(0,uNumber.length() - 3);
+        String uNumber = sfdcUserIdCompanyId.substring(0, this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER));
+        return uNumber.substring(0,uNumber.length() - 3);
     }
     public String getSfdcCompanyId() {
-    	return this.sfdcUserIdCompanyId.substring(this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER)+1);
+        return this.sfdcUserIdCompanyId.substring(this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER)+1);
     }
 
     public Student convertToCanonicalStudent() {
@@ -135,11 +135,11 @@ public class StudentRegistrationBindy {
     }
     
     public Company convertToCanonicalCompany() {
-    	Company cObj = new Company();
-    	cObj.setPartnertier(this.getPartnerTier());
-    	cObj.setPartnertype(this.getPartnerType());
-    	//cObj.setSalesForceCompanyId(this.getSfdcCompanyId());
-    	return cObj;
+        Company cObj = new Company();
+        cObj.setPartnertier(this.getPartnerTier());
+        cObj.setPartnertype(this.getPartnerType());
+        //cObj.setSalesForceCompanyId(this.getSfdcCompanyId());
+        return cObj;
     }
     
 }

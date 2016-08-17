@@ -41,7 +41,7 @@ public class JDBCDriverTest {
                 System.out.println("\t"+resultSet.getString(1));
             }
 
-	} catch (Exception x) {
+    } catch (Exception x) {
             x.printStackTrace();
         }
 

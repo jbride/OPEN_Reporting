@@ -365,11 +365,11 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
 
     public int getUniqueStudentCourseCount(StudentCourse scObj) {
-    	LocalDate accredDate = scObj.getAssessmentdate().toLocalDateTime().toLocalDate();
-    	String wholeDate = accredDate.getYear()+"-"+accredDate.getMonthValue()+"-"+accredDate.getDayOfMonth();
-    	String dayStart = wholeDate+" 00:00:00";
-    	String dayEnd = wholeDate+" 23:59:59";
-    	//logger.info("getUniqueStudentCourseCount() dayStart = "+dayStart+" : dayEnd = "+dayEnd );
+        LocalDate accredDate = scObj.getAssessmentdate().toLocalDateTime().toLocalDate();
+        String wholeDate = accredDate.getYear()+"-"+accredDate.getMonthValue()+"-"+accredDate.getDayOfMonth();
+        String dayStart = wholeDate+" 00:00:00";
+        String dayEnd = wholeDate+" 23:59:59";
+        //logger.info("getUniqueStudentCourseCount() dayStart = "+dayStart+" : dayEnd = "+dayEnd );
         String sql = "select count(*) from StudentCourses where studentId=? and CourseId=? and assessmentScore=? and AssessmentDate between ? and ?";
         return sbJdbcTemplate.queryForObject(sql, Integer.class, scObj.getStudentid(), scObj.getCourseid(), scObj.getAssessmentscore(), dayStart, dayEnd );
     }
