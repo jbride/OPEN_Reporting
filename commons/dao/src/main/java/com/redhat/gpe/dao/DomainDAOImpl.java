@@ -196,7 +196,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
 
     public int updateStudentStatus(String email, int statusCode, String field) {
-        String sql = "update Student set "+field+"=? where email=?";
+        String sql = "update Students set "+field+"=? where email=?";
         return sbJdbcTemplate.update(sql, statusCode, email.toLowerCase());
     }
 /* ******************************************************************************* */

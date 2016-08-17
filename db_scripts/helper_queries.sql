@@ -31,4 +31,6 @@ alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 
 # select count(sc.studentId) from StudentCourses sc, Courses c where c.CourseId=sc.CourseId and c.CourseName="Red Hat Sales Specialist - Platform";
 
-select sc.studentId, sc.courseId, sc.assessmentdate, sc.createdate, s.email, s.firstname, s.lastname  from StudentCourses sc, Students s where sc.studentId = s.studentId order by sc.createdate desc limit 10;
+# select sc.studentId, sc.courseId, sc.assessmentdate, sc.createdate, s.email, s.firstname, s.lastname  from StudentCourses sc, Students s where sc.studentId = s.studentId order by sc.createdate desc limit 10;
+
+# update Students set ipaStatus=0 where createdate > DATE_SUB(NOW(),INTERVAL 1 DAY);
