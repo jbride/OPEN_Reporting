@@ -14,25 +14,25 @@ public class StudentRegistrationBindy {
     private static final String PARTNER_DELIMITER = ".";
     private static final String SFDC_DELIMITER = ":";
 
-    @DataField(pos=1)
+    @DataField(pos=1, required=true)
     private String name;
 
-    @DataField(pos=2)
+    @DataField(pos=2, required=true)
     private String email;
 
-    @DataField(pos=3)
+    @DataField(pos=3, required=true)
     private String company;
 
-    @DataField(pos=4)
+    @DataField(pos=4, required=true)
     private String regionCode;
     
     @DataField(pos=5)
     private String userId;
 
-    @DataField(pos=6)
+    @DataField(pos=6, required=true)
     private String partnerTierType;
     
-    @DataField(pos=7)
+    @DataField(pos=7, required=true)
     private String sfdcUserIdCompanyId;
     
     public StudentRegistrationBindy() {  
@@ -107,12 +107,12 @@ public class StudentRegistrationBindy {
         return name.substring(name.indexOf(NAME_DELIMITER)+1);
     }
     public String getPartnerTier() {
-        String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+        String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER)+1);
         return tString.substring(0, tString.indexOf(PARTNER_DELIMITER));
     }
     public String getPartnerType() {
-        String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
-        return tString.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+        String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER)+1);
+        return tString.substring(tString.indexOf(PARTNER_DELIMITER)+1);
     }
     public String getSfdcUserId() {
         String uNumber = sfdcUserIdCompanyId.substring(0, this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER));

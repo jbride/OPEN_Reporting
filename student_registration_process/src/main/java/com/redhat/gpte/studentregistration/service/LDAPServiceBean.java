@@ -433,21 +433,27 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         List<StudentRegistrationBindy> sBindyList = null;
         
         
+        // 1)  Make sure always dealing with a list
+        //     If there is only one record in data file, then bindy will not return a list
         if( body instanceof java.util.List ) {
             sBindyList = (List<StudentRegistrationBindy>)exchange.getIn().getBody();
         }else {
-            // If attachment has only one record, create List
             sBindyList = new ArrayList<StudentRegistrationBindy>();
             sBindyList.add((StudentRegistrationBindy)body);
         }
         
+        // 2) Iterate through list and filter out potential duplicates by email address
         for(StudentRegistrationBindy sBindy : sBindyList){
             if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
                 dupsCounter++;
             }else {
+            	
+            	// 3) Grab student and company data as parsed by bindy
                 Student student = sBindy.convertToCanonicalStudent();
                 Company company = sBindy.convertToCanonicalCompany();
                 try {
+                	
+                	// 4) Determine companyId of affiliated company (based on company name provided in bindy)
                     this.getStudentCompanyId(student, false, company);
                     updateStudentsCounter++;
                 } catch (AttachmentValidationException e) {

@@ -64,7 +64,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void test00StudentRegistration() throws IOException {
         File inbox_file = new File(INBOX_PATH, GOOD_STUDENT_REG_FILE);
@@ -86,7 +86,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         exchange = template.send(RECEIVE_VALIDATE_INPUT_URI, exchange);
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void test01OneStudentRegistration() throws IOException {
         File inbox_file = new File(INBOX_PATH, MINI_STUDENT_REG_FILE);
