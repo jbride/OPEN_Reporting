@@ -16,16 +16,14 @@ public class Company implements Serializable {
     private static final long serialVersionUID = 1249015856;
     public static final String RED_HAT_COMPANY_NAME = "Red Hat";
     public static final String COMPANY_ID = "companyid";
-    public static final String ACCOUNT_ID = "accountid";
     public static final String COMPANY_NAME = "companyname";
     public static final String PARTNER_TYPE = "partnertype";
     public static final String PARTNER_TIER = "partnertier";
     public static final String LDAP_ID = "ldapId";
     public static final String SFDC_ID = "sfdcId";
-    public static final String FROM_CLAUSE = "c.CompanyID, c.AccountID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID, c.SfdcID ";
+    public static final String FROM_CLAUSE = "c.CompanyID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID, c.SfdcID ";
 
     private Integer companyid = 0;
-    private String  accountid;
     private String  companyname;
     private String  partnertype;
     private String  partnertier;
@@ -36,7 +34,6 @@ public class Company implements Serializable {
 
     public Company(Company value) {
         this.companyid = value.companyid;
-        this.accountid = value.accountid;
         this.companyname = value.companyname;
         this.partnertype = value.partnertype;
         this.partnertier = value.partnertier;
@@ -54,7 +51,6 @@ public class Company implements Serializable {
         String sfdcId
     ) {
         this.companyid = companyid;
-        this.accountid = accountid;
         this.companyname = companyname;
         this.partnertype = partnertype;
         this.partnertier = partnertier;
@@ -68,14 +64,6 @@ public class Company implements Serializable {
 
     public void setCompanyid(Integer companyid) {
         this.companyid = companyid;
-    }
-
-    public String getAccountid() {
-        return this.accountid;
-    }
-
-    public void setAccountid(String accountid) {
-        this.accountid = accountid;
     }
 
     public String getCompanyname() {
@@ -120,7 +108,6 @@ public class Company implements Serializable {
         StringBuilder sb = new StringBuilder("Companies (");
 
         sb.append(companyid);
-        sb.append(", ").append(accountid);
         sb.append(", ").append(companyname);
         sb.append(", ").append(partnertype);
         sb.append(", ").append(partnertier);

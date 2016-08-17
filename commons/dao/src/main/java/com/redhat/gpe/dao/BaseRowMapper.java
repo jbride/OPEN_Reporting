@@ -10,7 +10,6 @@ public class BaseRowMapper {
     public Company getCompany(ResultSet rs) throws SQLException {
         Company cObj = new Company();
         cObj.setCompanyid(rs.getInt(Company.COMPANY_ID));
-        cObj.setAccountid(rs.getString(Company.ACCOUNT_ID));
         cObj.setCompanyname(rs.getString(Company.COMPANY_NAME));
         cObj.setPartnertype(rs.getString(Company.PARTNER_TYPE));
         cObj.setPartnertier(rs.getString(Company.PARTNER_TIER));

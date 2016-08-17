@@ -58,7 +58,6 @@ public class CompanyTest extends CamelSpringTestSupport {
         
         Company companyObj = DomainMockObjectHelper.getMockRHTCompany();
         companyObj.setCompanyid(RED_HAT_COMPANY_ID);
-        companyObj.setAccountid("testTier");
         template.setDefaultEndpointUri(PERSIST_COMPANY_URI);
         template.sendBody(companyObj);
     }
