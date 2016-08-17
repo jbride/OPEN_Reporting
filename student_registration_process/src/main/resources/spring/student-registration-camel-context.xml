@@ -184,14 +184,21 @@
         <from uri="{{sr_post-new-students-to-ipa-uri}}"/>
         <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_completed"/>
         <to uri="bean:studentRegBean?method=queryForStudentsToPushToIPA" />
+        <setHeader headerName="unprocessedStudentList" id="unprocessedStudentList-set-header" >
+            <simple>${body}</simple>
+        </setHeader>
         <to uri="bean:ipaServiceBean?method=createLdapTemplateFile" />
+        <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd}.txt" />
+        <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd}.txt" id="log_write_file"/>
         <choice>
                 <when>
                     <simple>{{ipa_ldap.testMode}}</simple>
                     <log message="ipa_ldap.testMode set to true.  Will not upload to IPA LDAP"/>
                 </when>
                 <otherwise>
-                    <to uri="bean:ipaServiceBean?method=uploadToLdapServer"/>
+                    <!-- to uri="bean:ipaServiceBean?method=uploadToLdapServer"/ -->
+                    <setBody><simple>${header.unprocessedStudentList}</simple></setBody>
+                    <to uri="bean:studentRegBean?method=updateIPAFlagOnStudents" />
                 </otherwise>
         </choice>
         <log message="*!*!*!*!   Post New Students to IPA ...... Completed" id="log_post_new_students_done"/>

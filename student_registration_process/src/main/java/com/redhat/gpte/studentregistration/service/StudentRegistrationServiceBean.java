@@ -63,4 +63,9 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
         }
         return students;
     }
+
+    public void updateIPAFlagOnStudents(Exchange exchange) {
+        List<DenormalizedStudent> students = (List<DenormalizedStudent>)exchange.getIn().getBody();
+        logger.info("updateIPAFlagOnStudents() # of students to update = "+students.size());
+    }
 }

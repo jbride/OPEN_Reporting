@@ -92,13 +92,13 @@ public class IPAHTTPServiceBean {
             
             data.append("\n");
         }
-        File uploadFile = FileUtils.getFile(data.toString());
-        exchange.getIn().setBody(uploadFile);        
+        exchange.getIn().setBody(data.toString());        
     }
     
     public void uploadToLdapServer(Exchange exchange) throws Exception {
         
-        File uploadFile = (File)exchange.getIn().getBody();
+        String bodyString = (String)exchange.getIn().getBody();
+        File uploadFile = FileUtils.getFile(bodyString);
         if(uploadFile == null)
             throw new RuntimeException("uploadToLdapServer() uploadFile not on message body");
         

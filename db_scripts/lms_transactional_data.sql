@@ -1,3 +1,5 @@
+use lms_transactional;
+
 -- MySQL dump 10.15  Distrib 10.0.21-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: lms_transactional
