@@ -46,7 +46,6 @@ DROP TABLE IF EXISTS `Companies`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `Companies` (
   `CompanyID` int(11) NOT NULL AUTO_INCREMENT,
-  `AccountID` varchar(20) DEFAULT NULL,
   `CompanyName` varchar(100) NOT NULL,
   `PartnerType` varchar(50) DEFAULT NULL,
   `PartnerTier` varchar(50) DEFAULT NULL,
@@ -55,7 +54,6 @@ CREATE TABLE `Companies` (
   `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CompanyID`),
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),
-  KEY `IDX_AccountID` (`AccountID`),
   KEY `IDX_PartnerType` (`PartnerType`),
   KEY `IDX_PartnerTier` (`PartnerTier`),
   KEY `IDX_LdapID` (`LdapID`)
