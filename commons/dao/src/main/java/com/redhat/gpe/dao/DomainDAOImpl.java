@@ -195,11 +195,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         updateStudentStatus(email, DAOConstants.OK_STATUS_CODE, OK);        
     }
 
-    private void updateStudentStatus(String email, int statusCode, String details) {
-        // insert or update
-        //String sql = "insert into students_status (email, status_code, details) values (?, ?, ?) on duplicate key update email=values(email), status_code=values(status_code), details=values(details)";
-        
-        //sbJdbcTemplate.update(sql, email.toLowerCase(), statusCode, details);
+    public int updateStudentStatus(String email, int statusCode, String field) {
+        String sql = "update Student set "+field+"=? where email=?";
+        return sbJdbcTemplate.update(sql, statusCode, email.toLowerCase());
     }
 /* ******************************************************************************* */
 

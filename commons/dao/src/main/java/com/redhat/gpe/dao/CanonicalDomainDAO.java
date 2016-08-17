@@ -28,6 +28,7 @@ public interface CanonicalDomainDAO {
     public boolean hasThisStudentBeenEmailedBefore(String email);
     public void updateStudentStatusForEmailedAlready(String email);
     public void updateStudentStatusForOk(String email);
+    public int updateStudentStatus(String email, int statusCode, String field);
     
     
     /********  Course  ********/
