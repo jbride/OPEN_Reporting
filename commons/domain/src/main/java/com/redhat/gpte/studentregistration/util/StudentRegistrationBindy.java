@@ -4,12 +4,15 @@ import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;
 
 import com.redhat.gpe.domain.canonical.Student;
+import com.redhat.gpe.domain.canonical.Company;
 
 @CsvRecord(separator=",", skipFirstLine=true)
 public class StudentRegistrationBindy {
     
     private static final String REGION_DELIMITER = "|";
     private static final String NAME_DELIMITER = " ";
+    private static final String PARTNER_DELIMITER = ".";
+    private static final String SFDC_DELIMITER = ":";
 
     @DataField(pos=1)
     private String name;
@@ -24,16 +27,13 @@ public class StudentRegistrationBindy {
     private String regionCode;
     
     @DataField(pos=5)
-    private String dokeos;
-    
-    @DataField(pos=6)
     private String userId;
 
-    @DataField(pos=7)
-    private String sso;
+    @DataField(pos=6)
+    private String partnerTierType;
     
-    @DataField(pos=8)
-    private String role;
+    @DataField(pos=7)
+    private String sfdcUserIdCompanyId;
     
     public StudentRegistrationBindy() {  
     }
@@ -70,14 +70,6 @@ public class StudentRegistrationBindy {
         this.regionCode = regionCode;
     }
 
-    public String getDokeos() {
-        return dokeos;
-    }
-
-    public void setDokeos(String dokeos) {
-        this.dokeos = dokeos;
-    }
-
     public String getUserId() {
         return userId;
     }
@@ -86,20 +78,20 @@ public class StudentRegistrationBindy {
         this.userId = userId;
     }
 
-    public String getSso() {
-        return sso;
+    public String getPartnerTierType() {
+        return partnerTierType;
     }
 
-    public void setSso(String sso) {
-        this.sso = sso;
+    public void setPartnerTierType(String x) {
+        this.partnerTierType = x;
     }
 
-    public String getRole() {
-        return role;
+    public String getSfdcUserIdCompanyId() {
+        return this.sfdcUserIdCompanyId;
     }
 
-    public void setRole(String role) {
-        this.role = role;
+    public void setRole(String x) {
+        this.sfdcUserIdCompanyId = x;
     }
     
     public String getRegion(){
@@ -114,17 +106,40 @@ public class StudentRegistrationBindy {
     public String getLastName() {
         return name.substring(name.indexOf(NAME_DELIMITER)+1);
     }
+    public String getPartnerTier() {
+    	String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+    	return tString.substring(0, tString.indexOf(PARTNER_DELIMITER));
+    }
+    public String getPartnerType() {
+    	String tString = partnerTierType.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+    	return tString.substring(partnerTierType.indexOf(PARTNER_DELIMITER));
+    }
+    public String getSfdcUserId() {
+    	String uNumber = sfdcUserIdCompanyId.substring(0, this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER));
+    	return uNumber.substring(0,uNumber.length() - 3);
+    }
+    public String getSfdcCompanyId() {
+    	return this.sfdcUserIdCompanyId.substring(this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER)+1);
+    }
 
     public Student convertToCanonicalStudent() {
         Student sObj = new Student();
-        sObj.setCompanyName(this.getCompany());
-        sObj.setEmail(this.getEmail());
         sObj.setFirstname(this.getFirstName());
         sObj.setLastname(this.getLastName());
+        sObj.setEmail(this.getEmail());
+        sObj.setCompanyName(this.getCompany());
         sObj.setRegion(this.getRegion());
         sObj.setSubregion(this.getSubRegion());
-        sObj.setRoles(this.getRole());
+        sObj.setSalesforcecontactid(this.getSfdcUserId());
         return sObj;
+    }
+    
+    public Company convertToCanonicalCompany() {
+    	Company cObj = new Company();
+    	cObj.setPartnertier(this.getPartnerTier());
+    	cObj.setPartnertype(this.getPartnerType());
+    	//cObj.setSalesForceCompanyId(this.getSfdcCompanyId());
+    	return cObj;
     }
     
 }

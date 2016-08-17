@@ -59,30 +59,6 @@ public class GPTEBaseServiceBean {
         return tString;
     }
     
-    public int updateCompanyGivenCanonicalCompanyName(String canonicalCompanyName) {
-    	Company companyObj = new Company();
-    	companyObj.setCompanyname(canonicalCompanyName);
-    	companyObj.setLdapId(canonicalCompanyName);
-    	int companyId = 0;
-    	logger.info("updateCompanyGivenCanonicalCompanyName() about to persist new company: "+canonicalCompanyName);
-    	
-    	int updateCount = this.canonicalDAO.updateCompany(companyObj);
-    	if(updateCount == 1 ) {
-    		
-    		companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
-    		StringBuilder sBuilder = new StringBuilder("updateCompanyGivenCanonicalCompanyName() just persisted new company ");
-    		sBuilder.append("\n\tcompany: "+canonicalCompanyName);
-    		sBuilder.append("\n\tcompanyId: "+companyId);
-    		logger.info(sBuilder.toString());
-    		return companyId;
-    	}else {
-    		StringBuilder sBuilder = new StringBuilder("updateCompanyGivenCanonicalCompanyName() attempted to persist new company ");
-    		sBuilder.append("\n\tcompany: "+canonicalCompanyName);
-    		sBuilder.append("\n\tupdateCount: "+updateCount);
-    		throw new RuntimeException(sBuilder.toString());
-    	}
-    }
-    
     public void updateStudent(@Body Student student) {
         int companyId = student.getCompanyid();
         
@@ -97,9 +73,13 @@ public class GPTEBaseServiceBean {
         canonicalDAO.updateStudent(student);
     }
     
-    public void updateCompany(@Body Company companyObj) {
+    public int updateCompany(@Body Company companyObj) {
         int updatedCount = canonicalDAO.updateCompany(companyObj);
-        logger.info(companyObj.getCompanyname()+" : updated count = "+updatedCount);
+        StringBuilder sBuilder = new StringBuilder("updateCompany() just persisted updates to new company ");
+        sBuilder.append("\n\tcompanyName: "+companyObj.getCompanyname());
+        sBuilder.append("\n\tupdateCount: "+updatedCount);
+        logger.info(sBuilder.toString());
+        return updatedCount;
     }
     
     public int getCompanyID(String companyName) {

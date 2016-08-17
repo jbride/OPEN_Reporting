@@ -37,7 +37,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
     public static final String ADMIN_EMAIL = "admin_email";
     public static final String RETURN_PATH = "Return-Path";
     public static final String CAMEL_FILE_NAME = "CamelFileName";
-    public static final String GOOD_STUDENT_REG_FILE = "ELAB_Registration_Report_Report.csv";
+    public static final String GOOD_STUDENT_REG_FILE = "ELAB_Registration_Report.csv";
     public static final String MINI_STUDENT_REG_FILE = "ELAB_Registration_Report_Mini.csv";
     public static final String SUBJECT = "subject";
     public static final String NEW_STUDENT_SUBJECT = "New Student Registered in Sumtotal";
@@ -64,7 +64,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void test00StudentRegistration() throws IOException {
         File inbox_file = new File(INBOX_PATH, GOOD_STUDENT_REG_FILE);
@@ -86,7 +86,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         exchange = template.send(RECEIVE_VALIDATE_INPUT_URI, exchange);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void test01OneStudentRegistration() throws IOException {
         File inbox_file = new File(INBOX_PATH, MINI_STUDENT_REG_FILE);

@@ -130,7 +130,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     public void getStudentCompanyId(Exchange exchange) {
     	Student origStudent = (Student)exchange.getIn().getBody();
         try {
-			this.getStudentCompanyId(origStudent, true);
+			this.getStudentCompanyId(origStudent, true, null);
 		} catch (AttachmentValidationException e) {
 			logger.error(e.getMessage());
 		}
@@ -142,7 +142,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      *   3)  Creates and persists new company if need be
      *   4)  Populates companyId on student object
      */
-    public void getStudentCompanyId(Student origStudent, boolean queryLdap) throws AttachmentValidationException {
+    public void getStudentCompanyId(Student origStudent, boolean queryLdap, Company companyObj) throws AttachmentValidationException {
     	
         String origCompanyName = origStudent.getCompanyName();
         String email = origStudent.getEmail();
@@ -177,12 +177,18 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
             try {
                 // 4)  Determine if company (given canonical company name) has already been persisted in the Companies table
-                companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+            	companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
             } catch(org.springframework.dao.EmptyResultDataAccessException x) {
 
                 // 5)  Company (given canonical company name) has not yet been persisted in the Companies table
                 //     Create and persist a new Company
-            	companyId = updateCompanyGivenCanonicalCompanyName(canonicalCompanyName);
+            	if(companyObj == null) {
+            		companyObj = new Company();
+            	}
+            	companyObj.setCompanyname(canonicalCompanyName);
+            	companyObj.setLdapId(canonicalCompanyName);
+            	updateCompany(companyObj);
+            	companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
             }
             this.verifiedCompanies.put(origCompanyName, companyId);
         }
@@ -440,8 +446,9 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     			dupsCounter++;
     		}else {
     			Student student = sBindy.convertToCanonicalStudent();
+    			Company company = sBindy.convertToCanonicalCompany();
     			try {
-    				this.getStudentCompanyId(student, false);
+    				this.getStudentCompanyId(student, false, company);
     				updateStudentsCounter++;
     			} catch (AttachmentValidationException e) {
     				exceptions.put(sBindy.getEmail(), e);

@@ -1,2 +1,2 @@
-Name,Email,Company,Region | Subregion,Dokeos,USERID,SSO,Role
-David Holton,david.holton@hpe.com,Hewlett Packard North America,NA | UNKNOWN, ,david.holton@hpe.com, ,
+Name,Email,Company,Region | Subregion,USERID,Region.Partner Tier.Partner Type,SFDC User ID: Partner Company ID
+Bert Piesaar,b.piesaar@osp.nl,Uniteam B.V. trading as Open Solution Providers (OSP),EMEA | UNKNOWN,b.piesaar@osp.nl,EMEA.READY.RESELLER,00560000005GHW6AAO:0016000001EgWniAAF
