@@ -1,5 +1,7 @@
 package com.redhat.gpte.studentregistration.service;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -22,12 +24,14 @@ import javax.naming.directory.SearchResult;
 
 import com.sun.jndi.ldap.LdapCtx;
 
+import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Student;
+import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
 import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
@@ -41,9 +45,7 @@ import com.redhat.gpte.services.ExceptionCodes;
 @SuppressWarnings("restriction")
 public class LDAPServiceBean extends GPTEBaseServiceBean {
     
-    public static final String ACCENTURE="accenture";
-    public static final String REDHAT_HYPHENED="red-hat";
-    public static final String REDHAT="redhat";
+	private static final String ATTACHMENT_VALIDATION_EXCEPTIONS = "ATTACHMENT_VALIDATION_EXCEPTIONS";
     public static final String MAIL = "mail=";
     public static final String COMMA = ",";
     public static final String BASE_CTX_DN = "cn=users,cn=accounts,dc=opentlc,dc=com";
@@ -117,29 +119,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         }*/
     }
     
-    /*
-     * NOTE:  not ideal; use sparingly
-     *        LDAP algorithm found here:  https://github.com/redhat-gpe/OPEN_Admin/blob/master/OPENTLC-WWW-Scripts/import_users.rb#L196-L208
-     *        However, even with what appears to be equivalent algorithm here in java, different companyNames get generated
-     */
-    public String transformToCanonicalCompanyName(String companyName) {
-        String tString = companyName.toLowerCase();
-        tString = tString.replaceAll("[ ]{2,}", " "); // Not sure
-        tString = tString.replaceAll(" - ", "-"); // eliminate spaces before and after dashes
-        tString = tString.replaceAll(" ", "-"); //  replace spaces with dash
-        //tString = tString.replaceAll("[^\\p{ASCII}]", ""); //  eliminate all non-ascii characters
-        tString = tString.replaceAll("[^0-9a-z-]", ""); // eliminate all characters with exception alpha numeric and dash
-
-        if(tString.indexOf(REDHAT_HYPHENED) > -1 )
-            tString = REDHAT;
-
-        if(tString.indexOf(ACCENTURE) > -1)
-            tString = ACCENTURE;
-        else if(tString.indexOf(REDHAT) > -1)
-            tString = REDHAT;
-
-        return tString;
-    }
+    
     
     /*
      * Accepts a Student object (with companyName field populated) in body of Exchange message
@@ -147,86 +127,88 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Populates geo, role and company name attributes on student obj
      * Persists a new company if doesn't already exist
      */
-    public void getStudentCompanyInfo(Exchange exchange) {
-        Student origStudent = (Student)exchange.getIn().getBody();
+    public void getStudentCompanyId(Exchange exchange) {
+    	Student origStudent = (Student)exchange.getIn().getBody();
+        try {
+			this.getStudentCompanyId(origStudent, true);
+		} catch (AttachmentValidationException e) {
+			logger.error(e.getMessage());
+		}
+    }
+    
+    /* Given a student object with no affiliated companyId, executes the following:
+     *   1)  determines "canonical company name"  by optionally querying LDAP or generating via local algorithm
+     *   2)  Determines if company (given canonical company name), has already been persisted in Companies table
+     *   3)  Creates and persists new company if need be
+     *   4)  Populates companyId on student object
+     */
+    public void getStudentCompanyId(Student origStudent, boolean queryLdap) throws AttachmentValidationException {
+    	
         String origCompanyName = origStudent.getCompanyName();
+        String email = origStudent.getEmail();
+        String canonicalCompanyName  = null;
         Integer companyId = 0;
         
+        if(StringUtils.isEmpty(origCompanyName)) {
+        	throw new AttachmentValidationException(email+" : Big problem: company info not affiliated with student");
+        }
         
         // 1) if companyId already cached, then use it to set on student without any further lookups
-        if(StringUtils.isNotEmpty(origCompanyName) && this.verifiedCompanies.containsKey(origCompanyName)){
+        if(this.verifiedCompanies.containsKey(origCompanyName)){
             companyId = this.verifiedCompanies.get(origCompanyName);
         }else {
-
-            // 2)  go to ldap first to attempt to get the canonical company name
-            Student tempStudent = new Student();
-            String email = origStudent.getEmail();
-
-            tempStudent.setEmail(email);
-            exchange.getIn().setBody(tempStudent);
-            getStudentAttributesFromLDAP(exchange);
-            String canonicalCompanyName = tempStudent.getCompanyName();
+        	if(queryLdap) {
+        		// 2)  go to ldap to attempt to get the canonical company name
+        		Student tempStudent = new Student();
+        		tempStudent.setEmail(email);
+        		try {
+        			getStudentAttributesFromLDAP(tempStudent);
+        		} catch (InvalidAttributeException e) {
+        			logger.error(e.getMessage());
+        		}
+        		canonicalCompanyName = tempStudent.getCompanyName();
+        	}
+            
             if(StringUtils.isEmpty(canonicalCompanyName)){
 
-                if(StringUtils.isEmpty(origCompanyName)) {
-                    throw new RuntimeException(email+" : Big problem: company info not affiliated with student and no record of student found into IPA LDAP");
-                }
-
-                // 3)  Not able to identify canonical company name from LDAP;  will need to generate it
+                // 3)  Not able to identify canonical company name (given student email) from LDAP;  will need to generate it
                 canonicalCompanyName = this.transformToCanonicalCompanyName(origCompanyName);
             }
 
-            
             try {
                 // 4)  Determine if company (given canonical company name) has already been persisted in the Companies table
                 companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
-                this.verifiedCompanies.put(origCompanyName, companyId);
             } catch(org.springframework.dao.EmptyResultDataAccessException x) {
 
-                // 4)  Company (given canonical company name) has not yet been persisted in the Companies table
+                // 5)  Company (given canonical company name) has not yet been persisted in the Companies table
                 //     Create and persist a new Company
-
-                Company companyObj = new Company();
-                companyObj.setCompanyname(canonicalCompanyName);
-                companyObj.setLdapId(canonicalCompanyName);
-                logger.info("getStudentCompanyInfo() about to persist new company: "+canonicalCompanyName);
-
-                int updateCount = this.canonicalDAO.updateCompany(companyObj);
-                if(updateCount == 1 ) {
-
-                    companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
-                    StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() just persisted new company ");
-                    sBuilder.append("\n\temail: "+origStudent.getEmail());
-                    sBuilder.append("\n\tcompany: "+canonicalCompanyName);
-                    sBuilder.append("\n\tcompanyId: "+companyId);
-                    logger.info(sBuilder.toString());
-
-                    this.verifiedCompanies.put(origCompanyName, companyId);
-                }else {
-                    StringBuilder sBuilder = new StringBuilder("insertNewStudentCompanyInfo() attempted to persist new company ");
-                    sBuilder.append("\n\temail: "+origStudent.getEmail());
-                    sBuilder.append("\n\tcompany: "+canonicalCompanyName);
-                    sBuilder.append("\n\tupdateCount: "+updateCount);
-                    throw new RuntimeException(sBuilder.toString());
-                }
+            	companyId = updateCompanyGivenCanonicalCompanyName(canonicalCompanyName);
             }
+            this.verifiedCompanies.put(origCompanyName, companyId);
         }
         
-        // 5) set companyId on student obj
+        // 6) set companyId on student obj
         origStudent.setCompanyid(companyId);
-        
-        exchange.getIn().setBody(origStudent);
-        
     }
-    
     
     /*
      * Accepts a Student object in body of Exchange message.
      * Queries LDAP and populates the same student object with attributes such as companyName, role and geo
      */
-    public void getStudentAttributesFromLDAP(Exchange exchange) {
+    public void getStudentAttributesFromLDAP(Exchange exchange)  {
+    	Student student = (Student)exchange.getIn().getBody();
+    	try {
+			this.getStudentAttributesFromLDAP(student);
+		} catch (InvalidAttributeException e) {
+			handleValidationException(exchange, e.getMessage());
+		}
+    }
+    
+    /*
+     * Queries LDAP and populates student object with attributes such as companyName, role and geo
+     */
+    public void getStudentAttributesFromLDAP(Student student) throws InvalidAttributeException {
         
-        Student student = (Student)exchange.getIn().getBody();
         String companyName = student.getCompanyName();
         
         StringBuilder sBuilder = new StringBuilder();
@@ -251,15 +233,13 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             try {
                 while (listResults.hasMore()) {
                     if(count > 0) {
-                        handleValidationException(exchange, "\n\tStudent records in LDAP should be unique. However, more than one result returned for : "+sBuilder.toString());
-                        return;
+                        throw new InvalidAttributeException("\nStudent records in LDAP should be unique. However, more than one result returned for : "+sBuilder.toString());
                     }
 
                     SearchResult si =(SearchResult)listResults.next();
                     Attributes attrs = si.getAttributes();
                     if (attrs == null) {
-                        handleValidationException(exchange, "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1003); // No attributes for this user
-                        return;
+                        throw new InvalidAttributeException("\n"+student.getEmail()+ExceptionCodes.GPTE_SR1003); // No attributes for this user
                     }
                     NamingEnumeration<?> ae = attrs.getAll(); 
                     while (ae.hasMoreElements()) {
@@ -301,11 +281,10 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 }
             }catch(IllegalArgumentException x ) {
                 String message = "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1002+",  geo = "+student.getRegion() +" , title = "+student.getRoles(); // Invalid attributes from LDAP
-                handleValidationException(exchange, message);
-                return;
+                throw new InvalidAttributeException(message);
             }
             if(count == 0){
-                handleValidationException(exchange, "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1001); // Not able to locate this user in LDAP
+                throw new InvalidAttributeException("\n"+student.getEmail()+ExceptionCodes.GPTE_SR1001); // Not able to locate this user in LDAP
             }
         }catch(NamingException x) {
             x.printStackTrace();
@@ -326,19 +305,6 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         
     }
     
-    private void handleValidationException(Exchange exchange, String message) {
-        StringBuilder exBuilder;
-        Object validationExBuilderObj  = exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER);
-        if(validationExBuilderObj == null){
-            exBuilder = new StringBuilder();
-            exchange.getIn().setHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER, exBuilder);
-        } else
-            exBuilder = (StringBuilder)validationExBuilderObj;
-        
-        exBuilder.append(message);
-        //exBuilder.append(SOURCE_OF_PROBLEM);
-        //exBuilder.append(providerUrl);
-    }
     
     public boolean hasNoExceptionProperty(Exchange exchange) {
         Object validationExBuffer  = exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER);
@@ -427,5 +393,77 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private String getOPENTLCIDfromEmail(String email) {
         return email.replace(AMPERSAND, DASH);
     }
+    
+    
+    
+    
+    
+    
+    public void throwAnyCachedExceptions(Exchange exchange) {
+        // purge any existing exceptions
+        exchange.setException(null);
+        
+        Object exObj = exchange.getIn().getHeader(ATTACHMENT_VALIDATION_EXCEPTIONS);
+        if(exObj != null){
+            Collection<AttachmentValidationException> exceptions = (Collection<AttachmentValidationException>)exObj;
+            StringBuilder sBuilder = new StringBuilder("\n");
+            for(AttachmentValidationException x : exceptions) {
+                sBuilder.append(x.getLocalizedMessage()+"\n");
+            }
+            exchange.setException(new Exception(sBuilder.toString()));
+        }
+        
+    }
 
+    /* Given List<StudentRegistrationBindy>, transforms to Collection<Student>
+     * Removes any duplicates that might be in student registration CSV
+     */
+    public void convertToCanonicalStudents(Exchange exchange) {
+    	Map<String,Student> noDupsStudentMap = new HashMap<String, Student>();
+    	Map<String, AttachmentValidationException> exceptions = new HashMap<String, AttachmentValidationException>();
+    	int dupsCounter = 0;
+    	int updateStudentsCounter = 0;
+    	Object body = exchange.getIn().getBody();
+    	List<StudentRegistrationBindy> sBindyList = null;
+    	
+    	
+    	if( body instanceof java.util.List ) {
+    		sBindyList = (List<StudentRegistrationBindy>)exchange.getIn().getBody();
+    	}else {
+    		// If attachment has only one record, create List
+    		sBindyList = new ArrayList<StudentRegistrationBindy>();
+    		sBindyList.add((StudentRegistrationBindy)body);
+    	}
+    	
+    	for(StudentRegistrationBindy sBindy : sBindyList){
+    		if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
+    			dupsCounter++;
+    		}else {
+    			Student student = sBindy.convertToCanonicalStudent();
+    			try {
+    				this.getStudentCompanyId(student, false);
+    				updateStudentsCounter++;
+    			} catch (AttachmentValidationException e) {
+    				exceptions.put(sBindy.getEmail(), e);
+    			}
+    			noDupsStudentMap.put(student.getEmail(), student);
+    		}
+    	}
+    	logger.info("convertToCanonicalStudents() total students = "+noDupsStudentMap.size()+" : updatedStudents = "+updateStudentsCounter+" : dups = "+dupsCounter+" : exceptions = "+exceptions.size());
+    	if(exceptions.size() > 0)
+    		exchange.getIn().setHeader(ATTACHMENT_VALIDATION_EXCEPTIONS, exceptions.values());
+    	exchange.getIn().setBody(noDupsStudentMap.values());
+    }
+    
+    private void handleValidationException(Exchange exchange, String message) {
+    	StringBuilder exBuilder;
+    	Object validationExBuilderObj  = exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER);
+    	if(validationExBuilderObj == null){
+    		exBuilder = new StringBuilder();
+    		exchange.getIn().setHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER, exBuilder);
+    	} else
+    		exBuilder = (StringBuilder)validationExBuilderObj;
+    	
+    	exBuilder.append(message);
+    }
 }

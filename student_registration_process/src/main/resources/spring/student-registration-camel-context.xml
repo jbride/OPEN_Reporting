@@ -30,7 +30,7 @@
     <bean id="emailServiceBean" class="com.redhat.gpte.services.EmailServiceBean" />
     <bean id="studentRegBean" class="com.redhat.gpte.studentregistration.service.StudentRegistrationServiceBean" />
     <bean id="ipaServiceBean" class="com.redhat.gpte.studentregistration.service.IPAHTTPServiceBean" />
-    <bean id="ldapServiceBean"                class="com.redhat.gpte.studentregistration.service.LDAPServiceBean" />
+    <bean id="ldapServiceBean"  class="com.redhat.gpte.studentregistration.service.LDAPServiceBean" />
     <bean id="updateStudentAttributeResultsAggregatorStrategy" class="com.redhat.gpte.studentregistration.service.UpdateStudentAttributesResultsAggregator" />
 
   <!-- bridging Spring and Camel property placeholders -->
@@ -74,7 +74,7 @@
             2)  If student email not found, validation exception is thrown
         </description>
         <from uri="vm:get-student-company-info"/>
-        <to uri="bean:ldapServiceBean?method=getStudentCompanyInfo" id="getStudentCompanyInfo" />
+        <to uri="bean:ldapServiceBean?method=getStudentCompanyId" id="getStudentCompanyId" />
     </route>
 
     <route id="check-for-RHT-studentAttributes-in-batch">
@@ -155,29 +155,27 @@
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
         <log message="Received Student Registration email. from: ${header.Return-Path}, subject ${header.subject}" id="log_student_reg_receive"/>
         <to uri="bean:studentRegBean?method=changeMapToListOfValues" />
-            <split id="for-each-student-reg-attachment">
+        <split id="for-each-student-reg-attachment">
+            <simple>${body}</simple>
+            <unmarshal ref="studentRegBindy"/>
+            <doTry>
+                <!--potentially throws this exception:
+                    Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: DokeosCourseCompletion -->
+                <log message="# student registrations found in ${header.CamelFileName} : ${body.size()}"/>
+                <doCatch>
+                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                    <log message="only 1 student registration found in ${header.CamelFileName}"/>
+                    <to uri="bean:studentRegBean?method=clearException" />
+                </doCatch>
+            </doTry>
+            <to uri="bean:ldapServiceBean?method=convertToCanonicalStudents" />
+            <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
+            <split id="for-each-new-student-reg">
                 <simple>${body}</simple>
-                <unmarshal ref="studentRegBindy"/>
-                <doTry>
-                    <!--potentially throws this exception:
-                        Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: DokeosCourseCompletion -->
-                    <log message="# student registrations found in ${header.CamelFileName} : ${body.size()}"/>
-                    <to uri="bean:studentRegBean?method=convertToCanonicalStudents" />
-                    <split id="for-each-new-student-reg">
-                        <simple>${body}</simple>
-                        <to uri="direct:persist-student" />
-                    </split>
-                    <doCatch>
-                        <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                        <log message="only 1 student registration found in ${header.CamelFileName}"/>
-                        <to uri="bean:studentRegBean?method=clearException" />
-                        <to uri="bean:studentRegBean?method=convertStudentRegBindyToCanonicalStudent" />
-                        <to uri="direct:persist-student" />
-                    </doCatch>
-                </doTry>
-                <to uri="bean:studentRegBean?method=throwAnyCachedExceptions" />
-                <to uri="seda:send-email" />
+                <to uri="direct:persist-student" />
             </split>
+            <to uri="seda:send-email" />
+        </split>
     </route>
 
     <route id="post-new-students-to-ipa">

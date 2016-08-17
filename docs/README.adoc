@@ -298,3 +298,16 @@ mysql -u root -p mysql <  scripts/create-user.sql
 mysql -u root -p mysql <  scripts/create-tables.sql
 mysql -u root -p mysql <  scripts/load-reference-data.sql
 -----
+
+== activemq-artemis install
+
+-----
+# sudo yum install -y libaio-devel
+# sudo su - jboss
+$ cd /opt
+$ git clone https://github.com/apache/activemq-artemis.git
+$ cd activemq-artemis
+$ mvn -Prelease install -DskipTests
+$ cd artemis-distribution/target/apache-artemis-1.4.0-SNAPSHOT-bin/apache-artemis-1.4.0-SNAPSHOT
+
+-----

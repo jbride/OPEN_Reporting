@@ -117,6 +117,7 @@ public class StudentRegistrationBindy {
 
     public Student convertToCanonicalStudent() {
         Student sObj = new Student();
+        sObj.setCompanyName(this.getCompany());
         sObj.setEmail(this.getEmail());
         sObj.setFirstname(this.getFirstName());
         sObj.setLastname(this.getLastName());

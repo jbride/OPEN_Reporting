@@ -116,7 +116,7 @@
                     <choice id="if-assignment-passing-score">
                         <when>
                             <!--simple>${body.quizName} contains 'Assignment'  &amp;&amp; ${body.score} < 100</simple -->
-                        <simple>${body.quizName} contains 'Assignment' &amp;&amp; ${body.scoreInt} &lt; 100</simple>
+                            <simple>${body.quizName} contains 'Assignment' &amp;&amp; ${body.scoreInt} &lt; 100</simple>
                             <log message="${body.email} : Will not persist dokeos student assignment due to non-passing score: ${body.score}" id="log_dokeos_assignment_not_100"/>
                         </when>
                         <otherwise>

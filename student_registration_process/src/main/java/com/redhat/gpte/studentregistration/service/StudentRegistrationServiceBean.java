@@ -22,7 +22,6 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
 
     private Logger logger = Logger.getLogger(getClass());
     private static final String STUDENTS_TO_UPDATE = "studentsToUpdate";
-    private static final String ATTACHMENT_VALIDATION_EXCEPTIONS = "ATTACHMENT_VALIDATION_EXCEPTIONS";
     
     /*  This annotation is supported by Spring by adding the following to your application's:  *-camel-context.xml
      *     - <context:annotation-config />
@@ -63,75 +62,5 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
             logger.info("queryForStudentsToPushToIPA() # of students to push = "+students.size());
         }
         return students;
-    }
-    
-    public Collection<Student> convertToCanonicalStudents(Exchange exchange) {
-        Map<String,Student> sMap = new HashMap<String, Student>();
-        Map<String, AttachmentValidationException> exceptions = new HashMap<String, AttachmentValidationException>();
-        int dupsCounter = 0;
-        int updateStudentsCounter = 0;
-        @SuppressWarnings("unchecked")
-        List<StudentRegistrationBindy> sBindyList = (List<StudentRegistrationBindy>) exchange.getIn().getBody();
-        for(StudentRegistrationBindy sBindy : sBindyList){
-            if(sMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
-                dupsCounter++;
-            }else {
-                Student student;
-                try {
-                    student = this.convertStudentRegBindyToCanonicalStudent(sBindy);
-                    if(student.getStudentid() != 0)
-                        updateStudentsCounter++;
-                    sMap.put(student.getEmail(), student);
-                } catch (AttachmentValidationException e) {
-                    exceptions.put(sBindy.getEmail(), e);
-                }
-            }
-        }
-        logger.info("convertToCanonicalStudents() total students = "+sMap.size()+" : updatedStudents = "+updateStudentsCounter+" : dups = "+dupsCounter+" : exceptions = "+exceptions.size());
-        if(exceptions.size() > 0)
-            exchange.getIn().setHeader(ATTACHMENT_VALIDATION_EXCEPTIONS, exceptions.values());
-        return sMap.values();
-    }
-    
-    public Student convertStudentRegBindyToCanonicalStudent(@Body StudentRegistrationBindy studentBindy) throws AttachmentValidationException{
-        if(studentBindy == null)
-            throw new AttachmentValidationException("convertStudentRegBindyToCanonicalStudent() passed null studentBindy");
-        
-        int companyId = 0;
-        try {
-            companyId = canonicalDAO.getCompanyID(studentBindy.getCompany());
-        }catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            String eMessage = ExceptionCodes.GPTE_SR1000+"= "+studentBindy.getName()+" : companyName = "+studentBindy.getCompany();
-            throw new AttachmentValidationException(eMessage);
-        }
-        logger.debug("convertStudentRegBindyToCanonicalStudent() student = "+studentBindy.getName()+" : companyName = "+studentBindy.getCompany()+" : companyId = "+companyId);
-        Student sObj = studentBindy.convertToCanonicalStudent();
-        
-        sObj.setCompanyid(companyId);
-        
-        // Check if student already exists in DB
-        try {
-            Student sObjFromDB = canonicalDAO.getStudentByEmail(studentBindy.getEmail());
-            sObj.setStudentid(sObjFromDB.getStudentid());
-        }catch(org.springframework.dao.EmptyResultDataAccessException x){
-            
-        }
-        return sObj;
-    }
-    
-    public void throwAnyCachedExceptions(Exchange exchange) {
-        // purge any existing exceptions
-        exchange.setException(null);
-        
-        Object exObj = exchange.getIn().getHeader(ATTACHMENT_VALIDATION_EXCEPTIONS);
-        if(exObj != null){
-            Collection<AttachmentValidationException> exceptions = (Collection<AttachmentValidationException>)exObj;
-            StringBuilder sBuilder = new StringBuilder("\n");
-            for(AttachmentValidationException x : exceptions) {
-                sBuilder.append(x.getLocalizedMessage()+"\n");
-            }
-            exchange.setException(new Exception(sBuilder.toString()));
-        }
-        
     }
 }

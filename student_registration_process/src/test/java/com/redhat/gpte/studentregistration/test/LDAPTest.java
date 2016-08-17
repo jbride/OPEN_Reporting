@@ -153,7 +153,7 @@ public class LDAPTest {
         }
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void searchEmail() throws NamingException, InterruptedException {
         StringBuilder sBuilder = new StringBuilder();

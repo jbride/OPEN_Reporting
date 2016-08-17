@@ -26,11 +26,62 @@ public class GPTEBaseServiceBean {
     protected static final String RULES_FIRED_HEADER = "RULES_FIRED";
     public static final String LOW_STUDENT_ID = "LOW_STUDENT_ID";
     public static final String HIGH_STUDENT_ID = "HIGH_STUDENT_ID";
+    public static final String ACCENTURE="accenture";
+    public static final String REDHAT_HYPHENED="red-hat";
+    public static final String REDHAT="redhat";
     
     private Logger logger = Logger.getLogger(getClass());
     
     @Autowired
     protected CanonicalDomainDAO canonicalDAO;
+    
+    /*
+     * NOTE:  not ideal; use sparingly
+     *        LDAP algorithm found here:  https://github.com/redhat-gpe/OPEN_Admin/blob/master/OPENTLC-WWW-Scripts/import_users.rb#L196-L208
+     *        However, even with what appears to be equivalent algorithm here in java, different companyNames get generated
+     */
+    public String transformToCanonicalCompanyName(String companyName) {
+        String tString = companyName.toLowerCase();
+        tString = tString.replaceAll("[ ]{2,}", " "); // Not sure
+        tString = tString.replaceAll(" - ", "-"); // eliminate spaces before and after dashes
+        tString = tString.replaceAll(" ", "-"); //  replace spaces with dash
+        //tString = tString.replaceAll("[^\\p{ASCII}]", ""); //  eliminate all non-ascii characters
+        tString = tString.replaceAll("[^0-9a-z-]", ""); // eliminate all characters with exception alpha numeric and dash
+
+        if(tString.indexOf(REDHAT_HYPHENED) > -1 )
+            tString = REDHAT;
+
+        if(tString.indexOf(ACCENTURE) > -1)
+            tString = ACCENTURE;
+        else if(tString.indexOf(REDHAT) > -1)
+            tString = REDHAT;
+
+        return tString;
+    }
+    
+    public int updateCompanyGivenCanonicalCompanyName(String canonicalCompanyName) {
+    	Company companyObj = new Company();
+    	companyObj.setCompanyname(canonicalCompanyName);
+    	companyObj.setLdapId(canonicalCompanyName);
+    	int companyId = 0;
+    	logger.info("updateCompanyGivenCanonicalCompanyName() about to persist new company: "+canonicalCompanyName);
+    	
+    	int updateCount = this.canonicalDAO.updateCompany(companyObj);
+    	if(updateCount == 1 ) {
+    		
+    		companyId = this.canonicalDAO.getCompanyID(canonicalCompanyName);
+    		StringBuilder sBuilder = new StringBuilder("updateCompanyGivenCanonicalCompanyName() just persisted new company ");
+    		sBuilder.append("\n\tcompany: "+canonicalCompanyName);
+    		sBuilder.append("\n\tcompanyId: "+companyId);
+    		logger.info(sBuilder.toString());
+    		return companyId;
+    	}else {
+    		StringBuilder sBuilder = new StringBuilder("updateCompanyGivenCanonicalCompanyName() attempted to persist new company ");
+    		sBuilder.append("\n\tcompany: "+canonicalCompanyName);
+    		sBuilder.append("\n\tupdateCount: "+updateCount);
+    		throw new RuntimeException(sBuilder.toString());
+    	}
+    }
     
     public void updateStudent(@Body Student student) {
         int companyId = student.getCompanyid();
