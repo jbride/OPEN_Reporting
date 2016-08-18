@@ -68,8 +68,8 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
         List<DenormalizedStudent> students = (List<DenormalizedStudent>)exchange.getIn().getBody();
         int count = 0;
         for(DenormalizedStudent sObj : students) {
-        	int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
-        	count = count + sUpdate;
+            int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
+            count = count + sUpdate;
         }
         logger.info("updateIPAFlagOnStudents() # of students to update = "+students.size()+" : total updated = "+count);
     }

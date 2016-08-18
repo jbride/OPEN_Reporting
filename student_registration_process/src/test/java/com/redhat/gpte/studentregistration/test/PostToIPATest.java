@@ -2,16 +2,8 @@ package com.redhat.gpte.studentregistration.test;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Map;
-import java.util.HashMap;
-
-import javax.activation.FileDataSource;
-import javax.activation.DataHandler;
 
 import org.apache.camel.Endpoint;
-import org.apache.camel.Exchange;
-import org.apache.camel.ExchangePattern;
-import org.apache.camel.Message;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -21,8 +13,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.util.PropertiesSupport;
+
+import org.apache.commons.lang.StringUtils;
+
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 
 /* Purpose : test exception handling of various problematic input secenarios
  *
@@ -31,6 +28,13 @@ public class PostToIPATest extends CamelSpringTestSupport {
     
     private static final Logger logger = LoggerFactory.getLogger(PostToIPATest.class);
     public static final String INPUT_URI = "sr_post-new-students-to-ipa-uri";
+    public static final String LDAP_HTTP_URL = "ipa_ldap_http.url";
+    public static final String LDAP_HTTP_USER_NAME = "ipa_ldap_http.username";
+    public static final String LDAP_HTTP_PASSWORD = "ipa_ldap_http.password";
+    public static final String LDAP_GROUPNAME = "ipa_ldap.groupName";
+    public static final String LDAP_END_DATE = "ipa_ldap.endDate";
+    public static final String LDAP_SEND_MAIL = "ipa_ldap.sendMail";
+    private static final String IPA_UPLOAD_ABSOLUTE_PATH = null;
 
     private String routeURI = null;
     private Endpoint endpoint = null;
@@ -41,21 +45,67 @@ public class PostToIPATest extends CamelSpringTestSupport {
 
     @Before
     public void init() {
-
-        routeURI = System.getProperty(INPUT_URI);
-        if(routeURI == null)
-            throw new RuntimeException("init() must pass a system property: "+INPUT_URI);
-        endpoint = context.getEndpoint(routeURI);
     }
 
     @Override
     protected AbstractApplicationContext createApplicationContext() {
         return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
+
+    //@Ignore
+    @Test
+    public void testPostToIPAViaUnirest() throws UnirestException {
+        
+        String ldapHTTPUrl = System.getProperty(LDAP_HTTP_URL);
+        if(StringUtils.isEmpty(ldapHTTPUrl))
+            throw new RuntimeException("init() must pass sys property of: "+LDAP_HTTP_URL);
+        String ldapHTTPUserName = System.getProperty(LDAP_HTTP_USER_NAME);
+        if(StringUtils.isEmpty(ldapHTTPUserName))
+            throw new RuntimeException("init() must pass sys property of: "+LDAP_HTTP_USER_NAME);
+        String ldapHTTPPassword = System.getProperty(LDAP_HTTP_PASSWORD);
+        if(StringUtils.isEmpty(ldapHTTPPassword))
+            throw new RuntimeException("init() must pass sys property of: "+LDAP_HTTP_PASSWORD);
+        String groupName = System.getProperty(LDAP_GROUPNAME);
+        if(StringUtils.isEmpty(groupName))
+            throw new RuntimeException("init() must pass sys property of: "+LDAP_GROUPNAME);
+        String endDate = System.getProperty(LDAP_END_DATE);
+        if(StringUtils.isEmpty(endDate))
+            throw new RuntimeException("init() must pass sys property of: "+LDAP_END_DATE);
+        String sendMail = System.getProperty(LDAP_SEND_MAIL);
+        if(StringUtils.isEmpty(sendMail))
+            throw new RuntimeException("init() must pass sys property of: "+LDAP_SEND_MAIL);
+        
+        File uploadFile = new File("sample-spreadsheets", "ipa_upload_20160818_1015.txt");
+        if(uploadFile == null)
+            throw new RuntimeException("uploadToLdapServer() uploadFile not on message body");
+        
+        logger.info("Sending data to LDAP server: [" + ldapHTTPUrl + "] ...");
+        
+        HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
+                                            .basicAuth(ldapHTTPUserName, ldapHTTPPassword)
+                                            .header("accept", "text/plain")
+                                            .field("file", uploadFile, "multipart/form-data")
+                                            .field("groupName", groupName)
+                                            .field("endDate", endDate)
+                                            .field("sendMail", sendMail)
+                                            .asString();
+                 
+        logger.info("Result status code: " + result.getStatus());
+        logger.info("Result status text: " + result.getStatusText());
+
+        if (result.getStatus() != 200) {
+            logger.error("Error message from LDAP server. Status code: " + result.getStatus() + ", Status text: " + result.getStatusText());
+        }
+    }
     
     @Ignore
     @Test
-    public void testPostToIPA() {
+    public void testPostToIPAViaCamel() {
+        routeURI = System.getProperty(INPUT_URI);
+        if(routeURI == null)
+            throw new RuntimeException("init() must pass a system property: "+INPUT_URI);
+        endpoint = context.getEndpoint(routeURI);
+
         template.setDefaultEndpointUri(routeURI);
         template.sendBody(new Object());
 

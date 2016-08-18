@@ -1,0 +1,75 @@
+Name;Email;Company;Region | Subregion;Dokeos;USERID;SSO;Role
+Ekambaram Pasham;ekambaram_pasham@infosys.com;INFOSYS;EMEA  | ;;ekambaram_pasham-infosys.com;;null
+Ricardo Chiappe;ricardo.chiappe@entelgy.com;Entelgy Chile Consultores Ltda;LATAM  | ;;ricardo.chiappe-entelgy.com;;null
+Wojciech Glanowski;wojciech_glanowski@epam.com;EPAM Systems IP;EMEA  | ;;wojciech_glanowski-epam.com;;null
+Mina hnen;mhnen@valueit-me.com;ValueIT;EMEA  | ;;mhnen-valueit-me.com;;null
+Maximiliano Carabajal;carabajalm@systemscorp.com.ar;SYSTEMSCORP;LATAM  | ;;carabajalm-systemscorp.com.ar;;null
+Pratik Dave;pratik.dave@tcs.com;Tata Consultancy Services Ltd;APAC  | ;;pratik.dave-tcs.com;;null
+PruthviRaj yemakar;pyemakar@csc.com;Computer Sciences Corporation;NA  | ;;pyemakar-csc.com;;null
+Jacek Dunia;jacek.dunia@eskom.eu;ESKOM IT SP. Z O.O.;EMEA  | ;;jacek.dunia-eskom.eu;;null
+BHASKAR ASI;basi2@csc.com;Computer Sciences Corporation;NA  | ;;basi2-csc.com;;null
+Sally ElSaftawy;sally.elsaftawy@itworx.com;ITWorx;EMEA  | ;;sally.elsaftawy-itworx.com;;null
+Symon Fenton;sfenton@forsythe.com;Forsythe Solutions Group Inc;NA  | ;;sfenton-forsythe.com;;null
+Ahmed AlKahky;ahmed.alkahky@itworx.com;ITWorx;EMEA  | ;;ahmed.alkahky-itworx.com;;null
+Tolun ARDAHANLI;tolun.ardahanli@gantek.com;Gantek Teknoloji Bilisim Cozumleri A.S.;EMEA  | ;;tolun.ardahanli-gantek.com;;null
+Diego Brignardello;dbrignardello@netlabs.com.uy;Netlabs SRL;LATAM  | ;;dbrignardello-netlabs.com.uy;;null
+Paulo Queimadas;paulo.a.d.queimadas@accenture.com;Accenture Services Private Limited;APAC  | ;;paulo.a.d.queimadas-accenture.com;;null
+Pradeep Kumar Kadiyala;pradeep.kumar7@wipro.com;Wipro EMEA;EMEA  | ;;pradeep.kumar7-wipro.com;;null
+Mathan Raj R;mathanraj.r@cognizant.com;Cognizant Technology Solutions;APAC  | ;;mathanraj.r-cognizant.com;;null
+Cristhian Saavedra;csaavedra@bluesmile.cl;Blue Smile Technolgy;LATAM  | ;;csaavedra-bluesmile.cl;;null
+Fabiano Candiotto;fabiano@redix.com.br;Redix Servicos em Informatica Ltda;LATAM  | ;;fabiano-redix.com.br;;null
+Sherif Wagih;sherif.wagih@itworx.com;ITWorx;EMEA  | ;;sherif.wagih-itworx.com;;null
+Absar Ahammad Shaik;absar@kuwaitnet.net;KuwaitNET;EMEA  | ;;absar-kuwaitnet.net;;null
+Barend Bossert;barend.bossert@eoh.co.za;Glacier Consulting;EMEA  | ;;barend.bossert-eoh.co.za;;null
+Nazeema Begum;begum.nazeema@tcs.com;TATA CONSULTANCY SERVICE LTD;LATAM  | ;;begum.nazeema-tcs.com;;null
+?? ??;tetsuya.iwayoshi@afro.co.jp;Aflo Co.,Ltd;APAC  | ;;tetsuya.iwayoshi-afro.co.jp;;null
+Htet Aung;aung@infratechmm.com;Infra Tech Company Limited;APAC  | ;;aung-infratechmm.com;;null
+Mikel Etxeberria;metxeberria@indaba.es;LKS S.COOP;EMEA  | ;;metxeberria-indaba.es;;null
+Maria Montserrat Alonso;malonso@essiprojects.com;ESSI Projects;EMEA  | ;;malonso-essiprojects.com;;null
+Marcin Moneta;marcin.moneta@ts.fujitsu.com;Fujitsu Technology Solutions AG;EMEA  | ;;marcin.moneta-ts.fujitsu.com;;null
+Robert Dawson;robert.dawson@uk.fujitsu.com;Fujitsu EMEA;EMEA  | ;;robert.dawson-uk.fujitsu.com;;null
+Guillermo Heroles;guillermo.heroles@grupomost.com;Grupo MOST;LATAM  | ;;guillermo.heroles-grupomost.com;;null
+Oriol Sancho;osancho@essiprojects.com;ESSI Projects;EMEA  | ;;osancho-essiprojects.com;;null
+Bastiaan Ceuppens;bastiaan.ceuppens@devoteam.com;Devoteam NV;EMEA  | ;;bastiaan.ceuppens-devoteam.com;;null
+Crowe Gary;gary.crowe@computacenter.com;Computacenter (UK) Ltd;EMEA  | ;;gary.crowe-computacenter.com;;null
+asiye yigit;asiye.yigit@gantek.com;Gantek Teknoloji Bilisim Cozumleri A.S.;EMEA  | ;;asiye.yigit-gantek.com;;null
+Stephan Buys;stephan.buys@bcx.co.za;BUSINESS CONNEXION (PTY) LTD;EMEA  | ;;stephan.buys-bcx.co.za;;null
+Robert Rother;r.rother@profi-ag.de;PROFI Engineering Systems AG;EMEA  | ;;r.rother-profi-ag.de;;null
+Sebastien Michetti;bastien@sysphere.be;SYSPHERE SPRL;EMEA  | ;;bastien-sysphere.be;;null
+Marcos Subero;marcoss@tmi-services.com;Team Management Infrastructura S.A.;LATAM  | ;;marcoss-tmi-services.com;;null
+Yusnier Matos;ymatos@soaint.com;SOAINT ECUADOR;LATAM  | ;;ymatos-soaint.com;;null
+Adrian Izquierdo;aizquierdo@indaba.es;LKS S.COOP;EMEA  | ;;aizquierdo-indaba.es;;null
+Paulo Jose Bosco Otto;potto@f9c.com.br;F9C Security Ltda;LATAM  | ;;potto-f9c.com.br;;null
+Angelo Costa;angelo.costa@banetech.net;Bane Tech;EMEA  | ;;angelo.costa-banetech.net;;null
+Brian Henry;behenry@itveterans.com;IT Veterans, LLC;FEDSLED  | ;;behenry-itveterans.com;;null
+Steven Mercurio;smercurio@emergent360.com;Emergent, LLC;FEDSLED  | ;;smercurio-emergent360.com;;null
+João Carlos Gomes;joaocg@primeinformatica.com.br;PRIME INFORMATICA ALPHA LTDA;LATAM  | ;;joaocg-primeinformatica.com.br;;null
+Juan Carlos Fleitas;juan.fleitas@la.logicalis.com;Logicalis Paraguay S.A.;LATAM  | ;;juan.fleitas-la.logicalis.com;;null
+Rony Pappan;rony.pappan@constellationmd.com;Constellation Technologies Inc;FEDSLED  | ;;rony.pappan-constellationmd.com;;null
+Bart Challis;bchallis@skyscapecloud.com;UKCloud Ltd;EMEA  | ;;bchallis-skyscapecloud.com;;null
+Waleed Raslan;waleed.raslan@itworx.com;ITWorx;EMEA  | ;;waleed.raslan-itworx.com;;null
+TEST kawano;tkawano@redhat.com;Reseller Test Account for Japan;APAC  | ;;tkawano-redhat.com;;null
+Adam Harrison;adam.harrison@fuseeng.com;Fuse Engineering;FEDSLED  | ;;adam.harrison-fuseeng.com;;null
+Alexey Palagin;apalagin@clouddeliveryservices.com;Cloud Delivery Services;EMEA  | ;;apalagin-clouddeliveryservices.com;;null
+Mostafa Ismail;mostafa.ismail@itworx.com;ITWorx;EMEA  | ;;mostafa.ismail-itworx.com;;null
+Todd D'Amore;tdamore@evtcorp.com;Enterprise Vision Technologies;NA  | ;;tdamore-evtcorp.com;;null
+Narayanamoorthy Srinivasan;narayanamoorthy_s@infosys.com;Infosys Limited;APAC  | ;;narayanamoorthy_s-infosys.com;;null
+Lawrence Adeoye;lawrence.adeoye@accenture.com;Accenture (UK) Limited;EMEA  | ;;lawrence.adeoye-accenture.com;;null
+Conor McGarvey;conor.mcgarvey@uk.fujitsu.com;Fujitsu Services Limited;EMEA  | ;;conor.mcgarvey-uk.fujitsu.com;;null
+Tomasz Wladyczanski;tomasz.wladyczanski@ts.fujitsu.com;Fujitsu Technology Solutions AG;EMEA  | ;;tomasz.wladyczanski-ts.fujitsu.com;;null
+Victor Fernandez;vfernandez@bluesmile.cl;Blue Smile Technolgy;LATAM  | ;;vfernandez-bluesmile.cl;;null
+Jason Strand;jstrand@shadow-soft.com;Shadow-Soft, L.L.C.;NA  | ;;jstrand-shadow-soft.com;;null
+Eduardo Porras;eporras@topgroup.com.ar;TopGroup Colombia SAS;LATAM  | ;;eporras-topgroup.com.ar;;null
+Marcin Dudziak;marcin.dudziak@veracomp.pl;Veracomp SA;EMEA  | ;;marcin.dudziak-veracomp.pl;;null
+Daniel Adriano;daniel.adriano@lynxwork.com;Lynxwork Technologies S.A. de C.V.;LATAM  | ;;daniel.adriano-lynxwork.com;;null
+Bhupendra Singh Yadav;bhupendra@taashee.com;TAASHEE LINUX SERVICES;APAC  | ;;bhupendra-taashee.com;;null
+Madhavi Latha;madhavilatha.t@tcs.com;TATA CONSULTANCY SERVICE LTD;LATAM  | ;;madhavilatha.t-tcs.com;;null
+Siva Teja Balabadruni;sbalabadruni@csc.com;Computer Sciences Corporation;NA  | ;;sbalabadruni-csc.com;;null
+Francisco Javier Portero Garnica;francisco.portero@atos.net;ATOS EMEA;EMEA  | ;;francisco.portero-atos.net;;null
+Tamer Embaby;tamer.embaby@itworx.com;ITWorx;EMEA  | ;;tamer.embaby-itworx.com;;null
+Andreas Odermatt;odermatt@puzzle.ch;Puzzle Itc GmbH;EMEA  | ;;odermatt-puzzle.ch;;null
+Sobolev Ilya;ilya.sobolev@inventa.ru;Inventa;EMEA  | ;;ilya.sobolev-inventa.ru;;null
+SANTAM BIRUNI;santam.biruni@accenture.com;Accenture Services Private Limited;APAC  | ;;santam.biruni-accenture.com;;null
+ERIC SIMON;eric@sysphere.be;SYSPHERE SPRL;EMEA  | ;;eric-sysphere.be;;null
+Mauro Cortes;mauro.cortesmoreno@atos.net;Atos IT Outsourcing Services, LLC;NA  | ;;mauro.cortesmoreno-atos.net;;null
+Kevin Kennedy;kevin.kennedy@fuseeng.com;Fuse Engineering;FEDSLED  | ;;kevin.kennedy-fuseeng.com;;null
