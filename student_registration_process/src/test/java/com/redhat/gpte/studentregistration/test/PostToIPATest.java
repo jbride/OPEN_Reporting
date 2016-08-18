@@ -2,6 +2,11 @@ package com.redhat.gpte.studentregistration.test;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+
+import javax.net.ssl.SSLContext;
 
 import org.apache.camel.Endpoint;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
@@ -16,6 +21,11 @@ import org.slf4j.LoggerFactory;
 import com.redhat.gpte.util.PropertiesSupport;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -32,7 +42,6 @@ public class PostToIPATest extends CamelSpringTestSupport {
     public static final String LDAP_HTTP_USER_NAME = "ipa_ldap_http.username";
     public static final String LDAP_HTTP_PASSWORD = "ipa_ldap_http.password";
     public static final String LDAP_GROUPNAME = "ipa_ldap.groupName";
-    public static final String LDAP_END_DATE = "ipa_ldap.endDate";
     public static final String LDAP_SEND_MAIL = "ipa_ldap.sendMail";
     private static final String IPA_UPLOAD_ABSOLUTE_PATH = null;
 
@@ -52,9 +61,13 @@ public class PostToIPATest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
 
+    /* curl -v -X POST -HAccept:text/plain -HgroupName:newuser -HsendMail:true --user jbride-redhat.com:xxx  \ 
+            --insecure -F upload=@src/test/resources/sample-spreadsheets/ipa_upload_20160818_1015.txt \
+            "https://www.opentlc.com/sso-admin/upload_file.php"
+    */
     //@Ignore
     @Test
-    public void testPostToIPAViaUnirest() throws UnirestException {
+    public void testPostToIPAViaUnirest() throws UnirestException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
         
         String ldapHTTPUrl = System.getProperty(LDAP_HTTP_URL);
         if(StringUtils.isEmpty(ldapHTTPUrl))
@@ -68,30 +81,37 @@ public class PostToIPATest extends CamelSpringTestSupport {
         String groupName = System.getProperty(LDAP_GROUPNAME);
         if(StringUtils.isEmpty(groupName))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_GROUPNAME);
-        String endDate = System.getProperty(LDAP_END_DATE);
-        if(StringUtils.isEmpty(endDate))
-            throw new RuntimeException("init() must pass sys property of: "+LDAP_END_DATE);
         String sendMail = System.getProperty(LDAP_SEND_MAIL);
         if(StringUtils.isEmpty(sendMail))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_SEND_MAIL);
         
-        File uploadFile = new File("sample-spreadsheets", "ipa_upload_20160818_1015.txt");
-        if(uploadFile == null)
-            throw new RuntimeException("uploadToLdapServer() uploadFile not on message body");
+        File uploadFile = new File("target/test-classes/sample-spreadsheets/", "ipa_upload_20160818_1015.csv");
+        if(!uploadFile.exists())
+            throw new RuntimeException("uploadToLdapServer() uploadFile not found: "+ uploadFile.getAbsolutePath());
         
         logger.info("Sending data to LDAP server: [" + ldapHTTPUrl + "] ...");
+        
+        // Skip validation of SSL certificate with host
+        SSLContext sslcontext = SSLContexts.custom()
+                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                .build();
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .build();
+        Unirest.setHttpClient(httpclient);
         
         HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
                                             .basicAuth(ldapHTTPUserName, ldapHTTPPassword)
                                             .header("accept", "text/plain")
                                             .field("file", uploadFile, "multipart/form-data")
                                             .field("groupName", groupName)
-                                            .field("endDate", endDate)
                                             .field("sendMail", sendMail)
                                             .asString();
                  
         logger.info("Result status code: " + result.getStatus());
         logger.info("Result status text: " + result.getStatusText());
+        logger.info("Result body: "+ result.getBody());
 
         if (result.getStatus() != 200) {
             logger.error("Error message from LDAP server. Status code: " + result.getStatus() + ", Status text: " + result.getStatusText());

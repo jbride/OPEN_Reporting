@@ -1,13 +1,22 @@
 package com.redhat.gpte.studentregistration.service;
 
 import java.io.File;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.SSLContext;
 
 import org.apache.camel.Exchange;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
 
 import com.mashape.unirest.http.HttpResponse;
@@ -22,7 +31,6 @@ public class IPAHTTPServiceBean {
     public static final String LDAP_HTTP_USER_NAME = "ipa_ldap_http.username";
     public static final String LDAP_HTTP_PASSWORD = "ipa_ldap_http.password";
     public static final String LDAP_GROUPNAME = "ipa_ldap.groupName";
-    public static final String LDAP_END_DATE = "ipa_ldap.endDate";
     public static final String LDAP_SEND_MAIL = "ipa_ldap.sendMail";
     private static final String IPA_UPLOAD_ABSOLUTE_PATH = null;
     
@@ -32,10 +40,9 @@ public class IPAHTTPServiceBean {
     private String ldapHTTPUserName;
     private String ldapHTTPPassword;
     private String groupName;
-    private String endDate;
     private String sendMail;
     
-    public IPAHTTPServiceBean() {
+    public IPAHTTPServiceBean() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
         ldapHTTPUrl = System.getProperty(LDAP_HTTP_URL);
         if(StringUtils.isEmpty(ldapHTTPUrl))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_HTTP_URL);
@@ -48,12 +55,19 @@ public class IPAHTTPServiceBean {
         groupName = System.getProperty(LDAP_GROUPNAME);
         if(StringUtils.isEmpty(groupName))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_GROUPNAME);
-        endDate = System.getProperty(LDAP_END_DATE);
-        if(StringUtils.isEmpty(endDate))
-            throw new RuntimeException("init() must pass sys property of: "+LDAP_END_DATE);
         sendMail = System.getProperty(LDAP_SEND_MAIL);
         if(StringUtils.isEmpty(sendMail))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_SEND_MAIL);
+        
+        // Skip validation of SSL certificate with host
+        SSLContext sslcontext = SSLContexts.custom()
+                .loadTrustMaterial(null, new TrustSelfSignedStrategy())
+                .build();
+        SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslcontext,SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        CloseableHttpClient httpclient = HttpClients.custom()
+                .setSSLSocketFactory(sslsf)
+                .build();
+        Unirest.setHttpClient(httpclient);
     }
     
     
@@ -87,7 +101,8 @@ public class IPAHTTPServiceBean {
             data.append(dokeosId + ";");
             data.append(userId + ";");
             data.append(sso + ";");
-            data.append(role);
+            if(StringUtils.isNotEmpty(role))
+            	data.append(role);
             
             data.append("\n");
         }
@@ -108,7 +123,6 @@ public class IPAHTTPServiceBean {
                                             .header("accept", "text/plain")
                                             .field("file", uploadFile, "multipart/form-data")
                                             .field("groupName", groupName)
-                                            .field("endDate", endDate)
                                             .field("sendMail", sendMail)
                                             .asString();
                  
