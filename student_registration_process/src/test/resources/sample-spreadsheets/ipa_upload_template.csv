@@ -1,0 +1,5 @@
+Name;Email;Company;Region | Subregion;Dokeos;USERID;SSO;Role
+Joe Consultant;jconsultant@redhat.com;redhat;EMEA | dach;;jconsultant-redhat.com;;consultant
+Jill SA;jsa@redhat.com;redhat;EMEA | dach;;jsa-redhat.com;;sa
+John Sales;jsales@redhat.com;redhat;EMEA | dach;;jsales-redhat.com;;sales
+Jack Other;jother@redhat.com;redhat;EMEA | dach;;jother-redhat.com;;other
