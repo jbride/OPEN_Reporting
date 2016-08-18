@@ -199,7 +199,7 @@
                     <log message="ipa_ldap.testMode set to true.  Will not upload to IPA LDAP"/>
                 </when>
                 <otherwise>
-                    <!-- to uri="bean:ipaServiceBean?method=uploadToLdapServer"/ -->
+                    <to uri="bean:ipaServiceBean?method=uploadToLdapServer"/>
                     <setBody><simple>${header.unprocessedStudentList}</simple></setBody>
                     <to uri="bean:studentRegBean?method=updateIPAFlagOnStudents" />
                 </otherwise>

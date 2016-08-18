@@ -35,8 +35,7 @@ public class IPAHTTPServiceBean {
     private String endDate;
     private String sendMail;
     
-    @PostConstruct
-    public void init() {
+    public IPAHTTPServiceBean() {
         ldapHTTPUrl = System.getProperty(LDAP_HTTP_URL);
         if(StringUtils.isEmpty(ldapHTTPUrl))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_HTTP_URL);
