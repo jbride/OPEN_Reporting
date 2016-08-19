@@ -29,6 +29,7 @@ public class GPTEBaseServiceBean {
     public static final String ACCENTURE="accenture";
     public static final String REDHAT_HYPHENED="red-hat";
     public static final String REDHAT="redhat";
+    public static final String UPLOAD_EXCEPTION_SET = "UPLOAD_EXCEPTION_SET";
     
     private Logger logger = Logger.getLogger(getClass());
     
@@ -70,6 +71,10 @@ public class GPTEBaseServiceBean {
             } else 
                 throw new RuntimeException(ExceptionCodes.GPTE_CC1000+student.getEmail());
         }
+        try {
+            Student dbStudent = canonicalDAO.getStudentByEmail(student.getEmail());
+        	student.setStudentid(dbStudent.getStudentid());
+    	} catch(org.springframework.dao.EmptyResultDataAccessException x) {}
         canonicalDAO.updateStudent(student);
     }
     

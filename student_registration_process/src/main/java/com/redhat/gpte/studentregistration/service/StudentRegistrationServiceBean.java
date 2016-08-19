@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
@@ -66,10 +67,17 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
 
     public void updateIPAFlagOnStudents(Exchange exchange) {
         List<DenormalizedStudent> students = (List<DenormalizedStudent>)exchange.getIn().getBody();
+        Set<String> uploadExceptionSet = (Set<String>)exchange.getIn().getHeader(UPLOAD_EXCEPTION_SET);
+        
         int count = 0;
         for(DenormalizedStudent sObj : students) {
-            int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
-            count = count + sUpdate;
+        	String email = sObj.getStudentObj().getEmail();
+        	if(uploadExceptionSet.contains(email)){
+        		logger.error(email+" : will not update ipaStatus because of upload issues");
+        	}else {
+        		int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
+        		count = count + sUpdate;
+        	}
         }
         logger.info("updateIPAFlagOnStudents() # of students to update = "+students.size()+" : total updated = "+count);
     }

@@ -217,6 +217,7 @@ CREATE TABLE `Students` (
   `DeActivationDate` datetime DEFAULT NULL,
   `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`StudentID`),
+  UNIQUE KEY `IDX_Unique_Email` (`Email`),
   KEY `IDX_Email` (`Email`),
   KEY `IDX_FirstName` (`FirstName`),
   KEY `IDX_LastName` (`LastName`),

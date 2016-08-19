@@ -18,8 +18,10 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.redhat.gpte.studentregistration.service.IPAHTTPServiceBean;
 import com.redhat.gpte.util.PropertiesSupport;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLContexts;
@@ -65,7 +67,7 @@ public class PostToIPATest extends CamelSpringTestSupport {
             --insecure -F upload=@src/test/resources/sample-spreadsheets/ipa_upload_20160818_1015.txt \
             "https://www.opentlc.com/sso-admin/upload_file.php"
     */
-    //@Ignore
+    @Ignore
     @Test
     public void testPostToIPAViaUnirest() throws UnirestException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
         
@@ -118,7 +120,7 @@ public class PostToIPATest extends CamelSpringTestSupport {
         }
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void testPostToIPAViaCamel() {
         routeURI = System.getProperty(INPUT_URI);
@@ -130,5 +132,17 @@ public class PostToIPATest extends CamelSpringTestSupport {
         template.sendBody(new Object());
 
     }
+    
+    @Ignore
+    @Test
+    public void testLDAPResponseProcessing() throws IOException {
+    	File uploadFile = new File("target/test-classes/sample-response/", "good-ipa-response.txt");
+        if(!uploadFile.exists())
+            throw new RuntimeException("testLDAPResponseProcessing() response file not found: "+ uploadFile.getAbsolutePath());
+        
+        IPAHTTPServiceBean.logLdapServerResponse(FileUtils.readFileToString(uploadFile));
+
+    }
+    
 
 }
