@@ -40,9 +40,9 @@
         <!-- Need to set to true, however, when running in JBoss.  Otherwise, infinite loop of emails will go out -->
         <!-- Setting of sys property substition doesn't appear to take affect -->
         <!-- handled><constant>{{sb_onexception_handled}}</constant></handled -->
-        <handled><constant>true</constant></handled>
+        <handled><constant>false</constant></handled>
 
-        <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
+        <log message="Exception encountered: ${exception.message} : return-path = ${header.Return-Path} " loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
         <to uri="seda:send-email"/>
     </onException>
@@ -134,8 +134,6 @@
                     </choice>
                 </split>
             </split>
-            <!-- setBody><constant>Course Completion Process:  Dokeos Email with attachments received and validated</constant></setBody>
-            <to uri="seda:send-email"/ -->
     </route>
 
     <route id="receive-partner-course-completions">
@@ -188,7 +186,6 @@
         <choice id="if-exception-exists">
             <when>
                 <simple>${exception.message} != null</simple>
-                <setHeader headerName="to"><constant>{{admin_email}}</constant></setHeader>
                 <setHeader headerName="Subject">
                     <constant>GPTE Course Completion Service ({{jboss.host.name}}): Problem processing data</constant>
                 </setHeader>
@@ -199,13 +196,13 @@
                 <to uri="velocity:emailTemplates/problem-reply-email.vm"/>
             </when>
             <otherwise>
-                <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
                 <setHeader headerName="Subject">
                     <constant>GPTE Course Completion Service ({{jboss.host.name}}): Success</constant>
                 </setHeader>
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
+        <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
             <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
