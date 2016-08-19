@@ -97,10 +97,10 @@ public class Company implements Serializable {
         ldapId = x;
     }
     public String getSfdcId() {
-    	return this.sfdcId;
+        return this.sfdcId;
     }
     public void setSfdcId(String x) {
-    	sfdcId = x;
+        sfdcId = x;
     }
 
     @Override

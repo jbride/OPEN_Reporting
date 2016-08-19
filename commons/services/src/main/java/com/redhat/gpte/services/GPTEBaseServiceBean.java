@@ -73,8 +73,8 @@ public class GPTEBaseServiceBean {
         }
         try {
             Student dbStudent = canonicalDAO.getStudentByEmail(student.getEmail());
-        	student.setStudentid(dbStudent.getStudentid());
-    	} catch(org.springframework.dao.EmptyResultDataAccessException x) {}
+            student.setStudentid(dbStudent.getStudentid());
+        } catch(org.springframework.dao.EmptyResultDataAccessException x) {}
         canonicalDAO.updateStudent(student);
     }
     

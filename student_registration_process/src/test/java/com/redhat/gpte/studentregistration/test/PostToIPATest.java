@@ -136,7 +136,7 @@ public class PostToIPATest extends CamelSpringTestSupport {
     @Ignore
     @Test
     public void testLDAPResponseProcessing() throws IOException {
-    	File uploadFile = new File("target/test-classes/sample-response/", "good-ipa-response.txt");
+        File uploadFile = new File("target/test-classes/sample-response/", "good-ipa-response.txt");
         if(!uploadFile.exists())
             throw new RuntimeException("testLDAPResponseProcessing() response file not found: "+ uploadFile.getAbsolutePath());
         

@@ -121,33 +121,33 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             String subregion = student.getSubregion();
             
             if(StringUtils.isNotEmpty(firstName))
-            	data.append(firstName);
+                data.append(firstName);
             data.append(SPACE);
             if(StringUtils.isNotEmpty(lastName))
-            	data.append(lastName);
+                data.append(lastName);
             data.append(DELIMITER);
             if(StringUtils.isNotEmpty(email))
-            	data.append(email);
+                data.append(email);
             data.append(DELIMITER);
             if(StringUtils.isNotEmpty(companyName))
-            	data.append(companyName);
+                data.append(companyName);
             data.append(DELIMITER);
            
             if(StringUtils.isNotEmpty(region))
-            	data.append(region);
+                data.append(region);
             data.append(PIPE);
             if(StringUtils.isNotEmpty(subregion))
-            	data.append(subregion);
+                data.append(subregion);
             data.append(DELIMITER);
             
             data.append(dokeosId + ";");
             if(StringUtils.isNotEmpty(userId))
-            	data.append(userId);
+                data.append(userId);
             data.append(DELIMITER);
             data.append(sso + ";");
             
             if(StringUtils.isNotEmpty(role))
-            	data.append(role);
+                data.append(role);
             
             data.append("\n");
         }
@@ -170,70 +170,70 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
         int count = 0;
         for(String studentLine : studentLines ) {
 
-        	if(count == 0) {
-        		header = studentLine;
-        		count++;
-        		continue;
-        	}
-        	
-        	String email = StringUtils.substringBetween(studentLine, DELIMITER, DELIMITER);
-        	String dateS = dfObj.format(new Date());
-        	String fileName = NEW_STUDENT+dateS+CSV;
-        	File uploadFile = new File("/tmp", fileName);
-        	FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
+            if(count == 0) {
+                header = studentLine;
+                count++;
+                continue;
+            }
+            
+            String email = StringUtils.substringBetween(studentLine, DELIMITER, DELIMITER);
+            String dateS = dfObj.format(new Date());
+            String fileName = NEW_STUDENT+dateS+CSV;
+            File uploadFile = new File("/tmp", fileName);
+            FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
 
-        	logger.info(email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
+            logger.info(email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
 
-        	String responseBody = null;
-        	boolean mockUpload = false;
-        	if(!mockUpload) {
-        		HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
-        				.basicAuth(ldapHTTPUserName, ldapHTTPPassword)
-        				.header("accept", "text/plain")
-        				.field("file", uploadFile, "multipart/form-data")
-        				.field("groupName", groupName)
-        				.field("sendMail", sendMail)
-        				.asString();
+            String responseBody = null;
+            boolean mockUpload = false;
+            if(!mockUpload) {
+                HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
+                        .basicAuth(ldapHTTPUserName, ldapHTTPPassword)
+                        .header("accept", "text/plain")
+                        .field("file", uploadFile, "multipart/form-data")
+                        .field("groupName", groupName)
+                        .field("sendMail", sendMail)
+                        .asString();
 
-        		responseBody = result.getBody();
-        	}else {
-        		responseBody = PLEASE_WAIT+ERROR+DIV;
-        	}
-        	int start = responseBody.indexOf(PLEASE_WAIT);
-        	responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
-        	if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
-        		logger.error(email+" : uploadToLdapServer() Result body: "+ responseBody);
-        		exceptionSet.add(email);
-        	} else {
-        		logLdapServerResponse(responseBody);
-        	}
-        	uploadFile.delete();
+                responseBody = result.getBody();
+            }else {
+                responseBody = PLEASE_WAIT+ERROR+DIV;
+            }
+            int start = responseBody.indexOf(PLEASE_WAIT);
+            responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
+            if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
+                logger.error(email+" : uploadToLdapServer() Result body: "+ responseBody);
+                exceptionSet.add(email);
+            } else {
+                logLdapServerResponse(responseBody);
+            }
+            uploadFile.delete();
 
         }
         exchange.getIn().setHeader(UPLOAD_EXCEPTION_SET, exceptionSet);
     }
     
     public static void logLdapServerResponse(String rBody) {
-    	//logger.info(rBody);
-    	StringBuilder sBuilder = new StringBuilder("logLdapServerResponse() \n");
-    	String[] logLines = rBody.split("\\r?\\n");
-    	for(String lLine : logLines){
-    		if(lLine.contains(EXAMINING))
-    			sBuilder.append(lLine.substring(lLine.indexOf(EXAMINING))+NEW_LINE);
-    		if(lLine.contains(WARNING))
-    			sBuilder.append(lLine.substring(lLine.indexOf(WARNING))+NEW_LINE);
-    		if(lLine.contains(ADDING))
-    			sBuilder.append(lLine.substring(lLine.indexOf(ADDING))+NEW_LINE);
-    		if(lLine.contains(ALL_GOOD))
-    			sBuilder.append(lLine.substring(lLine.indexOf(ALL_GOOD))+NEW_LINE);
-    		if(lLine.contains(LOOKING))
-    			sBuilder.append(lLine.substring(lLine.indexOf(LOOKING))+NEW_LINE);
-    		if(lLine.contains(USER))
-    			sBuilder.append(lLine.substring(lLine.indexOf(USER))+NEW_LINE);
-    		if(lLine.contains(ERROR))
-    			sBuilder.append(lLine.substring(lLine.indexOf(ERROR))+NEW_LINE);
-    	}
-    	sBuilder.append(NEW_LINE);
-    	logger.info(sBuilder.toString());
+        //logger.info(rBody);
+        StringBuilder sBuilder = new StringBuilder("logLdapServerResponse() \n");
+        String[] logLines = rBody.split("\\r?\\n");
+        for(String lLine : logLines){
+            if(lLine.contains(EXAMINING))
+                sBuilder.append(lLine.substring(lLine.indexOf(EXAMINING))+NEW_LINE);
+            if(lLine.contains(WARNING))
+                sBuilder.append(lLine.substring(lLine.indexOf(WARNING))+NEW_LINE);
+            if(lLine.contains(ADDING))
+                sBuilder.append(lLine.substring(lLine.indexOf(ADDING))+NEW_LINE);
+            if(lLine.contains(ALL_GOOD))
+                sBuilder.append(lLine.substring(lLine.indexOf(ALL_GOOD))+NEW_LINE);
+            if(lLine.contains(LOOKING))
+                sBuilder.append(lLine.substring(lLine.indexOf(LOOKING))+NEW_LINE);
+            if(lLine.contains(USER))
+                sBuilder.append(lLine.substring(lLine.indexOf(USER))+NEW_LINE);
+            if(lLine.contains(ERROR))
+                sBuilder.append(lLine.substring(lLine.indexOf(ERROR))+NEW_LINE);
+        }
+        sBuilder.append(NEW_LINE);
+        logger.info(sBuilder.toString());
     }
 }

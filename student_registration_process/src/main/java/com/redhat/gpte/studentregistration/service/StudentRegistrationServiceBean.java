@@ -2,6 +2,7 @@ package com.redhat.gpte.studentregistration.service;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -71,14 +72,25 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
         
         int count = 0;
         for(DenormalizedStudent sObj : students) {
-        	String email = sObj.getStudentObj().getEmail();
-        	if(uploadExceptionSet.contains(email)){
-        		logger.error(email+" : will not update ipaStatus because of upload issues");
-        	}else {
-        		int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
-        		count = count + sUpdate;
-        	}
+            String email = sObj.getStudentObj().getEmail();
+            if(uploadExceptionSet.contains(email)){
+                logger.error(email+" : will not update ipaStatus because of upload issues");
+            }else {
+                int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
+                count = count + sUpdate;
+            }
         }
         logger.info("updateIPAFlagOnStudents() # of students to update = "+students.size()+" : total updated = "+count);
+        
+        if(uploadExceptionSet.size() > 0){
+            StringBuilder sBuilder = new StringBuilder("updateIPAFlagOnStudents() following students not updated to due upload issues with LDAP: \n");
+            Iterator emailIt = uploadExceptionSet.iterator();
+            while(emailIt.hasNext()){
+                String email = (String)emailIt.next();
+                sBuilder.append(email);
+                sBuilder.append("\n");
+            }
+            throw new RuntimeException(sBuilder.toString());
+        }
     }
 }
