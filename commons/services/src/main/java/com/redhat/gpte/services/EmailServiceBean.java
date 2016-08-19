@@ -212,13 +212,17 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             if(inObj instanceof List){
                 List<String> inList = (List<String>)inObj;
                 for(String email : inList){
-                    sBuilder.append(DELIMITER);
-                    sBuilder.append(email);
+                	if(email.contains(REDHAT)) {
+                        sBuilder.append(DELIMITER);
+                        sBuilder.append(email);
+                	}
                 }
                 
             }else {
-                sBuilder.append(DELIMITER);
-                sBuilder.append((String)inObj);
+            	if(((String)inObj).contains(REDHAT)) {
+                    sBuilder.append(DELIMITER);
+                    sBuilder.append((String)inObj);
+            	}
             }
         }
         in.setHeader("to", sBuilder.toString());
