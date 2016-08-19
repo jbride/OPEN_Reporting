@@ -191,7 +191,7 @@
                 <simple>${body}</simple>
             </setHeader>
             <to uri="bean:ipaServiceBean?method=createLdapTemplateFile" />
-            <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd_HHmm}.txt" />
+            <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd_HHmm}.csv" />
             <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.txt" id="log_write_file"/>
             <choice>
                 <when>
