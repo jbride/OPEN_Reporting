@@ -458,8 +458,7 @@
 
     <route id="send-email">
         <from uri="seda:send-email"/>
-        <removeHeaders pattern="*" excludePattern="Return-Path"/>
-        <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
+        <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
         <setHeader headerName="From">
             <constant>GPTE Accreditation Processing &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
@@ -483,6 +482,7 @@
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
+        <removeHeaders pattern="*" excludePattern="To"/>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
             <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>

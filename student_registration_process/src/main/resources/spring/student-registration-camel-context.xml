@@ -46,7 +46,7 @@
         <!-- Setting of sys property substition doesn't appear to take affect -->
         <!-- handled><constant>{{sb_onexception_handled}}</constant></handled -->
         <!--handled><constant>{{ipa_onexception_handled}}</constant></handled-->
-        <handled><constant>true</constant></handled>
+        <handled><constant>false</constant></handled>
 
         <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
@@ -153,10 +153,8 @@
                 So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
         </description>
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
-        <log message="Received Student Registration email. from: ${header.Return-Path}, subject ${header.subject}" id="log_student_reg_receive"/>
-        <to uri="bean:studentRegBean?method=changeMapToListOfValues" />
-        <split id="for-each-student-reg-attachment">
-            <simple>${body}</simple>
+        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com</constant></setHeader>
+        <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
             <unmarshal ref="studentRegBindy"/>
             <doTry>
                 <!--potentially throws this exception:
@@ -175,7 +173,6 @@
                 <to uri="direct:persist-student" />
             </split>
             <to uri="seda:send-email" />
-        </split>
     </route>
 
     <route id="post-new-students-to-ipa">
@@ -225,8 +222,7 @@
 
     <route id="send-email">
         <from uri="seda:send-email"/>
-        <removeHeaders pattern="*" excludePattern="Return-Path"/>
-        <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
+        <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
         <setHeader headerName="From" id="send-email-set-header" >
             <constant>GPTE Student Registrations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
@@ -235,7 +231,7 @@
             <when>
                 <simple>${exception.message} != null</simple>
                 <setHeader headerName="Subject">
-                    <constant>GPTE Student Registration Service ({{jboss.host.name}}): Problem processing data</constant>
+                    <constant>GPTE Student Registration Service ({{jboss.host.name}}): Problem processing ${header.CamelFileName}</constant>
                 </setHeader>
 
                 <!-- Appears that exception.message is not passed to velocity template -->
@@ -245,11 +241,12 @@
             </when>
             <otherwise>
                 <setHeader headerName="Subject">
-                    <constant>GPTE Student Registration Service ({{jboss.host.name}}): Success</constant>
+                    <constant>GPTE Student Registration Service ({{jboss.host.name}}): Success processing ${header.CamelFileName}</constant>
                 </setHeader>
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
+        <removeHeaders pattern="*" excludePattern="To"/>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
             <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>

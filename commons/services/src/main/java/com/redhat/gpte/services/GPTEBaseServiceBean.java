@@ -32,7 +32,7 @@ public class GPTEBaseServiceBean {
     public static final String UPLOAD_EXCEPTION_SET = "UPLOAD_EXCEPTION_SET";
     
     private Logger logger = Logger.getLogger(getClass());
-    
+
     @Autowired
     protected CanonicalDomainDAO canonicalDAO;
     
@@ -169,11 +169,6 @@ public class GPTEBaseServiceBean {
         headers.clear();
     }
     
-    public void changeMapToListOfValues(Exchange exchange) {
-        Map mapBody = (Map)exchange.getIn().getBody();
-        exchange.getIn().setBody(mapBody.values());
-    }
-    
     public void removeHeaderLinesFromSpreadsheet(Exchange exchange) {
         String numLinesSkipString = (String)exchange.getIn().getHeader(NUMBER_OF_LINES_TO_SKIP);
         if(StringUtils.isEmpty(numLinesSkipString))
@@ -210,8 +205,10 @@ public class GPTEBaseServiceBean {
         for(Entry<String,Object> entry : headers.entrySet()) {
             sBuilder.append("\n\t"+entry.getKey()+" : "+entry.getValue());
         }
-        sBuilder.append("\nBody:\n\t");
-        sBuilder.append(exchange.getIn().getBody());
+        if(false) {
+            sBuilder.append("\nBody:\n\t");
+            sBuilder.append(exchange.getIn().getBody());
+        }
         logger.info(sBuilder.toString());
     }
 }

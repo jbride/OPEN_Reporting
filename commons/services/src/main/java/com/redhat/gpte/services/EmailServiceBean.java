@@ -18,6 +18,14 @@ import javax.activation.DataHandler;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.camel.Body;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Message;
+import org.apache.camel.Producer;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +37,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
 
     public static final String ATTACHMENTS_ARE_VALID = "Attachments are valid.";
     private static final String RETURN_PATH = "Return-Path";
+    private static final String CAMEL_FILE_NAME = "CamelFileName";
     private static final String DATE = "Date";
     private static final String SUBJECT = "Subject";
     private static final String GPTE_VALID_EMAIL_SUFFIXES = "gpte_valid_email_suffixes";
@@ -48,7 +57,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String PARTNER = "partner_cc";
     private static final String STUDENT_REG = "student_registration";
     private static final Object RULES_SPREADSHEET = "rules_spreadsheet";
-    private static final String ACCRED_RULES_SPREADSHEET_INBOX_PATH = "accred_rules_spreadsheet_inbox_path";
+    private static final String ROUTE_SPECIFIC_EMAILS="ROUTE_SPECIFIC_EMAILS";
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -73,18 +82,24 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     public boolean isValidCamelMessage(Exchange exchange) throws AttachmentValidationException {
         Message in = exchange.getIn();
         
-        // make sure return email exists, it is from redhat.com and email has csv attachment(s)
-        // Do not throw AttachmentValidationException as this would be expensive to handle if originating from DDoS attack
-        String fromEmail = cleanEmailAddress(in.getHeader(RETURN_PATH, String.class));
-        if(fromEmail != null) {
+        String fromEmail = (String)in.getHeader(RETURN_PATH, String.class);
+        fromEmail = cleanEmailAddress(in.getHeader(RETURN_PATH, String.class));
+        if(StringUtils.isNotEmpty(fromEmail)) {
+            // make sure return email exists, it is from redhat.com and email has csv attachment(s)
+            // Do not throw AttachmentValidationException as this would be expensive to handle if originating from DDoS attack
+
+ 
             logger.debug("fromEmail = "+fromEmail);
-            String fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1, fromEmail.indexOf(".com")+4);
-            fromEmailSuffix = fromEmailSuffix.replace(">", "");
-            if(StringUtils.isEmpty(fromEmail)) {
-                logger.error("isValidCamelMessage() no return email address provided");
-                return false;
-            } else if (!validEmailSuffixes.contains(fromEmailSuffix))  {
-                logger.error("isValidCamelMessage() email address is invalid: "+fromEmailSuffix);
+            String fromEmailSuffix = null;
+            try {
+                fromEmailSuffix = fromEmail.substring(fromEmail.indexOf("@")+1, fromEmail.indexOf(".com")+4);
+                fromEmailSuffix = fromEmailSuffix.replace(">", "");
+                if (!validEmailSuffixes.contains(fromEmailSuffix))  {
+                    logger.error("isValidCamelMessage() email address is invalid: "+fromEmailSuffix);
+                    return false;
+                }
+            } catch(Exception x) {
+                logger.error("isValidCamelMessage() Exception thrown attempting to process from email: "+fromEmail+" : "+x.getMessage());
                 return false;
             }
         } else {
@@ -95,7 +110,10 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         // Ensure email has attachments
         Map<String, DataHandler> attachments = exchange.getIn().getAttachments();
         if(attachments.size() == 0) {
-            throw new AttachmentValidationException(AttachmentValidationException.NO_ATTACHMENTS_PROVIDED+" Input provided by "+fromEmail);
+            // loggering error only
+            // Not throwing exception because too expensive 
+            // Our gmail account could simply find itself involved in an email thread  between Red Hat associates
+            logger.error(AttachmentValidationException.NO_ATTACHMENTS_PROVIDED+" Input provided by "+fromEmail);
         } else {
             logger.debug("isValidCamelMessage() # attachments = "+attachments.size());
         }
@@ -114,67 +132,43 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     /* Iterates through attachments and converts each one to a String 
      * Message body is added with a List<String> of these converted attachments.
      */
-    public void moveAttachmentsToBody(Exchange exchange) throws Exception {
+    public void moveAttachmentsToBodyAndSendToGPTEProcessingRoute(Exchange exchange) throws Exception {
         Map<String, DataHandler> attachments = exchange.getIn().getAttachments();
-        Map<String,String> attachmentMap = new HashMap<String,String>();
+        logger.info("moveAttachmentsToBodyAndSendToGPTEProcessingRoute() received the following # of attachments: "+attachments.size());
         for(Entry<String, DataHandler> attachEntry : attachments.entrySet()){
             InputStream iStream = null;
+            Producer producer = null;
             try {
                 iStream = attachEntry.getValue().getInputStream();
                 String attachString = IOUtils.toString(iStream);
-                attachmentMap.put(attachEntry.getKey(), attachString);
+
+                CamelContext cContext = exchange.getContext();
+                Endpoint endpoint = cContext.getEndpoint("direct:process-gpte-operation-files");
+                producer = endpoint.createProducer();
+                producer.start();
+
+                Exchange newExchange = producer.createExchange();
+                newExchange.setPattern(ExchangePattern.InOnly);
+                Message in = newExchange.getIn();
+                in.setBody(attachString);
+                in.setHeader(CAMEL_FILE_NAME, attachEntry.getKey());
+                in.setHeader(RETURN_PATH, exchange.getIn().getHeader(RETURN_PATH));
+                in.setHeader(SUBJECT, exchange.getIn().getHeader(SUBJECT));
+
+                producer.process(newExchange);
+
             }finally {
+                if(producer != null)
+                    producer.stop();
                 if(iStream != null)
                     iStream.close();
             }
         }
-        exchange.getIn().setBody(attachmentMap);
     }
 
-    public void changeFileBodyToMapBody(Exchange exchange) throws Exception {
-        Map<String,String> attachmentMap = new HashMap<String,String>();
-        org.apache.camel.component.file.GenericFile gFile = (org.apache.camel.component.file.GenericFile)exchange.getIn().getBody();
-        File fileBody = (File)gFile.getBody();
-        String stringBody = FileUtils.readFileToString(fileBody);
-
-        attachmentMap.put(gFile.getFileName(), stringBody);
-        exchange.getIn().setBody(attachmentMap);
-    }
-    
-    public void writeRulesSpreadsheetsToDisk(Exchange exchange) throws IOException {
-        String ss_inbox_path = System.getProperty(ACCRED_RULES_SPREADSHEET_INBOX_PATH);
-        if(StringUtils.isEmpty(ss_inbox_path))
-            throw new RuntimeException("Need to define the following system property: "+ACCRED_RULES_SPREADSHEET_INBOX_PATH);
-        
-        Map<String,String> attachments = (Map<String,String>) exchange.getIn().getBody();
-        if(attachments.size() == 0)
-            throw new RuntimeException("No rule spreadsheet attachments");
-        
-        File outDir = new File(ss_inbox_path);
-        if(!outDir.exists())
-            outDir.mkdirs();
-        
-        for(Entry<String, String> attachment : attachments.entrySet()) {
-            FileOutputStream foStream = null;
-            try {
-                File outFile = new File(ss_inbox_path, attachment.getKey());
-                foStream = new FileOutputStream(outFile);
-                foStream.write(attachment.getValue().getBytes());
-                foStream.flush();
-                logger.info("writeRulesSpreadsheetsToDisk() just wrote rule spreadsheet: "+outFile.getAbsolutePath());
-            }finally {
-                if(foStream != null)
-                    foStream.close();
-            }
-        }
-    }
-
-    
     public void determineAttachmentType(Exchange exchange) {
-        Map<String,String> attachmentMap =  (Map<String,String>)exchange.getIn().getBody();
-        Collection<String> attachCollection = attachmentMap.values();
-        List<String> attachList = new ArrayList<String>(attachCollection);
-        String[] rows = attachList.get(0).split("\\r?\\n");
+        String body =  (String)exchange.getIn().getBody();
+        String[] rows = body.split("\\r?\\n");
         String firstRow = rows[0];
         if(firstRow.contains(DOKEOS_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, DOKEOS);
@@ -201,12 +195,13 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         logger.info("determineAttachmentType() attachment type = " + exchange.getIn().getHeader(ATTACHMENT_TYPE));
     }
 
-    // Get email address from the sender. 
-    // Then set this as the "To" header for reply email
-    // Also tack on admin email to recipientList
-    public void setHeaderToWithSendersEmail(Exchange exchange) {
+    public void setHeaderToWithProperEmails(Exchange exchange) {
         Message in = exchange.getIn();
+
+        // 1)  Alwayss send email to admin
         StringBuilder sBuilder = new StringBuilder(adminEmail);
+
+        // 2)  Send response back to originator, if exists
         Object inObj = in.getHeader(RETURN_PATH);
         if(inObj != null){
             if(inObj instanceof List){
@@ -225,6 +220,14 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             	}
             }
         }
+
+        // 3)  Send response email to ROUTE_SPECIFIC_EMAILS, if set
+        String routeSpecificEmails = (String)in.getHeader(ROUTE_SPECIFIC_EMAILS);
+        if(StringUtils.isNotEmpty(routeSpecificEmails)) {
+            sBuilder.append(DELIMITER);
+            sBuilder.append(routeSpecificEmails);
+        }
+
         in.setHeader("to", sBuilder.toString());
     }
 
@@ -285,4 +288,15 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         // update the body
         in.setBody(result.toString());                
     }
+
+    public void changeFileBodyToMapBody(Exchange exchange) throws Exception {
+        Map<String,String> attachmentMap = new HashMap<String,String>();
+        org.apache.camel.component.file.GenericFile gFile = (org.apache.camel.component.file.GenericFile)exchange.getIn().getBody();
+        File fileBody = (File)gFile.getBody();
+        String stringBody = FileUtils.readFileToString(fileBody);
+
+        attachmentMap.put(gFile.getFileName(), stringBody);
+        exchange.getIn().setBody(attachmentMap);
+    }
+    
 }

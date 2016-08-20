@@ -51,21 +51,21 @@
         <log message="Received file from: ${header.Return-Path}, subject ${header.subject}" id="log_receive_file"/>
         <filter>
             <method ref="emailServiceBean" method="isValidCamelMessage"></method>
-            <to uri="bean:emailServiceBean?method=moveAttachmentsToBody" />
-            <to uri="direct:receive-gpte-operation-files" />
+            <to uri="bean:emailServiceBean?method=moveAttachmentsToBodyAndSendToGPTEProcessingRoute" />
         </filter>
     </route>
 
-    <route id="receive-gpte-operation-files-via-file">
+    <route id="receive-gpte-operation-files-via-filesystem">
         <from uri="file:/tmp/gpte/inbox-for-emails/?noop=false"/>
-        <to uri="bean:emailServiceBean?method=changeFileBodyToMapBody" />
-        <to uri="direct:receive-gpte-operation-files" />
+        <log message="Just read file: ${header.CamelFileName}"/>
+        <convertBodyTo type="java.lang.String"/>
+        <to uri="direct:process-gpte-operation-files" />
     </route>
 
     <route id="receive-gpte-operation-files">
         <description>
         </description>
-        <from uri="direct:receive-gpte-operation-files"/>
+        <from uri="direct:process-gpte-operation-files"/>
             <to uri="bean:emailServiceBean?method=determineAttachmentType" />
             <choice>
                 <when>
@@ -82,7 +82,7 @@
                 </when>
                 <when>
                     <simple>${header.ATTACHMENT_TYPE} == "rules_spreadsheet"</simple>
-                    <to uri="bean:emailServiceBean?method=writeRulesSpreadsheetsToDisk" />
+                    <to uri="{{accred_receive_tsv_rules_spreadsheet_uri}}" />
                 </when>
                 <otherwise>
                     <throwException ref="invalidTypeEx" />
@@ -98,8 +98,8 @@
 
     <route id="send-email">
         <from uri="vm:send-email"/>
-        <removeHeaders pattern="*" excludePattern="Return-Path"/>
         <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
+        <removeHeaders pattern="*" excludePattern="To"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
         <setHeader headerName="From">
             <constant>GPTE Operations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
