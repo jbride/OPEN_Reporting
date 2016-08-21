@@ -99,7 +99,6 @@
     <route id="send-email">
         <from uri="vm:send-email"/>
         <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
-        <removeHeaders pattern="*" excludePattern="To"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
         <setHeader headerName="From">
             <constant>GPTE Operations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>

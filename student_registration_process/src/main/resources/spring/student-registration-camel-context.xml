@@ -231,7 +231,7 @@
             <when>
                 <simple>${exception.message} != null</simple>
                 <setHeader headerName="Subject">
-                    <constant>GPTE Student Registration Service ({{jboss.host.name}}): Problem processing ${header.CamelFileName}</constant>
+                    <simple>GPTE Student Registration Service {{jboss.host.name}}: Problem processing ${header.CamelFileName}</simple>
                 </setHeader>
 
                 <!-- Appears that exception.message is not passed to velocity template -->
@@ -241,12 +241,11 @@
             </when>
             <otherwise>
                 <setHeader headerName="Subject">
-                    <constant>GPTE Student Registration Service ({{jboss.host.name}}): Success processing ${header.CamelFileName}</constant>
+                    <simple>GPTE Student Registration Service {{jboss.host.name}}: Success processing ${header.CamelFileName}</simple>
                 </setHeader>
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
-        <removeHeaders pattern="*" excludePattern="To"/>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
             <to uri="smtps://smtp.gmail.com?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
