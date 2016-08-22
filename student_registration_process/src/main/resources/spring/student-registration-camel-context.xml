@@ -153,7 +153,7 @@
                 So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
         </description>
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com,prutledg@redhat.com</constant></setHeader>
+        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com,prutledg@redhat.com,asheer@redhat.com</constant></setHeader>
         <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
             <unmarshal ref="studentRegBindy"/>
             <doTry>
