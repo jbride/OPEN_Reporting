@@ -105,7 +105,7 @@
                         <!-- Allow only error free Skills Exchange records to be updated -->
                         <method ref="ldapServiceBean" method="hasNoExceptionProperty"></method>
                         <filter>
-                            <constant>{{gpte_enable_all_emails}}</constant>
+                            <constant>{{sr_persist_student_update_from_ipa_response}}</constant>
                             <to uri="direct:persist-student" />
                         </filter>
 
