@@ -149,6 +149,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             sObj.setSumtotalid(uNumber);
             sObj.setSalesforcecontactid(uNumber.substring(0,uNumber.length() - 3));
         }
+        sObj.setIpaStatus(1);
         insertNewStudent(exchange, sObj);
     }
     
@@ -159,6 +160,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sObj.setEmail(dokeosCourseCompletion.getEmail());
         sObj.setFirstname(dokeosCourseCompletion.calculateFirstName());
         sObj.setLastname(dokeosCourseCompletion.calculateLastName());
+        sObj.setIpaStatus(1);
         insertNewStudent(exchange, sObj);
     }
     
@@ -296,7 +298,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         } else {
             try {
                 course = canonicalDAO.getCourseByCourseId(stCC.getActivityCode());
-                this.courseMapTempCache.put(stCC.getActivityCode(), course);
+                //this.courseMapTempCache.put(stCC.getActivityCode(), course);
             } catch(org.springframework.dao.EmptyResultDataAccessException x) {
                 courseMapTempCache.put(stCC.getActivityCode(), null);
                 if(cc_append_course_issues_to_file ) {

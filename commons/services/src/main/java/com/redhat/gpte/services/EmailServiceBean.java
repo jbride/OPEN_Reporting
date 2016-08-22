@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -197,9 +198,13 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
 
     public void setHeaderToWithProperEmails(Exchange exchange) {
         Message in = exchange.getIn();
+        Set<String> uniqueEmails = new HashSet<String>();
 
-        // 1)  Alwayss send email to admin
-        StringBuilder sBuilder = new StringBuilder(adminEmail);
+        // 1)  Always send email to admin
+        String[] adminEmails = adminEmail.split(DELIMITER);
+        for(String aEmail : adminEmails) {
+            uniqueEmails.add(aEmail);
+        }
 
         // 2)  Send response back to originator, if exists
         Object inObj = in.getHeader(RETURN_PATH);
@@ -207,16 +212,14 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             if(inObj instanceof List){
                 List<String> inList = (List<String>)inObj;
                 for(String email : inList){
-                	if(email.contains(REDHAT)) {
-                        sBuilder.append(DELIMITER);
-                        sBuilder.append(email);
-                	}
+                    if(email.contains(REDHAT)) {
+                        uniqueEmails.add(email);
+                    }
                 }
                 
             }else {
             	if(((String)inObj).contains(REDHAT)) {
-                    sBuilder.append(DELIMITER);
-                    sBuilder.append((String)inObj);
+                    uniqueEmails.add((String)inObj);
             	}
             }
         }
@@ -224,10 +227,21 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         // 3)  Send response email to ROUTE_SPECIFIC_EMAILS, if set
         String routeSpecificEmails = (String)in.getHeader(ROUTE_SPECIFIC_EMAILS);
         if(StringUtils.isNotEmpty(routeSpecificEmails)) {
-            sBuilder.append(DELIMITER);
-            sBuilder.append(routeSpecificEmails);
+            String[] routeEmails = routeSpecificEmails.split(DELIMITER);
+            for(String email : routeEmails) {
+                uniqueEmails.add(routeSpecificEmails);
+            }
         }
-
+        Iterator uIterator = uniqueEmails.iterator();
+        int x = 0;
+        StringBuilder sBuilder  = new StringBuilder();
+        while(uIterator.hasNext()) {
+            if(x != 0) {
+                sBuilder.append(DELIMITER);
+                x++;
+            }
+            sBuilder.append(uIterator.next());
+        }
         in.setHeader("to", sBuilder.toString());
     }
 
