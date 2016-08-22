@@ -46,6 +46,14 @@
         <to uri="vm:send-email"/>
     </onException>
 
+    <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/student_registration/ipa_update/batch -->
+    <restConfiguration component="servlet" bindingMode="json" />
+    <rest path="/student_registration/ipa_update/">
+        <put uri="batch" produces="application/json" >
+            <to uri="vm:sr_post-new-students-to-ipa-uri?waitForTaskToComplete=Never"/>
+        </put>
+    </rest>
+
     <route id="receive-gpte-operation-files-via-email">
         <from uri="{{gpte_receive_ops_files_uri}}"/>
         <log message="Received file from: ${header.Return-Path}, subject ${header.subject}" id="log_receive_file"/>
@@ -98,7 +106,7 @@
 
     <route id="send-email">
         <from uri="vm:send-email"/>
-        <to uri="bean:emailServiceBean?method=setHeaderToWithSendersEmail"/>
+        <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
         <setHeader headerName="From">
             <constant>GPTE Operations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>

@@ -95,7 +95,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     }
     
     
-    public void createLdapTemplateFile(Exchange exchange) throws Exception {
+    public void createLdapHttpUploadFile(Exchange exchange) throws Exception {
         List<DenormalizedStudent> students = (List<DenormalizedStudent>) exchange.getIn().getBody();
         
         // leave these values blank: subregion, dokeos and sso
@@ -202,7 +202,8 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             int start = responseBody.indexOf(PLEASE_WAIT);
             responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
             if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
-                logger.error(email+" : uploadToLdapServer() Result body: "+ responseBody);
+                StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body: "+ responseBody);
+                logger.error(eBuilder.toString());
                 exceptionSet.add(email);
             } else {
                 logLdapServerResponse(responseBody);

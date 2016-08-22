@@ -64,8 +64,6 @@
         <to uri="{{sr_exception_output_uri}}"/>
     </onException>
 
-
-
 <!-- *************************          Retrieve Student  LDAP Attributes       ******************************  -->
     <route id="get-student-company-info">
         <description>
@@ -155,7 +153,7 @@
                 So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
         </description>
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com</constant></setHeader>
+        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com,prutledg@redhat.com</constant></setHeader>
         <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
             <unmarshal ref="studentRegBindy"/>
             <doTry>
@@ -174,6 +172,7 @@
                 <simple>${body}</simple>
                 <to uri="direct:persist-student" />
             </split>
+            <to uri="vm:sr_post-new-students-to-ipa-uri" />
             <to uri="seda:send-email" />
     </route>
 
@@ -184,7 +183,7 @@
             3. Write the upload file to disk (for possible debug purposes) and POST to GPTE IPA HTTP service
             4. Parse the response body pertaining to each student and, if no errors, update database for that student indicating that GPTE IPA now has record of that student information
         </description>
-        <from uri="{{sr_post-new-students-to-ipa-uri}}"/>
+        <from uri="vm:sr_post-new-students-to-ipa-uri"/>
         <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_completed"/>
         <to uri="bean:studentRegBean?method=queryForStudentsToPushToIPA" />
         <choice>
@@ -211,6 +210,7 @@
         </choice>
         <log message="*!*!*!*!   Post New Students to IPA ...... Completed" id="log_post_new_students_done"/>
     </route>
+
 
 <!--        ***************************************************************************************************         -->
 
