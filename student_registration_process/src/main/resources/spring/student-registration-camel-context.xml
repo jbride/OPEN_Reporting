@@ -104,7 +104,10 @@
 
                         <!-- Allow only error free Skills Exchange records to be updated -->
                         <method ref="ldapServiceBean" method="hasNoExceptionProperty"></method>
-                        <to uri="direct:persist-student" />
+                        <filter>
+                            <constant>{{gpte_enable_all_emails}}</constant>
+                            <to uri="direct:persist-student" />
+                        </filter>
 
                     </filter>
                 </filter>
@@ -130,7 +133,6 @@
 
             <!-- No errors encountered;  send email of successful processing -->
             <setBody><constant>Skills Exchange Integration App:  All Red Hat students updated with LDAP metadata</constant></setBody>
-            <to uri="seda:send-email"/>
         </aggregate>
     </route>
 
@@ -145,7 +147,7 @@
     <route id="receive-sumtotal-student-registrations">
         <description>
             1) Executes validation logic on inbound Student Registration data file generated from SumTotal
-            2) Kicks back data that does not pass validation logic and send notification email of problem(s)
+            2) Kicks back data that does not pass validation logic and sends notification email of problem(s) to a list or recipients customized for this business service
             3) Persists Student objects
 
             Note regarding sumtotal data file:
@@ -177,6 +179,10 @@
 
     <route id="post-new-students-to-ipa">
         <description>
+            1. Periodically query database for Students whose information needs to be pushed to GPTE IPA
+            2. Create an upload file of this Student information
+            3. Write the upload file to disk (for possible debug purposes) and POST to GPTE IPA HTTP service
+            4. Parse the response body pertaining to each student and, if no errors, update database for that student indicating that GPTE IPA now has record of that student information
         </description>
         <from uri="{{sr_post-new-students-to-ipa-uri}}"/>
         <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_completed"/>
@@ -187,7 +193,7 @@
             <setHeader headerName="unprocessedStudentList" id="unprocessedStudentList-set-header" >
                 <simple>${body}</simple>
             </setHeader>
-            <to uri="bean:ipaServiceBean?method=createLdapTemplateFile" />
+            <to uri="bean:ipaServiceBean?method=createLdapHttpUploadFile" />
             <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd_HHmm}.csv" />
             <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.txt" id="log_write_file"/>
             <choice>

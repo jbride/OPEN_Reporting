@@ -120,7 +120,7 @@ public class PostToIPATest extends CamelSpringTestSupport {
         }
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testPostToIPAViaCamel() {
         routeURI = System.getProperty(INPUT_URI);
