@@ -239,14 +239,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 /* **************       Student Courses        ********************** */
     
     public void validateSumtotalCourseCompletions(Exchange exchange) throws IOException {
-    	Object body = exchange.getIn().getBody();
-    	Collection<SumtotalCourseCompletion> sCourseCompletions = null;
-    	if(body instanceof SumtotalCourseCompletion) {
-    		sCourseCompletions = new ArrayList<SumtotalCourseCompletion>();
-    		sCourseCompletions.add((SumtotalCourseCompletion)body);
-    	} else {
+        Object body = exchange.getIn().getBody();
+        Collection<SumtotalCourseCompletion> sCourseCompletions = null;
+        if(body instanceof SumtotalCourseCompletion) {
+            sCourseCompletions = new ArrayList<SumtotalCourseCompletion>();
+            sCourseCompletions.add((SumtotalCourseCompletion)body);
+        } else {
             sCourseCompletions = (Collection<SumtotalCourseCompletion>)exchange.getIn().getBody();
-    	}
+        }
         StringBuilder eBuilder = new StringBuilder();
         int i = 2;
         Collection<SumtotalCourseCompletion> prunedCourseCompletions = new ArrayList<SumtotalCourseCompletion>();

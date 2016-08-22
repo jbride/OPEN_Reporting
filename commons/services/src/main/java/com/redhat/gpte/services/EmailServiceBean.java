@@ -201,7 +201,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         Set<String> uniqueEmails = new HashSet<String>();
 
         // 1)  Always send email to admin
-        String[] adminEmails = adminEmail.split(DELIMITER);
+        String[] adminEmails = StringUtils.split(adminEmail, DELIMITER);
         for(String aEmail : adminEmails) {
             uniqueEmails.add(aEmail);
         }
@@ -218,16 +218,16 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
                 }
                 
             }else {
-            	if(((String)inObj).contains(REDHAT)) {
+                if(((String)inObj).contains(REDHAT)) {
                     uniqueEmails.add((String)inObj);
-            	}
+                }
             }
         }
 
         // 3)  Send response email to ROUTE_SPECIFIC_EMAILS, if set
         String routeSpecificEmails = (String)in.getHeader(ROUTE_SPECIFIC_EMAILS);
         if(StringUtils.isNotEmpty(routeSpecificEmails)) {
-            String[] routeEmails = routeSpecificEmails.split(DELIMITER);
+            String[] routeEmails = StringUtils.split(routeSpecificEmails, DELIMITER);
             for(String email : routeEmails) {
                 uniqueEmails.add(routeSpecificEmails);
             }
@@ -238,9 +238,9 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         while(uIterator.hasNext()) {
             if(x != 0) {
                 sBuilder.append(DELIMITER);
-                x++;
             }
             sBuilder.append(uIterator.next());
+            x++;
         }
         in.setHeader("to", sBuilder.toString());
     }
