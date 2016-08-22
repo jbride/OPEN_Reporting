@@ -78,7 +78,7 @@ public class Student implements Serializable {
         sa,cons,other,sa_fed
     }
     public enum Geos {
-        na,latam,emea,apac
+        na,latam,emea,apac,global,fedsled
     }
 
     public Student() {}
