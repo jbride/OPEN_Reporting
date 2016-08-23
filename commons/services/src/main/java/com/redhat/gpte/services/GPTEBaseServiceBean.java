@@ -29,7 +29,7 @@ public class GPTEBaseServiceBean {
     public static final String ACCENTURE="accenture";
     public static final String REDHAT_HYPHENED="red-hat";
     public static final String REDHAT="redhat";
-    public static final String UPLOAD_EXCEPTION_SET = "UPLOAD_EXCEPTION_SET";
+    public static final String UPLOAD_EXCEPTION_MAP = "UPLOAD_EXCEPTION_MAP";
     
     private Logger logger = Logger.getLogger(getClass());
 

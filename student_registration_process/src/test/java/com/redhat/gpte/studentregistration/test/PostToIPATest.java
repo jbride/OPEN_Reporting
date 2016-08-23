@@ -140,7 +140,8 @@ public class PostToIPATest extends CamelSpringTestSupport {
         if(!uploadFile.exists())
             throw new RuntimeException("testLDAPResponseProcessing() response file not found: "+ uploadFile.getAbsolutePath());
         
-        IPAHTTPServiceBean.logLdapServerResponse(FileUtils.readFileToString(uploadFile));
+        String response = IPAHTTPServiceBean.getLdapServerResponse(FileUtils.readFileToString(uploadFile));
+        System.out.println(response);
 
     }
     

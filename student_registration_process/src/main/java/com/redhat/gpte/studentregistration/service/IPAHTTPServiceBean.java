@@ -7,9 +7,9 @@ import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.net.ssl.SSLContext;
@@ -40,6 +40,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     public static final String LDAP_SEND_MAIL = "ipa_ldap.sendMail";
     private static final String IPA_UPLOAD_ABSOLUTE_PATH = null;
     private static final String SPACE=" ";
+    private static final String TAB="\t";
     private static final String DELIMITER=";";
     private static final String PIPE=" | ";
     private static final String NEW_LINE="\n";
@@ -54,6 +55,8 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     private static final String LOOKING="Looking";
     private static final String USER="User ";
     private static final String ERROR="ERROR:";
+    private static final String CREATING="Creating:";
+    private static final String FAILED="Failed:";
     private static final String NEW_STUDENT="newstudent_";
     private static final String CSV=".csv";
     SimpleDateFormat dfObj = new SimpleDateFormat("yyyyMMddHHmmss");
@@ -157,7 +160,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     public void uploadToLdapServer(Exchange exchange) throws Exception {
         
         String bodyString = (String)exchange.getIn().getBody();
-        Set<String> exceptionSet = new HashSet<String>();
+        Map<String,String> exceptionMap = new HashMap<String,String>();
         
         /*
          *  IPA has a bug where upload of each new student takes about 2-3 minutes.
@@ -201,40 +204,43 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             }
             int start = responseBody.indexOf(PLEASE_WAIT);
             responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
+            String parsedResponse = getLdapServerResponse(responseBody);
             if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
-                StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body: "+ responseBody);
+                StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
                 logger.error(eBuilder.toString());
-                exceptionSet.add(email);
-            } else {
-                logLdapServerResponse(responseBody);
+                exceptionMap.put(email, TAB+studentLine+NEW_LINE+parsedResponse);
+            }else {
+                logger.info(parsedResponse);
+                uploadFile.delete();
             }
-            uploadFile.delete();
-
         }
-        exchange.getIn().setHeader(UPLOAD_EXCEPTION_SET, exceptionSet);
+        exchange.getIn().setHeader(UPLOAD_EXCEPTION_MAP, exceptionMap);
     }
     
-    public static void logLdapServerResponse(String rBody) {
-        //logger.info(rBody);
-        StringBuilder sBuilder = new StringBuilder("logLdapServerResponse() \n");
+    public static String getLdapServerResponse(String rBody) {
+        StringBuilder sBuilder = new StringBuilder();
         String[] logLines = rBody.split("\\r?\\n");
         for(String lLine : logLines){
             if(lLine.contains(EXAMINING))
-                sBuilder.append(lLine.substring(lLine.indexOf(EXAMINING))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(EXAMINING))+NEW_LINE);
             if(lLine.contains(WARNING))
-                sBuilder.append(lLine.substring(lLine.indexOf(WARNING))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(WARNING))+NEW_LINE);
             if(lLine.contains(ADDING))
-                sBuilder.append(lLine.substring(lLine.indexOf(ADDING))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(ADDING))+NEW_LINE);
             if(lLine.contains(ALL_GOOD))
-                sBuilder.append(lLine.substring(lLine.indexOf(ALL_GOOD))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(ALL_GOOD))+NEW_LINE);
             if(lLine.contains(LOOKING))
-                sBuilder.append(lLine.substring(lLine.indexOf(LOOKING))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(LOOKING))+NEW_LINE);
             if(lLine.contains(USER))
-                sBuilder.append(lLine.substring(lLine.indexOf(USER))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(USER))+NEW_LINE);
             if(lLine.contains(ERROR))
-                sBuilder.append(lLine.substring(lLine.indexOf(ERROR))+NEW_LINE);
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(ERROR))+NEW_LINE);
+            if(lLine.contains(CREATING))
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(CREATING))+NEW_LINE);
+            if(lLine.contains(FAILED))
+                sBuilder.append(TAB+lLine.substring(lLine.indexOf(FAILED))+NEW_LINE);
         }
         sBuilder.append(NEW_LINE);
-        logger.info(sBuilder.toString());
+        return sBuilder.toString();
     }
 }

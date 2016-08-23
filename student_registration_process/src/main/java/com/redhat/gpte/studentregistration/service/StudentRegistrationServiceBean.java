@@ -68,12 +68,13 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
 
     public void updateIPAFlagOnStudents(Exchange exchange) {
         List<DenormalizedStudent> students = (List<DenormalizedStudent>)exchange.getIn().getBody();
-        Set<String> uploadExceptionSet = (Set<String>)exchange.getIn().getHeader(UPLOAD_EXCEPTION_SET);
+        Map<String, String> uploadExceptionMap = (Map<String,String>)exchange.getIn().getHeader(UPLOAD_EXCEPTION_MAP);
+        exchange.getIn().removeHeader(UPLOAD_EXCEPTION_MAP);
         
         int count = 0;
         for(DenormalizedStudent sObj : students) {
             String email = sObj.getStudentObj().getEmail();
-            if(uploadExceptionSet.contains(email)){
+            if(uploadExceptionMap.containsKey(email)){
                 logger.error(email+" : will not update ipaStatus because of upload issues");
             }else {
                 int sUpdate = this.canonicalDAO.updateStudentStatus(sObj.getStudentObj().getEmail(), 1, Student.IPA_STATUS);
@@ -82,13 +83,15 @@ public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
         }
         logger.info("updateIPAFlagOnStudents() # of students to update = "+students.size()+" : total updated = "+count);
         
-        if(uploadExceptionSet.size() > 0){
-            StringBuilder sBuilder = new StringBuilder("updateIPAFlagOnStudents() following students not updated to due upload issues with LDAP: \n");
-            Iterator emailIt = uploadExceptionSet.iterator();
+        if(uploadExceptionMap.size() > 0){
+            StringBuilder sBuilder = new StringBuilder("updateIPAFlagOnStudents() following students not updated due to upload issues with LDAP: \n\n");
+            Iterator emailIt = uploadExceptionMap.keySet().iterator();
             while(emailIt.hasNext()){
                 String email = (String)emailIt.next();
                 sBuilder.append(email);
                 sBuilder.append("\n");
+                sBuilder.append(uploadExceptionMap.get(email));
+                sBuilder.append("\n\n");
             }
             throw new RuntimeException(sBuilder.toString());
         }
