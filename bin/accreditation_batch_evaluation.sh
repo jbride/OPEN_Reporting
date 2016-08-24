@@ -16,7 +16,7 @@ sleepAmount=1
 incrementAmount=1000
 
 low_student_id=10000
-max_student_id=35000
+max_student_id=100000
 
 PROPS_FILE_LOCATION="properties/$ENVIRONMENT.properties"
 OUTPUT_LOG_FILE=/tmp/accreditation_batch_evaluation.log
