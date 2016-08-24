@@ -28,7 +28,7 @@ function help() {
     echo -en "\n\t-env=[dev, test, prod]        REQUIRED: specify environment specific java system properties (as per properties directory at the root of this project)"
     echo -en "\n\t--help                        this help manual"
     echo -en "\n\nEXAMPLES:";
-    echo -en "\n\t./bin/accreditation_process_startup.sh -env=dev -f          :   start accred process in the foreground using dev environment properties\n\n"
+    echo -en "\n\t./bin/accreditation_batch_evaluation.sh -env=prod          :   initiate batch accreditations evaluation for all students in dev environment \n\n"
 }
 
 

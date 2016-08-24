@@ -142,7 +142,14 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
     
     public void addStudentAccreditationToDB(@Body Accreditation apWrapper) {
-        canonicalDAO.addStudentAccreditation(apWrapper.getStudentAccred());
+        StudentAccreditation sAccredObj = apWrapper.getStudentAccred();
+        try { 
+            canonicalDAO.addStudentAccreditation(sAccredObj);
+        }catch(Exception x) {
+            String eMessage = apWrapper.getStudent().getEmail()+" : "+ sAccredObj.getRuleFired()+" : addStudentAccreditationToDB() exception thrown: \n"+ x.getMessage();
+            x.printStackTrace();
+            throw new RuntimeException(eMessage);
+        }
     }
     
     public boolean isRedHatStudentFromStudentAccreditation(@Body Accreditation saObj) {
