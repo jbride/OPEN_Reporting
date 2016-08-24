@@ -12,7 +12,7 @@ do
     esac
 done
 
-sleepAmount=1
+sleepAmount=0
 incrementAmount=1000
 
 low_student_id=10000
@@ -56,7 +56,7 @@ function determineBatchAccreditations() {
   for (( ; ;  ))
   do
 
-    if [[ $low_student_id < $max_student_id ]]; then
+    if [ $low_student_id -lt $max_student_id ]; then
 
         high_student_id=`expr $low_student_id + $incrementAmount`
 
@@ -71,6 +71,7 @@ function determineBatchAccreditations() {
         sleep $sleepAmount
         low_student_id=`expr $low_student_id + $incrementAmount`
     else
+        echo -en "\ndetermining batch acreditations: DONE.  $low_student_id $high_student_id\n";
         exit 0;
     fi
 
