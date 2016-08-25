@@ -146,7 +146,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         try { 
             canonicalDAO.addStudentAccreditation(sAccredObj);
         }catch(Exception x) {
-            String eMessage = apWrapper.getStudent().getEmail()+" : "+ sAccredObj.getRuleFired()+" : addStudentAccreditationToDB() exception thrown: \n"+ x.getMessage();
+            String eMessage = apWrapper.getStudent().getEmail()+" : "+ sAccredObj.getRuleFired()+"\naddStudentAccreditationToDB() exception thrown: \n\n"+ x.getMessage();
             x.printStackTrace();
             throw new RuntimeException(eMessage);
         }
