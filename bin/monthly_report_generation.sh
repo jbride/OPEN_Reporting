@@ -65,6 +65,16 @@ function exportQvExport() {
 }
 
 
+sendEmail() {
+
+    # send email
+    EMESSAGE="Please find the latest QvExport file attached."
+    echo -en "email message body =\n $EMESSAGE"
+  
+    echo -en $EMESSAGE | mail -s "QV Export File" smangan@redhat.com
+
+}
+
 if [ ! -z "$HELP" ]; then
     help
 else
@@ -75,4 +85,5 @@ else
     echo "Exporting QvExport to csv"
     exportQvExport
     sleep $sleepAmount
+    sendEmail
 fi
