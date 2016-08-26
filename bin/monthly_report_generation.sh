@@ -53,8 +53,8 @@ function callQvExport() {
 
 
 function exportQvExport() {
-#rm /tmp/qvexport.csv
-mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'select * from lms_transactional.QvExport INTO OUTFILE '/tmp/qvexport.csv' FIELDS ENCLOSED BY '' TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n';'
+    #rm /tmp/qvexport.csv
+    mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'call export_QvExport;'
 }
 
 
