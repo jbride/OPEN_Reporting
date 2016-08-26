@@ -21,7 +21,7 @@ function help() {
     echo -en "\n\t-env=[dev, test, prod]        REQUIRED: specify environment specific java system properties (as per properties directory at the root of this project)"
     echo -en "\n\t--help                        This help manual"
     echo -en "\n\nEXAMPLES:";
-    echo -en "\n\t./bin/monthly_report_generation.sh -env=prod          :   initiate QvEx[prt for all students in prod environment \n\n"
+    echo -en "\n\t./bin/monthly_report_generation.sh -env=prod          :   initiate QvExport for all students in prod environment \n\n"
 }
 
 function readPropertiesFile() {
@@ -41,7 +41,9 @@ function readPropertiesFile() {
     done < "$PROPS_FILE_LOCATION"
 
   else
-    echo "$PROPS_FILE_LOCATION not found."
+    echo "$PROPS_FILE_LOCATION not found. Did you specify the following comand line parameter:  -env   ?"
+    help
+    exit 1;
   fi
 
 }
@@ -49,11 +51,16 @@ function readPropertiesFile() {
 function callQvExport() {
     echo -en "\n\ncallQvExport() db userId = $lms_transactional_username\n";
     mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'call refresh_QvExport;'
+    if [ $? != 0 ];
+    then
+        echo "Failed executing stored proc." >&2;
+        exit 1;
+    fi
 }
 
 
 function exportQvExport() {
-    rm /opt/shared/qvexport.csv
+    rm -f /opt/shared/qvexport.csv
     mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'call export_QvExport;'
 }
 
