@@ -10,7 +10,7 @@ do
     esac
 done
 
-sleepAmount=1
+sleepAmount=60
 
 PROPS_FILE_LOCATION="properties/$ENVIRONMENT.properties"
 OUTPUT_LOG_FILE=/tmp/monthly_report_generation.log
@@ -55,6 +55,10 @@ if [ ! -z "$HELP" ]; then
     help
 else
     readPropertiesFile
-    callQvExport
     echo "Procedure called"
+    callQvExport
+    echo "start sleep"
+    sleep $sleepAmount
+    echo "end sleep"
+
 fi
