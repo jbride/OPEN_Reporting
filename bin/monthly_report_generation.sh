@@ -53,7 +53,7 @@ function callQvExport() {
 
 
 function exportQvExport() {
-    #rm /tmp/qvexport.csv
+    rm /opt/shared/qvexport.csv
     mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'call export_QvExport;'
 }
 
