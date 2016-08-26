@@ -2,6 +2,14 @@
 # Purpose:  Create monthly QvExport file for reporting team.
 #
 
+for var in $@
+do
+    case "$var" in
+        --help) HELP=true ;;
+        -env=*) ENVIRONMENT=`echo $var | cut -f2 -d\=` ;;
+    esac
+done
+
 sleepAmount=1
 
 PROPS_FILE_LOCATION="properties/$ENVIRONMENT.properties"
