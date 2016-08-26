@@ -53,7 +53,7 @@ function callQvExport() {
 
 
 function exportQvExport() {
-select * from QvExport INTO OUTFILE '/tmp/qvexport.csv' FIELDS ENCLOSED BY '' TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n';
+select * from lms_transactional.QvExport INTO OUTFILE '/tmp/qvexport.csv' FIELDS ENCLOSED BY '' TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n';
 }
 
 
