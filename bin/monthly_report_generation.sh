@@ -10,7 +10,7 @@ do
     esac
 done
 
-sleepAmount=60
+sleepAmount=30
 
 PROPS_FILE_LOCATION="properties/$ENVIRONMENT.properties"
 OUTPUT_LOG_FILE=/tmp/monthly_report_generation.log
@@ -51,14 +51,20 @@ function callQvExport() {
     mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'call refresh_QvExport;'
 }
 
+
+function exportQvExport() {
+select * from QvExport INTO OUTFILE '/tmp/qvexport.csv' FIELDS ENCLOSED BY '' TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n';
+}
+
+
 if [ ! -z "$HELP" ]; then
     help
 else
     readPropertiesFile
-    echo "Procedure called"
+    echo "Calling procedure QvExport"
     callQvExport
-    echo "start sleep"
     sleep $sleepAmount
-    echo "end sleep"
-
+    echo "Exporting QvExport to csv"
+    exportQvExport
+    sleep $sleepAmount
 fi
