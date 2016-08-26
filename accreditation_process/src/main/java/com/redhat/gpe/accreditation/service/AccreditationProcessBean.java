@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
@@ -65,6 +66,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String CLOSED_PAREN = "}";
     private static final Object OPEN_BRACKET = "[";
     private static final Object CLOSED_BRACKET = "]";
+    
+    private static AtomicBoolean accredProcessLock = new AtomicBoolean(true);
 
     private Logger logger = Logger.getLogger(getClass());
     
@@ -117,7 +120,17 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         sBuilder.append("\n    grantType = "+grantType);
         logger.info(sBuilder.toString()); 
     }
+
+    public boolean isAccredLogicUnLocked() {
+        return accredProcessLock.get();
+    }
     
+    public void acquireAccredLogicLock() {
+    	accredProcessLock.set(false);
+    }
+    public void releaseAccredLogicLock() {
+    	accredProcessLock.set(true);
+    }
 
 /*  **********************    Student Accreditation     *************************** */
     
