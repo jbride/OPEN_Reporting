@@ -66,8 +66,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String CLOSED_PAREN = "}";
     private static final Object OPEN_BRACKET = "[";
     private static final Object CLOSED_BRACKET = "]";
+    private static final String GAINED_ACCRED_LOCK="gainedAccredLock";
     
-    private static AtomicBoolean accredProcessLock = new AtomicBoolean(true);
+    private static Object accredProcessLock = new Object();
+    private static boolean isLocked = false;
 
     private Logger logger = Logger.getLogger(getClass());
     
@@ -121,15 +123,27 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         logger.info(sBuilder.toString()); 
     }
 
-    public boolean isAccredLogicUnLocked() {
-        return accredProcessLock.get();
+    public boolean isAccredLogicLocked() {
+        return isLocked;
     }
     
-    public void acquireAccredLogicLock() {
-    	accredProcessLock.set(false);
+    public void acquireAccredLogicLock(Exchange exchange) {
+        exchange.getIn().setHeader(GAINED_ACCRED_LOCK, false);
+        if(isLocked)
+            return;
+        else {
+            synchronized(accredProcessLock) {
+                if(isLocked)
+                    return;
+
+    	        isLocked = true;
+                exchange.getIn().setHeader(GAINED_ACCRED_LOCK, true);
+            }
+        }
     }
+
     public void releaseAccredLogicLock() {
-    	accredProcessLock.set(true);
+    	isLocked = false;
     }
 
 /*  **********************    Student Accreditation     *************************** */

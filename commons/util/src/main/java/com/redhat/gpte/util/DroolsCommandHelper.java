@@ -91,18 +91,18 @@ public class DroolsCommandHelper implements ApplicationContextAware {
         StatefulKnowledgeSession kieSession = (StatefulKnowledgeSession) getApplicationContext().getBean(KSESSION_NAME);
         KieBase kBase = kieSession.getKieBase();
         Collection<KiePackage> kPackages = kBase.getKiePackages();
-        StringBuilder sBuilder = new StringBuilder(" : # of kPackages = "+ kPackages.size());
+        StringBuilder sBuilder = new StringBuilder(" # of kPackages = "+ kPackages.size());
         int numRules = 0;
         for(KiePackage kPackage : kPackages) {
             Collection<Rule> rules = kPackage.getRules();
             if(rules.size() == 0)
                 sBuilder.append("\n\tNo rules for package = "+kPackage.getName());
             for(Rule rObj : rules) {
-                sBuilder.append("\n\tpackage = "+kPackage.getName()+" : rule = "+rObj.getName());
                 numRules++;
+                sBuilder.append("\n\t"+numRules+" : package = "+kPackage.getName()+" : rule = "+rObj.getName());
             }
         }
-        logger.info("dumpKieBase() # of rules = "+numRules+sBuilder.toString());
+        logger.info("dumpKieBase() \n"+sBuilder.toString()+"\n\n # of rules = "+numRules+"\n\n");
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
