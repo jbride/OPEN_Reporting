@@ -10,7 +10,7 @@ do
     esac
 done
 
-sleepAmount=30
+sleepAmount=15
 
 PROPS_FILE_LOCATION="properties/$ENVIRONMENT.properties"
 OUTPUT_LOG_FILE=/tmp/monthly_report_generation.log
@@ -53,7 +53,8 @@ function callQvExport() {
 
 
 function exportQvExport() {
-mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'select * from lms_transactional.QvExport INTO OUTFILE /tmp/qvexport.csv FIELDS ENCLOSED BY '' TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n';'
+del "/tmp/qvexport.csv"
+#mysql -u $lms_transactional_username -p$lms_transactional_password -h $HOSTNAME lms_transactional -e 'select * from lms_transactional.QvExport INTO OUTFILE '/tmp/qvexport.csv' FIELDS ENCLOSED BY '' TERMINATED BY '\t' ESCAPED BY '' LINES TERMINATED BY '\r\n';'
 }
 
 
