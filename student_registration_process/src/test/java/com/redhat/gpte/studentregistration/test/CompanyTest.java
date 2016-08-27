@@ -22,6 +22,12 @@ public class CompanyTest extends CamelSpringTestSupport {
     private static final String PERSIST_COMPANY_URI = "direct:persist-company";
     private static final int RED_HAT_COMPANY_ID = 16518;
     private Endpoint endpoint = null;
+    private static String[] sfdcCompaniesToPrune = new String[] {
+                                                    "Interware de Mexico, S.A. de C.V.",
+                                                    "PCPC Direct, Ltd.",
+                                                    "inCommon, Inc - Public Sector",
+                                                    "Root Technologies, S.C."
+                                                };
 
     public CompanyTest() throws IOException {
         PropertiesSupport.setupProps();

@@ -40,6 +40,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     public static final String LDAP_SEND_MAIL = "ipa_ldap.sendMail";
     private static final String IPA_UPLOAD_ABSOLUTE_PATH = null;
     private static final String SPACE=" ";
+    private static final String COMMA=",";
     private static final String TAB="\t";
     private static final String DELIMITER=";";
     private static final String PIPE=" | ";
@@ -115,6 +116,11 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             Student student = dStudent.getStudentObj();
             Company company = dStudent.getCompanyObj();
             String companyName = company.getCompanyname();
+            if(companyName.indexOf(COMMA) > 0) {
+                String prunedCName = companyName.substring(0, companyName.indexOf(COMMA));
+                logger.info("createLdapHttpUploadFile() pruning company name for acceptance by GPTE IPA: "+companyName+"   ->    "+prunedCName);
+                companyName = prunedCName;
+            }
             String firstName = student.getFirstname();
             String lastName = student.getLastname();
             String email = student.getEmail();
