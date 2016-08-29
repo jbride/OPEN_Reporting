@@ -79,11 +79,11 @@ if [ ! -z "$HELP" ]; then
     help
 else
     readPropertiesFile
-    echo "Calling procedure QvExport"
-    callQvExport
-    sleep $sleepAmount
-    echo "Exporting QvExport to csv"
-    exportQvExport
-    sleep $sleepAmount
+ #   echo "Calling procedure QvExport"
+ #   callQvExport
+ #   sleep $sleepAmount
+ #   echo "Exporting QvExport to csv"
+ #   exportQvExport
+ #   sleep $sleepAmount
     sendEmail
 fi
