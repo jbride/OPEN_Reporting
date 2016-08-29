@@ -78,12 +78,13 @@ sendEmail() {
 if [ ! -z "$HELP" ]; then
     help
 else
+#test
     readPropertiesFile
- #   echo "Calling procedure QvExport"
- #   callQvExport
- #   sleep $sleepAmount
- #   echo "Exporting QvExport to csv"
- #   exportQvExport
- #   sleep $sleepAmount
+    echo "Calling procedure QvExport"
+    callQvExport
+    sleep $sleepAmount
+    echo "Exporting QvExport to csv"
+    exportQvExport
+    sleep $sleepAmount
     sendEmail
 fi
