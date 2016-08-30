@@ -425,6 +425,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             StringBuilder sBuilder = new StringBuilder("\n");
             for(AttachmentValidationException x : exceptions) {
                 sBuilder.append(x.getLocalizedMessage()+"\n");
+                x.printStackTrace();
             }
             exchange.setException(new Exception(sBuilder.toString()));
         }
@@ -451,27 +452,36 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             sBindyList = new ArrayList<StudentRegistrationBindy>();
             sBindyList.add((StudentRegistrationBindy)body);
         }
-        
+       
         // 2) Iterate through list and filter out potential duplicates by email address
         for(StudentRegistrationBindy sBindy : sBindyList){
             if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
                 dupsCounter++;
             }else {
                 
-                // 3) Grab student and company data as parsed by bindy
-                Student student = sBindy.convertToCanonicalStudent();
-                Company company = sBindy.convertToCanonicalCompany();
                 try {
+                    // 3) Grab student and company data as parsed by bindy
+                    Student student = sBindy.convertToCanonicalStudent();
+                    Company company = sBindy.convertToCanonicalCompany();
                     
                     // 4) Determine companyId of affiliated company (based on company name provided in bindy)
                     this.getStudentCompanyId(student, false, company, true);
                     updateStudentsCounter++;
+
+                    if(updateStudentsCounter%100 == 0)
+                        logger.info("convertStudentRegBindyToCanonicalStudents() processing # "+updateStudentsCounter);
+
+                    noDupsStudentMap.put(student.getEmail(), student);
+                    Thread.sleep(100);
                 } catch (AttachmentValidationException e) {
                     exceptions.put(sBindy.getEmail(), e);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    exceptions.put(sBindy.getEmail(), new AttachmentValidationException(sBindy.getEmail()+" : "+e.getMessage()));
                 }
-                noDupsStudentMap.put(student.getEmail(), student);
             }
         }
+
         logger.info("convertToCanonicalStudents() total students = "+noDupsStudentMap.size()+" : updatedStudents = "+updateStudentsCounter+" : dups = "+dupsCounter+" : exceptions = "+exceptions.size());
         if(exceptions.size() > 0)
             exchange.getIn().setHeader(ATTACHMENT_VALIDATION_EXCEPTIONS, exceptions.values());
