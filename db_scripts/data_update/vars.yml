@@ -2,7 +2,7 @@
 
 # Operating System user vars
 # Used to ssh into various machines
-remote_user_prod: jbride-redhat.com
+remote_user_prod: smangan-redhat.com
 remote_user_dev: jboss
 
 
