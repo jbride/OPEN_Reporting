@@ -83,7 +83,7 @@ public class GPTEBaseServiceBean {
         StringBuilder sBuilder = new StringBuilder("updateCompany() just persisted updates to company ");
         sBuilder.append("\n\tcompanyName: "+companyObj.getCompanyname());
         sBuilder.append("\n\tupdateCount: "+updatedCount);
-        logger.info(sBuilder.toString());
+        logger.debug(sBuilder.toString());
         return updatedCount;
     }
     

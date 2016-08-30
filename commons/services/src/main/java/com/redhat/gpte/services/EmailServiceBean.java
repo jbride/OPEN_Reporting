@@ -184,7 +184,22 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         }else if(firstRow.contains(RULES_SPREADSHEET_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
         }else {
-            String theReturnEmail = (String) exchange.getIn().getHeader(RETURN_PATH);
+            String theReturnEmail = null;
+            Object inObj = exchange.getIn().getHeader(RETURN_PATH);
+            if(inObj != null) {
+                if(inObj instanceof List) {
+                    List<String> inList = (List<String>)inObj;
+                    int x=0;
+                    for(String email : inList){
+                        if(x > 0) {
+                            theReturnEmail = theReturnEmail + DELIMITER;
+                        }
+                        theReturnEmail = theReturnEmail+email;
+                    }
+                }else {
+                    theReturnEmail = (String)inObj;
+                }
+            }
             StringBuilder sBuilder  = new StringBuilder();
             sBuilder.append(ExceptionCodes.GPTE_E_1000);
             sBuilder.append("\n\tfirstLine of attachment = "+firstRow);
