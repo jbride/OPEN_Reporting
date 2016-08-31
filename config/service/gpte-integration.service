@@ -4,7 +4,6 @@ Documentation=https://docs.jboss.org/author/display/WFLY9/Documentation
 After=network.target
 
 [Service]
-EnvironmentFile=/etc/jbosseap/gpte-integration.conf
 ExecStart=/opt/jboss/eap/jboss-eap-6.4/bin/standalone.sh -c standalone.xml -P=file:///opt/OPEN_Reporting/properties/dev.properties
 StandardOutput=journal
 SyslogIdentifier=gpteintegration

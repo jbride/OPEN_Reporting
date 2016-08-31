@@ -91,21 +91,15 @@ yum install java-1.8.0-openjdk-devel.x86_64
 yum install mariadb-server
 -----
 
-=== OPEN_Admin project
+=== OPEN_Reporting project
 Execute everything in this section as the `jboss` operating system user.
 
 === Clone
 -----
-git clone https://github.com/redhat-gpe/OPEN_Admin.git
+git clone https://github.com/redhat-gpe/OPEN_Reporting.git
 -----
 
-NOTE: For the purposes of this project, the term `$PROJECT_HOME` refers to the following directory: `/path/to/cloned/OPEN_Admin/integration`
-
-==== Configure Maven settings
-
------
-cp $PROJECT_HOME/config/maven/settings.xml ~/.m2
------
+NOTE: For the purposes of this project, the term `$PROJECT_HOME` refers to the following directory: `/path/to/cloned/OPEN_Reporting/integration`
 
 === MySQL
 
