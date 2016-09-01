@@ -2,14 +2,21 @@
 :toc: manual
 :toc-placement: preamble
 :numbered:
-:rulesspreadsheet: link:https://docs.google.com/spreadsheets/d/1KNENn8-lKtK3T_KFckPoFJBf_qALcd6FdR4cfKYgNHU/edit#gid=256351[GPTE Accreditation Rules Spreadsheet]
+:rulesspreadsheet: link:https://docs.google.com/spreadsheets/d/1C4jbSADmHJvLL3PBBBSEB54L8G_I6NN5rblWIGymAXg/edit#gid=1640119171[GPTE Accreditation Rules Spreadsheet with validation]
+:designdoc: link:https://docs.google.com/document/d/1rFioqj5uhLtdoUEfHHBEwh4_-bW7vqEc5N0R24tN9FU/edit#[GPTE Reporting design document]
 
-= GPTE Integration Projects
+= GPTE Reporting
 
 Administration Guide
 
 
 == Overview
+
+=== Purpose and design
+High level purpose and system design of the `GPTE Reporting` project can be found in the  {designdoc} (best viewed in Google Chrome).
+
+=== Audience
+The intended audience of this document architects, developers and administrators of the GPTE Reporting solution.
 
 == Pre-Reqs
 
@@ -20,9 +27,13 @@ Administration Guide
 
 === Skills
 
-. RHCSA or equivalent experience
-. Java development experience
-. Experience with Git
+. RHCSA or equivalent experience.
+. Experience with Git.
+. Experience with Java development and its defacto build tool: Maven.
+. Experience with JBoss EAP administration.
+. Experience developing services using JBoss Fuse.
+. Experience with the Drools and Dashbuilder components of JBoss BPMS.
+. Experience with database development and administration using MariaDB.
 
 == Administration
 
@@ -47,16 +58,21 @@ yum install mariadb-server
 
 ==== Maven
 
-Maven is the build tool used by GPTE Reporting.
+Maven is the build tool used by GPTE Reporting solution.
 
 RHEL based package repositories tend to provide older (buggy) versions of Maven.
 
-Manually install the latest maven from:  `maven.apache.org`
+Manually install the latest maven from:  `maven.apache.org`.
+
+Ensure that the downloaded version of Maven is on the $PATH of both the `jboss` and `root` operating system users.
 
 === OPEN_Reporting project
 Execute everything in this section as the `jboss` operating system user.
 
 ==== Clone
+The source code of the `GPTE Reporting` solution is maintained in private github organization at: `github.com/redhat-gpe`.
+
+Execute the following:
 
 -----
 git clone https://github.com/redhat-gpe/OPEN_Reporting.git
@@ -76,14 +92,36 @@ mvn clean install -DskipTests
 
 === MySQL
 
+. Ensure the most recent version of the `mariadb-server` package is installed on your RHEL7 operating system.
+. Enable and start the `mariadb-server` as an operating system service.
+. Log into the `mysql` database of the MariaDB RDBMS and create the following databases:
++
+-----
+create database dashbuilder;
+create database lms_reporting;
+create database lms_transactional;
+-----
+
+. Create database users and affiliate to databases:
++
+-----
+-----
+
+. Seed the `lms_transactional` database with test data
++
 -----
 mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
 mysql -u lms_trans -pc-9XSHln8hJ_UH9YvNOgc9mH lms_transactional < db_scripts/lms_transactional_data.sql
-delete from lms_transactional.Students where StudentID > 10399
-mysqldump --no-create-db --no-create-info -u lms_trans -p'lms_trans' lms_transactional > db_scripts/lms_transactional_data.sql
 -----
 
-=== JBoss Fuse
+. Periodically, create a new test datafile from a current snapshot of your `lms_transactional` database:
++
+-----
+mysql -u root -pc-9XSHln8hJ_UH9YvNOgc9mH mysql -e "use lms_transactional; delete from lms_transactional.Students where StudentID > 10399"
+mysqldump --no-create-db --no-create-info -u lms_trans -p'c-9XSHln8hJ_UH9YvNOgc9mH' lms_transactional > db_scripts/lms_transactional_data.sql
+-----
+
+=== JBoss Fuse on EAP
 
 ==== installation and configuration
 
@@ -107,11 +145,17 @@ cd modules/system/layers/base/com/mysql/jdbc/main
 ln -sf  /usr/share/java/mysql-connector-java.jar modules/system/layers/base/com/mysql/jdbc/main/mysql-connector-java.jar
 ----
 
+. Modify JBoss start-up JAVA_OPTS :
++
+-----
+cp $PROJECT_HOME/config/bin/standalone.conf $JBOSS_HOME/bin
+-----
+
 . Execute JBoss CLI based changes
 .. Start JBoss EAP in `admin-mode`:
 +
 -----
-./bin/standalone.sh -c standalone-camel.xml --admin-only
+./bin/standalone.sh -c standalone.xml --admin-only
 -----
 .. In another terminal window (again as the `jboss` operating system user), change directories to `$PROJECT_HOME`.
 .. Execute :
@@ -119,13 +163,8 @@ ln -sf  /usr/share/java/mysql-connector-java.jar modules/system/layers/base/com/
 -----
 $JBOSS_HOME/bin/jboss-cli.sh -c --file=config/cli/eap-configs.cli
 -----
-. Modify JBoss start-up JAVA_OPTS :
-+
------
-cp $PROJECT_HOME/config/bin/standalone.conf $JBOSS_HOME/bin
------
 
-==== OS service
+==== Enable as an OS service
 Execute the following as the `root` operating system user:
 
 . Configure the service
@@ -146,16 +185,9 @@ sudo systemctl start gpte-integration.service
 +
 -----
 sudo journalctl -u gpte-integration -f
-sudo journalctl -u accredprocess -f
 -----
 
-===== Accredition Process Service
-
------
-sudo systemctl restart accred-process.service
------
-
-. Gain access to `JBoss Command Line Interface`:
+==== Gain access to `JBoss Command Line Interface`:
 +
 -----
 $JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
@@ -202,6 +234,13 @@ This service consumes data files from a variety of endpoints such as email and l
 . Route the datafile for further processing to one of the other GPTE Reporting services also residing in the same JBoss Fuse on EAP JVM.
 
 === Filesystem
+The GPTE Reporting `universal` process consumes student registration and course completion datafiles directly from the filesystem.
+
+Subsequently, student registration and/or course completion datafiles can be uploaded to the following directory on the filesystem where JBoss Fuse on EAP is running:
+
+-----
+/tmp/gpte/inbox-for-emails
+-----
 
 === Email
 Allow camel email component to connect to gmail .
