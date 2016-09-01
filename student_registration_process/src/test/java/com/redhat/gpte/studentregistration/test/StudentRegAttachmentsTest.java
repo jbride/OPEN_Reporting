@@ -77,16 +77,14 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         headers.put(RETURN_PATH, adminEmail);
         headers.put(SUBJECT, NEW_STUDENT_SUBJECT);
         in.setHeaders(headers);
-        Map<String, String> attachments = new HashMap<String, String>();
         FileInputStream fStream = fStream = new FileInputStream(inbox_file);
         String attachment = IOUtils.toString(fStream);
         fStream.close();
-        attachments.put(GOOD_STUDENT_REG_FILE, attachment);
-        in.setBody(attachments);
+        in.setBody(attachment);
         exchange = template.send(RECEIVE_VALIDATE_INPUT_URI, exchange);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void test01OneStudentRegistration() throws IOException {
         File inbox_file = new File(INBOX_PATH, MINI_STUDENT_REG_FILE);
@@ -99,12 +97,10 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         headers.put(RETURN_PATH, adminEmail);
         headers.put(SUBJECT, NEW_STUDENT_SUBJECT);
         in.setHeaders(headers);
-        Map<String, String> attachments = new HashMap<String, String>();
         FileInputStream fStream = fStream = new FileInputStream(inbox_file);
         String attachment = IOUtils.toString(fStream);
         fStream.close();
-        attachments.put(MINI_STUDENT_REG_FILE, attachment);
-        in.setBody(attachments);
+        in.setBody(attachment);
         exchange = template.send(RECEIVE_VALIDATE_INPUT_URI, exchange);
     }
 
