@@ -8,69 +8,23 @@
 
 Administration Guide
 
-== Invoke accreditation logic REST service
-
-. Invoke accreditation logic on an existing student whose course completions should lead to an accredition
-+
------
-curl -v -X PUT  -H "ACCEPT: application/json" \
-                -H "TEST_RULES_ONLY: true" \
-                -H "RESPOND_JSON: true" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/10387
------
-
-. Invoke accreditation logic on a non existant student
-+
------
-curl -v -X PUT  -H "ACCEPT: application/json" \
-                -H "TEST_RULES_ONLY: true" \
-                -H "RESPOND_JSON: true" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/103899
------
-
-. Invoke accreditation logic on all students whose studentid > 10000 and < 11000
-+
------
-curl -v -X PUT  -H "ACCEPT: application/json" \
-                -H "TEST_RULES_ONLY: true" \
-                -H "RESPOND_JSON: true" \
-                -H "LOW_STUDENT_ID: 10000" \
-                -H "HIGH_STUDENT_ID: 11000" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/batch
------
 
 == Overview
+
+== Pre-Reqs
+
+=== Technical
+
+. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization
+. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk
+
+=== Skills
+
+. RHCSA or equivalent experience
+. Java development experience
+. Experience with Git
+
 == Administration
-
-=== Execute Rules Spreadsheet Validation and Parsing to DRL
-
-. SSH into docker1 as the `jboss` operating system user:
-+
------
-ssh jboss@docker1.ose.opentlc.com
------
-. Change diretories to OPEN_Reporting
-+
------
-cd /opt/OPEN_Reporting
------
-. Modify email address that validation reports should be sent to:
-.. vi properties/test.properties
-.. Modify value of:  `admin_email`
-. Start `accreditation-process` in `docker1.ose.opentlc.com`:
-.. start JVM
-+
------
-./bin/accreditation_process_startup.sh -env=test -f
------
-. Download `DCI`, `MW` and `CI` tabs from {rulesspreadsheet}
-.. For all three spreadsheet tabs, navigate to `File -> Download As -> Tab Separated Value (.tsv, current sheet)
-.. Save all three spreadsheets to your local file system, ie:  $HOME/Downloads
-. Secure copy latest *.tsv files to `docker1.ose.opentlc.com`
-+
------
-scp $HOME/Downloads/*.tsv jboss@docker1.ose.opentlc.com:/opt/OPEN_Reporting/accreditation_process/src/test/resources/rules-spreadsheet/
------
 
 === Operating System
 . Ensure that a `jboss` operating system user (with groupId = 100) exists.
@@ -91,17 +45,43 @@ yum install java-1.8.0-openjdk-devel.x86_64
 yum install mariadb-server
 -----
 
+==== Maven
+
+Maven is the build tool used by GPTE Reporting.
+
+RHEL based package repositories tend to provide older (buggy) versions of Maven.
+
+Manually install the latest maven from:  `maven.apache.org`
+
 === OPEN_Reporting project
 Execute everything in this section as the `jboss` operating system user.
 
-=== Clone
+==== Clone
+
 -----
 git clone https://github.com/redhat-gpe/OPEN_Reporting.git
 -----
 
-NOTE: For the purposes of this project, the term `$PROJECT_HOME` refers to the following directory: `/path/to/cloned/OPEN_Reporting/integration`
+The above command will prompt you for your github userId and password.
+Ensure that you provide your github userId that has at least `viewer` credentials to the `github.com/redhat-gpe` organization.
+
+NOTE: For the purposes of this project, the term `$PROJECT_HOME` refers to the following directory: `/path/to/cloned/OPEN_Reporting/`
+
+==== Build
+
+-----
+cd $PROJECT_HOME
+mvn clean install -DskipTests
+-----
 
 === MySQL
+
+-----
+mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
+mysql -u lms_trans -pc-9XSHln8hJ_UH9YvNOgc9mH lms_transactional < db_scripts/lms_transactional_data.sql
+delete from lms_transactional.Students where StudentID > 10399
+mysqldump --no-create-db --no-create-info -u lms_trans -p'lms_trans' lms_transactional > db_scripts/lms_transactional_data.sql
+-----
 
 === JBoss Fuse
 
@@ -149,15 +129,7 @@ cp $PROJECT_HOME/config/bin/standalone.conf $JBOSS_HOME/bin
 Execute the following as the `root` operating system user:
 
 . Configure the service
-.. mkdir /etc/jbosseap
-.. cp $PROJECT_HOME/config/service/gpte-integration.conf /etc/jbosseap
 .. cp $PROJECT_HOME/config/service/gpte-integration.service /usr/lib/systemd/system
-.. Create a link of gpte-integration.service for systemd
-+
------
-ln -sf /usr/lib/systemd/system/gpte-integration.service /etc/systemd/system/multi-user.target.wants/gpte-integration.service
------
-+
 .. Then enable the service
 +
 -----
@@ -189,7 +161,20 @@ sudo systemctl restart accred-process.service
 $JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
 -----
 
-== Hawtio Admin Console
+=== activemq-artemis install
+
+-----
+# sudo yum install -y libaio-devel
+# sudo su - jboss
+$ cd /opt
+$ git clone https://github.com/apache/activemq-artemis.git
+$ cd activemq-artemis
+$ mvn -Prelease install -DskipTests
+$ cd artemis-distribution/target/apache-artemis-1.4.0-SNAPSHOT-bin/apache-artemis-1.4.0-SNAPSHOT
+
+-----
+
+=== Hawtio Admin Console
 The `Hawtio` admin console can be reached by navigating to the following URL using your browser:
 
 -----
@@ -202,27 +187,23 @@ Use a browser tool such as `Firebug` to monitor download progress of these clien
 
 Login using the following credentials: `admin / jb0ssredhat!`
 
-== course_completion_process
 
-. As `jboss` operating system user, change directories into `course_completion_process` project:
-+
------
-cd $PROJECT_HOME/integration/course_completion_process
------
-. Execute `course_completion_process` specific CLI
-+
------
-mvn jboss-as:execute-commands -P eapProfile
------
-. Build and deploy application to JBoss
-+
------
-mvn jboss-as:deploy -P eapProfile -DskipTests
------
+== GPTE Reporting Routing Process
 
-== skillsbase_integration
+GPTE Reporting includes a service called: `gpte_universal_process`.
+This service executes within JBoss Fuse on EAP and its purpose is the following:
 
-=== Gmail
+. Consume data feeds sent to GPTE Reporting from external systems and users.
++
+Examples include course completions from Dokeos and student registration data from Sumtotal.
++
+This service consumes data files from a variety of endpoints such as email and local filesystem.
+. Light validation of the data file (ie: proper sender email account and correct file suffix).
+. Route the datafile for further processing to one of the other GPTE Reporting services also residing in the same JBoss Fuse on EAP JVM.
+
+=== Filesystem
+
+=== Email
 Allow camel email component to connect to gmail .
 
 . Execute steps #2 and #3 for the following gmail accounts:
@@ -238,70 +219,101 @@ https://myaccount.google.com/security#connectedapps
 +
 image::skillsbase_integration/doc/images/gmail_settings.png[]
 
-=== MySQL Tables
+== Student Registration Process
+
+=== GPTE IPA integration
+
+== Course Completion Process
+
+== Accreditation Process
+
+The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel based, Java process.
+
+Its purpose is to :
+
+. Parse and validate GPTE accreditation rules (in tab-delimited spreadsheet format) into Drools Rule Language (DRL) format.
+. Determine accreditations based on student's course completions.
++
+In particular, the `accred-process` background job periodically determines new accreditations based on new course completions that have entered the system during that time period.
+
+
+=== Start Accreditation Process
 
 -----
-mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
-mysql -u lms_trans -plms_trans lms_transactional < db_scripts/lms_transactional_data.sql
-delete from lms_transactional.Students where StudentID > 10399
-mysqldump --no-create-db --no-create-info -u lms_trans -p'lms_trans' lms_transactional > db_scripts/lms_transactional_data.sql
+sudo cp $PROJECT_HOME/config/service/accred-process.service /usr/lib/systemd/system
+sudo systemctl enable accred-process.service
+sudo systemctl restart accred-process.service
+sudo systemctl status accred-process.service
 -----
 
-=== Configure, build and deploy
+=== Monitor Accreditation Process log
 
-. As `jboss` operating system user, change directories into `skillsbase_integration` project:
+-----
+sudo journalctl -u accred-process -f
+-----
+
+=== Execute Rules Spreadsheet Validation and Parsing to DRL
+
+. SSH into GPTE Reporting operating system as the `jboss` operating system user:
+. Change directories to OPEN_Reporting
+. Ensure that `accred-process` JVM is running.
+. Download `DCI`, `MW` and `CI` tabs from {rulesspreadsheet}
+.. For all three spreadsheet tabs, navigate to `File -> Download As -> Tab Separated Value (.tsv, current sheet)
+.. Save all three spreadsheets to your local file system, ie:  $HOME/Downloads
+. Secure copy latest *.tsv files to dev environment at: `dev.opentlc.com`
 +
 -----
-cd $PROJECT_HOME/integration/skillsbase_integration
+scp $HOME/Downloads/*.tsv jboss@dev,opentlc.com:/tmp/gpte/inbox-for-rules-spreadsheets
 -----
-. Execute `skillsbase_integration` specific CLI
+
+. Monitor the `accred-process` log file for errors.
+
+=== Invoke accreditation logic REST service
+By default, the `accred-process` service runs as a background job that periodically determines accreditations.
+
+The `accred-process` service allows also allows for manual triggering of accreditation logic processing on one or more students.
+
+==== Full Accreditation Refresh
+This approach will delete all existing accreditations in the `StudentAccreditations` table.
+
+It will then re-calculate all accreditations for all students based on their existing course completions.
+
+. SSH into GPTE Reporting operating as the `jboss` operating system user.
+. Change directories to OPEN_Reporting
+. Ensure that `accred-process` JVM is running.
+. Execute:
 +
 -----
-mvn properties:read-project-properties replacer:replace jboss-as:execute-commands
+./bin/accreditation_batch_evaluation.sh -env=[prod | dev]
 -----
-. Build and deploy application to JBoss
+
+==== Focused Accreditation Refresh
+
+. Invoke accreditation logic on an existing student whose course completions should lead to an accreditation
 +
 -----
-mvn jboss-as:deploy -DskipTests
+curl -v -X PUT  -H "ACCEPT: application/json" \
+                -H "TEST_RULES_ONLY: true" \
+                -H "RESPOND_JSON: true" \
+                http://$HOSTNAME:9090/gpte_accreditation/students/10387
 -----
 
-. Undeploy app
+. Invoke accreditation logic on a non existent student
 +
 -----
-mvn clean
+curl -v -X PUT  -H "ACCEPT: application/json" \
+                -H "TEST_RULES_ONLY: true" \
+                -H "RESPOND_JSON: true" \
+                http://$HOSTNAME:9090/gpte_accreditation/students/103899
 -----
 
-=== Clean `employee-assessment` tables
-
+. Invoke accreditation logic on all students whose studentid > 10000 and < 11000
++
 -----
-mysql -u lms -p lms < db_scripts/biz-scripts/employee-assessment-cleanup.sql
------
-
------
-SkillsBase will recognize you as a new user ... it will send you thru a "self assessment" wizard ... then your SB account is activated.
-So in Production ... each Red Hat employee would need to manually log into to the SB GUI and do this.
-Ideally, it would be great if there was someway to auto-create these accounts.
-Maybe we should talk to the SB team about doing this.  It will make our life a bit easier since we will always find the user and be able to send the qualifications over.
-right now we have a "gap" because of the manual login process
------
-
-== ipa_integration
-
------
-mysql -u root -p mysql <  scripts/create-user.sql
-mysql -u root -p mysql <  scripts/create-tables.sql
-mysql -u root -p mysql <  scripts/load-reference-data.sql
------
-
-== activemq-artemis install
-
------
-# sudo yum install -y libaio-devel
-# sudo su - jboss
-$ cd /opt
-$ git clone https://github.com/apache/activemq-artemis.git
-$ cd activemq-artemis
-$ mvn -Prelease install -DskipTests
-$ cd artemis-distribution/target/apache-artemis-1.4.0-SNAPSHOT-bin/apache-artemis-1.4.0-SNAPSHOT
-
+curl -v -X PUT  -H "ACCEPT: application/json" \
+                -H "TEST_RULES_ONLY: true" \
+                -H "RESPOND_JSON: true" \
+                -H "LOW_STUDENT_ID: 10000" \
+                -H "HIGH_STUDENT_ID: 11000" \
+                http://$HOSTNAME:9090/gpte_accreditation/students/batch
 -----
