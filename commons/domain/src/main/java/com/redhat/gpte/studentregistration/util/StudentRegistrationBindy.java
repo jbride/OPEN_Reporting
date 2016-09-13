@@ -116,7 +116,9 @@ public class StudentRegistrationBindy {
     }
     public String getSfdcUserId() {
         String uNumber = sfdcUserIdCompanyId.substring(0, this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER));
-        return uNumber.substring(0,uNumber.length() - 3);
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/128
+        //return uNumber.substring(0,uNumber.length() - 3); 
+        return uNumber;
     }
     public String getSfdcCompanyId() {
         return this.sfdcUserIdCompanyId.substring(this.sfdcUserIdCompanyId.indexOf(this.SFDC_DELIMITER)+1);
