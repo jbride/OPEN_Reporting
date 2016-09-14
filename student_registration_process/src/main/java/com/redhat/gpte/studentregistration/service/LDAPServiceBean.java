@@ -65,6 +65,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private static final String SOURCE_OF_PROBLEM = "\n\tSource of problem:\t";
     private static final char AMPERSAND = '@';
     private static final char DASH = '-';
+    private static final String SREG_PERSIST_COMPANY = "sreg_persist_company";
     private static final String NULL_STRING = "null";
     private String providerUrl = null;
     private String securityPrincipal = null;
@@ -78,8 +79,14 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     
     private Map<String,Integer> verifiedCompanies = new HashMap<String,Integer>();
 
+    private boolean sregPersistCompany = true;
+
     public LDAPServiceBean() {
-        logger.info("LDAPServiceBean()  starting .... ");
+        if(System.getProperty(SREG_PERSIST_COMPANY) != null) {
+            sregPersistCompany = Boolean.parseBoolean(System.getProperty(SREG_PERSIST_COMPANY));
+        }
+
+        logger.info("LDAPServiceBean()  starting .... sregPersistCompany = "+sregPersistCompany);
         
         providerUrl = System.getProperty(IPA_PROVIDER_URL);
         if(StringUtils.isEmpty(providerUrl))
@@ -130,7 +137,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     public void getStudentCompanyId(Exchange exchange) {
         Student origStudent = (Student)exchange.getIn().getBody();
         try {
-            this.getStudentCompanyId(origStudent, true, null, false);
+            this.determineCompanyIdAndPersistCompanyIfNeedBe(origStudent, true, null, false);
         } catch (AttachmentValidationException e) {
             logger.error(e.getMessage());
         }
@@ -142,7 +149,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      *   3)  Creates and persists new company if need be
      *   4)  Populates companyId on student object
      */
-    public void getStudentCompanyId(Student origStudent, boolean queryLdap, Company companyObj, boolean alwaysUpdateCompany) throws AttachmentValidationException {
+    private void determineCompanyIdAndPersistCompanyIfNeedBe(Student origStudent, boolean queryLdap, Company companyObj, boolean alwaysUpdateCompany) throws AttachmentValidationException {
         
         String origCompanyName = origStudent.getCompanyName();
         String email = origStudent.getEmail();
@@ -465,7 +472,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     Company company = sBindy.convertToCanonicalCompany();
                     
                     // 4) Determine companyId of affiliated company (based on company name provided in bindy)
-                    this.getStudentCompanyId(student, false, company, true);
+                    this.determineCompanyIdAndPersistCompanyIfNeedBe(student, false, company, sregPersistCompany);
                     updateStudentsCounter++;
 
                     if(updateStudentsCounter%100 == 0)
