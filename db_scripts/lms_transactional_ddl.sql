@@ -207,7 +207,7 @@ CREATE TABLE `Students` (
   `SubRegion` varchar(20) DEFAULT NULL,
   `Country` char(2) DEFAULT NULL,
   `Roles` varchar(40) DEFAULT NULL,
-  `SalesForceContactID` varchar(15) DEFAULT NULL,
+  `SalesForceContactID` varchar(18) DEFAULT NULL,
   `SalesForceActive` char(3) DEFAULT NULL,
   `SumTotalID` varchar(18) DEFAULT NULL,
   `SumTotalActive` char(3) DEFAULT NULL,
