@@ -1,6 +1,8 @@
-package com.redhat.gpte.inbound_email;
+package com.redhat.gpte.email;
 
 import java.io.IOException;
+
+import org.apache.camel.test.spring.CamelSpringTestSupport;import org.apache.camel.test.spring.CamelSpringTestSupport;
 
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.EmailAttachment;
@@ -8,6 +10,8 @@ import org.apache.commons.mail.MultiPartEmail;
 import org.junit.Test;
 import org.junit.Ignore;
 import org.junit.Before;
+import org.springframework.context.support.AbstractApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.redhat.gpte.util.PropertiesSupport;
 
@@ -15,7 +19,7 @@ import com.redhat.gpte.util.PropertiesSupport;
  * TO-DO: This test is written generically and as such should be refactored such that it is re-used across all GPTE integration projects as per:
  *     http://blog.anorakgirl.co.uk/2013/04/sharing-junit-tests-with-maven/
  */
-public class SMTPTest {
+public class SMTPTest extends CamelSpringTestSupport {
     
     private static final String EMAIL_USERNAME = "gpte_email_username";
     private static final String EMAIL_PASSOWRD = "gpte_email_password";
@@ -30,16 +34,26 @@ public class SMTPTest {
     private String smtpServer = null;
     private int smtpPort = 0;
     private String testFilePath = "src/test/resources/";
+
+    public SMTPTest() throws IOException {
+        PropertiesSupport.setupProps();
+    }
     
     @Before
     public void init() throws IOException {
-        PropertiesSupport.setupProps();
 
         userId = System.getProperty(EMAIL_USERNAME);
         password = System.getProperty(EMAIL_PASSOWRD);
         recipientEmail = System.getProperty(RECIPIENT_EMAIL);
         smtpServer = System.getProperty(SMTP_SERVER);
         smtpPort = Integer.parseInt(System.getProperty(SMTP_PORT));
+
+        System.out.println("init() "+ smtpServer+" : "+smtpPort+" : "+userId);
+    }
+
+    @Override
+    protected AbstractApplicationContext createApplicationContext() {
+        return new ClassPathXmlApplicationContext("/spring/gpte-universal-camel-context.xml");
     }
 
     @Ignore
@@ -52,8 +66,8 @@ public class SMTPTest {
         MultiPartEmail email = new MultiPartEmail();
         email.setHostName(smtpServer);
         email.setSmtpPort(smtpPort);
-        email.setAuthenticator(new DefaultAuthenticator(userId, password));
-        email.setSSLOnConnect(true);
+        //email.setAuthenticator(new DefaultAuthenticator(userId, password));
+        //email.setSSLOnConnect(true);
         
         email.setFrom(userId); // Defines value of "X-Google-Original-From" field in header
         email.setSubject("TestMail");
@@ -71,6 +85,13 @@ public class SMTPTest {
 
         // send it out
         email.send();
+    }
+
+    //@Ignore
+    @Test
+    public void testCamelSendEmail() throws InterruptedException {
+        template.setDefaultEndpointUri("vm:send-email");
+        template.sendBody(new Object());
     }
 
 }

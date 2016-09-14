@@ -31,6 +31,15 @@
   </bean>
 
   <camelContext trace="false" id="gpte-universal-process" xmlns="http://camel.apache.org/schema/spring">
+    
+    <onException>
+        <exception>com.sun.mail.util.MailConnectException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
+    <onException>
+        <exception>com.sun.mail.smtp.SMTPSendFailedException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
 
     <onException>
         <exception>java.lang.Exception</exception>
@@ -43,12 +52,12 @@
 
         <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
-        <to uri="vm:send-email"/>
+        <to uri="vm:send-email-global"/>
     </onException>
 
     <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/student_registration/ipa_update/batch -->
     <restConfiguration component="servlet" bindingMode="json" />
-    <rest path="/student_registration/ipa_update/">
+    <rest id="studentRegUpdatePath" path="/student_registration/ipa_update/">
         <put uri="batch" produces="application/json" >
             <to uri="vm:sr_post-new-students-to-ipa-uri?waitForTaskToComplete=Never"/>
         </put>
@@ -108,9 +117,6 @@
         <from uri="vm:send-email"/>
         <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
-        <setHeader headerName="From">
-            <constant>GPTE Operations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
-        </setHeader>
         <choice id="if-exception-exists">
             <when>
                 <simple>${exception.message} != null</simple>
@@ -130,9 +136,14 @@
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
+        <to uri="vm:send-email-global"/>
+    </route>
+
+    <route id="send-email-global">
+        <from uri="vm:send-email-global"/>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
-            <to uri="smtps://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
+            <to uri="smtp://{{gpte_smtp_server}}?from={{gpte_email_username}}" id="send_email"/>
             <log message="Sent reply email to: ${header.to}"/>
         </filter>
     </route>

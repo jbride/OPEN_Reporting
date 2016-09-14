@@ -1,4 +1,4 @@
-package com.redhat.gpte.inbound_email.storedproc;
+package com.redhat.gpte.storedproc;
 
 import java.io.IOException;
 

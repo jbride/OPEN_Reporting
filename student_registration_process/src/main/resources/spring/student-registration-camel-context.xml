@@ -233,9 +233,6 @@
         <from uri="seda:send-email"/>
         <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
         <to uri="bean:emailServiceBean?method=clearAttachments"/>
-        <setHeader headerName="From" id="send-email-set-header" >
-            <constant>GPTE Student Registrations &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
-        </setHeader>
         <choice id="if-exception-exists">
             <when>
                 <simple>${exception.message} != null</simple>
@@ -255,11 +252,7 @@
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
-        <filter>
-            <constant>{{gpte_enable_all_emails}}</constant>
-            <to uri="smtps://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
-            <log message="Sent reply email to: ${header.to}"/>
-        </filter>
+        <to uri="vm:send-email-global"/>
     </route>
 
 
