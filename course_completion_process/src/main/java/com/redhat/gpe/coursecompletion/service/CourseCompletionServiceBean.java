@@ -150,6 +150,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             sObj.setSalesforcecontactid(uNumber.substring(0,uNumber.length() - 3));
         }
         sObj.setIpaStatus(1);
+        sObj.setCountry(stCourseCompletion.getCountry());
+
         insertNewStudent(exchange, sObj);
     }
     

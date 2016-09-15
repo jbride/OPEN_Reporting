@@ -50,7 +50,6 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     private String domain;
     
-    private String country;
     
     private boolean isActive;
     
@@ -87,6 +86,9 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     @DataField(pos=9)
     private String userNumber;
+
+    @DataField(pos=10)
+    private String country;
     
     public SumtotalCourseCompletion() {
     }
