@@ -157,12 +157,15 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         Integer companyId = 0;
         
         if(StringUtils.isEmpty(origCompanyName)) {
-            throw new AttachmentValidationException(email+" : Big problem: company info not affiliated with student");
-        }
+
+            // https://github.com/redhat-gpe/OPEN_Reporting/issues/44
+            companyId = Company.COMPANY_UNKNOWN_ID;
         
-        // 1) if companyId already cached, then use it to set on student without any further lookups
-        if(this.verifiedCompanies.containsKey(origCompanyName)){
+        }else if(this.verifiedCompanies.containsKey(origCompanyName)){
+
+            // 1) if companyId already cached, then use it to set on student without any further lookups
             companyId = this.verifiedCompanies.get(origCompanyName);
+
         }else {
             if(queryLdap) {
                 // 2)  go to ldap to attempt to get the canonical company name
