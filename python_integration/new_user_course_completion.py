@@ -73,7 +73,8 @@ def db_operations(text):
     logging.info(text)
 
     logging.info("Find all new users in PG in the past 24 hours")
-    fresh_user_email_ids=get_new_users()
+    fresh_user_email_ids = [' ']
+    fresh_user_email_ids += get_new_users()
     if len(fresh_user_email_ids) == 0:
         logging.info("Terminating process")
         return
@@ -89,7 +90,7 @@ def db_operations(text):
     except Exception, e:
         logging.exception(e)
     finally:
-        fresh_users = { }
+        fresh_users = {' ':' '}
         for record in cursor:
             fresh_users[record[0]]=record[1]
 
