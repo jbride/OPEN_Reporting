@@ -41,6 +41,7 @@ def prompt_user():
 
 if __name__ == '__main__':
     from config import *
+    from common import *
     from datetime import date
     import mysql.connector
     import requests
