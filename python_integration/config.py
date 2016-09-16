@@ -1,6 +1,6 @@
 datawarehouse = {
-    'user' : 'root',
-    'password': 'pass+word',
+    'user' : 'lms',
+    'password': 'S7K_3KVyD7co4F-qSj_-Yl9Q',
     'host' : 'localhost',
     'database' : 'lms_transactional'
     }
