@@ -55,8 +55,27 @@
         <to uri="vm:send-email-global"/>
     </onException>
 
-    <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/student_registration/ipa_update/batch -->
+    <!-- swagger not working in camel-2.15  :   https://issues.apache.org/jira/browse/CAMEL-9582
+    <restConfiguration component="servlet" bindingMode="json" apiContextPath="/api-docs" >
+        <dataFormatProperty key="prettyPrint" value="true"/>
+        <apiProperty key="api.title" value="User API" />
+        <apiProperty key="api.version" value="1.2.3" />
+        <apiProperty key="cors" value="true" />
+    </restConfiguration>
+    -->
+
     <restConfiguration component="servlet" bindingMode="json" />
+
+    <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/sanityCheck/-->
+    <rest id="sanityCheck" path="" >
+        <get uri="sanityCheck" >
+            <route>
+                <transform><constant>Red HatGPTE\n</constant></transform>
+            </route>
+        </get>
+    </rest>
+
+    <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/student_registration/ipa_update/batch -->
     <rest id="studentRegUpdatePath" path="/student_registration/ipa_update/">
         <put uri="batch" produces="application/json" >
             <to uri="vm:sr_post-new-students-to-ipa-uri?waitForTaskToComplete=Never"/>
