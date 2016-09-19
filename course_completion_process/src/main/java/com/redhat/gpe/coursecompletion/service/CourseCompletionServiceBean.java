@@ -47,16 +47,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public static final String GET_STUDENT_COMPANY_INFO_URI = "vm:get-student-company-info";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
     private static final String CC_APPEND_STUDENT_ISSUES_TO_FILE = "cc_append_student_issues_to_file";
-    private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte";
-    private static final String COURSE_ISSUES_OUTPUT = "gpte_course_issues.txt";
+    private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte/courseCodeIssues";
     private static final String STUDENT_ISSUES_OUTPUT = "gpte_student_issues.txt";
     private static final String COMMA = ",";
-    private static final String SUMTOTAL_REJECTION_CODES_FILE = "sumtotal_codes_to_reject.txt";
+    private static final String SUMTOTAL_REJECTION_CODES_FILE = "/sumtotal_codes_to_reject.txt";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
     private boolean cc_append_student_issues_to_file = false;
-    private File courseIssuesFile = null;
     private File studentIssuesFile = null;
     private Map<String, Course> courseMapTempCache = new HashMap<String, Course>();  // <mappedCourseId, Course obj>
     
@@ -72,28 +70,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         File courseIssuesDir = new File(COURSE_ISSUES_OUTPUT_DIR);
         courseIssuesDir.mkdirs();
 
-        String x = System.getProperty(CC_APPEND_COURSE_ISSUES_TO_FILE);
-        if(StringUtils.isNotEmpty(x)){
-            cc_append_course_issues_to_file = Boolean.parseBoolean(x);
-            if(cc_append_course_issues_to_file) {
-                courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, COURSE_ISSUES_OUTPUT);
-                courseIssuesFile.createNewFile();
-                FileOutputStream fStream = null;
-                try {
-                    fStream = new FileOutputStream(courseIssuesFile);
-                    String output = "Activity Code,Activity Name";
-                    fStream.write(output.getBytes());
-                    fStream.flush();
-                } finally {
-                    if(fStream != null)
-                        fStream.close();
-                }
-                logger.info("CourseCompletionServiceBean: appending course issues to: "+courseIssuesFile.getAbsolutePath());
-            }
-            
-        }
-        
-        x = System.getProperty(CC_APPEND_STUDENT_ISSUES_TO_FILE);
+        String x = System.getProperty(CC_APPEND_STUDENT_ISSUES_TO_FILE);
         if(StringUtils.isNotEmpty(x)){
             this.cc_append_student_issues_to_file = Boolean.parseBoolean(x);
             if(cc_append_student_issues_to_file) {
@@ -115,7 +92,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
         InputStream iStream = null;
         try {
-            this.getClass().getClassLoader().getResourceAsStream(SUMTOTAL_REJECTION_CODES_FILE);
+            iStream = this.getClass().getClassLoader().getResourceAsStream(SUMTOTAL_REJECTION_CODES_FILE);
             if(iStream == null)
                 throw new RuntimeException("Unable to locate the following file: "+SUMTOTAL_REJECTION_CODES_FILE);
 
@@ -278,15 +255,34 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         } else {
             sCourseCompletions = (Collection<SumtotalCourseCompletion>)exchange.getIn().getBody();
         }
+
+        // 1.5)  Instantiate new course issues file
+        String issueFileName = (String)exchange.getIn().getHeader("CamelFileName");
+        File courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, issueFileName+"_issues.txt");
+        courseIssuesFile.createNewFile();
+        FileOutputStream fStream = null;
+        try {
+            fStream = new FileOutputStream(courseIssuesFile);
+            String output = "Activity Code,Activity Name";
+            fStream.write(output.getBytes());
+            fStream.flush();
+        } finally {
+            if(fStream != null)
+                fStream.close();
+        }
+        
         StringBuilder eBuilder = new StringBuilder();
         int i = 2;
         Collection<SumtotalCourseCompletion> prunedCourseCompletions = new ArrayList<SumtotalCourseCompletion>();
         for(SumtotalCourseCompletion stCC : sCourseCompletions) {
             String aCode = stCC.getActivityCode();
             if(!StringUtils.isEmpty(aCode)) {
+
+                if(sumtotalRejectCodeSet.contains(aCode))
+                    continue;
             
                 try {
-                    Course course = getCourseFromSumtotalCompletion(stCC);
+                    Course course = getCourseFromSumtotalCompletion(stCC, courseIssuesFile);
                     prunedCourseCompletions.add(stCC);
                 }catch(InvalidCourseException x) {
                     eBuilder.append(i);
@@ -300,14 +296,18 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             i++;
         }
         if(eBuilder.length() > 0)
-            throw new RuntimeException(InvalidCourseException.INVALID_COURSE_PREFIX+"\nspreadsheet row #,student email, sumtotal activity code\n"+eBuilder.toString());
+            logger.error("validateSumtotalCourseCompletion() issues with error codes found in the following file: "+courseIssuesFile.getAbsolutePath());
         else {
             logger.info("validateSumtotalCourseCompletions() all activity codes from the following # of sumtotal course completions are found to have corresponding course Ids in GPTE database: "+prunedCourseCompletions.size());
             exchange.getIn().setBody(prunedCourseCompletions);
         }
     }
+
+    public void setSumtotalProcessingExceptionsToBody(Exchange exchange) {
+
+    }
     
-    private Course getCourseFromSumtotalCompletion(SumtotalCourseCompletion stCC) throws IOException, InvalidCourseException {
+    private Course getCourseFromSumtotalCompletion(SumtotalCourseCompletion stCC, File courseIssuesFile) throws IOException, InvalidCourseException {
         if(StringUtils.isEmpty(this.langFilter)){
             this.setLangFilter();
         }
@@ -342,14 +342,16 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         return course;
     }
     
-    public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(@Body SumtotalCourseCompletion stCC) throws IOException, InvalidCourseException {
+    public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(Exchange exchange) throws IOException, InvalidCourseException {
+
+        SumtotalCourseCompletion stCC = (SumtotalCourseCompletion)exchange.getIn().getBody();
         
         // 1)  Identify student
         Student student = canonicalDAO.getStudentByEmail(stCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
-        
+
         // 2)  Identify canonical course name given a sumtotal "activity code"
         logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse. ActivityCode = "+stCC.getActivityCode());
-        Course course = getCourseFromSumtotalCompletion(stCC);
+        Course course = getCourseFromSumtotalCompletion(stCC, null);
         
         // 3)  Create StudentCourse object
         Language language = new Language();

@@ -80,7 +80,7 @@
                 </doTry>
                 <to uri="direct:add-student-course-to-db" id="cc_add-sumtotal-student-course-to-db" />
             </split>
-        <setBody><constant>Course Completion Process:  Sumtotal Email with attachments received and validated</constant></setBody>
+        <to uri="bean:cCompletionServiceBean?method=setSumtotalProcessingExceptionsToBody" />
         <to uri="seda:send-email"/>
     </route>
 
