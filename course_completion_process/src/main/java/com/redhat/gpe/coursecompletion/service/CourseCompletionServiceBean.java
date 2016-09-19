@@ -18,9 +18,12 @@ import org.apache.camel.Producer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
@@ -32,6 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
@@ -46,6 +51,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String COURSE_ISSUES_OUTPUT = "gpte_course_issues.txt";
     private static final String STUDENT_ISSUES_OUTPUT = "gpte_student_issues.txt";
     private static final String COMMA = ",";
+    private static final String SUMTOTAL_REJECTION_CODES_FILE = "sumtotal_codes_to_reject.txt";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
@@ -59,6 +65,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String dashFilter="-$";
     private static String langFilter;
     private static int rhtCompanyId = 0;
+    private static Set sumtotalRejectCodeSet = new HashSet<String>();
     
    
     public CourseCompletionServiceBean() throws IOException {
@@ -105,6 +112,24 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 logger.info("CourseCompletionServiceBean:  appending student issues to: "+studentIssuesFile.getAbsolutePath());
             }
         }
+
+        InputStream iStream = null;
+        try {
+            this.getClass().getClassLoader().getResourceAsStream(SUMTOTAL_REJECTION_CODES_FILE);
+            if(iStream == null)
+                throw new RuntimeException("Unable to locate the following file: "+SUMTOTAL_REJECTION_CODES_FILE);
+
+            BufferedReader r = new BufferedReader(new InputStreamReader(iStream));
+            String line;
+            while ((line=r.readLine()) != null) {
+                sumtotalRejectCodeSet.add(line);
+            }
+
+        } finally {
+            if(iStream != null)
+                iStream.close();
+        }
+        logger.info("CourseCompletionServiceBean: # of sumtotal code rejections = "+sumtotalRejectCodeSet.size());
         
     }
     
