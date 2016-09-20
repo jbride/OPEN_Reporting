@@ -26,14 +26,16 @@ def mark_complete(obj):
     pg_headers["Authorization"] = pg_headers["Authorization"].replace("Bearer ","")
     pg_headers["Authorization"] = pg_headers["Authorization"].replace(" ","")
     pg_headers["Authorization"] = "Bearer " + pg_headers["Authorization"]
-    req = requests.post(pg_url, headers=pg_headers, data=obj)
+
+    logging.info(obj)
+    req = requests.post(pg_url, headers=pg_headers, data=json.dumps(obj))
     if req.status_code == 404:
         logging.error(": " + str(req.status_code) + " " + obj)
     else:
         logging.info(": " + str(req.status_code))
 
-def create_log_file():
+def create_log_file(name):
     week = date.today().isocalendar()[1]
     year = date.today().year
-    filename = '{}/{}-week{}.log'.format(log_path, year, week)
+    filename = '{}/{}-{}-week{}.log'.format(log_path, name, year, week)
     logging.basicConfig(filename=filename, level=logging.INFO)

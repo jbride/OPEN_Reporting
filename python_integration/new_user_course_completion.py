@@ -112,6 +112,7 @@ def db_operations(text):
             content_obj.append(fresh_users[record[2]])       
             content_obj.append(record[0])
             jsondata=create_pg_user_content_obj(content_obj)
+            logging.info(jsondata)
             mark_complete(jsondata)
 
     mysql_con["connection"].close()
@@ -119,7 +120,7 @@ def db_operations(text):
     logging.info("End of Process")
 
 def prompt_user():
-    create_log_file()
+    create_log_file("new_user_sync")
     logging.info("Ask user permission to continue")
 
     user_choice = input("Mark course completion for new users every 24 hours? y or n ").lower()

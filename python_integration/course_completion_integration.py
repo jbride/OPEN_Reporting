@@ -10,7 +10,7 @@ def get_new_completions(creds, query_string):
     return [i for i in cursor]
 
 def main(query):
-    create_log_file()
+    create_log_file("course_completion_sync")
     if not query:
         logging.info('Doing bulk integration')
     else:
