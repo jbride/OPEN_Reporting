@@ -20,7 +20,7 @@ def create_pg_user_content_obj(comp):
 def mark_complete(obj):
     """gets incomplete user_content objects and sets the 'completed_at' field \
        with a timestamp string"""
-    pg_url = 'http://{}/v1/user_content/'.format(pathgather_url)
+    pg_url = 'https://{}/v1/user_content'.format(pathgather_url)
 
     #Remove the white spaces from authorization key
     pg_headers["Authorization"] = pg_headers["Authorization"].replace("Bearer ","")
@@ -28,7 +28,8 @@ def mark_complete(obj):
     pg_headers["Authorization"] = "Bearer " + pg_headers["Authorization"]
 
     logging.info(obj)
-    req = requests.post(pg_url, headers=pg_headers, data=json.dumps(obj))
+    time.sleep(3)
+    req = requests.post(pg_url, headers=pg_headers, data=obj)
     if req.status_code == 404:
         logging.error(": " + str(req.status_code) + " " + obj)
     else:
