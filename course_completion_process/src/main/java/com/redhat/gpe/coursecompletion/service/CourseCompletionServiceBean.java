@@ -16,11 +16,13 @@ import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.apache.camel.Producer;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -48,9 +50,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
     private static final String CC_APPEND_STUDENT_ISSUES_TO_FILE = "cc_append_student_issues_to_file";
     private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte/courseCodeIssues";
+    private static final String ISSUES_SUFFIX="_issues.txt";
     private static final String STUDENT_ISSUES_OUTPUT = "gpte_student_issues.txt";
     private static final String COMMA = ",";
-    private static final String SUMTOTAL_REJECTION_CODES_FILE = "/sumtotal_codes_to_reject.txt";
+    private static final String SUMTOTAL_REJECTION_CODES_FILE = "sumtotal_codes_to_reject.txt";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = false;
@@ -92,9 +95,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
         InputStream iStream = null;
         try {
-            iStream = this.getClass().getClassLoader().getResourceAsStream(SUMTOTAL_REJECTION_CODES_FILE);
-            if(iStream == null)
-                throw new RuntimeException("Unable to locate the following file: "+SUMTOTAL_REJECTION_CODES_FILE);
+            iStream = this.getClass().getClassLoader().getResourceAsStream("/"+SUMTOTAL_REJECTION_CODES_FILE); // works in JEE server
+            if(iStream == null) {
+                iStream = this.getClass().getClassLoader().getResourceAsStream(SUMTOTAL_REJECTION_CODES_FILE); // works during maven tests
+                if(iStream == null) 
+                    throw new RuntimeException("Unable to locate the following file: "+SUMTOTAL_REJECTION_CODES_FILE);
+            }
 
             BufferedReader r = new BufferedReader(new InputStreamReader(iStream));
             String line;
@@ -245,8 +251,13 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     
 
 /* **************       Student Courses        ********************** */
-    
+   
+    /*
+     * Given a collection of SumtotalCourseCompletion objects, iterates and validates each one
+     */ 
     public void validateSumtotalCourseCompletions(Exchange exchange) throws IOException {
+
+        // 1)  make sure what is used in this function is a Collection<SumtotalCourseCompletion> 
         Object body = exchange.getIn().getBody();
         Collection<SumtotalCourseCompletion> sCourseCompletions = null;
         if(body instanceof SumtotalCourseCompletion) {
@@ -256,9 +267,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             sCourseCompletions = (Collection<SumtotalCourseCompletion>)exchange.getIn().getBody();
         }
 
-        // 1.5)  Instantiate new course issues file
-        String issueFileName = (String)exchange.getIn().getHeader("CamelFileName");
-        File courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, issueFileName+"_issues.txt");
+        // 2)  Instantiate new course issues file
+        //     Contents of this file contain a list of all invalid courses encountered while processing this collection of sumtotalcoursecompletion objects
+        String issueFileName = (String)exchange.getIn().getHeader(CAMEL_FILE_NAME);
+        File courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, issueFileName+ISSUES_SUFFIX);
         courseIssuesFile.createNewFile();
         FileOutputStream fStream = null;
         try {
@@ -271,13 +283,18 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 fStream.close();
         }
         
-        StringBuilder eBuilder = new StringBuilder();
         int i = 2;
+        boolean invalidCourseExceptionThrown = false;
+
+        // 3) this is the datastructure of validated course completions that is passed to downstream business logic
         Collection<SumtotalCourseCompletion> prunedCourseCompletions = new ArrayList<SumtotalCourseCompletion>();
+
+        // 4) iterate via each unvalidated sumtotal course completion
         for(SumtotalCourseCompletion stCC : sCourseCompletions) {
             String aCode = stCC.getActivityCode();
             if(!StringUtils.isEmpty(aCode)) {
 
+                // 5)  filter out course completions that have been identified as bogus of sumtotal LMS team
                 if(sumtotalRejectCodeSet.contains(aCode))
                     continue;
             
@@ -285,17 +302,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     Course course = getCourseFromSumtotalCompletion(stCC, courseIssuesFile);
                     prunedCourseCompletions.add(stCC);
                 }catch(InvalidCourseException x) {
-                    eBuilder.append(i);
-                    eBuilder.append(COMMA);
-                    eBuilder.append(stCC.getEmail());
-                    eBuilder.append(COMMA);
-                    eBuilder.append(stCC.getActivityCode());
-                    eBuilder.append("\n");
+                    invalidCourseExceptionThrown = true;
                 }
+            }else {
+                logger.error("validateSumtotalCourseCompletion() passed an empty activity code");
             }
             i++;
         }
-        if(eBuilder.length() > 0)
+        if(invalidCourseExceptionThrown)
             logger.error("validateSumtotalCourseCompletion() issues with error codes found in the following file: "+courseIssuesFile.getAbsolutePath());
         else {
             logger.info("validateSumtotalCourseCompletions() all activity codes from the following # of sumtotal course completions are found to have corresponding course Ids in GPTE database: "+prunedCourseCompletions.size());
@@ -303,7 +317,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         }
     }
 
-    public void setSumtotalProcessingExceptionsToBody(Exchange exchange) {
+    public void setSumtotalProcessingExceptionsToBody(Exchange exchange) throws java.io.IOException {
+
+        String issueFileName = (String)exchange.getIn().getHeader(CAMEL_FILE_NAME);
+        File courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, issueFileName+ISSUES_SUFFIX);
+        String courseIssues = FileUtils.readFileToString(courseIssuesFile);
+        exchange.getIn().setBody(courseIssues);
 
     }
     

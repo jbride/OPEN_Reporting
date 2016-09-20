@@ -1,0 +1,1 @@
+../../main/resources/sumtotal_codes_to_reject.txt

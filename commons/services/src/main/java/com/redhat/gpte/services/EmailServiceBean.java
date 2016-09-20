@@ -38,7 +38,6 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
 
     public static final String ATTACHMENTS_ARE_VALID = "Attachments are valid.";
     private static final String RETURN_PATH = "Return-Path";
-    private static final String CAMEL_FILE_NAME = "CamelFileName";
     private static final String DATE = "Date";
     private static final String SUBJECT = "Subject";
     private static final String GPTE_VALID_EMAIL_SUFFIXES = "gpte_valid_email_suffixes";

@@ -30,6 +30,7 @@ public class GPTEBaseServiceBean {
     public static final String REDHAT_HYPHENED="red-hat";
     public static final String REDHAT="redhat";
     public static final String UPLOAD_EXCEPTION_MAP = "UPLOAD_EXCEPTION_MAP";
+    public static final String CAMEL_FILE_NAME="CAMEL_FILE_NAME";
     
     private Logger logger = Logger.getLogger(getClass());
 
