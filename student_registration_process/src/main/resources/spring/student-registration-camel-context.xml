@@ -173,8 +173,8 @@
                 <to uri="direct:persist-student" />
                 <delay><constant>50</constant></delay>
             </split>
-            <!--to uri="vm:sr_post-new-students-to-ipa-uri" />
-            <to uri="seda:send-email" / -->
+            <to uri="vm:sr_post-new-students-to-ipa-uri" />
+            <to uri="seda:send-email" />
         <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
     </route>
 
