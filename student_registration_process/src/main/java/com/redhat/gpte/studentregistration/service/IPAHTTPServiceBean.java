@@ -116,7 +116,9 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             Student student = dStudent.getStudentObj();
             Company company = dStudent.getCompanyObj();
             String companyName = company.getCompanyname();
-            if(companyName.indexOf(COMMA) > 0) {
+            if(StringUtils.isEmpty(companyName)) {
+                logger.error("createLdapHttpUploadFile() Unknown companyName for: "+student.getEmail());
+            } else if (companyName.indexOf(COMMA) > 0) {
                 String prunedCName = companyName.substring(0, companyName.indexOf(COMMA));
                 logger.info("createLdapHttpUploadFile() pruning company name for acceptance by GPTE IPA: "+companyName+"   ->    "+prunedCName);
                 companyName = prunedCName;
@@ -191,7 +193,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             File uploadFile = new File("/tmp", fileName);
             FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
 
-            logger.info(email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
+            logger.info("\n"+count+" of "+studentLines.length+" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
 
             String responseBody = null;
             boolean mockUpload = false;
@@ -219,6 +221,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
                 logger.info(parsedResponse);
                 uploadFile.delete();
             }
+            count++;
         }
         exchange.getIn().setHeader(UPLOAD_EXCEPTION_MAP, exceptionMap);
     }

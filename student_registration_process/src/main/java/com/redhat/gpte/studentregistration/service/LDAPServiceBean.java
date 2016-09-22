@@ -31,6 +31,7 @@ import org.apache.log4j.Logger;
 
 import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Student;
+import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
@@ -67,6 +68,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private static final char DASH = '-';
     private static final String SREG_PERSIST_COMPANY = "sreg_persist_company";
     private static final String NULL_STRING = "null";
+    public static final String SR_DENORMALIZED_STUDENTS_TO_PROCESS="sr_denormalized_students_to_process";
     private String providerUrl = null;
     private String securityPrincipal = null;
     private String securityCredentials = null;
@@ -188,8 +190,10 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             // 4)  Create company object (which could optionally be used to persist/update database)
             if(companyObj == null) {
                 companyObj = new Company();
+                companyObj.setCompanyname(origCompanyName);
             }
-            companyObj.setCompanyname(origCompanyName);
+
+            // 4.5) Always set LdapID to canonical company name
             companyObj.setLdapId(canonicalCompanyName);
             
             boolean companyUpdated = false;
@@ -444,6 +448,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
     /* Given List<StudentRegistrationBindy>, transforms to Collection<Student>
      * Removes any duplicates that might be in student registration CSV
+     * Also creates Collection<DenormalizedStudents> and sets to header = SR_DENORMALIZED_STUDENTS_TO_PROCESS
      */
     public void convertStudentRegBindyToCanonicalStudents(Exchange exchange) {
         Map<String,Student> noDupsStudentMap = new HashMap<String, Student>();
@@ -452,6 +457,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         int updateStudentsCounter = 0;
         Object body = exchange.getIn().getBody();
         List<StudentRegistrationBindy> sBindyList = null;
+        List<DenormalizedStudent> dStudents = new ArrayList<DenormalizedStudent>();
         
         
         // 1)  Make sure always dealing with a list
@@ -473,6 +479,9 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     // 3) Grab student and company data as parsed by bindy
                     Student student = sBindy.convertToCanonicalStudent();
                     Company company = sBindy.convertToCanonicalCompany();
+                    DenormalizedStudent dStudent = new DenormalizedStudent();
+                    dStudent.setStudentObj(student);
+                    dStudent.setCompanyObj(company);
                     
                     // 4) Determine companyId of affiliated company (based on company name provided in bindy)
                     this.determineCompanyIdAndPersistCompanyIfNeedBe(student, false, company, sregPersistCompany);
@@ -482,6 +491,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                         logger.info("convertStudentRegBindyToCanonicalStudents() processing # "+updateStudentsCounter);
 
                     noDupsStudentMap.put(student.getEmail(), student);
+                    dStudents.add(dStudent); 
+
                     Thread.sleep(100);
                 } catch (AttachmentValidationException e) {
                     exceptions.put(sBindy.getEmail(), e);
@@ -495,6 +506,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         logger.info("convertToCanonicalStudents() total students = "+noDupsStudentMap.size()+" : updatedStudents = "+updateStudentsCounter+" : dups = "+dupsCounter+" : exceptions = "+exceptions.size());
         if(exceptions.size() > 0)
             exchange.getIn().setHeader(ATTACHMENT_VALIDATION_EXCEPTIONS, exceptions.values());
+
+        exchange.getIn().setHeader(SR_DENORMALIZED_STUDENTS_TO_PROCESS, dStudents);
         exchange.getIn().setBody(noDupsStudentMap.values());
     }
     

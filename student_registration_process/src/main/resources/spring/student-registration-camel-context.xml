@@ -173,21 +173,31 @@
                 <to uri="direct:persist-student" />
                 <delay><constant>50</constant></delay>
             </split>
+            <setBody><simple>${header.sr_denormalized_students_to_process}</simple></setBody>
             <to uri="vm:sr_post-new-students-to-ipa-uri" />
-            <to uri="seda:send-email" />
+        <to uri="seda:send-email" />
         <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
+    </route>
+
+    <route id="post-new-students-to-ipa-batch">
+        <description>
+            1. Periodically query database for Students whose information needs to be pushed to GPTE IPA
+            2. Create collection of these students and pass to the following route:  post-new-students-to-ipa
+        </description>
+        <from uri="{{sr_post-new-students-to-ipa-batch-uri}}"/>
+        <to uri="bean:studentRegBean?method=queryForStudentsToPushToIPA" />
+        <to uri="vm:sr_post-new-students-to-ipa-uri" />
     </route>
 
     <route id="post-new-students-to-ipa">
         <description>
-            1. Periodically query database for Students whose information needs to be pushed to GPTE IPA
+            1. Accepts a collection of students
             2. Create an upload file of this Student information
             3. Write the upload file to disk (for possible debug purposes) and POST to GPTE IPA HTTP service
             4. Parse the response body pertaining to each student and, if no errors, update database for that student indicating that GPTE IPA now has record of that student information
         </description>
         <from uri="vm:sr_post-new-students-to-ipa-uri"/>
-        <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_completed"/>
-        <to uri="bean:studentRegBean?method=queryForStudentsToPushToIPA" />
+        <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_log"/>
         <choice>
           <when>
             <simple>${body.size} > 0 </simple>
