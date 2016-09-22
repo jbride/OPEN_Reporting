@@ -206,7 +206,7 @@
             </setHeader>
             <to uri="bean:ipaServiceBean?method=createLdapHttpUploadFile" />
             <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd_HHmm}.csv" />
-            <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.txt" id="log_write_file"/>
+            <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.csv" id="log_write_file"/>
             <choice>
                 <when>
                     <simple>{{ipa_ldap.testMode}}</simple>
@@ -220,7 +220,7 @@
             </choice>
           </when>
         </choice>
-        <log message="*!*!*!*!   Post New Students to IPA ...... Completed" id="log_post_new_students_done"/>
+        <log message="*!*!*!*!   Post New Students to IPA ...... Completed processing of: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.csv" id="log_post_new_students_done"/>
     </route>
 
 

@@ -38,6 +38,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     public static final String LDAP_HTTP_PASSWORD = "ipa_ldap_http.password";
     public static final String LDAP_GROUPNAME = "ipa_ldap.groupName";
     public static final String LDAP_SEND_MAIL = "ipa_ldap.sendMail";
+    public static final String MOCK_IPA_UPLOAD = "ipa_mock_upload";
     private static final String IPA_UPLOAD_ABSOLUTE_PATH = null;
     private static final String SPACE=" ";
     private static final String COMMA=",";
@@ -69,8 +70,14 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
     private String ldapHTTPPassword;
     private String groupName;
     private String sendMail;
+    private boolean mockUpload = false;
     
     public IPAHTTPServiceBean() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
+        if(! StringUtils.isEmpty(System.getProperty(MOCK_IPA_UPLOAD)))
+            mockUpload = Boolean.parseBoolean(System.getProperty(MOCK_IPA_UPLOAD));
+
+        logger.info("IPAHTTPServiceBean() mockUpload = "+mockUpload);
+
         ldapHTTPUrl = System.getProperty(LDAP_HTTP_URL);
         if(StringUtils.isEmpty(ldapHTTPUrl))
             throw new RuntimeException("init() must pass sys property of: "+LDAP_HTTP_URL);
@@ -178,10 +185,10 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
         
         
         String header = null;
-        int count = 0;
+        int count = 1;
         for(String studentLine : studentLines ) {
 
-            if(count == 0) {
+            if(count == 1) {
                 header = studentLine;
                 count++;
                 continue;
@@ -193,10 +200,9 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             File uploadFile = new File("/tmp", fileName);
             FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
 
-            logger.info("\n"+(count+1) +" of "+studentLines.length+" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
+            logger.info("\n"+ (count-1) +" of "+(studentLines.length -1) +" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
 
             String responseBody = null;
-            boolean mockUpload = false;
             if(!mockUpload) {
                 HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
                         .basicAuth(ldapHTTPUserName, ldapHTTPPassword)
@@ -210,16 +216,23 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             }else {
                 responseBody = PLEASE_WAIT+ERROR+DIV;
             }
-            int start = responseBody.indexOf(PLEASE_WAIT);
-            responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
-            String parsedResponse = getLdapServerResponse(responseBody);
-            if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
+            try {
+                int start = responseBody.indexOf(PLEASE_WAIT);
+                responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
+                String parsedResponse = getLdapServerResponse(responseBody);
+                if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
+                    StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
+                    logger.error(eBuilder.toString());
+                    exceptionMap.put(email, TAB+studentLine+NEW_LINE+parsedResponse);
+                }else {
+                    logger.info(parsedResponse);
+                    uploadFile.delete();
+                }
+            } catch(Exception x) {
                 StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
                 logger.error(eBuilder.toString());
-                exceptionMap.put(email, TAB+studentLine+NEW_LINE+parsedResponse);
-            }else {
-                logger.info(parsedResponse);
-                uploadFile.delete();
+                exceptionMap.put(email, TAB+studentLine+NEW_LINE+x.getMessage()+NEW_LINE+NEW_LINE+responseBody);
+                x.printStackTrace();
             }
             count++;
         }
