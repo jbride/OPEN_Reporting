@@ -9,6 +9,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
@@ -24,27 +26,28 @@ public class StudentCompanyHttp {
 
     /**
      * sample usage :
-     *  curl -X PUT -HAccept:text/plain $HOSTNAME:8330/knowledgeService/kbase
-     *  curl -X PUT -HAccept:text/plain http://pfpcore-jbride0.rhcloud.com/knowledgeService/kbase
+     *  curl -v -X PUT -HAccept:text/plain -HContent-Type:application/json --upload-file student_registration_process/src/test/resources/rs/student.json $HOSTNAME:8205/user-registration-process/rs/student/123456
      */
-    /*
     @PUT
-    @Path("/student")
+    @Path("/student/{salesForceId: .*}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ "text/plain" })
     public Response updateStudent(@PathParam("salesForceId")final String salesForceId,
+                                  final String payload
                                  ) {
         ResponseBuilder builder = Response.ok();
         try {
-            log.info("updateStudent() ");
+            logger.info("updateStudent() salesForceId = "+salesForceId);
+            logger.info("updateStudent() payload = "+payload);
         }catch(RuntimeException x){
             builder = Response.status(Status.SERVICE_UNAVAILABLE);
         }
         return builder.build();
     }
-    */
 
     /**
      * sample usage :
-     *  curl -X GET -HAccept:text/plain $HOSTNAME:8330/knowledgeService/sanityCheck
+     *   curl -X GET -HAccept:text/plain $HOSTNAME:8205/user-registration-process/rs/sanityCheck
      */
     @GET
     @Path("/sanityCheck")
