@@ -193,7 +193,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             File uploadFile = new File("/tmp", fileName);
             FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
 
-            logger.info("\n"+count+" of "+studentLines.length+" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
+            logger.info("\n"+(count+1) +" of "+studentLines.length+" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
 
             String responseBody = null;
             boolean mockUpload = false;
