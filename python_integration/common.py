@@ -20,20 +20,23 @@ def create_pg_user_content_obj(comp):
 def mark_complete(obj):
     """gets incomplete user_content objects and sets the 'completed_at' field \
        with a timestamp string"""
-    pg_url = 'http://{}/v1/user_content/'.format(pathgather_url)
+    pg_url = 'https://{}/v1/user_content'.format(pathgather_url)
 
     #Remove the white spaces from authorization key
     pg_headers["Authorization"] = pg_headers["Authorization"].replace("Bearer ","")
     pg_headers["Authorization"] = pg_headers["Authorization"].replace(" ","")
     pg_headers["Authorization"] = "Bearer " + pg_headers["Authorization"]
+
+    logging.info(obj)
+    time.sleep(3)
     req = requests.post(pg_url, headers=pg_headers, data=obj)
     if req.status_code == 404:
         logging.error(": " + str(req.status_code) + " " + obj)
     else:
         logging.info(": " + str(req.status_code))
 
-def create_log_file():
+def create_log_file(name):
     week = date.today().isocalendar()[1]
     year = date.today().year
-    filename = '{}/{}-week{}.log'.format(log_path, year, week)
+    filename = '{}/{}-{}-week{}.log'.format(log_path, name, year, week)
     logging.basicConfig(filename=filename, level=logging.INFO)
