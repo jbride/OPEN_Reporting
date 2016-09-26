@@ -27,12 +27,12 @@
   </modules>
   <dependencyManagement>
       <dependencies>
-      <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl -->
-      <dependency>
-              <groupId>org.codehaus.jackson</groupId>
-                  <artifactId>jackson-mapper-asl</artifactId>
-                      <version>1.9.9</version>
-                  </dependency>
+        <dependency>
+          <groupId>org.codehaus.jackson</groupId>
+          <artifactId>jackson-mapper-asl</artifactId>
+          <version>1.9.9</version>
+          <scope>provided</scope>
+       </dependency>
 
 
       <!-- pom imports -->
