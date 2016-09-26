@@ -18,11 +18,29 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
+
+import com.redhat.gpe.domain.canonical.Student;
+
 @Stateless
 @Path("/rs/")
 public class StudentCompanyHttp {
 
-    private Logger logger = LoggerFactory.getLogger("StudentCompanyHttp");
+    private static Logger logger = LoggerFactory.getLogger("StudentCompanyHttp");
+    private static ObjectMapper jsonMapper;
+    private static Object lockObj = new Object();
+
+    public StudentCompanyHttp() {
+        if(jsonMapper == null) {
+            synchronized(lockObj) {
+                if(jsonMapper != null)
+                    return;
+
+                jsonMapper = new ObjectMapper();
+            }
+        }
+    }
 
     /**
      * sample usage :
@@ -38,8 +56,13 @@ public class StudentCompanyHttp {
         ResponseBuilder builder = Response.ok();
         try {
             logger.info("updateStudent() salesForceId = "+salesForceId);
+            Student sObj = jsonMapper.readValue(payload, Student.class);
             logger.info("updateStudent() payload = "+payload);
+        }catch(java.io.IOException x) {
+            x.printStackTrace();
+            builder = Response.status(Status.BAD_REQUEST);
         }catch(RuntimeException x){
+            x.printStackTrace();
             builder = Response.status(Status.SERVICE_UNAVAILABLE);
         }
         return builder.build();

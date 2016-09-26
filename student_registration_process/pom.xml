@@ -21,6 +21,12 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
   </properties>
   <dependencies>
+    <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl -->
+    <dependency>
+            <groupId>org.codehaus.jackson</groupId>
+                <artifactId>jackson-mapper-asl</artifactId>
+                </dependency>
+
     <dependency>
       <groupId>com.redhat.gpte.ops</groupId>
       <artifactId>gpte-domain</artifactId>

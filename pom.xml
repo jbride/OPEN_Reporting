@@ -26,7 +26,14 @@
     <module>gpte_universal_process</module>
   </modules>
   <dependencyManagement>
-    <dependencies>
+      <dependencies>
+      <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-core-asl -->
+      <dependency>
+              <groupId>org.codehaus.jackson</groupId>
+                  <artifactId>jackson-mapper-asl</artifactId>
+                      <version>1.9.9</version>
+                  </dependency>
+
 
       <!-- pom imports -->
       <dependency>
