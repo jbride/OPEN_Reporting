@@ -21,17 +21,30 @@ import org.slf4j.LoggerFactory;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
 
-import com.redhat.gpe.domain.canonical.Student;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.Processor;
+import org.apache.camel.Producer;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.impl.DefaultCamelContext;
+
+import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
 
 @Stateless
 @Path("/rs/")
 public class StudentCompanyHttp {
 
+    private static final String PROCESS_STUDENT_REG_SERVICE_URI="vm:process-student-registrations-vm";
     private static Logger logger = LoggerFactory.getLogger("StudentCompanyHttp");
     private static ObjectMapper jsonMapper;
     private static Object lockObj = new Object();
 
+    private String studentRegServiceUri = null;
+
+
     public StudentCompanyHttp() {
+
         if(jsonMapper == null) {
             synchronized(lockObj) {
                 if(jsonMapper != null)
@@ -44,26 +57,46 @@ public class StudentCompanyHttp {
 
     /**
      * sample usage :
-     *  curl -v -X PUT -HAccept:text/plain -HContent-Type:application/json --upload-file student_registration_process/src/test/resources/rs/student.json $HOSTNAME:8205/user-registration-process/rs/student/123456
+     *  curl -v -X PUT -HAccept:text/plain -HContent-Type:application/json --upload-file student_registration_process/src/test/resources/rs/studentregistration.json $HOSTNAME:8205/user-registration-process/rs/student/123456
      */
     @PUT
     @Path("/student/{salesForceId: .*}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ "text/plain" })
-    public Response updateStudent(@PathParam("salesForceId")final String salesForceId,
+    public Response processStudentReg(@PathParam("salesForceId")final String salesForceId,
                                   final String payload
                                  ) {
         ResponseBuilder builder = Response.ok();
+        Producer producer = null;
+        StudentRegistrationBindy sObj = null;
         try {
-            logger.info("updateStudent() salesForceId = "+salesForceId);
-            Student sObj = jsonMapper.readValue(payload, Student.class);
-            logger.info("updateStudent() payload = "+sObj);
+            logger.info("processStudentReg() salesForceId = "+salesForceId);
+            sObj = jsonMapper.readValue(payload, StudentRegistrationBindy.class);
+            logger.info("processStudentReg() payload = "+sObj);
         }catch(java.io.IOException x) {
             x.printStackTrace();
             builder = Response.status(Status.BAD_REQUEST);
-        }catch(RuntimeException x){
+        }
+
+        try {
+
+            CamelContext cContext = new DefaultCamelContext();
+            Endpoint endpoint = cContext.getEndpoint(PROCESS_STUDENT_REG_SERVICE_URI);
+            producer = endpoint.createProducer();
+            producer.start();
+            Exchange exchange = producer.createExchange();
+            exchange.getIn().setBody(sObj);
+            producer.process(exchange);
+        }catch(Exception x){
             x.printStackTrace();
             builder = Response.status(Status.SERVICE_UNAVAILABLE);
+        }finally {
+            try {
+                if(producer != null)
+                    producer.stop();
+            } catch(Exception y) {
+                y.printStackTrace();
+            }
         }
         return builder.build();
     }

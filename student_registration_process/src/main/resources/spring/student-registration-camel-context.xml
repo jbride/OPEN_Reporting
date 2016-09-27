@@ -155,8 +155,8 @@
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
         <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com,prutledg@redhat.com,asheer@redhat.com</constant></setHeader>
         <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
-            <unmarshal ref="studentRegBindy"/>
-            <doTry>
+        <unmarshal ref="studentRegBindy"/>
+        <doTry>
                 <!--potentially throws this exception:
                     Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: DokeosCourseCompletion -->
                 <log message="# student registrations found in ${header.CamelFileName} : ${body.size()}"/>
@@ -165,18 +165,27 @@
                     <log message="only 1 student registration found in ${header.CamelFileName}"/>
                     <to uri="bean:studentRegBean?method=clearException" />
                 </doCatch>
-            </doTry>
-            <to uri="bean:ldapServiceBean?method=convertStudentRegBindyToCanonicalStudents" />
-            <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
-            <split id="for-each-new-student-reg">
+        </doTry>
+        <to uri="direct:process-student-registrations-direct" />
+        <to uri="seda:send-email" />
+        <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
+    </route>
+
+    <route id="process-student-registrations-vm">
+        <from uri="vm:process-student-registrations-vm"/>
+        <to uri="direct:process-student-registrations-direct" />
+    </route>
+    <route id="process-student-registrations-direct">
+        <from uri="direct:process-student-registrations-direct"/>
+        <to uri="bean:ldapServiceBean?method=convertStudentRegBindyToCanonicalStudents" />
+        <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
+        <split id="for-each-new-student-reg">
                 <simple>${body}</simple>
                 <to uri="direct:persist-student" />
                 <delay><constant>50</constant></delay>
-            </split>
-            <setBody><simple>${header.sr_denormalized_students_to_process}</simple></setBody>
-            <to uri="vm:sr_post-new-students-to-ipa-uri" />
-        <to uri="seda:send-email" />
-        <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
+        </split>
+        <setBody><simple>${header.sr_denormalized_students_to_process}</simple></setBody>
+        <to uri="vm:sr_post-new-students-to-ipa-uri" />
     </route>
 
     <route id="post-new-students-to-ipa-batch">
