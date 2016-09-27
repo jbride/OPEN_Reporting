@@ -57,7 +57,7 @@ public class StudentCompanyHttp {
         try {
             logger.info("updateStudent() salesForceId = "+salesForceId);
             Student sObj = jsonMapper.readValue(payload, Student.class);
-            logger.info("updateStudent() payload = "+payload);
+            logger.info("updateStudent() payload = "+sObj);
         }catch(java.io.IOException x) {
             x.printStackTrace();
             builder = Response.status(Status.BAD_REQUEST);

@@ -1,6 +1,14 @@
-[
-  {"sfid":"12345", "firstname":"jeff", "lastanme":"bride"},
-  {"sfid":"12345", "firstname":"jessica", "lastanme":"bride"},
-  {"sfid":"12346", "firstname":"azra", "lastanme":"hodges-bride"},
-  {"sfid":"12345", "firstname":"alex", "lastanme":"bride"}
-]
+{
+    "email":"jbride@redhat.com", 
+    "firstname":"jeff", 
+    "lastname":"bride",
+    "region":"EMEA", 
+    "subregion":"", 
+    "country":"", 
+    "companyName":"Red Hat", 
+    "roles":"",
+    "salesforcecontactid":"00560000002SU7u", 
+    "salesforceactive":"Yes", 
+    "sumtotalid":"00560000002SU7uAAG", 
+    "sumtotalactive":"No"
+}
