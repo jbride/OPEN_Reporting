@@ -34,3 +34,8 @@ alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 # select sc.studentId, sc.courseId, sc.assessmentdate, sc.createdate, s.email, s.firstname, s.lastname  from StudentCourses sc, Students s where sc.studentId = s.studentId order by sc.createdate desc limit 10;
 
 # update Students set ipaStatus=0 where createdate > DATE_SUB(NOW(),INTERVAL 1 DAY);
+
+# select c.courseName, sc.courseId, sc.assessmentdate, sc.createdate, s.email, s.firstname, s.lastname  from Courses c, StudentCourses sc, Students s where c.courseId=sc.courseId and sc.studentId = s.studentId and s.email="wdovey@redhat.com" order by sc.createdate
+
+# List latest middleware course completions
+# select c.courseName, sc.courseId, sc.assessmentdate, sc.createdate, s.email, sc.AssessmentResult, sc.AssessmentScore  from Courses c, StudentCourses sc, Students s where c.courseId=sc.courseId and sc.studentId = s.studentId and c.CourseId like "MWS-%" order by sc.createdate desc limit 100;

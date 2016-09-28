@@ -356,3 +356,6 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 -H "HIGH_STUDENT_ID: 11000" \
                 http://$HOSTNAME:9090/gpte_accreditation/students/batch
 -----
+
+ifdef::showscript[]
+endif::showscript[]
