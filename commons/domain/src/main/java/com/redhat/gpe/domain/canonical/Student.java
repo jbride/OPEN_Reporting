@@ -61,7 +61,7 @@ public class Student implements Serializable {
      * probably a good idea to maintain it in Students as well so that we can more easily feed it back to SalesForce. 
      * I'm fine with handling it either way. The important thing will be to keep it in sync across all systems. */
     private String  roles;
-    private String  salesforcecontactid;
+    private String  salesforcecontactid; // salesforce ID
     private String  salesforceactive;
     private String  sumtotalid;
     private String  sumtotalactive;
@@ -70,6 +70,13 @@ public class Student implements Serializable {
     private int        ipaStatus = IPA_UNSYNCHED;
     private Timestamp    activationDate;
     private Timestamp    deActivationDate;
+
+    private String salesforceusername;
+    private String salesforcemanagerid;
+    private String salesforceaccountname;
+    private String salesforcepartnertype;
+    private String salesforcepartnertier;
+    private String salesforcejobfunctions;  // channel roles
 
     /* Patrick, 20 January 2016
      * the Title attribute in LDAP is being used for Role because it was available. It does not mean its their title
@@ -234,7 +241,55 @@ public class Student implements Serializable {
         this.companyName = companyName;
     }
 
-    @Override
+    public String getSalesforceusername() {
+		return salesforceusername;
+	}
+
+	public void setSalesforceusername(String salesforceusername) {
+		this.salesforceusername = salesforceusername;
+	}
+
+	public String getSalesforcemanagerid() {
+		return salesforcemanagerid;
+	}
+
+	public void setSalesforcemanagerid(String salesforcemanagerid) {
+		this.salesforcemanagerid = salesforcemanagerid;
+	}
+
+	public String getSalesforceaccountname() {
+		return salesforceaccountname;
+	}
+
+	public void setSalesforceaccountname(String salesforceaccountname) {
+		this.salesforceaccountname = salesforceaccountname;
+	}
+
+	public String getSalesforcepartnertype() {
+		return salesforcepartnertype;
+	}
+
+	public void setSalesforcepartnertype(String salesforcepartnertype) {
+		this.salesforcepartnertype = salesforcepartnertype;
+	}
+
+	public String getSalesforcepartnertier() {
+		return salesforcepartnertier;
+	}
+
+	public void setSalesforcepartnertier(String salesforcepartnertier) {
+		this.salesforcepartnertier = salesforcepartnertier;
+	}
+
+	public String getSalesforcejobfunctions() {
+		return salesforcejobfunctions;
+	}
+
+	public void setSalesforcejobfunctions(String salesforcejobfunctions) {
+		this.salesforcejobfunctions = salesforcejobfunctions;
+	}
+
+	@Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
                 + ", firstname=" + firstname + ", lastname=" + lastname
