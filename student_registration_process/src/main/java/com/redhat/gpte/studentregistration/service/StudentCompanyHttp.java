@@ -35,7 +35,8 @@ import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
 @Path("/rs/")
 public class StudentCompanyHttp {
 
-    private static final String PROCESS_STUDENT_REG_SERVICE_URI="vm:process-student-registrations-vm";
+    private static final String PROCESS_DENORMALIZED_STUDENT_VM_URI="vm:process-denormalized-student-vm";
+    private static final String PROCESS_STUDENT_REGISTRATION_VM_URI="vm:process-student-registrations-vm";
     private static Logger logger = LoggerFactory.getLogger("StudentCompanyHttp");
     private static ObjectMapper jsonMapper;
     private static Object lockObj = new Object();
@@ -81,7 +82,7 @@ public class StudentCompanyHttp {
         try {
 
             CamelContext cContext = new DefaultCamelContext();
-            Endpoint endpoint = cContext.getEndpoint(PROCESS_STUDENT_REG_SERVICE_URI);
+            Endpoint endpoint = cContext.getEndpoint(PROCESS_STUDENT_REGISTRATION_VM_URI);
             producer = endpoint.createProducer();
             producer.start();
             Exchange exchange = producer.createExchange();
