@@ -129,6 +129,27 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     }
     
     
+    /*
+     * Accepts a DenormalizedStudent object (with companyName field populated) in body of Exchange message
+     * Populates companyId on student obj
+     * Populates geo, role and company name attributes on student obj
+     * Persists a new company if doesn't already exist
+     */
+    public void determineCompanyIdAndPersistCompanyIfNeedBeGivenDenormalizedStudent(Exchange exchange) throws AttachmentValidationException {
+        DenormalizedStudent dStudent = (DenormalizedStudent)exchange.getIn().getBody();
+        boolean queryLdap = false;
+        boolean alwaysUpdateCompany = true;
+        
+        String queryLdapHeader = (String)exchange.getIn().getHeader(QUERY_LDAP);
+        String updateCompanyHeader = (String)exchange.getIn().getHeader(UPDATE_COMPANY);
+        if(StringUtils.isNotEmpty(queryLdapHeader))
+        	queryLdap = Boolean.parseBoolean(queryLdapHeader);
+        if(StringUtils.isNotEmpty(updateCompanyHeader))
+        	alwaysUpdateCompany = Boolean.getBoolean(updateCompanyHeader);
+        	
+        this.determineCompanyIdAndPersistCompanyIfNeedBe(dStudent.getStudentObj(), queryLdap, null, alwaysUpdateCompany);
+    }
+    
     
     /*
      * Accepts a Student object (with companyName field populated) in body of Exchange message
@@ -136,13 +157,19 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Populates geo, role and company name attributes on student obj
      * Persists a new company if doesn't already exist
      */
-    public void getStudentCompanyId(Exchange exchange) {
+    public void determineCompanyIdAndPersistCompanyIfNeedBe(Exchange exchange) throws AttachmentValidationException{
         Student origStudent = (Student)exchange.getIn().getBody();
-        try {
-            this.determineCompanyIdAndPersistCompanyIfNeedBe(origStudent, true, null, false);
-        } catch (AttachmentValidationException e) {
-            logger.error(e.getMessage());
-        }
+        boolean queryLdap = false;
+        boolean alwaysUpdateCompany = true;
+        
+        String queryLdapHeader = (String)exchange.getIn().getHeader(QUERY_LDAP);
+        String updateCompanyHeader = (String)exchange.getIn().getHeader(UPDATE_COMPANY);
+        if(StringUtils.isNotEmpty(queryLdapHeader))
+        	queryLdap = Boolean.parseBoolean(queryLdapHeader);
+        if(StringUtils.isNotEmpty(updateCompanyHeader))
+        	alwaysUpdateCompany = Boolean.getBoolean(updateCompanyHeader);
+        	
+        this.determineCompanyIdAndPersistCompanyIfNeedBe(origStudent, queryLdap, null, alwaysUpdateCompany);
     }
     
     /* Given a student object with no affiliated companyId, executes the following:
@@ -428,7 +455,9 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     
     
     
-    
+    /*  Inspect exchange header for:  ATTACHMENT_VALIDATION_EXCEPTIONS
+     *  If found, iterates through exceptions, creates a String concatenation and sets exception on Exchange
+     */
     public void throwAnyCachedExceptions(Exchange exchange) {
         // purge any existing exceptions
         exchange.setException(null);
@@ -448,6 +477,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
     /* Given List<StudentRegistrationBindy>, transforms to Collection<Student>
      * Removes any duplicates that might be in student registration CSV
+     * All students objects will created by this function will include flag for upload to GPTE IPA
      * Also creates Collection<DenormalizedStudents> and sets to header = SR_DENORMALIZED_STUDENTS_TO_PROCESS
      */
     public void convertStudentRegBindyToCanonicalStudents(Exchange exchange) {
@@ -486,6 +516,9 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     // 4) Determine companyId of affiliated company (based on company name provided in bindy)
                     this.determineCompanyIdAndPersistCompanyIfNeedBe(student, false, company, sregPersistCompany);
                     updateStudentsCounter++;
+                    
+                    // 5)  Ensure that all students get uploaded to IPA
+                    student.setShouldUpdateIPA(true);
 
                     if(updateStudentsCounter%100 == 0)
                         logger.info("convertStudentRegBindyToCanonicalStudents() processing # "+updateStudentsCounter);

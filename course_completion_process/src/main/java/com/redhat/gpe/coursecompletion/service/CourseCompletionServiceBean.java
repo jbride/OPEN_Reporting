@@ -48,7 +48,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final byte coursePassingValue = 70;
     private static final String ISSUES_SUFFIX="_issues.txt";
 
-    public static final String GET_STUDENT_COMPANY_INFO_URI = "vm:get-student-company-info";
+    public static final String DETERMINE_COMPANY_ID_AND_PERSIST_COMPANY = "vm:determineCompanyIdAndPersistCompanyIfNeedBe";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
     private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte/courseCodeIssues";
     private static final String COURSE_ISSUES_HEADER = "Activity Code,Activity Name";
@@ -205,7 +205,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             
             // 1.2)  If not RHT student, then query GPTE LDAP for student info (to include company name)
             CamelContext cContext = exchange.getContext();
-            Endpoint endpoint = cContext.getEndpoint(GET_STUDENT_COMPANY_INFO_URI);
+            Endpoint endpoint = cContext.getEndpoint(DETERMINE_COMPANY_ID_AND_PERSIST_COMPANY);
             exchange.setPattern(ExchangePattern.InOut);
             Message in = exchange.getIn();
             in.setBody(studentIn);
@@ -217,6 +217,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 getCompanyExchange = producer.createExchange();
                 getCompanyExchange.setPattern(ExchangePattern.InOut);
                 getCompanyExchange.getIn().setBody(studentIn);
+                getCompanyExchange.getIn().setHeader(QUERY_LDAP, "TRUE");
+                getCompanyExchange.getIn().setHeader(UPDATE_COMPANY, "FALSE");
                 producer.process(getCompanyExchange);
                 Student studentOut = (Student)getCompanyExchange.getIn().getBody();
                 
