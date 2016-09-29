@@ -185,7 +185,7 @@
     </route>
     <route id="process-student-registrations-direct">
         <description>
-            1)  Accepts Collection<StudentRegistrationBindy>()
+            1)  Accepts Collection of StudentRegistrationBindy
         </description>
         <from uri="direct:process-student-registrations-direct"/>
 
@@ -209,7 +209,7 @@
 
     <route id="process-denormalized-student-direct">
         <description>
-            1)  Accepts Collection<DenormalizedStudent>()
+            1)  Accepts Collection of DenormalizedStudent
             2)  Accepts the following boolean Header values:
                 a) queryldap
                 b) updatecompany
@@ -234,7 +234,7 @@
 
     <route id="post-new-students-to-ipa">
         <description>
-            1. Accepts: Collection<DenormalizedStudent>
+            1. Accepts: Collection of DenormalizedStudent
             2. Create an upload file of this Student information
             3. Write the upload file to disk (for possible debug purposes) and POST to GPTE IPA HTTP service
             4. Parse the response body pertaining to each student and, if no errors, update database for that student indicating that GPTE IPA now has record of that student information
