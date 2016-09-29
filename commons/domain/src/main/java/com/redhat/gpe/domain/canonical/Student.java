@@ -56,6 +56,8 @@ public class Student implements Serializable {
     
     // https://github.com/redhat-gpe/OPEN_Reporting/issues/40
     private transient String companyName;
+    
+    private transient boolean shouldUpdateIPA = false;
 
     /* smangan: 22 Feb 2016
      * probably a good idea to maintain it in Students as well so that we can more easily feed it back to SalesForce. 
@@ -234,7 +236,15 @@ public class Student implements Serializable {
         this.companyName = companyName;
     }
 
-    @Override
+    public boolean getShouldUpdateIPA() {
+		return shouldUpdateIPA;
+	}
+
+	public void setShouldUpdateIPA(boolean shouldUpdateIPA) {
+		this.shouldUpdateIPA = shouldUpdateIPA;
+	}
+
+	@Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
                 + ", firstname=" + firstname + ", lastname=" + lastname

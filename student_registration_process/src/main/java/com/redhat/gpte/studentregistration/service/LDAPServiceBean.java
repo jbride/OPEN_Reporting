@@ -477,6 +477,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
     /* Given List<StudentRegistrationBindy>, transforms to Collection<Student>
      * Removes any duplicates that might be in student registration CSV
+     * All students objects will created by this function will include flag for upload to GPTE IPA
      * Also creates Collection<DenormalizedStudents> and sets to header = SR_DENORMALIZED_STUDENTS_TO_PROCESS
      */
     public void convertStudentRegBindyToCanonicalStudents(Exchange exchange) {
@@ -515,6 +516,9 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     // 4) Determine companyId of affiliated company (based on company name provided in bindy)
                     this.determineCompanyIdAndPersistCompanyIfNeedBe(student, false, company, sregPersistCompany);
                     updateStudentsCounter++;
+                    
+                    // 5)  Ensure that all students get uploaded to IPA
+                    student.setShouldUpdateIPA(true);
 
                     if(updateStudentsCounter%100 == 0)
                         logger.info("convertStudentRegBindyToCanonicalStudents() processing # "+updateStudentsCounter);
