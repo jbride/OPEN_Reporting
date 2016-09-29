@@ -36,8 +36,8 @@ public class StudentCompanyHttp {
     private static final String PROCESS_DENORMALIZED_STUDENT_VM_URI="vm:process-denormalized-student-vm";
     private static final String PROCESS_STUDENT_REGISTRATION_VM_URI="vm:process-student-registrations-vm";
     private static final String FALSE = "FALSE";
-	private static final String UPLOAD_TO_GPTE_IPA = "UPLOAD_TO_GPTE_IPA";
-	private static final String SALES_FORCE_ID = "salesForceId";
+    private static final String UPLOAD_TO_GPTE_IPA = "UPLOAD_TO_GPTE_IPA";
+    private static final String SALES_FORCE_ID = "salesForceId";
     private static Logger logger = LoggerFactory.getLogger("StudentCompanyHttp");
     private static ObjectMapper jsonMapper;
     private static Object lockObj = new Object();
@@ -116,7 +116,7 @@ public class StudentCompanyHttp {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces({ "text/plain" })
     public Response processStudent(@PathParam(SALES_FORCE_ID)final String salesForceId,
-    		                       @HeaderParam(UPLOAD_TO_GPTE_IPA) String uploadIPA,
+                                   @HeaderParam(UPLOAD_TO_GPTE_IPA) String uploadIPA,
                                    final String payload
                                  ) {
         ResponseBuilder builder = Response.ok();
@@ -127,7 +127,7 @@ public class StudentCompanyHttp {
             sObj = jsonMapper.readValue(payload, Student.class);
             
             if(StringUtils.isNotEmpty(uploadIPA))
-            	sObj.setShouldUpdateIPA(Boolean.parseBoolean(uploadIPA));
+                sObj.setShouldUpdateIPA(Boolean.parseBoolean(uploadIPA));
             
             logger.debug("processStudentReg() payload = "+sObj);
         }catch(java.io.IOException x) {
@@ -137,13 +137,13 @@ public class StudentCompanyHttp {
         }
 
         try {
-        	Company cObj = new Company();
-        	cObj.setCompanyname(sObj.getCompanyName());
+            Company cObj = new Company();
+            cObj.setCompanyname(sObj.getCompanyName());
 
-        	DenormalizedStudent dsObj = new DenormalizedStudent();
-        	dsObj.setStudentObj(sObj);
-        	dsObj.setCompanyObj(cObj);
-        	
+            DenormalizedStudent dsObj = new DenormalizedStudent();
+            dsObj.setStudentObj(sObj);
+            dsObj.setCompanyObj(cObj);
+            
             CamelContext cContext = new DefaultCamelContext();
             Endpoint endpoint = cContext.getEndpoint(PROCESS_DENORMALIZED_STUDENT_VM_URI);
             producer = endpoint.createProducer();

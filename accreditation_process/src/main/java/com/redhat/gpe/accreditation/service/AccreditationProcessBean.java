@@ -136,14 +136,14 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
                 if(isLocked)
                     return;
 
-    	        isLocked = true;
+                isLocked = true;
                 exchange.getIn().setHeader(GAINED_ACCRED_LOCK, true);
             }
         }
     }
 
     public void releaseAccredLogicLock() {
-    	isLocked = false;
+        isLocked = false;
     }
 
 /*  **********************    Student Accreditation     *************************** */

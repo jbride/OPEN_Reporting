@@ -237,14 +237,14 @@ public class Student implements Serializable {
     }
 
     public boolean getShouldUpdateIPA() {
-		return shouldUpdateIPA;
-	}
+        return shouldUpdateIPA;
+    }
 
-	public void setShouldUpdateIPA(boolean shouldUpdateIPA) {
-		this.shouldUpdateIPA = shouldUpdateIPA;
-	}
+    public void setShouldUpdateIPA(boolean shouldUpdateIPA) {
+        this.shouldUpdateIPA = shouldUpdateIPA;
+    }
 
-	@Override
+    @Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
                 + ", firstname=" + firstname + ", lastname=" + lastname

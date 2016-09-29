@@ -177,7 +177,7 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             if(student.getShouldUpdateIPA())
                 data.append(TRUE);
             else
-            	data.append(FALSE);
+                data.append(FALSE);
             
             data.append("\n");
         }
@@ -213,47 +213,47 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             
             String email = StringUtils.substringBetween(studentLine, DELIMITER, DELIMITER);
             if(shouldUpload) {
-            	String dateS = dfObj.format(new Date());
-            	String fileName = NEW_STUDENT+dateS+CSV;
-            	File uploadFile = new File("/tmp", fileName);
-            	FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
+                String dateS = dfObj.format(new Date());
+                String fileName = NEW_STUDENT+dateS+CSV;
+                File uploadFile = new File("/tmp", fileName);
+                FileUtils.writeStringToFile(uploadFile, header + NEW_LINE + studentLine);
 
-            	logger.info("\n"+ (count-1) +" of "+(studentLines.length -1) +" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
+                logger.info("\n"+ (count-1) +" of "+(studentLines.length -1) +" : "+email+" : Sending data to LDAP server: [" + ldapHTTPUrl + "] ..."+fileName);
 
-            	String responseBody = null;
-            	if(!mockUpload) {
-            		HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
-            				.basicAuth(ldapHTTPUserName, ldapHTTPPassword)
-            				.header("accept", "text/plain")
-            				.field("file", uploadFile, "multipart/form-data")
-            				.field("groupName", groupName)
-            				.field("sendMail", sendMail)
-            				.asString();
+                String responseBody = null;
+                if(!mockUpload) {
+                    HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
+                            .basicAuth(ldapHTTPUserName, ldapHTTPPassword)
+                            .header("accept", "text/plain")
+                            .field("file", uploadFile, "multipart/form-data")
+                            .field("groupName", groupName)
+                            .field("sendMail", sendMail)
+                            .asString();
 
-            		responseBody = result.getBody();
-            	}else {
-            		responseBody = PLEASE_WAIT+ERROR+DIV;
-            	}
-            	try {
-            		int start = responseBody.indexOf(PLEASE_WAIT);
-            		responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
-            		String parsedResponse = getLdapServerResponse(responseBody);
-            		if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
-            			StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
-            			logger.error(eBuilder.toString());
-            			exceptionMap.put(email, TAB+studentLine+NEW_LINE+parsedResponse);
-            		}else {
-            			logger.info(parsedResponse);
-            			uploadFile.delete();
-            		}
-            	} catch(Exception x) {
-            		StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
-            		logger.error(eBuilder.toString());
-            		exceptionMap.put(email, TAB+studentLine+NEW_LINE+x.getMessage()+NEW_LINE+NEW_LINE+responseBody);
-            		x.printStackTrace();
-            	}
+                    responseBody = result.getBody();
+                }else {
+                    responseBody = PLEASE_WAIT+ERROR+DIV;
+                }
+                try {
+                    int start = responseBody.indexOf(PLEASE_WAIT);
+                    responseBody = responseBody.substring(start, responseBody.indexOf(DIV, start));
+                    String parsedResponse = getLdapServerResponse(responseBody);
+                    if(!responseBody.contains(ALL_GOOD) || responseBody.contains(ERROR)){
+                        StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
+                        logger.error(eBuilder.toString());
+                        exceptionMap.put(email, TAB+studentLine+NEW_LINE+parsedResponse);
+                    }else {
+                        logger.info(parsedResponse);
+                        uploadFile.delete();
+                    }
+                } catch(Exception x) {
+                    StringBuilder eBuilder = new StringBuilder(email+" : uploadToLdapServer() Result body:\n"+ responseBody);
+                    logger.error(eBuilder.toString());
+                    exceptionMap.put(email, TAB+studentLine+NEW_LINE+x.getMessage()+NEW_LINE+NEW_LINE+responseBody);
+                    x.printStackTrace();
+                }
             }else {
-            	logger.info(email+" : will not upload to IPA");
+                logger.info(email+" : will not upload to IPA");
             }
             count++;
         }
