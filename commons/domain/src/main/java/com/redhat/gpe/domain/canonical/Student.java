@@ -243,64 +243,63 @@ public class Student implements Serializable {
         this.companyName = companyName;
     }
 
-        public boolean getShouldUpdateIPA() {
-		return shouldUpdateIPA;
-	}
+    public boolean getShouldUpdateIPA() {
+        return shouldUpdateIPA;
+    }
 
-	public void setShouldUpdateIPA(boolean shouldUpdateIPA) {
-		this.shouldUpdateIPA = shouldUpdateIPA;
-	}
-
+    public void setShouldUpdateIPA(boolean shouldUpdateIPA) {
+        this.shouldUpdateIPA = shouldUpdateIPA;
+    }
 
     public String getSalesforceusername() {
-		return salesforceusername;
-	}
+        return salesforceusername;
+    }
 
-	public void setSalesforceusername(String salesforceusername) {
-		this.salesforceusername = salesforceusername;
-	}
+    public void setSalesforceusername(String salesforceusername) {
+        this.salesforceusername = salesforceusername;
+    }
 
-	public String getSalesforcemanagerid() {
-		return salesforcemanagerid;
-	}
+    public String getSalesforcemanagerid() {
+        return salesforcemanagerid;
+    }
 
-	public void setSalesforcemanagerid(String salesforcemanagerid) {
-		this.salesforcemanagerid = salesforcemanagerid;
-	}
+    public void setSalesforcemanagerid(String salesforcemanagerid) {
+        this.salesforcemanagerid = salesforcemanagerid;
+    }
 
-	public String getSalesforceaccountname() {
-		return salesforceaccountname;
-	}
+    public String getSalesforceaccountname() {
+        return salesforceaccountname;
+    }
 
-	public void setSalesforceaccountname(String salesforceaccountname) {
-		this.salesforceaccountname = salesforceaccountname;
-	}
+    public void setSalesforceaccountname(String salesforceaccountname) {
+        this.salesforceaccountname = salesforceaccountname;
+    }
 
-	public String getSalesforcepartnertype() {
-		return salesforcepartnertype;
-	}
+    public String getSalesforcepartnertype() {
+        return salesforcepartnertype;
+    }
 
-	public void setSalesforcepartnertype(String salesforcepartnertype) {
-		this.salesforcepartnertype = salesforcepartnertype;
-	}
+    public void setSalesforcepartnertype(String salesforcepartnertype) {
+        this.salesforcepartnertype = salesforcepartnertype;
+    }
 
-	public String getSalesforcepartnertier() {
-		return salesforcepartnertier;
-	}
+    public String getSalesforcepartnertier() {
+        return salesforcepartnertier;
+    }
 
-	public void setSalesforcepartnertier(String salesforcepartnertier) {
-		this.salesforcepartnertier = salesforcepartnertier;
-	}
+    public void setSalesforcepartnertier(String salesforcepartnertier) {
+        this.salesforcepartnertier = salesforcepartnertier;
+    }
 
-	public String getSalesforcejobfunctions() {
-		return salesforcejobfunctions;
-	}
+    public String getSalesforcejobfunctions() {
+        return salesforcejobfunctions;
+    }
 
-	public void setSalesforcejobfunctions(String salesforcejobfunctions) {
-		this.salesforcejobfunctions = salesforcejobfunctions;
-        }
+    public void setSalesforcejobfunctions(String salesforcejobfunctions) {
+        this.salesforcejobfunctions = salesforcejobfunctions;
+    }
 
-	@Override
+    @Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
                 + ", firstname=" + firstname + ", lastname=" + lastname

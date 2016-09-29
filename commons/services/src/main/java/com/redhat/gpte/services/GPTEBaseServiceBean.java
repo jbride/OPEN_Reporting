@@ -32,7 +32,7 @@ public class GPTEBaseServiceBean {
     public static final String UPLOAD_EXCEPTION_MAP = "UPLOAD_EXCEPTION_MAP";
     public static final String CAMEL_FILE_NAME="CAMEL_FILE_NAME";
     public static final String QUERY_LDAP = "queryldap";
-	public static final String UPDATE_COMPANY = "updatecompany";
+    public static final String UPDATE_COMPANY = "updatecompany";
     
     private Logger logger = Logger.getLogger(getClass());
 

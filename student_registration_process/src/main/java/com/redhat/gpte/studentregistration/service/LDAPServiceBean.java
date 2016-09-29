@@ -143,10 +143,10 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         String queryLdapHeader = (String)exchange.getIn().getHeader(QUERY_LDAP);
         String updateCompanyHeader = (String)exchange.getIn().getHeader(UPDATE_COMPANY);
         if(StringUtils.isNotEmpty(queryLdapHeader))
-        	queryLdap = Boolean.parseBoolean(queryLdapHeader);
+            queryLdap = Boolean.parseBoolean(queryLdapHeader);
         if(StringUtils.isNotEmpty(updateCompanyHeader))
-        	alwaysUpdateCompany = Boolean.getBoolean(updateCompanyHeader);
-        	
+            alwaysUpdateCompany = Boolean.getBoolean(updateCompanyHeader);
+            
         this.determineCompanyIdAndPersistCompanyIfNeedBe(dStudent.getStudentObj(), queryLdap, null, alwaysUpdateCompany);
     }
     
@@ -165,10 +165,10 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         String queryLdapHeader = (String)exchange.getIn().getHeader(QUERY_LDAP);
         String updateCompanyHeader = (String)exchange.getIn().getHeader(UPDATE_COMPANY);
         if(StringUtils.isNotEmpty(queryLdapHeader))
-        	queryLdap = Boolean.parseBoolean(queryLdapHeader);
+            queryLdap = Boolean.parseBoolean(queryLdapHeader);
         if(StringUtils.isNotEmpty(updateCompanyHeader))
-        	alwaysUpdateCompany = Boolean.getBoolean(updateCompanyHeader);
-        	
+            alwaysUpdateCompany = Boolean.getBoolean(updateCompanyHeader);
+            
         this.determineCompanyIdAndPersistCompanyIfNeedBe(origStudent, queryLdap, null, alwaysUpdateCompany);
     }
     
