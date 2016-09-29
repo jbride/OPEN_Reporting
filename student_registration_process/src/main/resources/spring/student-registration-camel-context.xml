@@ -193,7 +193,7 @@
         <to uri="bean:ldapServiceBean?method=convertStudentRegBindyToCanonicalStudents" />
 
         <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
-        <to uri="direct:process-student-list"/>
+        <to uri="direct:persist-student-list"/>
 
         <!-- Requires Collection<DenormalizedStudent> as body -->
         <setBody><simple>${header.sr_denormalized_students_to_process}</simple></setBody>
