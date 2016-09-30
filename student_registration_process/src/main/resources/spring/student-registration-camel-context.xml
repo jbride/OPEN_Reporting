@@ -216,6 +216,7 @@
         </description>
         <from uri="direct:process-denormalized-student-direct"/>
         <to uri="bean:ldapServiceBean?method=determineCompanyIdAndPersistCompanyIfNeedBeGivenDenormalizedStudent" />
+        <to uri="bean:ldapServiceBean?method=addBodyToCollection" />
         <to uri="vm:sr_post-new-students-to-ipa-uri" />
     </route>
 

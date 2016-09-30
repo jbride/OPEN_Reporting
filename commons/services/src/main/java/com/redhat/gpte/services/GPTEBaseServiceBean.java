@@ -1,5 +1,7 @@
 package com.redhat.gpte.services;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -213,5 +215,11 @@ public class GPTEBaseServiceBean {
             sBuilder.append(exchange.getIn().getBody());
         }
         logger.info(sBuilder.toString());
+    }
+
+    public void addBodyToCollection(Exchange exchange) {
+        Collection cObj = new ArrayList();
+        cObj.add(exchange.getIn().getBody());
+        exchange.getIn().setBody(cObj);
     }
 }
