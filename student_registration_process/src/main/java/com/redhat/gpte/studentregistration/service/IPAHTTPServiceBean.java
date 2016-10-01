@@ -205,12 +205,13 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
             }
             
             // Last field of String indicates whether student data should be uploaded to IPA
-            // Strip it and apply logic
-            boolean shouldUpload = Boolean.parseBoolean(studentLine.substring(studentLine.length()));
-            studentLine = studentLine.substring(0, studentLine.length() - 1);
+            // Strip it (along with pre-ceeding delimiter) and apply logic
+            String shouldUpload = studentLine.substring(studentLine.length() - 1);
+            studentLine = studentLine.substring(0, studentLine.length() - 2);
             
             String email = StringUtils.substringBetween(studentLine, DELIMITER, DELIMITER);
-            if(shouldUpload) {
+            logger.debug(email+" : "+shouldUpload);
+            if(TRUE.equals(shouldUpload)) {
                 String dateS = dfObj.format(new Date());
                 String fileName = NEW_STUDENT+dateS+CSV;
                 File uploadFile = new File("/tmp", fileName);
