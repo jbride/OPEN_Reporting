@@ -4,13 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -22,9 +18,6 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import com.sun.jndi.ldap.LdapCtx;
-
-import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -477,7 +470,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
     /* Given List<StudentRegistrationBindy>, transforms to Collection<Student>
      * Removes any duplicates that might be in student registration CSV
-     * All students objects will created by this function will include flag for upload to GPTE IPA
+     * All students objects created by this function will include flag for upload to GPTE IPA
      * Also creates Collection<DenormalizedStudents> and sets to header = SR_DENORMALIZED_STUDENTS_TO_PROCESS
      */
     public void convertStudentRegBindyToCanonicalStudents(Exchange exchange) {
