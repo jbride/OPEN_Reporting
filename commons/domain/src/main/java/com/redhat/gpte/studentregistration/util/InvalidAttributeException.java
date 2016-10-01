@@ -3,7 +3,7 @@ package com.redhat.gpte.studentregistration.util;
 public class InvalidAttributeException extends Exception {
 
     private static final long serialVersionUID = 1L;
-    public static final String INVALID_ATTRIBUTE_PREFIX = "\nInvalid student attribute(s): ";
+    public static final String INVALID_ATTRIBUTE_PREFIX = "Invalid student attribute(s): ";
     public static final String VALIDATION_EXCEPTION_BUFFER = "validation_exception_buffer";
 
     private String assessFile;

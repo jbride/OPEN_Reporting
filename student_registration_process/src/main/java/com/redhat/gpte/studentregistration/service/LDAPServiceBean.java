@@ -245,12 +245,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
      * Accepts a Student object in body of Exchange message.
      * Queries LDAP and populates the same student object with attributes such as companyName, role and geo
      */
-    public void getStudentAttributesFromLDAP(Exchange exchange)  {
+    public void getStudentAttributesFromLDAP(Exchange exchange) {
         Student student = (Student)exchange.getIn().getBody();
         try {
             this.getStudentAttributesFromLDAP(student);
-        } catch (InvalidAttributeException e) {
-            handleValidationException(exchange, e.getMessage());
+        }catch(InvalidAttributeException x) {
+            handleValidationException(exchange, x.getMessage());
         }
     }
     
@@ -280,7 +280,6 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
             
             listResults = (NamingEnumeration<SearchResult>) ctx.search(BASE_CTX_DN, sBuilder.toString(), ctls);
             int count = 0;
-            try {
                 while (listResults.hasMore()) {
                     if(count > 0) {
                         throw new InvalidAttributeException("\nStudent records in LDAP should be unique. However, more than one result returned for : "+sBuilder.toString());
@@ -301,7 +300,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                                 logger.warn(student.getEmail()+" : null role from LDAP");
                             else {
                                 student.setRoles(attValue);
-                                Student.Titles.valueOf(student.getRoles());
+                                try { 
+                                    Student.Titles.valueOf(student.getRoles());
+                                }catch(IllegalArgumentException x ) {
+                                    String message = student.getEmail()+ExceptionCodes.GPTE_SR1002+",\t\t  title = "+student.getRoles(); // Invalid attributes from LDAP
+                                    throw new InvalidAttributeException(message);
+                                }
                             }
                         }else if(MEMBEROF_ATTRIBUTE.equals(id)) {
                             Enumeration<?> vals = attr.getAll();
@@ -314,7 +318,12 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                                         logger.warn(student.getEmail()+" : null geo from LDAP");
                                     else {
                                         student.setRegion(geoValue);
-                                        Student.Geos.valueOf(student.getRegion());
+                                        try{
+                                            Student.Geos.valueOf(student.getRegion());
+                                        }catch(IllegalArgumentException x ) {
+                                            String message = student.getEmail()+ExceptionCodes.GPTE_SR1002+",\t\t  geo = "+student.getRegion(); // Invalid attributes from LDAP
+                                            throw new InvalidAttributeException(message);
+                                        }
                                     }
                                 }else if(attributeValue.startsWith(PARTNER_ATTRIBUTE_PREFIX)) {
                                     if(NULL_STRING.equals(attributeValue))
@@ -329,14 +338,17 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                     }
                     count++;
                 }
-            }catch(IllegalArgumentException x ) {
-                String message = "\n"+student.getEmail()+ExceptionCodes.GPTE_SR1002+",  geo = "+student.getRegion() +" , title = "+student.getRoles(); // Invalid attributes from LDAP
-                throw new InvalidAttributeException(message);
-            }
             if(count == 0){
-                throw new InvalidAttributeException("\n"+student.getEmail()+ExceptionCodes.GPTE_SR1001); // Not able to locate this user in LDAP
+
+                // https://github.com/redhat-gpe/OPEN_Reporting/issues/77#issuecomment-241466635
+                student.setRoles(Student.Titles.other.name());
+                student.setRegion(Student.Geos.global.name());
+
+                throw new InvalidAttributeException(student.getEmail()+ExceptionCodes.GPTE_SR1001); // Not able to locate this user in LDAP
             }
-        }catch(NamingException x) {
+        }catch(InvalidAttributeException x) {
+            throw x;
+        }catch(Exception x) {
             x.printStackTrace();
             logger.error("NamingException: "+x.getLocalizedMessage()+" : query = : "+sBuilder.toString());
         } finally {
@@ -546,6 +558,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         } else
             exBuilder = (StringBuilder)validationExBuilderObj;
         
+        exBuilder.append("\n");
         exBuilder.append(message);
     }
 }

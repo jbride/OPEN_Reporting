@@ -70,7 +70,7 @@ public class UpdateStudentAttributesResultsAggregator implements Service, Comple
         
         //If exceptions do exist, then set the exception on the Camel message
         if(exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER) != null)
-            exchange.setException(new Exception(ALL_IS_NOT_WELL+((StringBuilder)exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER)).toString()));
+            exchange.setException(new com.redhat.gpte.studentregistration.util.InvalidAttributeException(ALL_IS_NOT_WELL+((StringBuilder)exchange.getIn().getHeader(InvalidAttributeException.VALIDATION_EXCEPTION_BUFFER)).toString()));
         
         successCount = 0;
     }

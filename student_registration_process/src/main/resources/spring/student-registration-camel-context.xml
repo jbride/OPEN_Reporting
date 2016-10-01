@@ -55,21 +55,14 @@
     </onException>
 
 
-    <onException>
-        <description>
-            Catches InvalidAttributeException thrown by: UpdateStudentAttributesResultsAggregator
-        </description>
-        <exception>com.redhat.gpte.studentregistration.util.InvalidAttributeException</exception>
-        <setBody><simple>${exception.message}</simple></setBody>
-        <to uri="{{sr_exception_output_uri}}"/>
-    </onException>
-
-
 
     <route id="determineCompanyIdAndPersistCompanyIfNeedBe">
         <description>
-            1)  Given a Student object (with email populated), queries IPA LDAP for student attributes (company name, geo, role)
-            2)  If student email found, then Student object populated with attributes is returned
+            1)  Given a Student object (with email populated), attempts to determine information (such as companyName) about the company that the student is affiliated with
+            2)  In doing so, this route may optionally query IPA LDAP for that information (which in doing so, also provides the  geo and role of a student)
+            2)  If student email found, then :
+                a) Student object populated with attributes is returned
+                b) Company information is optionally 
             3)  If student email not found, validation exception is thrown
             4)  Accepts the following boolean Header values:
                 a) queryldap
@@ -81,7 +74,7 @@
 
 
 
-<!-- *************************          Retrieve Student  LDAP Attributes       ******************************  -->
+<!-- *************************          Retrieve RHT Student  LDAP Attributes       ******************************  -->
     <route id="check-for-RHT-studentAttributes-in-batch">
         <description>
             1)  Periodically checks that all attributes (ie:  geo and title) in the Student table are populated
@@ -90,7 +83,9 @@
                 NOTE:  Student attributes are useful for Dashbuilder reporting filters
         </description>
         <from uri="{{sr_check-for-rht-student_attributes_batch_uri}}"/>
-        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@    Starting .... check-for-studentAttributes" loggingLevel="INFO"/>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@    Starting .... check-for-studentAttributes.  Log written to: {{sr_ldap_query_output_uri}}" loggingLevel="INFO"/>
+        <setBody><constant>email,companyName,roles,region,subregion,country</constant></setBody>
+        <to uri="{{sr_ldap_query_output_uri}}"/>
         <to uri="bean:studentRegBean?method=selectRHTStudentsWithMissingAttributes"/>
         <filter>
             <simple>${header.studentsToUpdate} > 0</simple>
@@ -106,16 +101,12 @@
                     <to uri="bean:ldapServiceBean?method=getStudentAttributesFromLDAP" id="getStudentAttributes" />
                     <to uri="direct:studentAttributeAggregate" />
                     <filter>
-
-                        <!-- Allow only error free Skills Exchange records to be updated -->
-                        <method ref="ldapServiceBean" method="hasNoExceptionProperty"></method>
-                        <filter>
-                            <constant>{{sr_persist_student_update_from_ipa_response}}</constant>
-                            <to uri="direct:persist-student" />
-                        </filter>
-
+                        <constant>{{sr_persist_student_update_from_ipa_response}}</constant>
+                        <to uri="direct:persist-student" />
                     </filter>
                 </filter>
+                <setBody><simple>${body.toCsv()}</simple></setBody>
+                <to uri="{{sr_ldap_query_output_append_uri}}"/>
             </split>
 
             <!-- Now that route has looped through all students with missing attributes, send an aggregated report -->
@@ -127,6 +118,10 @@
     </route>
 
     <route id="studentAttribute-aggregate" >
+        <description>
+            1)  Upon onCompletion, throws the following exception if any problems encountered:  com.redhat.gpte.studentregistration.util.InvalidAttributeException
+            2)  onException processor catches InvalidAttributeExeption and logs issues to value of system property: sr_ldap_query_output_uri
+        </description>
         <from uri="direct:studentAttributeAggregate" />
         <aggregate strategyRef="updateStudentAttributeResultsAggregatorStrategy" >
             <correlationExpression>
@@ -139,6 +134,23 @@
             <!-- No errors encountered;  send email of successful processing -->
             <setBody><constant>Skills Exchange Integration App:  All Red Hat students updated with LDAP metadata</constant></setBody>
         </aggregate>
+        <onException>
+            <exception>com.redhat.gpte.studentregistration.util.InvalidAttributeException</exception>
+            <setBody><simple>${exception.message}</simple></setBody>
+            <to uri="{{sr_ldap_query_output_append_uri}}"/>
+        </onException>
+
+    </route>
+
+    <route id="get-student-attributes-from-ipa" >
+        <description>
+            1)  Given a Student object, querys GPTE IPA for various attributes
+            2)  Used for fine grain testing of ability to query for student information from LDAP
+        </description>
+        <from uri="direct:get-student-attributes-from-ipa"/>
+        <to uri="bean:ldapServiceBean?method=getStudentAttributesFromLDAP" />
+        <setBody><simple>${body.toCsv()}</simple></setBody>
+        <to uri="{{sr_ldap_query_output_append_uri}}"/>
     </route>
 
 <!-- ***********************************************************************************************************  -->
