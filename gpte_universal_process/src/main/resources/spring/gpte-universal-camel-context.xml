@@ -166,7 +166,7 @@
         <from uri="vm:send-email-global"/>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
-            <to uri="smtp://{{gpte_smtp_server}}?from={{gpte_email_username}}" id="send_email"/>
+            <to uri="smtp://{{gpte_smtp_server}}?from={{gpte_smtp_from_email_name}}" id="send_email"/>
             <!-- to uri="smtp://{{gpte_smtp_server}}?from=jboss@dev.opentlc.com" id="send_email"/ -->
             <log message="Sent reply email to: ${header.to}"/>
         </filter>

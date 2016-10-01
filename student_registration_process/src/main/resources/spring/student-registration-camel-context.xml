@@ -160,8 +160,9 @@
                 So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
         </description>
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,mawisner@redhat.com,lana@redhat.com,prutledg@redhat.com,asheer@redhat.com</constant></setHeader>
         <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
+        <setHeader headerName="ROUTE_SPECIFIC_SUBJECT"><simple>OPENTLC Daily Import Exceptions: ${date:now:MM-dd-yy} : {{jboss.host.name}}  : ${header.CamelFileName}</simple></setHeader>
+        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>open-program@redhat.com</constant></setHeader>
         <unmarshal ref="studentRegBindy"/>
         <doTry>
                 <!--potentially throws this exception:
@@ -174,7 +175,6 @@
                 </doCatch>
         </doTry>
         <to uri="direct:process-student-registrations-direct" />
-        <to uri="seda:send-email" />
         <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
     </route>
 
@@ -305,9 +305,15 @@
         <choice id="if-exception-exists">
             <when>
                 <simple>${exception.message} != null</simple>
-                <setHeader headerName="Subject">
-                    <simple>GPTE Student Registration Service {{jboss.host.name}}: Problem processing ${header.CamelFileName}</simple>
-                </setHeader>
+                <choice id="if-subject-does-not-exist">
+                    <when>
+                        <simple>${header.ROUTE_SPECIFIC_SUBJECT} != null</simple>
+                        <setHeader headerName="Subject"><simple>${header.ROUTE_SPECIFIC_SUBJECT}</simple></setHeader>
+                    </when>
+                    <otherwise>
+                        <setHeader headerName="Subject"><simple>GPTE Student Registration Service {{jboss.host.name}}: Problem processing ${header.CamelFileName}</simple></setHeader>
+                    </otherwise>
+                </choice>
 
                 <!-- Appears that exception.message is not passed to velocity template -->
                 <setBody><simple>${exception.message}</simple></setBody>
