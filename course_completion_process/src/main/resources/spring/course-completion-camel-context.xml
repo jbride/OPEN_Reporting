@@ -95,7 +95,6 @@
         </description>
         <from uri="{{cc_receive_dokeos_input_uri}}" />
         <log message="Received Dokeos email. from: ${header.Return-Path}, subject ${header.subject}, ${header.CamelFileName}" id="log_dokeos_receive"/>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,jdisrael@redhat.com</constant></setHeader>
                 <unmarshal ref="bindyDokeos"/>
                 <doTry>
                     <!--potentially throws this exception:
@@ -125,6 +124,11 @@
                                 </doCatch>
                             </doTry>
                             <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
+                            <when>
+                                <simple>${body.quizName} contains 'Assignment'</simple>
+                                <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>kboone@redhat.com,jdelong@redhat.com</constant></setHeader>
+                                <to uri="seda:send-email"/>
+                            </when>
                         </otherwise>
                     </choice>
                 </split>
