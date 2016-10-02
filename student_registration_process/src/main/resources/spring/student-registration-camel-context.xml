@@ -223,14 +223,17 @@
     <route id="process-denormalized-student-direct">
         <description>
             1)  Accepts Collection of DenormalizedStudent
-            2)  Accepts the following boolean Header values:
+            2)  Accepts the following optional boolean Header values:
                 a) queryldap
                 b) updatecompany
         </description>
         <from uri="direct:process-denormalized-student-direct"/>
         <to uri="bean:ldapServiceBean?method=determineCompanyIdAndPersistCompanyIfNeedBeGivenDenormalizedStudent" />
+        <to uri="bean:ldapServiceBean?method=setStudentToHeader" />
         <to uri="bean:ldapServiceBean?method=addBodyToCollection" />
         <to uri="vm:sr_post-new-students-to-ipa-uri" />
+        <to uri="bean:ldapServiceBean?method=setStudentToBody" />
+        <to uri="direct:persist-student"/>
     </route>
 
 
@@ -242,8 +245,10 @@
             2. Create collection of these students and pass to the following route:  post-new-students-to-ipa
         </description>
         <from uri="{{sr_post-new-students-to-ipa-batch-uri}}"/>
+        <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_log"/>
         <to uri="bean:studentRegBean?method=queryForStudentsToPushToIPA" />
         <to uri="vm:sr_post-new-students-to-ipa-uri" />
+        <log message="*!*!*!*!   Post New Students to IPA ...... Completed processing of: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.csv" id="log_post_new_students_done"/>
     </route>
 
     <route id="post-new-students-to-ipa">
@@ -254,7 +259,6 @@
             4. Parse the response body pertaining to each student and, if no errors, update database for that student indicating that GPTE IPA now has record of that student information
         </description>
         <from uri="vm:sr_post-new-students-to-ipa-uri"/>
-        <log message="*!*!*!*!   Post New Students to IPA ...... Starting" id="log_post_new_students_log"/>
         <choice>
           <when>
             <simple>${body.size} > 0 </simple>
@@ -277,7 +281,6 @@
             </choice>
           </when>
         </choice>
-        <log message="*!*!*!*!   Post New Students to IPA ...... Completed processing of: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.csv" id="log_post_new_students_done"/>
     </route>
 
 <!--        ***************************************************************************************************         -->
@@ -292,7 +295,7 @@
 
     <route id="persist-student" >
         <from uri="direct:persist-student" />
-        <!-- log message="${body.email} : About to update student"/ -->
+        <!--log message="${body.email} : About to update student"/ -->
         <to uri="bean:studentRegBean?method=updateStudent" id="update-student" />
     </route>
 

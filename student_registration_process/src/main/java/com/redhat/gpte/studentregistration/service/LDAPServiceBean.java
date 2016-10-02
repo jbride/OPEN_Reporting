@@ -561,4 +561,13 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
         exBuilder.append("\n");
         exBuilder.append(message);
     }
+
+    
+    public void setStudentToHeader(Exchange exchange) {
+        DenormalizedStudent dsObj = (DenormalizedStudent)exchange.getIn().getBody();
+        exchange.getIn().setHeader("STUDENT_OBJ", dsObj.getStudentObj());
+    }
+    public void setStudentToBody(Exchange exchange) {
+        exchange.getIn().setBody(exchange.getIn().getHeader("STUDENT_OBJ"));
+    }
 }

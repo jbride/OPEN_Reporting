@@ -141,6 +141,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getDeActivationDate(),
                     null
                     );
+            logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
         } else {
             StringBuilder sBuilder = new StringBuilder("update Students set ");
             sBuilder.append(Student.EMAIL+EQUAL+Student.FIRST_NAME+EQUAL+Student.LAST_NAME+EQUAL);
@@ -167,6 +168,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getActivationDate(),
                     studentObj.getDeActivationDate()
                 });
+            logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
         }
     }
 

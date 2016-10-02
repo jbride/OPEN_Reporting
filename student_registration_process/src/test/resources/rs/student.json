@@ -2,9 +2,9 @@
     "email":"jbride@redhat.com", 
     "firstname":"Jeff", 
     "lastname":"Bride", 
-    "region":"NA", 
+    "region":"global", 
     "subregion":"UNKNOWN", 
-    "country":"USA", 
+    "country":"US", 
     "companyName":"Red Hat", 
-    "roles":"cons"
+    "roles":"consultant"
 }
