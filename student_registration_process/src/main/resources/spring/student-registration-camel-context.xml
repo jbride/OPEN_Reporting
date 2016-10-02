@@ -151,6 +151,7 @@
         <to uri="bean:ldapServiceBean?method=getStudentAttributesFromLDAP" />
         <setBody><simple>${body.toCsv()}</simple></setBody>
         <to uri="{{sr_ldap_query_output_append_uri}}"/>
+        <log message="get-student-attributes-from-ipa: exceptions = \n ${header.validation_exception_buffer} \n" />
     </route>
 
 <!-- ***********************************************************************************************************  -->

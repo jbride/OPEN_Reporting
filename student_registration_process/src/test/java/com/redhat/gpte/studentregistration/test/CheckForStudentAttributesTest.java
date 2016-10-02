@@ -38,7 +38,7 @@ public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testCheckForRHTStudentAttributesBatchTest() throws InterruptedException {
         String routeURI = System.getProperty(CHECK_RHT_STUDENT_ATTRIBUTES_BATCH_URI);
@@ -48,11 +48,12 @@ public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
         template.sendBody(new Object());
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testGetStudentAttributesFromIPATest() throws InterruptedException {
         //String email = "junxian.xu@yun-idc.com";  // valid
-        String email = "ysumida@redhat.com";  // in-valid
+        String email = "jbride@redhat.com";  // valid
+        //String email = "ysumida@redhat.com";  // in-valid
         Student studentIn = new Student();
         studentIn.setEmail(email);
 
