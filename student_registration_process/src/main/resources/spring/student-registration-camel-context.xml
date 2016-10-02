@@ -46,7 +46,7 @@
         <!-- Setting of sys property substition doesn't appear to take affect -->
         <!-- handled><constant>{{sb_onexception_handled}}</constant></handled -->
         <!--handled><constant>{{ipa_onexception_handled}}</constant></handled-->
-        <handled><constant>false</constant></handled>
+        <handled><constant>true</constant></handled>
 
         <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
