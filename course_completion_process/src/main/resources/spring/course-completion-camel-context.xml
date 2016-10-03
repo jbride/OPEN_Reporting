@@ -103,6 +103,7 @@
                     <doCatch>
                         <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
                         <log message="only 1 dokeos student course found in ${header.CamelFileName}"/>
+                        <to uri="bean:cCompletionServiceBean?method=clearException" id="clear-exception"/>
                     </doCatch>
                 </doTry>
                 <split id="for-each-dokeos-course-completion">
@@ -116,7 +117,12 @@
                             <when>
                                 <simple>${body.quizName} contains 'Assignment'</simple>
                                 <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>kboone@redhat.com,jdelong@redhat.com</constant></setHeader>
-                                <to uri="seda:send-email"/>
+                                <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
+                                <to uri="bean:emailServiceBean?method=clearAttachments"/>
+                                <setHeader headerName="Subject">
+                                    <simple>GPTE Advanced ILT Completion: {{jboss.host.name}}: ${body.email}</simple>
+                                </setHeader>
+                                <to uri="seda:send-generic-email"/>
                             </when>
                             <doTry>
                                 <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-convert"/>
@@ -195,6 +201,12 @@
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
+        <to uri="vm:send-email-global"/>
+    </route>
+
+    <route>
+        <from uri="seda:send-generic-email"/>
+        <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
         <to uri="vm:send-email-global"/>
     </route>
 
