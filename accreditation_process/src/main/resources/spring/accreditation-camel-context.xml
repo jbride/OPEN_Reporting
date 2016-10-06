@@ -337,7 +337,10 @@
                 <when><simple>${header.course7} == null</simple>
                     <to uri="velocity:rulesTemplates/rule-template-6courses.vm"/>
                 </when>
-                <otherwise><to uri="velocity:rulesTemplates/rule-template-7courses.vm"/></otherwise>
+                <when><simple>${header.course8} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-7courses.vm"/>
+                </when>
+                <otherwise><to uri="velocity:rulesTemplates/rule-template-8courses.vm"/></otherwise>
             </choice>
             <to uri="file:{{accred_drl_rules_path}}?fileName=${header.CamelFileName}&amp;fileExist=Append"/>
         </split>
