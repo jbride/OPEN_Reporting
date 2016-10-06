@@ -87,7 +87,7 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     @DataField(pos=9, required=true)
     private String userNumber;
 
-    @DataField(pos=10, required=true)
+    @DataField(pos=10, required=true, length=2)
     private String country;
     
     public SumtotalCourseCompletion() {
