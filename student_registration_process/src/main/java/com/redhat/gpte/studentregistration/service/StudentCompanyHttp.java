@@ -135,6 +135,7 @@ public class StudentCompanyHttp {
         }catch(DomainValidationException x) {
             builder = Response.status(Status.BAD_REQUEST);
             builder.entity(x.getLocalizedMessage());
+            return builder.build();
         }catch(java.io.IOException x) {
             x.printStackTrace();
             builder = Response.status(Status.BAD_REQUEST);
