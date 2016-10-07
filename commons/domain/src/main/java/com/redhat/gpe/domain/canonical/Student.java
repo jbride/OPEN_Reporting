@@ -279,4 +279,12 @@ public class Student implements Serializable {
         return sBuilder.toString();
     }
     
+    public void validate() throws DomainValidationException {
+    	StringBuilder sBuilder = new StringBuilder();
+    	if(email == null || email.equals("") )
+    		throw new DomainValidationException("BAD_EMIL"+this.toString());
+    	if(country != null && country.length() != 2)
+    		throw new DomainValidationException("BAD_COUNTRY"+this.toString());
+    }
+    
 }
