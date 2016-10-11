@@ -93,7 +93,18 @@ mvn clean install -DskipTests
 === MySQL
 
 . Ensure the most recent version of the `mariadb-server` package is installed on your RHEL7 operating system.
++
+-----
+# yum install -y mariadb-server
+-----
+
 . Enable and start the `mariadb-server` as an operating system service.
++
+-----
+# systemctl enable mariadb-server.service
+# systemctl start mariadb-server.service
+-----
+
 . Log into the `mysql` database of the MariaDB RDBMS and create the following databases:
 +
 -----
@@ -105,6 +116,10 @@ create database lms_transactional;
 . Create database users and affiliate to databases:
 +
 -----
+grant all on mysql.* to 'root'@'%' identified by 'c-9XSHln8hJ_UH9YvNOgc9mH';
+grant all on dashbuilder.* to 'dashbuilder'@'localhost' identified by 'dashbuilder';
+grant all on lms_reporting.* to 'lms_report'@'localhost' identified by 'lms_report';
+grant all on lms_transactional.* to 'lms_trans'@'localhost' identified by 'lms_trans';
 -----
 
 . Seed the `lms_transactional` database with test data
