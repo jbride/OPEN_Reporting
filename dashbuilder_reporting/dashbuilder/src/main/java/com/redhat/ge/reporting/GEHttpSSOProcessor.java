@@ -35,6 +35,7 @@ public class GEHttpSSOProcessor extends HttpSSOProcessor {
 
     public static final String GE_IPA_FORGE_USERS="cn=forge-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_REPORT_CREATORS="cn=report-creators,cn=groups,cn=accounts,dc=opentlc,dc=com";
+    public static final String GE_IPA_REPORTING_USERS="cn=reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_REGIONAL_MANAGERS="cn=rht-regional-managers,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_PARTNER_USERS="cn=partner-users,cn=groups,cn=accounts,dc=opentlc,dc=co";
 
@@ -66,6 +67,8 @@ public class GEHttpSSOProcessor extends HttpSSOProcessor {
                 // Login as root since user's login = value of this sys property:  org.jboss.dashboard.users.UserStatus.rootLogin
                 log.debug("processRequest() logging in as root: "+login);
                 us.initSessionAsRoot();
+            } else if (request.isUserInRole(GE_IPA_REPORTING_USERS)) {
+                initSession(login, us, GE_IPA_REPORTING_USERS);
             } else if (request.isUserInRole(GE_IPA_REPORT_CREATORS)) {
                 initSession(login, us, GE_IPA_REPORT_CREATORS);
             } else if (request.isUserInRole(GE_IPA_REGIONAL_MANAGERS)) {
