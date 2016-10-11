@@ -169,6 +169,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         }
         sObj.setIpaStatus(1);
         sObj.setCountry(stCourseCompletion.getCountry());
+        sObj.setRegion(stCourseCompletion.getRegion());
 
         insertNewStudent(exchange, sObj);
     }
