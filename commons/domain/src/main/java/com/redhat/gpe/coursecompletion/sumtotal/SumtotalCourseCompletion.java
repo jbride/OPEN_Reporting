@@ -30,6 +30,7 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     public static final String ATTEMPT_START_DATE="attemptStartDate";
     public static final String ATTEMPT_END_DATE="attemptEndDate";
     public static final String TEXT4="text4";
+    public static final String TEXT4_DELIMITER=".";
     public static final DateFormat dfObj = new SimpleDateFormat("MMM dd, yyyy");
 
     public static final String COURSE_COMPLETION_MAPPING_NAME = "sumtotal";
@@ -80,8 +81,8 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     @DataField(pos=7, required=true)
     private String organization;
     
-    // Tier and type (not currently used)
-    @DataField(pos=8)
+    // Region / Tier and type (not currently used):  example:   EMEA.ADVANCED.ISV
+    @DataField(pos=8, required=true)
     private String text4;
 
     @DataField(pos=9, required=true)
@@ -258,6 +259,11 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     
     public String getAttemptEndDateString(){
         return dfObj.format(this.attemptEndDate);
+    }
+
+    public String getRegion() {
+        String region = this.text4.substring(0, text4.indexOf(TEXT4_DELIMITER));
+        return region;
     }
     
     @Override
