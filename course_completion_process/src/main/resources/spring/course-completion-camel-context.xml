@@ -49,7 +49,7 @@
 
     <route id="receive-sumtotal-course-completions">
         <description>
-            1)  Executes validation logic on inbound data file
+            1)  Executes validation logic on inbound Sumtotal Course Completion data file
             2)  Kicks back data files that do not pass validation logic and sends notification email of problem
             3)  Persists valid course completions
         </description>

@@ -79,6 +79,15 @@
         <to uri="seda:send-email"/>
     </onException>
 
+    <onException>
+        <exception>java.lang.NullPointerException</exception>
+
+        <handled><constant>true</constant></handled>
+
+        <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
+        <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+    </onException>
+
 
     <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
     <rest path="/gpte_accreditation/students/">
