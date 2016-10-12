@@ -100,7 +100,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public List<Student> selectRHTStudentsWithMissingAttributes() {
-        String sql = "SELECT * FROM Students WHERE Region is NULL or Roles is NULL and email like \"%redhat.com\" order by email";
+        String sql = "SELECT * FROM Students WHERE (Region is NULL or Roles is NULL) and email like \"%redhat.com\" order by email";
         List<Student> students = sbJdbcTemplate.query(sql, new StudentRowMapper());
         return students;
     }
