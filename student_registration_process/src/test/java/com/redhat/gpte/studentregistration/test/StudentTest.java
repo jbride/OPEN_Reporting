@@ -42,7 +42,7 @@ public class StudentTest extends CamelSpringTestSupport {
         template.sendBody(studentObj);
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testPersistRHTStudent() throws InterruptedException {
         
