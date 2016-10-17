@@ -1,0 +1,55 @@
+:uri:
+:toc: manual
+:toc-placement: preamble
+:numbered:
+:rulesspreadsheet: link:https://docs.google.com/spreadsheets/d/1C4jbSADmHJvLL3PBBBSEB54L8G_I6NN5rblWIGymAXg/edit#gid=1640119171[GPTE Accreditation Rules Spreadsheet with validation]
+:designdoc: link:https://docs.google.com/document/d/1rFioqj5uhLtdoUEfHHBEwh4_-bW7vqEc5N0R24tN9FU/edit#[GPTE Reporting design document]
+
+= GPTE Student Registration API
+
+== Overview
+The Red Hat GPTE team has a need to provide reports regarding course completions and accreditations achieved by both Red Hat associates as well as Red Hat partners.
+A copy of the student and company details related to those students who participate in Red Hat GPTE's enablement offerings should be co-located with the course completion and accreditation data.
+
+The _system of record_ of student and company information is Red Hat's Saleforce account.
+
+This document provides details needed for a Salesforce client to supply student and company details to GPTE Reporting.
+
+
+== REST API
+
+=== Overview
+GPTE Reporting exposes a RESTful interface to manage student and company information.
+
+=== Resources
+
+===== *processStudent*
+
+. *HTTP Method* :  _PUT_
+. *Content-Type* : _application/json_
+. *Payload Example* :
++
+-----
+-----
+
+. *URI* : _user-registration-process/rs/student/{salesForceStudentId}user-registration-process/rs/student/{salesForceStudentId}_
+. *Response Codes* :
+.. 400 - Invalid JSON payload
+.. 404 - Resource not found
+.. 503 - Internal GPTE Reporting system(s) not available
+. *Notes*
+
+==== Development Environment
+==== Production Environment
+
+=== Security
+
+== AMQP API
+future
+
+== Internal Implementation Details
+
+
+
+ifdef::showscript[]
+endif::showscript[]

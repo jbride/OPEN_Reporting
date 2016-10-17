@@ -139,6 +139,7 @@ public class StudentCompanyHttp {
         }catch(java.io.IOException x) {
             x.printStackTrace();
             builder = Response.status(Status.BAD_REQUEST);
+            builder.entity(x.getLocalizedMessage());
             return builder.build();
         }
 
