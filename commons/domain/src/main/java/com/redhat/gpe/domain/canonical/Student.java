@@ -38,7 +38,7 @@ public class Student implements Serializable {
     public static final String COMMA = ",";
     public static final String NEW_LINE = "\n";
 
-    public static final String FROM_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate";
+    public static final String SELECT_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate";
 
     public static final int SKILLSBASE_PERSON_UNVERIFIED = 0;
     public static final int SKILLSBASE_PERSON_NOTIFIED_NO_ACCOUNT=1;

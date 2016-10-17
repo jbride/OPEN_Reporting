@@ -21,7 +21,7 @@ public class Company implements Serializable {
     public static final String PARTNER_TIER = "partnertier";
     public static final String LDAP_ID = "ldapId";
     public static final String SFDC_ID = "sfdcId";
-    public static final String FROM_CLAUSE = "c.CompanyID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID, c.SfdcID ";
+    public static final String SELECT_CLAUSE = "c.CompanyID, c.CompanyName, c.PartnerType, c.PartnerTier, c.LdapID, c.SfdcID ";
     public static final Integer COMPANY_UNKNOWN_ID = 10000;
 
     private Integer companyid = 0;

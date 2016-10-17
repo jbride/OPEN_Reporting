@@ -25,7 +25,7 @@ public class StudentCourse implements Serializable {
     public static final String PROCESSED = "processed";
     public static final int UNPROCESSED = 0;
     public static final int PROCESSED_ALL = 1;
-    public static final String FROM_CLAUSE = "sc.StudentCourseID, sc.StudentID, sc.CourseID, sc.LanguageID, sc.AssessmentDate, sc.AssessmentResult, sc.AssessmentScore, sc.Processed";
+    public static final String SELECT_CLAUSE = "sc.StudentCourseID, sc.StudentID, sc.CourseID, sc.LanguageID, sc.AssessmentDate, sc.AssessmentResult, sc.AssessmentScore, sc.Processed";
 
     private Integer    studentcourseid = 0;
 

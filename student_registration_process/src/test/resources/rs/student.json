@@ -6,5 +6,12 @@
     "subregion":"UNKNOWN", 
     "country":"US", 
     "companyName":"Red Hat", 
-    "roles":"consultant"
+    "roles":"consultant",
+    "salesforcecontactid":"unknown",
+    "salesforceusername":"unknown",
+    "salesforcemanagerid":"unknown",
+    "salesforceaccountname":"unknown",
+    "salesforcepartnertype":"unknown",
+    "salesforcepartnertier":"unknown",
+    "salesforcejobfunctions":"consultant",
 }

@@ -17,7 +17,7 @@ public class Course implements Serializable {
 
     public static final String COURSE_ID = "CourseID";
     public static final String COURSE_NAME = "CourseName";
-    public static final String FROM_CLAUSE = "c.CourseID,c.CourseName";
+    public static final String SELECT_CLAUSE = "c.CourseID,c.CourseName";
 
     private String courseid;
     private String coursename;

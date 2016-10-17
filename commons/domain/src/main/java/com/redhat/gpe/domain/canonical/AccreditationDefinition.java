@@ -21,7 +21,7 @@ public class AccreditationDefinition implements Serializable {
     public static final String TRACK = "Track";
     public static final String PROFICIENCY = "Proficiency";
     public static final String ACCREDITATION_EXPORT_ID = "AccreditationExportID";
-    public static final String FROM_CLAUSE = "a.AccreditationID,a.AccreditationName,a.Role,a.Specialization,a.Track,a.Proficiency,a.AccreditationExportID";
+    public static final String SELECT_CLAUSE = "a.AccreditationID,a.AccreditationName,a.Role,a.Specialization,a.Track,a.Proficiency,a.AccreditationExportID";
 
     private Integer accreditationid = 0;
     private String  accreditationname;
