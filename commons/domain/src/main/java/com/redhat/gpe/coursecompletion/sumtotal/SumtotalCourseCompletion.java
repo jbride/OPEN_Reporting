@@ -30,6 +30,7 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     public static final String ATTEMPT_START_DATE="attemptStartDate";
     public static final String ATTEMPT_END_DATE="attemptEndDate";
     public static final String TEXT4="text4";
+    public static final String TEXT4_DELIMITER=".";
     public static final DateFormat dfObj = new SimpleDateFormat("MMM dd, yyyy");
 
     public static final String COURSE_COMPLETION_MAPPING_NAME = "sumtotal";
@@ -40,7 +41,7 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     private String fullName;
     
 
-    @DataField(pos=2)
+    @DataField(pos=2, required=true)
     private String email;
     
     private String text3;
@@ -53,13 +54,13 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     
     private boolean isActive;
     
-    @DataField(pos=3)
+    @DataField(pos=3, required=true)
     private String activityLabel;
 
     @DataField(pos=4)
     private String activityName;
     
-    @DataField(pos=5)
+    @DataField(pos=5, required=true)
     private String activityCode;
     
     private boolean isCertification;
@@ -70,24 +71,24 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
 
     private Date attemptStartDate = new Date();
     
-    @DataField(pos=6, pattern="MMM dd, yyyy")
+    @DataField(pos=6, pattern="MMM dd, yyyy", required=true)
     private Date attemptEndDate = new Date();
     
     
     // Sumtotal course completion spreadsheet now provides company name from SalesForce
     // This companyName is included because the information often times is not available in GPTE's IPA LDAP
     // This is the case for students that are in a Sales track and not a SE / Delivery track (thus student doesn't need a lab environment nor OPENTLC SSO
-    @DataField(pos=7)
+    @DataField(pos=7, required=true)
     private String organization;
     
-    // Tier and type (not currently used)
-    @DataField(pos=8)
+    // Region / Tier and type (not currently used):  example:   EMEA.ADVANCED.ISV
+    @DataField(pos=8, required=true)
     private String text4;
 
-    @DataField(pos=9)
+    @DataField(pos=9, required=true)
     private String userNumber;
 
-    @DataField(pos=10)
+    @DataField(pos=10, required=true, length=2)
     private String country;
     
     public SumtotalCourseCompletion() {
@@ -258,6 +259,11 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     
     public String getAttemptEndDateString(){
         return dfObj.format(this.attemptEndDate);
+    }
+
+    public String getRegion() {
+        String region = this.text4.substring(0, text4.indexOf(TEXT4_DELIMITER));
+        return region;
     }
     
     @Override

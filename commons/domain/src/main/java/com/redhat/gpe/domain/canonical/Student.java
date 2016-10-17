@@ -35,6 +35,8 @@ public class Student implements Serializable {
     public static final String IPA_STATUS = "IpaStatus";
     public static final String ACTIVATION_DATE = "ActivationDate";
     public static final String DEACTIVATION_DATE = "DeActivationDate";
+    public static final String COMMA = ",";
+    public static final String NEW_LINE = "\n";
 
     public static final String FROM_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate";
 
@@ -84,7 +86,7 @@ public class Student implements Serializable {
      * the Title attribute in LDAP is being used for Role because it was available. It does not mean its their title
      * Cost center is computed by their role (aka:  title)  and geo */
     public enum Titles {
-        sa,cons,other,sa_fed
+        sa,consultant,other,sa_fed
     }
     public enum Geos {
         na,latam,emea,apac,global,fedsled
@@ -313,6 +315,31 @@ public class Student implements Serializable {
                 + skillsbasePersonId + ", ipaStatus=" + ipaStatus
                 + ", activationDate=" + activationDate + ", deActivationDate="
                 + deActivationDate + "]";
+    }
+
+    public String toCsv() {
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append(NEW_LINE);
+        sBuilder.append(email);
+        sBuilder.append(COMMA);
+        sBuilder.append(companyName);
+        sBuilder.append(COMMA);
+        sBuilder.append(roles);
+        sBuilder.append(COMMA);
+        sBuilder.append(region);
+        sBuilder.append(COMMA);
+        sBuilder.append(subregion);
+        sBuilder.append(COMMA);
+        sBuilder.append(country);
+        return sBuilder.toString();
+    }
+    
+    public void validate() throws DomainValidationException {
+        StringBuilder sBuilder = new StringBuilder();
+        if(email == null || email.equals("") )
+            throw new DomainValidationException("BAD_EMIL :\n"+this.toString());
+        if(country != null && country.length() != 2)
+            throw new DomainValidationException("BAD_COUNTRY :\n"+this.toString());
     }
     
 }

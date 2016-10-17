@@ -39,3 +39,6 @@ alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 
 # List latest middleware course completions
 # select c.courseName, sc.courseId, sc.assessmentdate, sc.createdate, s.email, sc.AssessmentResult, sc.AssessmentScore  from Courses c, StudentCourses sc, Students s where c.courseId=sc.courseId and sc.studentId = s.studentId and c.CourseId like "MWS-%" order by sc.createdate desc limit 100;
+
+# view attributes of latest RHT students
+# select email, roles, region, createDate from Students where email like '%redhat.com%' order by createDate desc limit 30;

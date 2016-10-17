@@ -40,7 +40,7 @@
         <!-- Need to set to true, however, when running in JBoss.  Otherwise, infinite loop of emails will go out -->
         <!-- Setting of sys property substition doesn't appear to take affect -->
         <!-- handled><constant>{{sb_onexception_handled}}</constant></handled -->
-        <handled><constant>false</constant></handled>
+        <handled><constant>true</constant></handled>
 
         <log message="Exception encountered: ${exception.message} : return-path = ${header.Return-Path} " loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
@@ -49,7 +49,7 @@
 
     <route id="receive-sumtotal-course-completions">
         <description>
-            1)  Executes validation logic on inbound data file
+            1)  Executes validation logic on inbound Sumtotal Course Completion data file
             2)  Kicks back data files that do not pass validation logic and sends notification email of problem
             3)  Persists valid course completions
         </description>
@@ -95,7 +95,6 @@
         </description>
         <from uri="{{cc_receive_dokeos_input_uri}}" />
         <log message="Received Dokeos email. from: ${header.Return-Path}, subject ${header.subject}, ${header.CamelFileName}" id="log_dokeos_receive"/>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdoser@redhat.com,nihall@redhat.com,jdisrael@redhat.com</constant></setHeader>
                 <unmarshal ref="bindyDokeos"/>
                 <doTry>
                     <!--potentially throws this exception:
@@ -104,17 +103,27 @@
                     <doCatch>
                         <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
                         <log message="only 1 dokeos student course found in ${header.CamelFileName}"/>
+                        <to uri="bean:cCompletionServiceBean?method=clearException" id="clear-exception"/>
                     </doCatch>
                 </doTry>
                 <split id="for-each-dokeos-course-completion">
                     <simple>${body}</simple>
                     <choice id="if-assignment-passing-score">
                         <when>
-                            <!--simple>${body.quizName} contains 'Assignment'  &amp;&amp; ${body.score} < 100</simple -->
                             <simple>${body.quizName} contains 'Assignment' &amp;&amp; ${body.scoreInt} &lt; 100</simple>
                             <log message="${body.email} : Will not persist dokeos student assignment due to non-passing score: ${body.score}" id="log_dokeos_assignment_not_100"/>
                         </when>
                         <otherwise>
+                            <when>
+                                <simple>${body.quizName} contains 'Assignment'</simple>
+                                <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>kiboone@redhat.com</constant></setHeader>
+                                <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
+                                <to uri="bean:emailServiceBean?method=clearAttachments"/>
+                                <setHeader headerName="Subject">
+                                    <simple>GPTE Advanced ILT Completion: {{jboss.host.name}}: ${body.email}</simple>
+                                </setHeader>
+                                <to uri="seda:send-generic-email"/>
+                            </when>
                             <doTry>
                                 <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-convert"/>
                                 <doCatch>
@@ -192,6 +201,12 @@
                 <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
             </otherwise>
         </choice>
+        <to uri="vm:send-email-global"/>
+    </route>
+
+    <route>
+        <from uri="seda:send-generic-email"/>
+        <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
         <to uri="vm:send-email-global"/>
     </route>
 

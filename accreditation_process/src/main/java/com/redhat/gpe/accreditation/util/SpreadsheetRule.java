@@ -19,6 +19,7 @@ public class SpreadsheetRule implements java.io.Serializable {
     public static final String COURSE5 = "course5";
     public static final String COURSE6 = "course6";
     public static final String COURSE7 = "course7";
+    public static final String COURSE8 = "course8";
     public static final String ACCRED_NAME = "accredName";
     public static final String RULE_NAME = "ruleName";
     
@@ -50,9 +51,12 @@ public class SpreadsheetRule implements java.io.Serializable {
     private String course7;
     
     @DataField(pos=10)
+    private String course8;
+    
+    @DataField(pos=11)
     private String accredName;
 
-    @DataField(pos=11)
+    @DataField(pos=12)
     private String notes;
     
     private String ruleName;
@@ -149,6 +153,14 @@ public class SpreadsheetRule implements java.io.Serializable {
         this.course7 = course7;
     }
 
+    public String getCourse8() {
+        return course8;
+    }
+
+    public void setCourse8(String course8) {
+        this.course8 = course8;
+    }
+
     public String getAccredName() {
         return accredName;
     }
@@ -170,7 +182,8 @@ public class SpreadsheetRule implements java.io.Serializable {
                 + endDate + ", course1=" + course1 + ", course2=" + course2
                 + ", course3=" + course3 + ", course4=" + course4
                 + ", course5=" + course5 + ", course6=" + course6
-                + ", course7=" + course7 + ", accredName=" + accredName + "]";
+                + ", course7=" + course7 + ", course8=" + course8
+                + ", accredName=" + accredName + "]";
     }
 
     public int getSpreadsheetRowNumber() {

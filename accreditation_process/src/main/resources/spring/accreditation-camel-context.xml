@@ -79,6 +79,15 @@
         <to uri="seda:send-email"/>
     </onException>
 
+    <onException>
+        <exception>java.lang.NullPointerException</exception>
+
+        <handled><constant>true</constant></handled>
+
+        <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
+        <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+    </onException>
+
 
     <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
     <rest path="/gpte_accreditation/students/">
@@ -337,7 +346,10 @@
                 <when><simple>${header.course7} == null</simple>
                     <to uri="velocity:rulesTemplates/rule-template-6courses.vm"/>
                 </when>
-                <otherwise><to uri="velocity:rulesTemplates/rule-template-7courses.vm"/></otherwise>
+                <when><simple>${header.course8} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-7courses.vm"/>
+                </when>
+                <otherwise><to uri="velocity:rulesTemplates/rule-template-8courses.vm"/></otherwise>
             </choice>
             <to uri="file:{{accred_drl_rules_path}}?fileName=${header.CamelFileName}&amp;fileExist=Append"/>
         </split>

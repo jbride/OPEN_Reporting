@@ -377,6 +377,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse5(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse6(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse7(), courseSet);
+            problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse8(), courseSet);
             
             // 3)  Validate Accreditation
             problemNumber = checkAccreditation(problemNumber, rNumber, sRule, eBuilder, sRule.getAccredName(), accredSet);

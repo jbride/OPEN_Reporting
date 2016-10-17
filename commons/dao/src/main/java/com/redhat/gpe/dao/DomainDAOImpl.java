@@ -100,7 +100,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
     
     public List<Student> selectRHTStudentsWithMissingAttributes() {
-        String sql = "SELECT * FROM Students WHERE Region is NULL or Roles is NULL and email like \"%redhat.com\" order by email";
+        String sql = "SELECT * FROM Students WHERE (Region is NULL or Roles is NULL) and email like \"%redhat.com\" order by email";
         List<Student> students = sbJdbcTemplate.query(sql, new StudentRowMapper());
         return students;
     }
@@ -141,6 +141,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getDeActivationDate(),
                     null
                     );
+            logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
         } else {
             StringBuilder sBuilder = new StringBuilder("update Students set ");
             sBuilder.append(Student.EMAIL+EQUAL+Student.FIRST_NAME+EQUAL+Student.LAST_NAME+EQUAL);
@@ -167,6 +168,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getActivationDate(),
                     studentObj.getDeActivationDate()
                 });
+            logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
         }
     }
 

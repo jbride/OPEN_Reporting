@@ -24,6 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.redhat.gpe.domain.canonical.Company;
+import com.redhat.gpe.domain.canonical.DomainValidationException;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
@@ -125,14 +126,20 @@ public class StudentCompanyHttp {
         try {
             logger.info("processStudentReg() salesForceId = "+salesForceId);
             sObj = jsonMapper.readValue(payload, Student.class);
+            sObj.validate();
             
             if(StringUtils.isNotEmpty(uploadIPA))
                 sObj.setShouldUpdateIPA(Boolean.parseBoolean(uploadIPA));
             
             logger.debug("processStudentReg() payload = "+sObj);
+        }catch(DomainValidationException x) {
+            builder = Response.status(Status.BAD_REQUEST);
+            builder.entity(x.getLocalizedMessage());
+            return builder.build();
         }catch(java.io.IOException x) {
             x.printStackTrace();
             builder = Response.status(Status.BAD_REQUEST);
+            builder.entity(x.getLocalizedMessage());
             return builder.build();
         }
 

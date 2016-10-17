@@ -22,7 +22,7 @@ import com.redhat.gpte.util.PropertiesSupport;
 public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
     
     public static final String CHECK_RHT_STUDENT_ATTRIBUTES_BATCH_URI = "sr_check-for-rht-student_attributes_batch_uri";
-    public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "vm:get-student-attributes-from-ipa";
+    public static final String GET_STUDENT_ATTRIBUTES_FROM_IPA_URI = "direct:get-student-attributes-from-ipa";
     private static final Logger logger = LoggerFactory.getLogger(CheckForStudentAttributesTest.class);
     
     public CheckForStudentAttributesTest() throws IOException {
@@ -48,10 +48,12 @@ public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
         template.sendBody(new Object());
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testGetStudentAttributesFromIPATest() throws InterruptedException {
-        String email = "junxian.xu@yun-idc.com";
+        //String email = "junxian.xu@yun-idc.com";  // valid
+        String email = "jbride@redhat.com";  // valid
+        //String email = "ysumida@redhat.com";  // in-valid
         Student studentIn = new Student();
         studentIn.setEmail(email);
 
@@ -61,8 +63,5 @@ public class CheckForStudentAttributesTest extends CamelSpringTestSupport {
         Message in = exchange.getIn();
         in.setBody(studentIn);
         exchange = template.send(GET_STUDENT_ATTRIBUTES_FROM_IPA_URI, exchange);
-        Student studentOut = (Student)exchange.getIn().getBody();
-        System.out.println("testGetStudentAttributesFromIPATest() email = "+email+" ; companyName = "+studentOut.getCompanyName());
-
     }
 }
