@@ -124,14 +124,14 @@ public class StudentCompanyHttp {
         Producer producer = null;
         Student sObj = null;
         try {
-            logger.info("processStudentReg() salesForceId = "+salesForceId);
+            logger.info("processStudentReg() salesForceId = "+salesForceId+" : uploadIPA = "+uploadIPA);
             sObj = jsonMapper.readValue(payload, Student.class);
             sObj.validate();
             
             if(StringUtils.isNotEmpty(uploadIPA))
                 sObj.setShouldUpdateIPA(Boolean.parseBoolean(uploadIPA));
             
-            logger.debug("processStudentReg() payload = "+sObj);
+            logger.debug("processStudentReg() uploadIPA = "+sObj.getShouldUpdateIPA()+" : payload = "+sObj);
         }catch(DomainValidationException x) {
             builder = Response.status(Status.BAD_REQUEST);
             builder.entity(x.getLocalizedMessage());
