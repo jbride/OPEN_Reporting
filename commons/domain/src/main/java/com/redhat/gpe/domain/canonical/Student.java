@@ -35,6 +35,12 @@ public class Student implements Serializable {
     public static final String IPA_STATUS = "IpaStatus";
     public static final String ACTIVATION_DATE = "ActivationDate";
     public static final String DEACTIVATION_DATE = "DeActivationDate";
+    public static final String SALESFORCEUSERNAME = "SalesForceUserName";
+    public static final String SALESFORCEMANAGERID = "SalesForceManagerID";
+    public static final String SALESFORCEACCOUNTNAME = "SalesForceAccountName";
+    public static final String SALESFORCEPARTNERTYPE = "SalesForcePartnerType";
+    public static final String SALESFORCEPARTNERTIER = "SalesForcePartnerTier";
+    public static final String SALESFORCEJOBFUNCTIONS = "SalesForceJobFunctions";
     public static final String COMMA = ",";
     public static final String NEW_LINE = "\n";
 

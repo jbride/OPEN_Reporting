@@ -139,7 +139,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getIpaStatus(),
                     studentObj.getActivationDate(),
                     studentObj.getDeActivationDate(),
-                    null
+                    null,
+                    studentObj.getSalesforceusername(),
+                    studentObj.getSalesforcemanagerid(),
+                    studentObj.getSalesforceaccountname(),
+                    studentObj.getSalesforcepartnertype(),
+                    studentObj.getSalesforcepartnertier(),
+                    studentObj.getSalesforcejobfunctions()
                     );
             logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
         } else {
@@ -148,7 +154,10 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append(Student.COMPANY_ID+EQUAL+Student.REGION+EQUAL+Student.SUBREGION+EQUAL+Student.COUNTRY+EQUAL+Student.ROLES+EQUAL);
             sBuilder.append(Student.SALES_FORCE_CONTACT_ID+EQUAL+Student.SALES_FORCE_ACTIVE+EQUAL+Student.SUMTOTAL_ID+EQUAL+Student.SUMTOTAL_ACTIVE+EQUAL);
             sBuilder.append(Student.SKILLSBASE_STATUS+EQUAL+Student.IPA_STATUS+EQUAL);
-            sBuilder.append(Student.ACTIVATION_DATE+EQUAL+Student.DEACTIVATION_DATE+"=? ");
+            sBuilder.append(Student.ACTIVATION_DATE+EQUAL+Student.DEACTIVATION_DATE+EQUAL);
+            sBuilder.append(Student.SALESFORCEUSERNAME+EQUAL+Student.SALESFORCEMANAGERID+EQUAL);
+            sBuilder.append(Student.SALESFORCEACCOUNTNAME+Student.SALESFORCEPARTNERTYPE+EQUAL);
+            sBuilder.append(Student.SALESFORCEPARTNERTIER+Student.SALESFORCEJOBFUNCTIONS+"=? ");
             sBuilder.append("where studentID="+studentObj.getStudentid());
             sbJdbcTemplate.update(sBuilder.toString(),new Object[]{
                     studentObj.getEmail(),
@@ -166,7 +175,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getSkillsbaseStatus(),
                     studentObj.getIpaStatus(),
                     studentObj.getActivationDate(),
-                    studentObj.getDeActivationDate()
+                    studentObj.getDeActivationDate(),
+                    studentObj.getSalesforceusername(),
+                    studentObj.getSalesforcemanagerid(),
+                    studentObj.getSalesforceaccountname(),
+                    studentObj.getSalesforcepartnertype(),
+                    studentObj.getSalesforcepartnertier(),
+                    studentObj.getSalesforcejobfunctions()
                 });
             logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
         }
