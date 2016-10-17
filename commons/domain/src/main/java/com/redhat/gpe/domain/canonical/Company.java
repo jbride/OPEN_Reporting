@@ -116,4 +116,9 @@ public class Company implements Serializable {
         sb.append(")");
         return sb.toString();
     }
+
+    public void validate() throws DomainValidationException {
+        if(companyname == null || companyname.equals("") )
+            throw new DomainValidationException("BAD_COMPANY_NAME :\n"+this.toString());
+    }
 }

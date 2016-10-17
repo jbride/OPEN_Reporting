@@ -36,6 +36,7 @@ public class StudentCompanyHttp {
 
     private static final String PROCESS_DENORMALIZED_STUDENT_VM_URI="vm:process-denormalized-student-vm";
     private static final String PROCESS_STUDENT_REGISTRATION_VM_URI="vm:process-student-registrations-vm";
+    private static final String PROCESS_COMPANY_VM_URI="vm:persist-company";
     private static final String FALSE = "FALSE";
     private static final String UPLOAD_TO_GPTE_IPA = "UPLOAD_TO_GPTE_IPA";
     private static final String SALES_FORCE_ID = "salesForceId";
@@ -106,6 +107,61 @@ public class StudentCompanyHttp {
         builder = Response.ok("successfully processed student registration with following salesforceid: "+salesForceId+"\n");
         return builder.build();
     }
+
+    /**
+     * sample usage :
+     *  Post to GPTE (never uploads to IPA):  curl -v -X PUT -HAccept:text/plain -HContent-Type:application/json --upload-file student_registration_process/src/test/resources/rs/company.json $HOSTNAME:8205/user-registration-process/rs/company/123456
+     */
+    @PUT
+    @Path("/company/{salesForceId: .*}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({ "text/plain" })
+    public Response processCompany(@PathParam(SALES_FORCE_ID)final String salesForceId,
+                                   final String payload
+                                 ) {
+        ResponseBuilder builder = Response.ok();
+        Producer producer = null;
+        Company cObj = null;
+        try {
+            logger.info("processCompany() salesForceId = "+salesForceId);
+            cObj = jsonMapper.readValue(payload, Company.class);
+            cObj.setSfdcId(salesForceId);
+            cObj.validate();
+            
+        }catch(DomainValidationException x) {
+            builder = Response.status(Status.BAD_REQUEST);
+            builder.entity(x.getLocalizedMessage());
+            return builder.build();
+        }catch(java.io.IOException x) {
+            x.printStackTrace();
+            builder = Response.status(Status.BAD_REQUEST);
+            builder.entity(x.getLocalizedMessage());
+            return builder.build();
+        }
+
+        try {
+            CamelContext cContext = new DefaultCamelContext();
+            Endpoint endpoint = cContext.getEndpoint(PROCESS_COMPANY_VM_URI);
+            producer = endpoint.createProducer();
+            producer.start();
+            Exchange exchange = producer.createExchange();
+            exchange.getIn().setBody(cObj);
+            producer.process(exchange);
+        }catch(Exception x){
+            x.printStackTrace();
+            builder = Response.status(Status.SERVICE_UNAVAILABLE);
+            return builder.build();
+        }finally {
+            try {
+                if(producer != null)
+                    producer.stop();
+            } catch(Exception y) {
+                y.printStackTrace();
+            }
+        }
+        builder = Response.ok("successfully processed company with following salesforceid: "+salesForceId+"\n");
+        return builder.build();
+    }
     
     /**
      * sample usage :
@@ -124,14 +180,15 @@ public class StudentCompanyHttp {
         Producer producer = null;
         Student sObj = null;
         try {
-            logger.info("processStudentReg() salesForceId = "+salesForceId+" : uploadIPA = "+uploadIPA);
+            logger.info("processStudent() salesForceId = "+salesForceId+" : uploadIPA = "+uploadIPA);
             sObj = jsonMapper.readValue(payload, Student.class);
+            sObj.setSalesforcecontactid(salesForceId);
             sObj.validate();
             
             if(StringUtils.isNotEmpty(uploadIPA))
                 sObj.setShouldUpdateIPA(Boolean.parseBoolean(uploadIPA));
             
-            logger.debug("processStudentReg() uploadIPA = "+sObj.getShouldUpdateIPA()+" : payload = "+sObj);
+            logger.debug("processStudent() uploadIPA = "+sObj.getShouldUpdateIPA()+" : payload = "+sObj);
         }catch(DomainValidationException x) {
             builder = Response.status(Status.BAD_REQUEST);
             builder.entity(x.getLocalizedMessage());

@@ -309,6 +309,10 @@
     </route>
 
 
+    <route id="vm-persist-company" >
+        <from uri="vm:persist-company" />
+        <to uri="direct:persist-company" id="update-company-direct" />
+    </route>
     <route id="persist-company" >
         <from uri="direct:persist-company" />
         <to uri="bean:studentRegBean?method=updateCompany" id="update-company" />

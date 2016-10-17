@@ -7,11 +7,11 @@
     "country":"US", 
     "companyName":"Red Hat", 
     "roles":"consultant",
-    "salesforcecontactid":"unknown",
-    "salesforceusername":"unknown",
-    "salesforcemanagerid":"unknown",
-    "salesforceaccountname":"unknown",
-    "salesforcepartnertype":"unknown",
-    "salesforcepartnertier":"unknown",
-    "salesforcejobfunctions":"consultant",
+    "salesforcecontactid":"uk_contact",
+    "salesforceusername":"uk_username",
+    "salesforcemanagerid":"uk_managerid",
+    "salesforceaccountname":"uk_accountname",
+    "salesforcepartnertype":"uk_partnertype",
+    "salesforcepartnertier":"uk_partnertier",
+    "salesforcejobfunctions":"uk_consultant"
 }
