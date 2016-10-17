@@ -25,24 +25,73 @@ GPTE Reporting exposes a RESTful interface to manage student and company informa
 
 ===== *processStudent*
 
+. *Network protocol* : _https_  (See the <<security>> section for more details).
 . *HTTP Method* :  _PUT_
 . *Content-Type* : _application/json_
 . *Payload Example* :
 +
 -----
+{
+    "email":"jbride@redhat.com",
+    "firstname":"Jeff",
+    "lastname":"Bride",
+    "region":"global",
+    "subregion":"GPTE_NOT_USED",
+    "country":"US",
+    "companyName":"Red Hat",
+    "roles":"consultant",
+    "salesforcecontactid":"testcontactId",
+    "salesforceusername":"test_username",
+    "salesforcemanagerid":"test_managerid",
+    "salesforceaccountname":"test_accountname",
+    "salesforcejobfunctions":"test_consultant"
+}
 -----
 
-. *URI* : _user-registration-process/rs/student/{salesForceStudentId}user-registration-process/rs/student/{salesForceStudentId}_
+. *URI* : _user-registration-process/rs/company/{salesForceStudentId}_
 . *Response Codes* :
 .. 400 - Invalid JSON payload
 .. 404 - Resource not found
 .. 503 - Internal GPTE Reporting system(s) not available
 . *Notes*
 
-==== Development Environment
-==== Production Environment
+===== *processCompany*
 
+. *Network protocol* : _https_  (See the <<security>> section for more details).
+. *HTTP Method* :  _PUT_
+. *Content-Type* : _application/json_
+. *Payload Example* :
++
+-----
+{
+    "companyname":"GPTE TEST COMPANY",
+    "partnertype":"test_partnertype",
+    "partnertier":"test_partnertier"
+}
+-----
+
+. *URI* : _user-registration-process/rs/company/{salesForceCompanyId}_
+. *Response Codes* :
+.. 400 - Invalid JSON payload
+.. 404 - Resource not found
+.. 503 - Internal GPTE Reporting system(s) not available
+. *Notes*
+
+
+=== FQDNs
+. *Development Environment:*  _dev.opentlc.com_
+. *Production Environment:* _reporting.opentlc.com_
+
+[[security]]
 === Security
+Both the _processStudent_ as well as the _processCompany_ REST APIs are secured using the _https_ with _Client Authentication_ protocol.
+
+The server certificate is self-signed.
+The client certificate is generated from the server key and the server certificate .
+
+Please send a request for the GPTE Reporting client certificate to the following address:  _opentlc-infra-admins@redhat.com_
+
+=== Example
 
 == AMQP API
 future
