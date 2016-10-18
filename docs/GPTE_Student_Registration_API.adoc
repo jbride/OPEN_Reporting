@@ -25,6 +25,7 @@ GPTE Reporting exposes a RESTful interface to manage student and company informa
 
 ===== *processStudent*
 
+. *purpose* : create or update student record (keyed by email) in GPTE Reporting database.
 . *Network protocol* : _https_  (See the <<security>> section for more details).
 . *HTTP Method* :  _PUT_
 . *Content-Type* : _application/json_
@@ -57,6 +58,7 @@ GPTE Reporting exposes a RESTful interface to manage student and company informa
 
 ===== *processCompany*
 
+. *Purpose* : Create or update company record (keyed by companyName) in GPTE Reporting database
 . *Network protocol* : _https_  (See the <<security>> section for more details).
 . *HTTP Method* :  _PUT_
 . *Content-Type* : _application/json_
