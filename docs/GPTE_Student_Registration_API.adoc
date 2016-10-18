@@ -23,7 +23,7 @@ GPTE Reporting exposes a RESTful interface to manage student and company informa
 
 === Resources
 
-===== *processStudent*
+===== _processStudent_
 
 . *purpose* : create or update student record (keyed by email) in GPTE Reporting database.
 . *Network protocol* : _https_  (See the <<security>> section for more details).
@@ -56,7 +56,7 @@ GPTE Reporting exposes a RESTful interface to manage student and company informa
 .. 503 - Internal GPTE Reporting system(s) not available
 . *Notes*
 
-===== *processCompany*
+===== _processCompany_
 
 . *Purpose* : Create or update company record (keyed by companyName) in GPTE Reporting database
 . *Network protocol* : _https_  (See the <<security>> section for more details).
