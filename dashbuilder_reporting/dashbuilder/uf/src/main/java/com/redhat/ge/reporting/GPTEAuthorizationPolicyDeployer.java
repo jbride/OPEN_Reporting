@@ -40,8 +40,9 @@ import org.uberfire.security.impl.authz.AuthorizationPolicyBuilder;
 import org.uberfire.backend.server.authz.AuthorizationPolicyMarshaller;
 
 // Replacement for:  org.uberfire.backend.server.authz.AuthorizationPolicyDeployer
-// Purpose is to allow for LDAP roles with the following syntax:
-//     cn=forge-admins,cn=groups,cn=accounts,dc=opentlc,dc=com
+// Purpose is to allow for uberfire security properties that reference LDAP roles with the following syntax:
+//     role.cn=forge-admins,cn=groups,cn=accounts,dc=opentlc,dc=com.permission.perspective.create=true
+
 @Startup
 @ApplicationScoped
 public class GPTEAuthorizationPolicyDeployer {
@@ -110,7 +111,7 @@ public class GPTEAuthorizationPolicyDeployer {
         AuthorizationPolicyMarshaller marshaller = new AuthorizationPolicyMarshaller();
         if (policyDir != null) {
             try {
-                NonEscapedProperties properties = readPolicyProperties(policyDir);
+                GPTENonEscapedProperties properties = readPolicyProperties(policyDir);
                 marshaller.read(builder, properties);
             }
             catch (IOException e) {
@@ -127,8 +128,8 @@ public class GPTEAuthorizationPolicyDeployer {
      * @return An {@link NonEscapedProperties} instance containing all the properties read from the policy files found
      * @throws IOException When an IO error occurs reading any of the policy files
      */
-    public NonEscapedProperties readPolicyProperties(Path policyDir) throws IOException {
-        NonEscapedProperties properties = new NonEscapedProperties();
+    public GPTENonEscapedProperties readPolicyProperties(Path policyDir) throws IOException {
+        GPTENonEscapedProperties properties = new GPTENonEscapedProperties();
         Files.list(policyDir)
                 .filter(this::isPolicyFile)
                 .forEach(path -> loadPolicyFile(properties, path));
@@ -141,7 +142,7 @@ public class GPTEAuthorizationPolicyDeployer {
         return fileName.equals("security-policy.properties") || fileName.startsWith("security-module-");
     }
 
-    public void loadPolicyFile(NonEscapedProperties properties, Path path) {
+    public void loadPolicyFile(GPTENonEscapedProperties properties, Path path) {
         try {
             properties.load(path);
         }

@@ -9,19 +9,22 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.Properties;
 import java.util.TreeMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A {@link TreeMap} implementation that mimics the behaviour of the JDK's {@link Properties} class
  * preventing the '/' or ':' chars from being escaped.
 * */
-public class NonEscapedProperties extends TreeMap<String,String> {
+public class GPTENonEscapedProperties extends TreeMap<String,String> {
 
     private static final long serialVersionUID = 1L;
+    private Logger logger = LoggerFactory.getLogger(GPTENonEscapedProperties.class);
 
-    public NonEscapedProperties() {
+    public GPTENonEscapedProperties() {
     }
 
-    public NonEscapedProperties(Comparator<? super String> comparator) {
+    public GPTENonEscapedProperties(Comparator<? super String> comparator) {
         super(comparator);
     }
 
@@ -59,6 +62,7 @@ public class NonEscapedProperties extends TreeMap<String,String> {
         if (line != null) {
             String _line = line.trim();
             if (!_line.isEmpty() && !_line.startsWith("#")) {
+                /*
                 String[] tokens = _line.split("=");
                 if (tokens.length == 1) {
                     super.put(tokens[0], "");
@@ -66,6 +70,12 @@ public class NonEscapedProperties extends TreeMap<String,String> {
                 if (tokens.length == 2) {
                     super.put(tokens[0], tokens[1]);
                 }
+                */
+                int i = _line.lastIndexOf("=");
+                String firstS = _line.substring(0, i);
+                String secondS = _line.substring(i+1);
+                logger.debug("putLine() "+firstS+" : "+secondS);
+                super.put(firstS, secondS);
             }
         }
     }
