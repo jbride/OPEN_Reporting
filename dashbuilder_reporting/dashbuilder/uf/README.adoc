@@ -1,0 +1,136 @@
+:data-uri:
+:toc: manual
+:toc-placement: preamble
+:numbered:
+
+
+= Global Enablement Accreditation Reporting
+
+Administration Guide
+
+== System Property
+
+<property name="com.redhat.gp.reporting.cdi.space.delimited.veto.classes" value="org.uberfire.backend.server.authz.AuthorizationPolicyDeployer"/>
+
+== LDAP roles
+
+. _cn=forge-users,cn=groups,cn=accounts,dc=opentlc,dc=com_
++
+Administrative access to all Dashbuilder workspaces.
+As per _com.redhat.ge.reporting.GEHttpSSOProcessor_, this role is assigned as the _root_ Dashbuilder user.
+
+. _cn=report-creators,cn=groups,cn=accounts,dc=opentlc,dc=com_
++
+Ability to create and edit all pages in all non-admin workspaces.
++
+Accessible using the following credentials: `gpsetraining1` / `jb0ssRedhat!`
+
+. _cn=rht-regional-managers,cn=groups,cn=accounts,dc=opentlc,dc=com_
++
+View only access to all non-admin workspaces.
++
+Accessible using the following credentials: `gpsetraining2` / `jb0ssRedhat!`
+
+. _cn=partner-users,cn=groups,cn=accounts,dc=opentlc,dc=com_
++
+View access to Red Hat Partner Workspace
+
+. _cn=rhpds-partner-redhat,cn=groups,cn=accounts,dc=opentlc,dc=com_
++
+Currently not used.
+Could potentially be a role where data presented in dashboard KPIs is specific to Red Hat only.
+
+. _cn=rhpds-partner-cisco,cn=groups,cn=accounts,dc=opentlc,dc=com_
++
+Currently not used.
+Could potentially be a role where data presented in dashboard KPIs is specific to Cisco only.
+
+
+== Administration
+
+=== Mysql
+
+. Create tables
++
+-----
+mysql -u root -p mysql
+create database dashbuilder;
+grant all on dashbuilder.* to 'dashbuilder'@'127.0.0.1' identified by 'dashbuilder';
+grant all on dashbuilder.* to 'dashbuilder'@'%' identified by 'dashbuilder';
+-----
+
+. Access _lms database
++
+-----
+mysql -h docker1.ose.opentlc.com -u lms -p lms
+-----
+
+=== Wildfly
+
+==== installation and configuration
+. Install wildfly-8.2.0.Final 
+
+. Install mysql JDBC
++
+-----
+yum install -y mysql-connector-java.noarch
+-----
+
+. deploy Wildfly configs
++
+----
+cd $WF_HOME
+cp -r /path/to/OPEN_Admin/ge_reporting/config/* .
+cd modules/system/layers/base/com/mysql/jdbc/main
+ln -s /usr/share/java/mysql-connector-java.jar
+----
+
+==== OS service
+
+. Configuring the service 
+
+.. Copy config/service/dashbuilder.service to `/usr/lib/systemd/system` 
+.. Create a link of dashbuilder.service for systemd
++
+-----
+ln -sf /usr/lib/systemd/system/dashbuilder.service /etc/systemd/system/multi-user.target.wants/dashbuilder.service
+-----
++
+.. Then enable the service
++
+-----
+systemctl enable dashbuilder.service
+-----
+
+. start
++
+-----
+systemctl start dashbuilder.service
+-----
+
+. check log
++
+-----
+journalctl -u dashbuilder
+-----
+
+
+=== GPTE Reporting App
+
+This project includes customized security logic for Dashbuilder.
+
+This project needs to be built using a modified version of org.jboss.dashboard-builder:dashboard-ui-core:6.2.0.Final .
+Specifically, this package needs to be changed from a war package to a jar.
+
+. build GE_Reporting
++
+-----
+cd /path/to/ge_reporting
+mvn clean package -s ~/.m2/community.xml
+-----
+
+. deploy GE_Reporting
++
+-----
+cp /path/to/OPEN_Admin/ge_reporting/target/ge-dashboard-1.0.jar standalone/deployments/dashbuilder.war/WEB-INF/lib/
+-----
