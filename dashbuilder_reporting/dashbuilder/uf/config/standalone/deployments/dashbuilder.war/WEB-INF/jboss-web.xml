@@ -18,11 +18,6 @@
 -->
 <jboss-web>
     <context-root>/dashbuilder</context-root>
-    <resource-ref>
-        <res-ref-name>jdbc/dashbuilder</res-ref-name>
-        <res-type>javax.sql.DataSource</res-type>
-        <jndi-name>java:jboss/datasources/DashbuilderDS</jndi-name>
-    </resource-ref>
 
     <!--
         Use by default the JBoss AS security domain.

@@ -10,7 +10,13 @@ Administration Guide
 
 == System Property
 
-<property name="com.redhat.gp.reporting.cdi.space.delimited.veto.classes" value="org.uberfire.backend.server.authz.AuthorizationPolicyDeployer"/>
+Add the following to $JBOSS_HOME/bin/standalone.conf:
+
+JAVA_OPTS="$JAVA_OPTS -Dorg.guvnor.m2repo.dir=/tmp/jboss/dashbuilder-uf/m2/repository "
+JAVA_OPTS="$JAVA_OPTS -Dorg.uberfire.nio.git.dir=/tmp/jboss/dashbuilder-uf/git/ "
+JAVA_OPTS="$JAVA_OPTS -Dorg.uberfire.metadata.index.dir=/tmp/jboss/dashbuilder-uf/index/ "
+JAVA_OPTS="$JAVA_OPTS -Dcom.redhat.gp.reporting.cdi.space.delimited.veto.classes=org.uberfire.backend.server.authz.AuthorizationPolicyDeployer"
+
 
 == LDAP roles
 
@@ -125,12 +131,12 @@ Specifically, this package needs to be changed from a war package to a jar.
 . build GE_Reporting
 +
 -----
-cd /path/to/ge_reporting
-mvn clean package -s ~/.m2/community.xml
+cd /path/to/OPEN_Reporting/dashbuilder_reporting/dashbuilder/uf
+mvn clean package 
 -----
 
 . deploy GE_Reporting
 +
 -----
-cp /path/to/OPEN_Admin/ge_reporting/target/ge-dashboard-1.0.jar standalone/deployments/dashbuilder.war/WEB-INF/lib/
+cp /path/to/OPEN_Reporting/dashbuilder_reporting/dashbuilder/uf/target/gpte-uf-dashboard-1.0.jar standalone/deployments/dashbuilder.war/WEB-INF/lib/
 -----
