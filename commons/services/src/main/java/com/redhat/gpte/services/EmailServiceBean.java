@@ -26,7 +26,6 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ExchangePattern;
 import org.apache.camel.Message;
 import org.apache.camel.Producer;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,11 +50,13 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String SUMTOTAL_FIRST_LINE = "Full Name,Email,Activity Label,Activity Name,Activity Code,Attempt End Date";
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,USERID,Region.Partner Tier.Partner Type,SFDC User ID: Partner Company ID";
+    private static final String STUDENT_UPDATE_FIRST_LINE = "Email,FirstName,LastName,Company Name,Region,Country,Roles";
     private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition    Condition";
     private static final String DOKEOS = "dokeos_cc";
     private static final String SUMTOTAL = "sumtotal_cc";
     private static final String PARTNER = "partner_cc";
     private static final String STUDENT_REG = "student_registration";
+    private static final Object STUDENT_UPDATE = "student_update";
     private static final Object RULES_SPREADSHEET = "rules_spreadsheet";
     private static final String ROUTE_SPECIFIC_EMAILS="ROUTE_SPECIFIC_EMAILS";
 
@@ -168,19 +169,19 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
 
     public void determineAttachmentType(Exchange exchange) {
         String body =  (String)exchange.getIn().getBody();
-        String[] rows = body.split("\\r?\\n");
-        String firstRow = rows[0];
-        if(firstRow.contains(DOKEOS_FIRST_LINE)) {
+        if(body.startsWith(DOKEOS_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, DOKEOS);
-        }else if(firstRow.contains(DOKEOS_ASSIGNMENT_FIRST_LINE)) {
+        }else if(body.startsWith(DOKEOS_ASSIGNMENT_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, DOKEOS);
-        }else if(firstRow.contains(SUMTOTAL_FIRST_LINE)) {
+        }else if(body.startsWith(SUMTOTAL_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, SUMTOTAL);
-        }else if(firstRow.contains(PARTNER_FIRST_LINE)) {
+        }else if(body.startsWith(PARTNER_FIRST_LINE)) {
             exchange.getIn().setHeader(ATTACHMENT_TYPE, PARTNER);
-        }else if(firstRow.contains(STUDENT_REG_FIRST_LINE)){
+        }else if(body.startsWith(STUDENT_REG_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, STUDENT_REG);
-        }else if(firstRow.contains(RULES_SPREADSHEET_FIRST_LINE)){
+        }else if(body.startsWith(STUDENT_UPDATE_FIRST_LINE)){
+            exchange.getIn().setHeader(ATTACHMENT_TYPE, STUDENT_UPDATE);
+        }else if(body.startsWith(RULES_SPREADSHEET_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
         }else {
             String theReturnEmail = null;
@@ -201,7 +202,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             }
             StringBuilder sBuilder  = new StringBuilder();
             sBuilder.append(ExceptionCodes.GPTE_E_1000);
-            sBuilder.append("\n\tfirstLine of attachment = "+firstRow);
+            sBuilder.append("\n\tfirstLine of attachment = "+body);
             sBuilder.append("\n\treturnAddress = "+theReturnEmail);
             sBuilder.append("\n\tdate = "+(String)exchange.getIn().getHeader(DATE));
             sBuilder.append("\n\tsubject = "+(String)exchange.getIn().getHeader(SUBJECT));
@@ -226,13 +227,13 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             if(inObj instanceof List){
                 List<String> inList = (List<String>)inObj;
                 for(String email : inList){
-                    if(email.contains(REDHAT)) {
+                    if(email.startsWith(REDHAT)) {
                         uniqueEmails.add(email);
                     }
                 }
                 
             }else {
-                if(((String)inObj).contains(REDHAT)) {
+                if(((String)inObj).startsWith(REDHAT)) {
                     uniqueEmails.add((String)inObj);
                 }
             }
