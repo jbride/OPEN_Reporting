@@ -127,6 +127,10 @@
                     <simple>${header.ATTACHMENT_TYPE} == "rules_spreadsheet"</simple>
                     <to uri="{{accred_receive_tsv_rules_spreadsheet_uri}}" />
                 </when>
+                <when>
+                    <simple>${header.ATTACHMENT_TYPE} == "student_update"</simple>
+                    <to uri="vm:sr_process-student-updates-uri" />
+                </when>
                 <otherwise>
                     <throwException ref="invalidTypeEx" />
                 </otherwise>

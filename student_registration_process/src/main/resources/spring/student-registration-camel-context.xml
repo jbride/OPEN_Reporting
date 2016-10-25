@@ -289,6 +289,23 @@
 
 
 
+<!--        *************                    process student updates                       ********************         -->
+    <route id="process-student-updates">
+        <description>
+            1)  Update Students directly 
+        </description>
+        <from uri="vm:sr_process-student-updates-uri"/>
+        <split streaming="true" >
+            <tokenize token="\n" />
+            <log message="body = ${body} " id="logstudentrecordbody"/>
+        </split>
+        <log message="*!*!*!*!   process student updates" id="processStudentUpdates"/>
+    </route>
+<!--        ***************************************************************************************************         -->
+
+
+
+
 
 
 <!--        *************                   generic utility routes                  *******************         -->

@@ -31,7 +31,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
-/* TO-DO: Much of this class is generic and could be re-used across all integration projects
+/* 
+ * TO-DO: Much of this class is generic and could be re-used across all integration projects
  */
 public class EmailServiceBean extends GPTEBaseServiceBean {
 
@@ -50,7 +51,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String SUMTOTAL_FIRST_LINE = "Full Name,Email,Activity Label,Activity Name,Activity Code,Attempt End Date";
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,USERID,Region.Partner Tier.Partner Type,SFDC User ID: Partner Company ID";
-    private static final String STUDENT_UPDATE_FIRST_LINE = "Email,FirstName,LastName,Company Name,Region,Country,Roles";
+    private static final String STUDENT_UPDATE_FIRST_LINE = "Email,FirstName,LastName,Company Name,Region,Country,Role";
     private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition    Condition";
     private static final String DOKEOS = "dokeos_cc";
     private static final String SUMTOTAL = "sumtotal_cc";
@@ -180,7 +181,10 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
         }else if(body.startsWith(STUDENT_REG_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, STUDENT_REG);
         }else if(body.startsWith(STUDENT_UPDATE_FIRST_LINE)){
+            int headerLength = STUDENT_UPDATE_FIRST_LINE.length();
+            body = body.substring(headerLength + 1); // includes first line break
             exchange.getIn().setHeader(ATTACHMENT_TYPE, STUDENT_UPDATE);
+            exchange.getIn().setBody(body);
         }else if(body.startsWith(RULES_SPREADSHEET_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
         }else {
