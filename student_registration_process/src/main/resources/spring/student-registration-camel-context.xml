@@ -37,6 +37,7 @@
   <camelContext trace="false" id="user-registration-process" xmlns="http://camel.apache.org/schema/spring">
     <dataFormats>
         <bindy type="Csv" classType="com.redhat.gpte.studentregistration.util.StudentRegistrationBindy" id="studentRegBindy"/>
+        <bindy type="Csv" classType="com.redhat.gpte.studentregistration.util.StudentBindy" id="studentBindy"/>
     </dataFormats>
 
     <onException>
@@ -290,6 +291,7 @@
 
 
 <!--        *************                    process student updates                       ********************         -->
+
     <route id="process-student-updates">
         <description>
             1)  Update Students directly 
@@ -297,10 +299,12 @@
         <from uri="vm:sr_process-student-updates-uri"/>
         <split streaming="true" >
             <tokenize token="\n" />
-            <log message="body = ${body} " id="logstudentrecordbody"/>
+            <to uri="bean:ipaServiceBean?method=convertStudentString" />
+            <to uri="direct:persist-student"/>
         </split>
         <log message="*!*!*!*!   process student updates" id="processStudentUpdates"/>
     </route>
+
 <!--        ***************************************************************************************************         -->
 
 
