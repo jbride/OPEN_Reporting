@@ -19,15 +19,12 @@ public class StudentBindy {
     private String lastName;
 
     @DataField(pos=4, required=true)
-    private String company;
-
-    @DataField(pos=5, required=true)
     private String region;
     
-    @DataField(pos=6, required=true)
+    @DataField(pos=5, required=true)
     private String country;
 
-    @DataField(pos=7, required=true)
+    @DataField(pos=6, required=true)
     private String role;
     
     public StudentBindy() {  
@@ -55,14 +52,6 @@ public class StudentBindy {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
-    }
-
-    public String getCompany() {
-        return company;
-    }
-
-    public void setCompany(String company) {
-        this.company = company;
     }
 
     public String getRegion() {
@@ -95,10 +84,9 @@ public class StudentBindy {
         sBindy.setEmail(tokens[0]);
         sBindy.setFirstName(tokens[1]);
         sBindy.setLastName(tokens[2]);
-        sBindy.setCompany(tokens[3]);
-        sBindy.setRegion(tokens[4]);
-        sBindy.setCountry(tokens[5]);
-        sBindy.setRole(tokens[6]);
+        sBindy.setRegion(tokens[3]);
+        sBindy.setCountry(tokens[4]);
+        sBindy.setRole(tokens[5]);
 
         return sBindy.convertToCanonicalStudent();
     }
@@ -108,7 +96,6 @@ public class StudentBindy {
         sObj.setEmail(this.getEmail());
         sObj.setFirstname(this.getFirstName());
         sObj.setLastname(this.getLastName());
-        sObj.setCompanyName(this.getCompany());
         sObj.setRegion(this.getRegion());
         sObj.setCountry(this.getCountry());
         sObj.setRoles(this.getRole());

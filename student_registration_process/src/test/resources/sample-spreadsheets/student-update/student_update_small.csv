@@ -1,5 +1,9 @@
-Email,FirstName,LastName,Company Name,Region,Country,Role
-jbride@redhat.com,Jeffrey,Bride,Red Hat,NA,US,sa
-btison@redhat.com,Bernard,Tison,Red Hat,EMEA,US,sa
-cdarby@redhat.com,Chad,Darby,Red Hat,NA,US,sa
-njoshi@redhat.com,Nandan,Joshi,Red Hat,NA,US,sa
+Email,FirstName,LastName,Region,Country,Role
+jbride@redhat.com,Jeffrey,Bride,NA,US,sa
+btison@redhat.com,Bernard,Tison,EMEA,US,sa
+cdarby@redhat.com,Chad,Darby,NA,US,sa
+njoshi@redhat.com,Nandan,Joshi,NA,US,sa
+1oliver.vieweger@also.com,Oliver,Viewager,EMEA,AU,Technical
+1pecher@atix.de,Christian,Pecher,EMEA,AU,Technical
+3psimota@gi-de.com,Three,Simote,EMEA,DE,Sales; Sales Engineering
+908@irsural.ru,Denis,Kustyshev,EMEA,DE,Technical
