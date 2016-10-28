@@ -38,8 +38,6 @@ public class Student implements Serializable {
     public static final String SALESFORCEUSERNAME = "SalesForceUserName";
     public static final String SALESFORCEMANAGERID = "SalesForceManagerID";
     public static final String SALESFORCEACCOUNTNAME = "SalesForceAccountName";
-    public static final String SALESFORCEPARTNERTYPE = "SalesForcePartnerType";
-    public static final String SALESFORCEPARTNERTIER = "SalesForcePartnerTier";
     public static final String SALESFORCEJOBFUNCTIONS = "SalesForceJobFunctions";
     public static final String COMMA = ",";
     public static final String NEW_LINE = "\n";
@@ -84,8 +82,6 @@ public class Student implements Serializable {
     private String salesforceusername;
     private String salesforcemanagerid;
     private String salesforceaccountname;
-    private String salesforcepartnertype;
-    private String salesforcepartnertier;
     private String salesforcejobfunctions;  // channel roles
 
     /* Patrick, 20 January 2016
@@ -281,22 +277,6 @@ public class Student implements Serializable {
 
     public void setSalesforceaccountname(String salesforceaccountname) {
         this.salesforceaccountname = salesforceaccountname;
-    }
-
-    public String getSalesforcepartnertype() {
-        return salesforcepartnertype;
-    }
-
-    public void setSalesforcepartnertype(String salesforcepartnertype) {
-        this.salesforcepartnertype = salesforcepartnertype;
-    }
-
-    public String getSalesforcepartnertier() {
-        return salesforcepartnertier;
-    }
-
-    public void setSalesforcepartnertier(String salesforcepartnertier) {
-        this.salesforcepartnertier = salesforcepartnertier;
     }
 
     public String getSalesforcejobfunctions() {
