@@ -86,7 +86,9 @@ public class StudentBindy {
         sBindy.setLastName(tokens[2]);
         sBindy.setRegion(tokens[3]);
         sBindy.setCountry(tokens[4]);
-        sBindy.setRole(tokens[5]);
+
+        if(tokens.length > 5)
+            sBindy.setRole(tokens[5]);
 
         return sBindy.convertToCanonicalStudent();
     }
