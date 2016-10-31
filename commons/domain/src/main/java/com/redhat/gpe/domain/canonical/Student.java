@@ -77,7 +77,7 @@ public class Student implements Serializable {
     private String  sumtotalactive;
     private int     skillsbaseStatus = SKILLSBASE_PERSON_UNVERIFIED;
     private String  skillsbasePersonId;  // Does not need to be persisted.  Value is refereshed with every invocation to SkillsBase
-    private int        ipaStatus = IPA_UNSYNCHED;
+    private int        ipaStatus = IPA_SYNCHED;
     private Timestamp    activationDate;
     private Timestamp    deActivationDate;
 
