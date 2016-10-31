@@ -3,15 +3,13 @@
     "firstname":"Jeff", 
     "lastname":"Bride", 
     "region":"global", 
-    "subregion":"UNKNOWN", 
+    "subregion":"GPTE_NOT_USED", 
     "country":"US", 
     "companyName":"Red Hat", 
     "roles":"consultant",
-    "salesforcecontactid":"uk_contact",
-    "salesforceusername":"uk_username",
-    "salesforcemanagerid":"uk_managerid",
-    "salesforceaccountname":"uk_accountname",
-    "salesforcepartnertype":"uk_partnertype",
-    "salesforcepartnertier":"uk_partnertier",
-    "salesforcejobfunctions":"uk_consultant"
+    "salesforcecontactid":"testcontactId",
+    "salesforceusername":"test_username",
+    "salesforcemanagerid":"test_managerid",
+    "salesforceaccountname":"test_accountname",
+    "salesforcejobfunctions":"test_consultant"
 }

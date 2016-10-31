@@ -6,14 +6,9 @@ import org.apache.camel.dataformat.bindy.annotation.DataField;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.Company;
 
-@CsvRecord(separator=",", skipFirstLine=true)
+@CsvRecord(separator=",", skipFirstLine=false)
 public class StudentBindy {
     
-    private static final String REGION_DELIMITER = "|";
-    private static final String NAME_DELIMITER = " ";
-    private static final String PARTNER_DELIMITER = ".";
-    private static final String SFDC_DELIMITER = ":";
-
     @DataField(pos=1, required=true)
     private String email;
 
@@ -24,82 +19,85 @@ public class StudentBindy {
     private String lastName;
 
     @DataField(pos=4, required=true)
-    private String company;
-
-    @DataField(pos=5, required=true)
     private String region;
     
-    @DataField(pos=6, required=true)
+    @DataField(pos=5, required=true)
     private String country;
 
-    @DataField(pos=7, required=true)
+    @DataField(pos=6, required=true)
     private String role;
     
     public StudentBindy() {  
     }
 
     public String getEmail() {
-		return email;
-	}
+        return email;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public String getCompany() {
-		return company;
-	}
+    public String getRegion() {
+        return region;
+    }
 
-	public void setCompany(String company) {
-		this.company = company;
-	}
+    public void setRegion(String region) {
+        this.region = region;
+    }
 
-	public String getRegion() {
-		return region;
-	}
+    public String getCountry() {
+        return country;
+    }
 
-	public void setRegion(String region) {
-		this.region = region;
-	}
+    public void setCountry(String country) {
+        this.country = country;
+    }
 
-	public String getCountry() {
-		return country;
-	}
+    public String getRole() {
+        return role;
+    }
 
-	public void setCountry(String country) {
-		this.country = country;
-	}
+    public void setRole(String role) {
+        this.role = role;
+    }
 
-	public String getRole() {
-		return role;
-	}
+    public static Student convertToCanonicalStudent(String csvLine) {
+        String[] tokens = csvLine.split(",");
+        StudentBindy sBindy = new StudentBindy();
+        sBindy.setEmail(tokens[0]);
+        sBindy.setFirstName(tokens[1]);
+        sBindy.setLastName(tokens[2]);
+        sBindy.setRegion(tokens[3]);
+        sBindy.setCountry(tokens[4]);
 
-	public void setRole(String role) {
-		this.role = role;
-	}
+        if(tokens.length > 5)
+            sBindy.setRole(tokens[5]);
 
-	public Student convertToCanonicalStudent() {
+        return sBindy.convertToCanonicalStudent();
+    }
+
+    public Student convertToCanonicalStudent() {
         Student sObj = new Student();
         sObj.setEmail(this.getEmail());
         sObj.setFirstname(this.getFirstName());
         sObj.setLastname(this.getLastName());
-        sObj.setCompanyName(this.getCompany());
         sObj.setRegion(this.getRegion());
         sObj.setCountry(this.getCountry());
         sObj.setRoles(this.getRole());

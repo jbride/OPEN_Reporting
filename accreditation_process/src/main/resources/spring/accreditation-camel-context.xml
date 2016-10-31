@@ -521,6 +521,12 @@
             <to uri="smtps://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
             <log message="Sent reply email to: ${header.to}"/>
         </filter>
+        <onException>
+            <exception>com.sun.mail.util.MailConnectException</exception>
+            <handled><constant>true</constant></handled>
+            <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
+            <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+        </onException>
     </route>
 
 

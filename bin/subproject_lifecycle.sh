@@ -182,6 +182,6 @@ else
     checkRemotePort
     #deployJBossModules
     #deployCC
-    deploySReg
-    #deployUP
+    #deploySReg
+    deployUP
 fi

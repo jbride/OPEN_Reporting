@@ -67,17 +67,27 @@ public class GPTEBaseServiceBean {
     
     public void updateStudent(@Body Student student) {
         int companyId = student.getCompanyid();
+
+        Student dbStudent = null;
         
         // Associate RHT companyID to RHT students (as per email address) not yet associated with RHT
         if(companyId == 0) {
             if(student.getEmail().indexOf(RED_HAT_SUFFIX) > 0){
                 companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
                 student.setCompanyid(companyId);
-            } else 
-                throw new RuntimeException(ExceptionCodes.GPTE_CC1000+student.getEmail());
+            } else {
+                try {
+                    dbStudent = canonicalDAO.getStudentByEmail(student.getEmail());
+                    student.setCompanyid(dbStudent.getCompanyid());
+                } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+                    throw new RuntimeException(ExceptionCodes.GPTE_CC1000+student.getEmail());
+                }
+            }
         }
         try {
-            Student dbStudent = canonicalDAO.getStudentByEmail(student.getEmail());
+            if(dbStudent == null)
+                dbStudent = canonicalDAO.getStudentByEmail(student.getEmail());
+
             student.setStudentid(dbStudent.getStudentid());
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {}
         canonicalDAO.updateStudent(student);

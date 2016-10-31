@@ -1,5 +1,5 @@
 {
-    "companyname":"gpte_rs_company", 
-    "partnertype":"uk_partnertype",
-    "partnertier":"uk_partnertier"
+    "companyname":"GPTE TEST COMPANY", 
+    "partnertype":"test_partnertype",
+    "partnertier":"test_partnertier"
 }

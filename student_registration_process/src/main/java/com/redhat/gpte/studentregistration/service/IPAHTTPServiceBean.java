@@ -28,6 +28,7 @@ import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
+import com.redhat.gpte.studentregistration.util.StudentBindy;
 
 public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
 
@@ -104,7 +105,20 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
                 .build();
         Unirest.setHttpClient(httpclient);
     }
-    
+
+
+    public void convertStudentString(Exchange exchange) throws Exception {
+
+        String body = null;
+        try {
+            body = (String)exchange.getIn().getBody();
+            Student sObj = StudentBindy.convertToCanonicalStudent(body);
+            exchange.getIn().setBody(sObj);
+        }catch(Exception x) {
+            logger.error("convertStudentString() exception thrown for body = "+body);
+            throw x;
+        }
+    }    
    
     
     public void createLdapHttpUploadFile(Exchange exchange) throws Exception {
