@@ -119,6 +119,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     public void updateStudent(Student studentObj) {
         if(studentObj == null)
             throw new RuntimeException("updateStudent() passed null student");
+
+        if(studentObj.getCompanyid() == 0 )
+            throw new RuntimeException(studentObj.getEmail()+ " : updateStudent() need to specify a valid existing Company Id");
         
         if(studentObj.getStudentid() == 0) {
             StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");

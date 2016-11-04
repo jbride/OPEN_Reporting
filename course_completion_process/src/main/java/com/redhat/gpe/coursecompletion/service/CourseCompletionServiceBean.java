@@ -46,10 +46,11 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String SUMTOTAL_COMPLETED = "COMPLETED";
     private static final byte coursePassingValue = 70;
     private static final String ISSUES_SUFFIX="_issues.txt";
+    private static final String COURSE_COMPLETION_ISSUES_SUFFIX="_completion_validation_issues.txt";
 
     public static final String DETERMINE_COMPANY_ID_AND_PERSIST_COMPANY = "vm:determineCompanyIdAndPersistCompanyIfNeedBe";
     private static final String CC_APPEND_COURSE_ISSUES_TO_FILE = "cc_append_course_issues_to_file";
-    private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte/courseCodeIssues";
+    private static final String COURSE_ISSUES_OUTPUT_DIR="/tmp/gpte/courseCompletionIssues";
     private static final String COURSE_ISSUES_HEADER = "Activity Code,Activity Name";
     private static final String SUMTOTAL_REJECTION_CODES_FILE = "sumtotal_codes_to_reject.txt";
 
@@ -294,6 +295,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             if(fStream != null)
                 fStream.close();
         }
+
+        // 2.5)  Instantiate new course completion validation issues file
+        File cCompletionIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, issueFileName+COURSE_COMPLETION_ISSUES_SUFFIX);
+        if(cCompletionIssuesFile.exists())
+            cCompletionIssuesFile.delete();
+        cCompletionIssuesFile.createNewFile();
         
         int i = 2;
         boolean invalidCourseExceptionThrown = false;
@@ -303,10 +310,19 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
         // 4) iterate via each unvalidated sumtotal course completion
         for(SumtotalCourseCompletion stCC : sCourseCompletions) {
+
+            try {
+                stCC.validate();
+            }catch(Exception t) {
+                logger.error(t.getMessage());
+                Files.write(Paths.get(cCompletionIssuesFile.getAbsolutePath()), t.getMessage().getBytes(), StandardOpenOption.APPEND);
+                continue;
+            }
+
             String aCode = stCC.getActivityCode();
             if(!StringUtils.isEmpty(aCode)) {
 
-                // 5)  filter out course completions that have been identified as bogus of sumtotal LMS team
+                // 5)  filter out course completions that have been identified as bogus as per sumtotal LMS team
                 if(sumtotalRejectCodeSet.contains(aCode))
                     continue;
             

@@ -274,5 +274,10 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
                 activityName, activityCode, isCertification, attendanceStatus, completionStatus, attemptStartDate,
                 attemptEndDate, text4);
     }
+
+    public void validate() throws Exception {
+        if(country.length() != 2)
+            throw new Exception(email+" : country must be of length = 2 : "+country+"\n");
+    }
     
 }
