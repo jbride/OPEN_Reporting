@@ -72,6 +72,10 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     // Data structure of userIds that have been verified to exist in LDAP
     // private Set<String> verifiedUsers = new HashSet<String>();
     
+    // This cache can go stale if/when the underlying database is reloaded with new data
+    // The data in this cache will no longer reflect this data
+    // Scenario happens from time to time in dev
+    // Need to bounce studentreg service 
     private Map<String,Integer> verifiedCompanies = new HashMap<String,Integer>();
 
     private boolean sregPersistCompany = true;
