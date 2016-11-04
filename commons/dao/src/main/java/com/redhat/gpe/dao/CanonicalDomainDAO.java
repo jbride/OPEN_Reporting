@@ -23,7 +23,7 @@ public interface CanonicalDomainDAO {
     public Student getStudentByEmail(String email);
     public List<DenormalizedStudent> selectStudentsByIpaStatus(int status);
     public List<Student> selectRHTStudentsWithMissingAttributes();
-    public void updateStudent(Student emp);
+    public void updateStudent(Student emp) throws Exception;
     public boolean doesStudentExist(String email);
     public boolean hasThisStudentBeenEmailedBefore(String email);
     public void updateStudentStatusForEmailedAlready(String email);

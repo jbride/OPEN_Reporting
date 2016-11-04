@@ -65,7 +65,7 @@ public class GPTEBaseServiceBean {
         return tString;
     }
     
-    public void updateStudent(@Body Student student) {
+    public void updateStudent(@Body Student student) throws Exception {
         int companyId = student.getCompanyid();
 
         Student dbStudent = null;

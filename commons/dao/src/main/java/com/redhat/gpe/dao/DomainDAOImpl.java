@@ -116,73 +116,79 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return students;
     }
     
-    public void updateStudent(Student studentObj) {
-        if(studentObj == null)
-            throw new RuntimeException("updateStudent() passed null student");
+    public void updateStudent(Student studentObj) throws Exception {
+    	if(studentObj == null)
+    		throw new RuntimeException("updateStudent() passed null student");
 
-        if(studentObj.getCompanyid() == 0 )
-            throw new RuntimeException(studentObj.getEmail()+ " : updateStudent() need to specify a valid existing Company Id");
-        
-        if(studentObj.getStudentid() == 0) {
-            StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
-            sbJdbcTemplate.update(sBuilder.toString(), 
-                    studentObj.getEmail().toLowerCase(), 
-                    studentObj.getFirstname(),
-                    studentObj.getLastname(), 
-                    studentObj.getCompanyid(),
-                    studentObj.getRegion(),
-                    studentObj.getSubregion(),
-                    studentObj.getCountry(),
-                    studentObj.getRoles(),
-                    studentObj.getSalesforcecontactid(),
-                    studentObj.getSalesforceactive(),
-                    studentObj.getSumtotalid(),
-                    studentObj.getSumtotalactive(),
-                    studentObj.getSkillsbaseStatus(),
-                    studentObj.getIpaStatus(),
-                    studentObj.getActivationDate(),
-                    studentObj.getDeActivationDate(),
-                    null,
-                    studentObj.getSalesforceusername(),
-                    studentObj.getSalesforcemanagerid(),
-                    studentObj.getSalesforceaccountname(),
-                    studentObj.getSalesforcejobfunctions()
-                    );
-            logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
-        } else {
-            StringBuilder sBuilder = new StringBuilder("update Students set ");
-            sBuilder.append(Student.EMAIL+EQUAL+Student.FIRST_NAME+EQUAL+Student.LAST_NAME+EQUAL);
-            sBuilder.append(Student.COMPANY_ID+EQUAL+Student.REGION+EQUAL+Student.SUBREGION+EQUAL+Student.COUNTRY+EQUAL+Student.ROLES+EQUAL);
-            sBuilder.append(Student.SALES_FORCE_CONTACT_ID+EQUAL+Student.SALES_FORCE_ACTIVE+EQUAL+Student.SUMTOTAL_ID+EQUAL+Student.SUMTOTAL_ACTIVE+EQUAL);
-            sBuilder.append(Student.SKILLSBASE_STATUS+EQUAL+Student.IPA_STATUS+EQUAL);
-            sBuilder.append(Student.ACTIVATION_DATE+EQUAL+Student.DEACTIVATION_DATE+EQUAL);
-            sBuilder.append(Student.SALESFORCEUSERNAME+EQUAL+Student.SALESFORCEMANAGERID+EQUAL);
-            sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+"=? ");
-            sBuilder.append("where studentID="+studentObj.getStudentid());
-            sbJdbcTemplate.update(sBuilder.toString(),new Object[]{
-                    studentObj.getEmail(),
-                    studentObj.getFirstname(),
-                    studentObj.getLastname(), 
-                    studentObj.getCompanyid(),
-                    studentObj.getRegion(),
-                    studentObj.getSubregion(),
-                    studentObj.getCountry(),
-                    studentObj.getRoles(),
-                    studentObj.getSalesforcecontactid(),
-                    studentObj.getSalesforceactive(),
-                    studentObj.getSumtotalid(),
-                    studentObj.getSumtotalactive(),
-                    studentObj.getSkillsbaseStatus(),
-                    studentObj.getIpaStatus(),
-                    studentObj.getActivationDate(),
-                    studentObj.getDeActivationDate(),
-                    studentObj.getSalesforceusername(),
-                    studentObj.getSalesforcemanagerid(),
-                    studentObj.getSalesforceaccountname(),
-                    studentObj.getSalesforcejobfunctions()
-                });
-            logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
-        }
+    	if(studentObj.getCompanyid() == 0 )
+    		throw new RuntimeException(studentObj.getEmail()+ " : updateStudent() need to specify a valid existing Company Id");
+
+    	try {
+    		if(studentObj.getStudentid() == 0) {
+    			StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
+    			sbJdbcTemplate.update(sBuilder.toString(), 
+    					studentObj.getEmail().toLowerCase(), 
+    					studentObj.getFirstname(),
+    					studentObj.getLastname(), 
+    					studentObj.getCompanyid(),
+    					studentObj.getRegion(),
+    					studentObj.getSubregion(),
+    					studentObj.getCountry(),
+    					studentObj.getRoles(),
+    					studentObj.getSalesforcecontactid(),
+    					studentObj.getSalesforceactive(),
+    					studentObj.getSumtotalid(),
+    					studentObj.getSumtotalactive(),
+    					studentObj.getSkillsbaseStatus(),
+    					studentObj.getIpaStatus(),
+    					studentObj.getActivationDate(),
+    					studentObj.getDeActivationDate(),
+    					null,
+    					studentObj.getSalesforceusername(),
+    					studentObj.getSalesforcemanagerid(),
+    					studentObj.getSalesforceaccountname(),
+    					studentObj.getSalesforcejobfunctions()
+    					);
+    			logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
+    		} else {
+    			StringBuilder sBuilder = new StringBuilder("update Students set ");
+    			sBuilder.append(Student.EMAIL+EQUAL+Student.FIRST_NAME+EQUAL+Student.LAST_NAME+EQUAL);
+    			sBuilder.append(Student.COMPANY_ID+EQUAL+Student.REGION+EQUAL+Student.SUBREGION+EQUAL+Student.COUNTRY+EQUAL+Student.ROLES+EQUAL);
+    			sBuilder.append(Student.SALES_FORCE_CONTACT_ID+EQUAL+Student.SALES_FORCE_ACTIVE+EQUAL+Student.SUMTOTAL_ID+EQUAL+Student.SUMTOTAL_ACTIVE+EQUAL);
+    			sBuilder.append(Student.SKILLSBASE_STATUS+EQUAL+Student.IPA_STATUS+EQUAL);
+    			sBuilder.append(Student.ACTIVATION_DATE+EQUAL+Student.DEACTIVATION_DATE+EQUAL);
+    			sBuilder.append(Student.SALESFORCEUSERNAME+EQUAL+Student.SALESFORCEMANAGERID+EQUAL);
+    			sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+"=? ");
+    			sBuilder.append("where studentID="+studentObj.getStudentid());
+    			sbJdbcTemplate.update(sBuilder.toString(),new Object[]{
+    				studentObj.getEmail(),
+    				studentObj.getFirstname(),
+    				studentObj.getLastname(), 
+    				studentObj.getCompanyid(),
+    				studentObj.getRegion(),
+    				studentObj.getSubregion(),
+    				studentObj.getCountry(),
+    				studentObj.getRoles(),
+    				studentObj.getSalesforcecontactid(),
+    				studentObj.getSalesforceactive(),
+    				studentObj.getSumtotalid(),
+    				studentObj.getSumtotalactive(),
+    				studentObj.getSkillsbaseStatus(),
+    				studentObj.getIpaStatus(),
+    				studentObj.getActivationDate(),
+    				studentObj.getDeActivationDate(),
+    				studentObj.getSalesforceusername(),
+    				studentObj.getSalesforcemanagerid(),
+    				studentObj.getSalesforceaccountname(),
+    				studentObj.getSalesforcejobfunctions()
+    			});
+    			logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
+    		}
+    	}catch(Exception x){
+    		// catch:  com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException
+    		logger.error("Exception persisting student.  Student = "+studentObj.toString());
+    		throw x;
+    	}
     }
 
     public boolean doesStudentExist(String email) {
