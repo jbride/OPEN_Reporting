@@ -36,8 +36,8 @@
   <!-- bridging Spring and Camel property placeholders -->
   <camelContext trace="false" id="user-registration-process" xmlns="http://camel.apache.org/schema/spring">
     <dataFormats>
-        <bindy type="Csv" classType="com.redhat.gpte.studentregistration.service.studentreg.StudentRegistrationBindy" id="studentRegBindy"/>
-        <bindy type="Csv" classType="com.redhat.gpte.studentregistration.service.student.StudentBindy" id="studentBindy"/>
+        <bindy type="Csv" classType="com.redhat.gpe.studentregistration.studentreg.StudentRegistrationBindy" id="studentRegBindy"/>
+        <bindy type="Csv" classType="com.redhat.gpe.studentregistration.student.StudentBindy" id="studentBindy"/>
     </dataFormats>
 
     <onException>

@@ -28,7 +28,7 @@ import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
-import com.redhat.gpte.studentregistration.service.studentreg.StudentRegistrationBindy;
+import com.redhat.gpe.studentregistration.studentreg.StudentRegistrationBindy;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
 import com.redhat.gpte.services.ExceptionCodes;
 

@@ -1,4 +1,4 @@
-package com.redhat.gpte.studentregistration.service.studentreg;
+package com.redhat.gpe.studentregistration.studentreg;
 
 import org.apache.camel.dataformat.bindy.annotation.CsvRecord;
 import org.apache.camel.dataformat.bindy.annotation.DataField;

@@ -28,7 +28,7 @@ import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
-import com.redhat.gpte.studentregistration.service.student.StudentBindy;
+import com.redhat.gpe.studentregistration.student.StudentBindy;
 
 public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
 

@@ -18,7 +18,6 @@ import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.ExceptionCodes;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
-import com.redhat.gpte.studentregistration.service.studentreg.StudentRegistrationBindy;
 
 public class StudentRegistrationServiceBean extends GPTEBaseServiceBean {
 
