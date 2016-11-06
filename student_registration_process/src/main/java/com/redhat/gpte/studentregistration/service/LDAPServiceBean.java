@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -27,8 +28,8 @@ import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
+import com.redhat.gpte.studentregistration.service.studentreg.StudentRegistrationBindy;
 import com.redhat.gpte.studentregistration.util.InvalidAttributeException;
-import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
 import com.redhat.gpte.services.ExceptionCodes;
 
 

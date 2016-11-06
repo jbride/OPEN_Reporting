@@ -28,7 +28,7 @@ import com.redhat.gpe.domain.canonical.DomainValidationException;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
-import com.redhat.gpte.studentregistration.util.StudentRegistrationBindy;
+import com.redhat.gpte.studentregistration.service.studentreg.StudentRegistrationBindy;
 
 @Stateless
 @Path("/rs/")
