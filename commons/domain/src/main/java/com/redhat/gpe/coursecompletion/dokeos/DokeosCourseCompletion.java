@@ -23,6 +23,7 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     public static final String COURSE_COMPLETION_MAPPING_NAME = null;
 
     private static final String COMMA = ",";
+    private static final String SPACE = " ";
 
     @DataField(pos=1)
     private String fullname;
@@ -156,16 +157,28 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     }
     
     public String calculateFirstName() throws Exception {
-        if(fullname.indexOf(COMMA) < 0 ) 
-            throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
-    
-        return this.fullname.substring(fullname.indexOf(COMMA)+1);
+
+        if(fullname.indexOf(COMMA) < 0 ) {
+            // somtimes dokeos uses a comma, othertimes dokeos uses a space
+            if(fullname.indexOf(SPACE) < 0 )
+                throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
+            return this.fullname.substring(fullname.indexOf(SPACE)+1);
+   
+        } else { 
+            return this.fullname.substring(fullname.indexOf(COMMA)+1);
+        }
     }
     public String calculateLastName() throws Exception {
-        if(fullname.indexOf(COMMA) < 0 ) 
-            throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
+        
+        if(fullname.indexOf(COMMA) < 0 ) {
+            // somtimes dokeos uses a comma, othertimes dokeos uses a space
+            if(fullname.indexOf(SPACE) < 0 )
+                throw new Exception(ExceptionCodes.GPTE_CC1001+" Dokeos course completion full name must include the following delimeter: "+COMMA);
+            return this.fullname.substring(0, fullname.indexOf(SPACE));
 
-        return this.fullname.substring(0, fullname.indexOf(COMMA));
+        } else {
+            return this.fullname.substring(0, fullname.indexOf(COMMA));
+        }
     }
 
     public int getScoreInt() {
