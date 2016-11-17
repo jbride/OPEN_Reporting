@@ -480,7 +480,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sCourse.setAssessmentscore(canonicalScore);
         
         String dSuccess = null;
-        if(canonicalScore > coursePassingValue)
+        if(canonicalScore >= coursePassingValue)
             dSuccess = StudentCourse.ResultTypes.Pass.name();
         else
             dSuccess = StudentCourse.ResultTypes.Fail.name();
