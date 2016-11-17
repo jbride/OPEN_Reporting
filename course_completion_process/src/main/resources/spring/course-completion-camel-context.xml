@@ -116,7 +116,7 @@
                         <otherwise>
                             <when>
                                 <simple>${body.quizName} contains 'Assignment'</simple>
-                                <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>kiboone@redhat.com</constant></setHeader>
+                                <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>kiboone@redhat.com,sduttama@redhat.com,tshaikh@redhat.com</constant></setHeader>
                                 <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
                                 <to uri="bean:emailServiceBean?method=clearAttachments"/>
                                 <setHeader headerName="Subject">
