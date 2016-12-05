@@ -3,7 +3,7 @@
 # Operating System user vars
 # Used to ssh into various machines
 remote_user_prod: smangan-redhat.com
-remote_user_dev: jboss
+remote_user_dev: smangan-redhat.com
 
 
 # Mariadb RDBMS connection vars
@@ -15,8 +15,8 @@ db_pass: c-9XSHln8hJ_UH9YvNOgc9mH
 
 # Mariadb databases to export (from production) and import (into other environments such as QA and DEV)
 databases: 
-#   - lms_transactional
-#  - lms_reporting
+  - lms_transactional
+  - lms_reporting
   - dashbuilder
 
 
