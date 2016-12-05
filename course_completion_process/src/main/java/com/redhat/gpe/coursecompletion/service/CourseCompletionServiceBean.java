@@ -72,12 +72,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static String langFilter;
     private static int rhtCompanyId = 0;
     private static Set sumtotalRejectCodeSet = new HashSet<String>();
+    private File courseIssuesDir = new File(COURSE_ISSUES_OUTPUT_DIR);
     
    
     public CourseCompletionServiceBean() throws IOException {
 
         // 1) make sure COURSE_ISSUES_OUTPUT_DIR is created on filesystem
-        File courseIssuesDir = new File(COURSE_ISSUES_OUTPUT_DIR);
         courseIssuesDir.mkdirs();
 
         // 2) sees a STUDENT_ISSUES_OUTPUT file on filesystem
@@ -285,6 +285,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         //     Contents of this file contain a list of all invalid courses encountered while processing this collection of sumtotalcoursecompletion objects
         String issueFileName = (String)exchange.getIn().getHeader(CAMEL_FILE_NAME);
         File courseIssuesFile = new File(COURSE_ISSUES_OUTPUT_DIR, issueFileName+ISSUES_SUFFIX);
+        if(!courseIssuesDir.exists()) {
+            courseIssuesDir.mkdirs();
+        }
         courseIssuesFile.createNewFile();
         FileOutputStream fStream = null;
         try {
