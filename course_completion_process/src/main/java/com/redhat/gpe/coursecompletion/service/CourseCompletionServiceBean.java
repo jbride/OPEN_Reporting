@@ -311,6 +311,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         // 3) this is the datastructure of validated course completions that is passed to downstream business logic
         Collection<SumtotalCourseCompletion> prunedCourseCompletions = new ArrayList<SumtotalCourseCompletion>();
 
+        // 3.5) count the # of rejected course completions
+        int rejectCount = 0;
+
         // 4) iterate via each unvalidated sumtotal course completion
         for(SumtotalCourseCompletion stCC : sCourseCompletions) {
 
@@ -326,8 +329,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             if(!StringUtils.isEmpty(aCode)) {
 
                 // 5)  filter out course completions that have been identified as bogus as per sumtotal LMS team
-                if(sumtotalRejectCodeSet.contains(aCode))
+                if(sumtotalRejectCodeSet.contains(aCode)){
+                    rejectCount++;
                     continue;
+                }
             
                 try {
                     // 6) identify the canonical course specified in the sumtotal activity code
@@ -350,6 +355,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
         // 7) set prunedCourseCompletions to exchange body for further downstream processing
         exchange.getIn().setBody(prunedCourseCompletions);
+
+        logger.warn("\n**********\nvalidateSumtotalCourseCompletions() # of rejected course completions = "+rejectCount+"\n**********");
     }
 
     private Course getCourseFromSumtotalCompletion(SumtotalCourseCompletion stCC, File courseIssuesFile) throws IOException, InvalidCourseException {
