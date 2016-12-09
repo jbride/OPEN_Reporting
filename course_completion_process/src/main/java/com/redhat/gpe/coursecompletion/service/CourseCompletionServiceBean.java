@@ -314,6 +314,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         // 3.5) count the # of rejected course completions
         int rejectCount = 0;
 
+        int courseValidationProblems = 0;
+        int unknownCourseProblems = 0;
+
         // 4) iterate via each unvalidated sumtotal course completion
         for(SumtotalCourseCompletion stCC : sCourseCompletions) {
 
@@ -322,6 +325,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             }catch(Exception t) {
                 logger.error(t.getMessage());
                 Files.write(Paths.get(cCompletionIssuesFile.getAbsolutePath()), t.getMessage().getBytes(), StandardOpenOption.APPEND);
+                courseValidationProblems++;
                 continue;
             }
 
@@ -341,6 +345,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     prunedCourseCompletions.add(stCC);
                 }catch(InvalidCourseException x) {
                     invalidCourseExceptionThrown = true;
+                    unknownCourseProblems++;
                 }
             }else {
                 logger.error("validateSumtotalCourseCompletion() passed an empty activity code");
@@ -356,7 +361,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         // 7) set prunedCourseCompletions to exchange body for further downstream processing
         exchange.getIn().setBody(prunedCourseCompletions);
 
-        logger.warn("\n**********\nvalidateSumtotalCourseCompletions() # of rejected course completions = "+rejectCount+"\n**********");
+        StringBuilder sBuilder = new StringBuilder("\n********** validateSumtotalCourseCompletions report:   **********\n");
+        sBuilder.append("# of initial course completions  = "+sCourseCompletions.size());
+        sBuilder.append("\n# of rejected course completions = "+rejectCount);
+        sBuilder.append("\n# of course validation problems = "+courseValidationProblems);
+        sBuilder.append("\n# of unknownCourseProblems = "+unknownCourseProblems);
+        sBuilder.append("\n# of course completions to persist = "+prunedCourseCompletions.size());
+        sBuilder.append("\n****************************************\n");
+        logger.info(sBuilder.toString());
     }
 
     private Course getCourseFromSumtotalCompletion(SumtotalCourseCompletion stCC, File courseIssuesFile) throws IOException, InvalidCourseException {
