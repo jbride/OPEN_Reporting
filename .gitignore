@@ -20,3 +20,4 @@ build.metadata
 .metadata
 target/
 .camel/
+*retry

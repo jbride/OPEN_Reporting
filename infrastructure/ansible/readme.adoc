@@ -1,15 +1,15 @@
 :scrollbar:
 :data-uri:
 
-== Ansible playbook for BxMS Advanced Infrastructure course virtual machine
+== Ansible playbook for Red Hat GPTE Reporting virtual machine
 
 === Base image
 
-* OS : CentOS 7 x68_64
-* Disk: 20GB, dynamically allocated, VDI format
+* OS : RHEL 7 x68_64
+* Disk: 60GB, dynamically allocated, qcow2 format
 * Memory : 4GB
 * Base images installation:
-** Hostname: bpms
+** Hostname: rhel73base
 ** Network: on
 ** HDD Partitioning:
 *** File system : ext4
@@ -24,17 +24,8 @@
 
 The following binary files must be added to the playbook, to the `files` directory of the role:
 
-* Role `bpms` :
-** `jboss-bpmssuite-6.3.0.GA-redhat-4-deployable-eap6.x.zip`
-** `jboss-eap-6.4.7-full-build.zip`
-* Role `rhsso` :
-** `rh-sso-7.0.0.zip`
-* Role `rhsso-adapter` :
-** `rh-sso-7.0.0-eap6-adapter.zip`
 * Role `maven`
 ** `apache-maven-3.2.5-bin.zip`
-* Role `oc`
-** `oc version 3.2.0.44`
 
 === Maven repository
 
@@ -51,7 +42,7 @@ Copy the `hosts.example` file to `hosts`, and replace `<ip address of virtual ma
 In the `ansible` directory, issue the following command:
 
 ----
-$ ansible-playbook -i hosts bpms.yml
+$ ansible-playbook -i hosts install.yml
 ----
 
 === Virtual machine compacting
