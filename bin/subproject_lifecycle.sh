@@ -142,9 +142,9 @@ function deployCC() {
     fi
 }
 
-function deployUP() {
-    echo -en "deployUP() \n\n"
-    cd $RESOLVED_ROOT_PROJECT_HOME/gpte_universal_process
+function deployShared() {
+    echo -en "deployShared() \n\n"
+    cd $RESOLVED_ROOT_PROJECT_HOME/gpte_shared_process
     if [ "$UNDEPLOY" = true ];
     then
         mvn jboss-as:undeploy -Dcli.port=$cli_port
@@ -153,7 +153,7 @@ function deployUP() {
     fi
     if [ $? != 0 ];
     then
-        echo "Failed gpte_uniersal_process deploy." >&2;
+        echo "Failed gpte_shared_process deploy." >&2;
         exit 1;
     fi
 }
@@ -183,5 +183,5 @@ else
     #deployJBossModules
     #deployCC
     #deploySReg
-    deployUP
+    deployShared
 fi

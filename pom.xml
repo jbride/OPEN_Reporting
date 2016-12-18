@@ -23,7 +23,7 @@
     <module>course_completion_process</module>
     <module>accreditation_process</module>
     <module>student_registration_process</module>
-    <module>gpte_universal_process</module>
+    <module>gpte_shared_process</module>
   </modules>
   <dependencyManagement>
       <dependencies>
