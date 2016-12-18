@@ -1,4 +1,4 @@
-mvn_install_dir: "{{lab_home_dir}}/mvn"
+mvn_install_dir: "{{mw_install_dir}}/mvn"
 mvn_install_script_dir: mvn
 mvn_resources_dir: resources
 mvn_configuration_dir: configuration

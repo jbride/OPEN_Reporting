@@ -1,0 +1,10 @@
+---
+
+- name: Install mysql-connector-java
+  yum: name=mysql-connector-java state=present
+
+- name: Create installation target directory
+  file: path={{mw_install_dir}} state=directory owner={{user}} group={{user}}
+
+- name: Copy EAP distro
+  unarchive: src={{eap_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}

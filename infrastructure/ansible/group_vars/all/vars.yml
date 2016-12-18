@@ -1,4 +1,5 @@
-user: jboss
-home_dir: /home/{{user}}
-lab_home_dir: /home/{{user}}/lab
 install_script_dir: /opt/install/scripts
+user: jboss
+group: jboss
+mw_install_dir: /opt/jboss
+eap_distro: jboss-eap-6.4.7-full-build.zip

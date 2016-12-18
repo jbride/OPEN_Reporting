@@ -3,7 +3,6 @@
 SCRIPT_DIR=$(cd -P -- "$(dirname -- "$0")" && pwd -P)
 
 HOME_DIR=/home/{{user}}
-LAB_DIR={{lab_home_dir}}
 RESOURCES_DIR=$SCRIPT_DIR/{{mvn_resources_dir}}
 CONFIGURATION_DIR=$SCRIPT_DIR/{{mvn_configuration_dir}}
 MVN_DISTRO={{mvn_distro}}
