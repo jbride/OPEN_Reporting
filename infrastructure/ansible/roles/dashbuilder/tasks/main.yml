@@ -1,0 +1,16 @@
+---
+
+- name: Install mysql-connector-java
+  yum: name=mysql-connector-java state=present
+
+- name: Create installation target directory
+  file: path={{mw_install_dir}} state=directory owner={{user}} group={{user}}
+
+- name: Unzip Wildfly distro
+  unarchive: "src={{wildfly_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}"
+
+- name: Create dashbuilder.war directory
+  file: "path={{wf_home}}/standalone/deployments/dashbuilder.war state=directory owner={{user}} group={{user}}"
+
+- name: Deploy dashbuilder archive to wildfly as an exploded web artifact
+  unarchive: "src={{dashbuilder_distro}} dest={{wf_home}}/standalone/deployments/dashbuilder.war owner={{user}} group={{user}}"

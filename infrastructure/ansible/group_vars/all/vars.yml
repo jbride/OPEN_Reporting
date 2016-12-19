@@ -3,3 +3,7 @@ user: jboss
 group: jboss
 mw_install_dir: /opt/jboss
 eap_distro: jboss-eap-6.4.7-full-build.zip
+wildfly_distro: wildfly-8.2.0.Final.tar.gz
+dashbuilder_distro: dashbuilder-6.3.0.Final-wildfly8.war
+jboss-home: "{{mw_install_dir}}/jboss-eap-6.4"
+wf_home: "{{mw_install_dir}}/wildfly-8.2.0.Final"

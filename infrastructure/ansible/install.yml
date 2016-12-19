@@ -13,4 +13,5 @@
     - mariadb
     - maven
     - eap
+    - dashbuilder
     - yum-clean
