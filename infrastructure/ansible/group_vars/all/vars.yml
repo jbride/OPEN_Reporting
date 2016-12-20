@@ -5,5 +5,15 @@ mw_install_dir: /opt/jboss
 eap_distro: jboss-eap-6.4.7-full-build.zip
 wildfly_distro: wildfly-8.2.0.Final.tar.gz
 dashbuilder_distro: dashbuilder-6.3.0.Final-wildfly8.war
-jboss-home: "{{mw_install_dir}}/jboss-eap-6.4"
+eap_home: "{{mw_install_dir}}/jboss-eap-6.4"
 wf_home: "{{mw_install_dir}}/wildfly-8.2.0.Final"
+
+# Database properties
+lms_trans_module_name: com.mysql
+lms_trans_driver_jar_dir: /usr/share/java
+lms_trans_driver_jar: mysql-connector-java.jar
+lms_trans_host_ip: localhost
+lms_trans_host_port: 3306
+lms_trans_db_name: lms_trans
+lms_trans_userId: lms
+lms_trans_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q

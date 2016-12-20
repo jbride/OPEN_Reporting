@@ -1,0 +1,2 @@
+lms_trans_cli: lms_trans_cli.sh
+db_module_cli: db_module_cli.sh

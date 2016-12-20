@@ -2,16 +2,16 @@
   remote_user: root
 
   roles:
-    - update
-    - yum-clean
-    - reboot
-    - useradd
-    - mate
-    - selinux
-    - tools
-    - java
-    - mariadb
-    - maven
+#    - update
+#    - yum-clean
+#    - reboot
+#    - useradd
+#    - mate
+#    - selinux
+#    - tools
+#    - java
+#    - mariadb
+#    - maven
     - eap
     - dashbuilder
     - yum-clean

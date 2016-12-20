@@ -6,5 +6,31 @@
 - name: Create installation target directory
   file: path={{mw_install_dir}} state=directory owner={{user}} group={{user}}
 
-- name: Copy EAP distro
-  unarchive: src={{eap_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}
+- name: Unarchive EAP distro if doesn't already exist
+  stat: 
+    path: "{{eap_home}}"
+  register: st
+- unarchive: src={{eap_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}
+  when: st.stat.isdir is not defined
+
+- name: Copy JBoss EAP cli scripts to target
+  copy: src=templates/{{db_module_cli}} dest=/tmp owner={{user}} group={{user}}
+- copy: src=templates/{{lms_trans_cli}} dest=/tmp owner={{user}} group={{user}}
+
+- name: Search and replace variables in database CLI scripts
+  replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
+- replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_driver_jar_dir@@' replace={{lms_trans_driver_jar_dir}}
+- replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_driver_jar@@' replace={{lms_trans_driver_jar}}
+- replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
+- replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_userId@@' replace={{lms_trans_userId}}
+- replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_passwd@@' replace={{lms_trans_passwd}}
+
+- name: Start EAP in admin mode and execute cli
+  command: "{{eap_home}}/bin/standalone.sh --admin-only"
+  async:   15
+  poll:    0
+- command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{lms_trans_cli}}"
+- command: "{{eap_home}}/bin/jboss-cli.sh -c :shutdown"
+  async:   5
+  poll:    0
+    
