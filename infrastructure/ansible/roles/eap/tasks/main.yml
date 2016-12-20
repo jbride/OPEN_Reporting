@@ -25,11 +25,16 @@
 - replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_userId@@' replace={{lms_trans_userId}}
 - replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_passwd@@' replace={{lms_trans_passwd}}
 
-- name: Start EAP in admin mode and execute cli
-  command: "{{eap_home}}/bin/standalone.sh --admin-only"
+- name: Start EAP in admin mode and execute cli scripts
+  stat: 
+    path: "{{eap_home}}/modules/com/mysql"
+  register: st
+- command: "{{eap_home}}/bin/standalone.sh --admin-only"
   async:   15
   poll:    0
 - command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{lms_trans_cli}}"
+- command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{db_module_cli}}"
+  when: st.stat.isdir is not defined
 - command: "{{eap_home}}/bin/jboss-cli.sh -c :shutdown"
   async:   5
   poll:    0
