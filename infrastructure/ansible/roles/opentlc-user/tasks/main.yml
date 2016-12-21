@@ -1,0 +1,13 @@
+---
+
+- name: Create jboss user's .ssh directory
+  file: state=directory path=/home/{{user}}/.ssh owner={{user}} group={{group}} mode=0600
+
+- name: Add ssh config
+  template:
+    src: config
+    dest: /home/{{user}}/.ssh
+    mode: "0600"
+
+- name: Add id_ecdsa private ssh key
+  copy: dest=/home/{{user}}/.ssh owner={{user}} group={{group}} mode=0600 src=id_ecdsa
