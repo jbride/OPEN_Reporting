@@ -6,11 +6,19 @@
 - name: Create installation target directory
   file: path={{mw_install_dir}} state=directory owner={{user}} group={{user}}
 
-- name: Unzip Wildfly distro
-  unarchive: "src={{wildfly_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}"
+- name: Unzip Wildfly distro (if doesn't already exist)
+  stat:
+    path: "{{wf_home}}"
+  register: st
+- unarchive: "src={{wildfly_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}"
+  when: st.stat.isdir is not defined
 
 - name: Create dashbuilder.war directory
   file: "path={{wf_home}}/standalone/deployments/dashbuilder.war state=directory owner={{user}} group={{user}}"
 
-- name: Deploy dashbuilder archive to wildfly as an exploded web artifact
-  unarchive: "src={{dashbuilder_distro}} dest={{wf_home}}/standalone/deployments/dashbuilder.war owner={{user}} group={{user}}"
+- name: Deploy dashbuilder archive to wildfly as an exploded web artifact (if doesn't already exist)
+  stat:
+    path: "{{wf_home}}"
+  register: st
+- unarchive: "src={{dashbuilder_distro}} dest={{wf_home}}/standalone/deployments/dashbuilder.war owner={{user}} group={{user}}"
+  when: st.stat.isdir is not defined

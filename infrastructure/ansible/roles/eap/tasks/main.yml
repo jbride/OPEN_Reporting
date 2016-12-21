@@ -32,6 +32,7 @@
 - command: "{{eap_home}}/bin/standalone.sh --admin-only"
   async:   15
   poll:    0
+- command: "sleep 3"
 - command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{lms_trans_cli}}"
 - command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{db_module_cli}}"
   when: st.stat.isdir is not defined

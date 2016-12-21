@@ -1,0 +1,31 @@
+---
+
+- name: create lms_reporting database and corresponding user
+  mysql_db:
+    name: lms_reporting
+    state: present
+- mysql_user:
+    name: "{{lms_reporting_userId}}"
+    password: "{{lms_reporting_passwd}}"
+    priv: 'lms_reporting.*:ALL'
+    state: present
+
+- name: create dashbuilder database and corresponding user
+  mysql_db:
+    name: dashbuilder
+    state: present
+- mysql_user:
+    name: "{{dashbuilder_db_userId}}"
+    password: "{{dashbuilder_db_passwd}}"
+    priv: 'dashbuilder.*:ALL'
+    state: present
+
+- name: create lms_trans database and corresponding user
+  mysql_db:
+    name: lms_trans
+    state: present
+- mysql_user:
+    name: "{{lms_trans_userId}}"
+    password: "{{lms_trans_passwd}}"
+    priv: 'lms_trans.*:ALL'
+    state: present

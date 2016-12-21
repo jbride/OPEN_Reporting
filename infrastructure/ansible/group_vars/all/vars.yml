@@ -8,7 +8,10 @@ dashbuilder_distro: dashbuilder-6.3.0.Final-wildfly8.war
 eap_home: "{{mw_install_dir}}/jboss-eap-6.4"
 wf_home: "{{mw_install_dir}}/wildfly-8.2.0.Final"
 
-# Database properties
+# General Database properties
+db_root_passwd: JJ8_3KVbD7co4F-qSj_-Yl9Q
+
+# lms_trans database properties
 lms_trans_module_name: com.mysql
 lms_trans_driver_jar_dir: /usr/share/java
 lms_trans_driver_jar: mysql-connector-java.jar
@@ -17,3 +20,23 @@ lms_trans_host_port: 3306
 lms_trans_db_name: lms_trans
 lms_trans_userId: lms
 lms_trans_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
+
+# lms_reporting database properties
+lms_reporting_module_name: com.mysql
+lms_reporting_driver_jar_dir: /usr/share/java
+lms_reporting_driver_jar: mysql-connector-java.jar
+lms_reporting_host_ip: localhost
+lms_reporting_host_port: 3306
+lms_reporting_db_name: lms_reporting
+lms_reporting_userId: lms_report
+lms_reporting_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
+
+# dashbuilder database properties
+dashbuilder_db_module_name: com.mysql
+dashbuilder_db_driver_jar_dir: /usr/share/java
+dashbuilder_db_driver_jar: mysql-connector-java.jar
+dashbuilder_db_host_ip: localhost
+dashbuilder_db_host_port: 3306
+dashbuilder_db_name: dashbuilder
+dashbuilder_db_userId: dashbuilder
+dashbuilder_db_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q

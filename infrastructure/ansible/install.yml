@@ -10,8 +10,9 @@
 #    - selinux
 #    - tools
 #    - java
-#    - mariadb
 #    - maven
+    - mariadb
+    - mariadb-reporting-db
     - eap
     - dashbuilder
     - yum-clean
