@@ -7,6 +7,7 @@ wildfly_distro: wildfly-8.2.0.Final.tar.gz
 dashbuilder_distro: dashbuilder-6.3.0.Final-wildfly8.war
 eap_home: "{{mw_install_dir}}/jboss-eap-6.4"
 wf_home: "{{mw_install_dir}}/wildfly-8.2.0.Final"
+gpte_reporting_home: /opt/OPEN_Reporting
 
 # General Database properties
 db_root_passwd: JJ8_3KVbD7co4F-qSj_-Yl9Q

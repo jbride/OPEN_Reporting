@@ -1,2 +1,3 @@
 lms_trans_cli: lms_trans_cli.sh
-db_module_cli: db_module_cli.sh
+eap_generic_cli: eap_generic_cli.sh
+eap_jvm_props: -Xms512m -Xmx1024m -Djboss.bind.address=0.0.0.0 -Djboss.socket.binding.port-offset=125

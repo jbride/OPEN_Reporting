@@ -14,17 +14,28 @@
   when: st.stat.isdir is not defined
 
 - name: Copy JBoss EAP cli scripts to target
-  copy: src=templates/{{db_module_cli}} dest=/tmp owner={{user}} group={{user}}
+  copy: src=templates/{{eap_generic_cli}} dest=/tmp owner={{user}} group={{user}}
 - copy: src=templates/{{lms_trans_cli}} dest=/tmp owner={{user}} group={{user}}
 
 - name: Search and replace variables in database CLI scripts
-  replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
-- replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_driver_jar_dir@@' replace={{lms_trans_driver_jar_dir}}
-- replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_driver_jar@@' replace={{lms_trans_driver_jar}}
-- replace: dest=/tmp/{{db_module_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
+  replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
+- replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_driver_jar_dir@@' replace={{lms_trans_driver_jar_dir}}
+- replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_driver_jar@@' replace={{lms_trans_driver_jar}}
+- replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
 - replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_userId@@' replace={{lms_trans_userId}}
 - replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_passwd@@' replace={{lms_trans_passwd}}
 
+- name: Ensure JBoss EAP has correct JVM settings and binds to ports that do not conflict with dashbuilder
+  replace: dest={{eap_home}}/bin/standalone.conf regexp='-Xms1303m -Xmx1303m' replace={{eap_jvm_props}}
+
+- name: Add system properties to JBoss EAP
+  blockinfile:
+    dest: "{{eap_home}}/bin/standalone.conf"
+    block: |
+      JAVA_OPTS="$JAVA_OPTS -Dmysql.host.ip={{lms_trans_host_ip}}"
+      JAVA_OPTS="$JAVA_OPTS -Dmysql.host.port={{lms_trans_host_port}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlms_trans_db_name={{lms_trans_db_name}}"
+    
 - name: Start EAP in admin mode and execute cli scripts
   stat: 
     path: "{{eap_home}}/modules/com/mysql"
@@ -33,10 +44,9 @@
   async:   15
   poll:    0
 - command: "sleep 3"
-- command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{lms_trans_cli}}"
-- command: "{{eap_home}}/bin/jboss-cli.sh -c --file=/tmp/{{db_module_cli}}"
+- command: "{{eap_home}}/bin/jboss-cli.sh -c --controller=localhost:10124 --file=/tmp/{{lms_trans_cli}}"
+- command: "{{eap_home}}/bin/jboss-cli.sh -c --controller=localhost:10124 --file=/tmp/{{eap_generic_cli}}"
   when: st.stat.isdir is not defined
 - command: "{{eap_home}}/bin/jboss-cli.sh -c :shutdown"
   async:   5
   poll:    0
-    

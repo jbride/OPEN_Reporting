@@ -1,0 +1,13 @@
+[Unit]
+Description=JBoss EAP Application Platform
+Documentation=https://docs.jboss.org/author/display/WFLY9/Documentation
+After=network.target
+
+[Service]
+ExecStart={{eap_home}}/bin/standalone.sh -c standalone.xml -P=file://{{gpte_reporting_home}}/properties/prod.properties
+StandardOutput=journal
+SyslogIdentifier=gpteintegration
+User=jboss
+
+[Install]
+WantedBy=multi-user.target

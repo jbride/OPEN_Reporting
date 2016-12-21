@@ -1,0 +1,13 @@
+[Unit]
+Description=OPEN Reporting Accred Process
+After=network.target
+
+[Service]
+ExecStart={{gpte_reporting_home}}/bin/accreditation_process_startup.sh -env=prod -f
+ExecStop={{gpte_reporting_home}}/bin/accreditation_process_startup.sh stop
+StandardOutput=journal
+SyslogIdentifier=accredprocess
+User=jboss
+
+[Install]
+WantedBy=multi-user.target

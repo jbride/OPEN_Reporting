@@ -11,6 +11,7 @@
 #    - tools
 #    - java
 #    - maven
+    - systemd
     - mariadb
     - mariadb-reporting-db
     - eap
