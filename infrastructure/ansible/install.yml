@@ -5,7 +5,7 @@
 #    - update
 #    - yum-clean
 #    - reboot
-#    - useradd
+     - useradd
      - opentlc-user
 #    - mate
 #    - selinux

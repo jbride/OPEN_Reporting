@@ -2,3 +2,6 @@
 
 - name: Add jboss user
   user: name={{user}} groups=wheel password={{password}}
+
+- name: Ensure /opt directory is owned by jboss:jboss
+  file: state=directory path=/opt owner={{user}} group={{group}}
