@@ -4,6 +4,7 @@
 *.zip
 *.war
 *.gz
+*.jar
 *~
 ~lock.*
 ~$*

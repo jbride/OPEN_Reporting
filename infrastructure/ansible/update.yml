@@ -1,0 +1,6 @@
+- hosts: prod
+  remote_user: root
+
+  roles:
+    - gpte_reporting
+    - gpte_integration

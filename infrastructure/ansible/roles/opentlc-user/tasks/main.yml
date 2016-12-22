@@ -17,7 +17,7 @@
 - name: Clone GPTE Reporting as the jboss user using opentlc-user github account
   git: 
     repo: git@github.com:redhat-gpe/OPEN_Reporting.git
-    dest: /opt/OPEN_Reporting
+    dest: "{{gpte_reporting_home}}"
     clone: yes 
     accept_hostkey: true 
     key_file: /home/{{user}}/.ssh/id_ecdsa

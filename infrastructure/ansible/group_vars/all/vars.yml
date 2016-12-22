@@ -1,14 +1,20 @@
-install_script_dir: /opt/install/scripts
-mvn_root: apache-maven-3.2.5
-user: jboss
-group: jboss
-mw_install_dir: /opt/jboss
-eap_distro: jboss-eap-6.4.7-full-build.zip
+# Product artifacts
+eap_distro: jboss-eap-6.4.6-full-build.zip
 wildfly_distro: wildfly-8.2.0.Final.tar.gz
 dashbuilder_distro: dashbuilder-6.3.0.Final-wildfly8.war
+fuse_eap_distro: fuse-eap-installer-6.2.1.redhat-084.jar
+mvn_root: apache-maven-3.2.5
+
+# Operating system user and group
+user: jboss
+group: jboss
+
+# Installation paths
+mw_install_dir: /opt/jboss
 eap_home: "{{mw_install_dir}}/jboss-eap-6.4"
 wf_home: "{{mw_install_dir}}/wildfly-8.2.0.Final"
 gpte_reporting_home: /opt/OPEN_Reporting
+install_script_dir: /opt/install/scripts
 
 # General Database properties
 db_root_passwd: JJ8_3KVbD7co4F-qSj_-Yl9Q
@@ -42,3 +48,11 @@ dashbuilder_db_host_port: 3306
 dashbuilder_db_name: dashbuilder
 dashbuilder_db_userId: dashbuilder
 dashbuilder_db_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
+
+
+# GPTE Reporting parameters
+gpte_domain_jar: gpte-domain-1.0.jar
+course_completion_war: course-completion-process-1.0.war
+student_reg_war: student-registration-process-1.0.war
+shared_process_war: gpte-shared-process-1.0.war
+

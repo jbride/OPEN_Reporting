@@ -149,7 +149,7 @@ NOTE: Execute all of the following as the `jboss` operating system user.
 +
 NOTE: For the purpose of this admin guide, the term `$JBOSS_HOME` will refer to the following path: `/opt/jboss/eap/jboss-eap-6.4`.
 . Change directories into: $JBOSS_HOME
-. java -jar /path/to/fuse-eap-installer-6.2.1.redhat-084.jarfuse-eap-installer-6.2.1.redhat-412.jar
+. java -jar /path/to/fuse-eap-installer-6.2.1.redhat-084.jar
 
 . Create `com.mysql.jdbc` JBoss module
 +

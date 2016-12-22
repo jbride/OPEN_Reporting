@@ -1,5 +1,6 @@
 ---
 
+#########       PRODUCT INSTALLS        ################
 - name: Install mysql-connector-java
   yum: name=mysql-connector-java state=present
 
@@ -13,6 +14,26 @@
 - unarchive: src={{eap_distro}} dest={{mw_install_dir}} owner={{user}} group={{user}}
   when: st.stat.isdir is not defined
 
+- name: Unarchive Fuse distro if doesn't already exist
+  stat: 
+    path: "{{eap_home}}/fusepatch"
+  register: st
+- copy: src={{fuse_eap_distro}} dest=/tmp
+  when: st.stat.isdir is not defined
+- shell: java -jar /tmp/{{fuse_eap_distro}}
+  args:
+      chdir: "{{eap_home}}"
+  become: yes
+  become_user: "{{user}}"
+  when: st.stat.isdir is not defined
+
+- name: delete * from {{eap_home}}/standalone/deployments
+  shell: rm -rf {{eap_home}}/standalone/deployments/*
+
+
+
+
+#########       GPTE Reporting Customizations to Fuse on EAP        ################
 - name: Copy JBoss EAP cli scripts to target
   copy: src=templates/{{eap_generic_cli}} dest=/tmp owner={{user}} group={{user}}
 - copy: src=templates/{{lms_trans_cli}} dest=/tmp owner={{user}} group={{user}}
@@ -50,7 +71,10 @@
 - name: Now that EAP is executing, run CLI scripts
   command: "{{eap_home}}/bin/jboss-cli.sh -c --controller=localhost:10124 --file=/tmp/{{lms_trans_cli}}"
 - command: "{{eap_home}}/bin/jboss-cli.sh -c --controller=localhost:10124 --file=/tmp/{{eap_generic_cli}}"
+  become: yes
+  become_user: "{{user}}"
   when: st.stat.isdir is not defined
 - command: "{{eap_home}}/bin/jboss-cli.sh -c :shutdown"
   async:   5
   poll:    0
+

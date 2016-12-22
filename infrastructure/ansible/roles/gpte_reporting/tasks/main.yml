@@ -1,0 +1,24 @@
+---
+
+- name: update GPTE Reporting as the jboss user using opentlc-user github account
+  git:
+    repo: git@github.com:redhat-gpe/OPEN_Reporting.git
+    dest: "{{gpte_reporting_home}}"
+    update: yes
+    accept_hostkey: true
+    key_file: /home/{{user}}/.ssh/id_ecdsa
+  become: yes
+  become_user: "{{user}}"
+
+# name: Build GPTE Reporting using maven
+- shell: /opt/{{mvn_root}}/bin/mvn clean package -DskipTests
+  args:
+      chdir: "{{gpte_reporting_home}}"
+  become: yes
+  become_user: "{{user}}"
+
+- name: stop all GPTE Reporting services
+  command: systemctl stop gpte-integration.service
+- command: systemctl stop accred-process.service
+- command: systemctl stop dashbuilder.service
+

@@ -1,8 +1,8 @@
-- hosts: bpms-advanced-infrastructure
+- hosts: prod
   remote_user: root
 
   roles:
-#    - update
+#    - os_update
 #    - yum-clean
 #    - reboot
      - useradd
