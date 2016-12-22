@@ -11,9 +11,9 @@
     <artifactId>parent</artifactId>
     <version>1.0</version>
   </parent>
-  <artifactId>gpte-universal-process</artifactId>
+  <artifactId>gpte-shared-process</artifactId>
   <packaging>war</packaging>
-  <name>GPTE Universal Process</name>
+  <name>GPTE Shared Process</name>
   <url>http://www.redhat.com</url>
   <properties>
     <version.jboss.maven.plugin>7.7.Final</version.jboss.maven.plugin>
