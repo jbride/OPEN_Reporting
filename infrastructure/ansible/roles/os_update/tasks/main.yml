@@ -1,4 +1,5 @@
 ---
+
 - name: Install deltarpm
   yum: name=deltarpm state=present
 

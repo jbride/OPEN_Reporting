@@ -1,10 +1,16 @@
 - hosts: prod
   remote_user: root
 
+  vars_prompt:
+    - name: "gpte_env"
+      prompt: "GPTE Reporting Environment (valid options:  prod, qa, dev) : "
+      private: no
+
   roles:
-#    - os_update
-#    - yum-clean
-#    - reboot
+     - hostname
+     - os_update
+     - yum-clean
+     - reboot
      - useradd
      - opentlc-user
 #    - mate
