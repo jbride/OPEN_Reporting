@@ -11,10 +11,10 @@
 #    - selinux
 #    - tools
 #    - java
-#    - maven
-#    - systemd
-#    - mariadb
-#    - mariadb-reporting-db
-#    - eap
-#    - dashbuilder
-#    - yum-clean
+     - maven
+     - systemd
+     - mariadb
+     - mariadb-reporting-db
+     - eap
+     - dashbuilder
+     - yum-clean

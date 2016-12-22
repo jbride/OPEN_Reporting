@@ -3,5 +3,8 @@
 - name: Add jboss user
   user: name={{user}} groups=wheel password={{password}}
 
+- name: Set environment variables for user
+  template: src=bashrc dest=/home/{{user}}/.bashrc owner={{user}} group={{group}}
+
 - name: Ensure /opt directory is owned by jboss:jboss
   file: state=directory path=/opt owner={{user}} group={{group}}

@@ -1,4 +1,5 @@
 install_script_dir: /opt/install/scripts
+mvn_root: apache-maven-3.2.5
 user: jboss
 group: jboss
 mw_install_dir: /opt/jboss

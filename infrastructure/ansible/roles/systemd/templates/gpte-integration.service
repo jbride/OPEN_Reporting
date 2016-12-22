@@ -7,7 +7,7 @@ After=network.target
 ExecStart={{eap_home}}/bin/standalone.sh -c standalone.xml -P=file://{{gpte_reporting_home}}/properties/prod.properties
 StandardOutput=journal
 SyslogIdentifier=gpteintegration
-User=jboss
+User={{user}}
 
 [Install]
 WantedBy=multi-user.target

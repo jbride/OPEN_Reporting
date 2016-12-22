@@ -7,8 +7,7 @@ After=network.target
 ExecStart={{wf_home}}/bin/standalone.sh
 StandardOutput=journal
 SyslogIdentifier=Wildfly
-User=jboss
-#Restart=on-failure
+User={{user}}
 
 [Install]
 WantedBy=multi-user.target

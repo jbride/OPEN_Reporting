@@ -7,7 +7,7 @@ ExecStart={{gpte_reporting_home}}/bin/accreditation_process_startup.sh -env=prod
 ExecStop={{gpte_reporting_home}}/bin/accreditation_process_startup.sh stop
 StandardOutput=journal
 SyslogIdentifier=accredprocess
-User=jboss
+User={{user}}
 
 [Install]
 WantedBy=multi-user.target
