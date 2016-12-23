@@ -1,10 +1,25 @@
-- hosts: prod
-  remote_user: root
-
+- hosts: localhost
+  gather_facts: no
   vars_prompt:
-    - name: "gpte_env"
+    - name: gpte_env
       prompt: "GPTE Reporting Environment (valid options:  prod, qa, dev) : "
       private: no
+
+  # Appears that this now works: https://github.com/ansible/ansible/issues/10942
+  # As of ansible v.2.1.2.0
+  pre_tasks:
+  - set_fact: gpte_env={{ gpte_env }}
+
+  tasks:
+  - debug: 
+      # msg: "Will install the following environment: {{ hostvars['localhost']['gpte_env'] }}"
+      msg: "Will install the following environment: {{ hostvars.localhost.gpte_env }}"
+
+- hosts: "{{ hostvars['localhost']['gpte_env'] }}"
+  remote_user: root
+
+  pre_tasks:
+  - set_fact: gpte_env={{ hostvars['localhost']['gpte_env'] }}
 
   roles:
      - hostname
