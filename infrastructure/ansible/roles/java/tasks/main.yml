@@ -2,3 +2,23 @@
 
 - name: install Java
   yum: name=java-1.8.0-openjdk-devel state=present
+
+# The Dashbuilder server integrates with the OPENTLC-SSO IPA using the LDAPS protocol.
+# Clients connecting to the OPENTLC-SSO IPA server need to make use of the IPA server's self-signed public certificate.
+# This self-signed certificate can be found at:   forge.opentlc.com:/etc/ipa/ca.crt
+# Being that Dashbuilder is a Java process, this IPA self-signed certificate can be imported into the JDKs database of trusted certificates
+# To determine if `OPENTLC_IPA2` cert is imported into JRE keystore:
+#     keytool -list -storepass changeit -alias OPENTLC_IPA2 -keystore /etc/pki/ca-trust/extracted/java/cacerts
+#
+# NOTE: `/etc/pki/java/cacerts` is a soft-link to: `/etc/pki/ca-trust/extracted/java/cacerts`
+
+- name: copy ca.crt to remote {{gpte_env}}}
+  file: 
+    path: /etc/ipa 
+    state: directory
+- copy:
+    src: ca.crt
+    dest: /etc/ipa
+
+- name: import self-signed cert into JRE keystore
+  command: keytool -import -trustcacerts -file /etc/ipa/ca.crt -alias OPENTLC_IPA2 -keystore /etc/pki/ca-trust/extracted/java/cacerts -storepass changeit -noprompt

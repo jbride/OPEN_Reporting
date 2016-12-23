@@ -8,17 +8,21 @@
 - name: Ensure that gpte-domain module path is created
   file: path={{gpte_domain_install_dir}} state=directory owner={{user}} group={{user}}
 
-- name: Copy over gpte-domain module.xml
+- name: Copy over gpte-domain module.xml to JBoss EAP 
   template: src=module.xml dest={{gpte_domain_install_dir}} owner={{user}} group={{group}}
 
-- name: Copy gpte-domain jar file
+- name: Copy gpte-domain jar file to JBoss EAP as a Module
   copy: remote_src=True src={{gpte_reporting_home}}/commons/domain/target/{{gpte_domain_jar}} dest={{gpte_domain_install_dir}} owner={{user}} group={{group}}
 
-- name: Copy course completion service
+- name: Copy course completion service to JBoss EAP
   copy: remote_src=True src={{gpte_reporting_home}}/course_completion_process/target/{{course_completion_war}} dest={{eap_home}}/standalone/deployments owner={{user}} group={{group}}
 
-- name: Copy student registration service
+- name: Copy student registration service to JBoss EAP
   copy: remote_src=True src={{gpte_reporting_home}}/student_registration_process/target/{{student_reg_war}} dest={{eap_home}}/standalone/deployments owner={{user}} group={{group}}
 
-- name: Copy shared process service
+- name: Copy shared GPTE process service to JBoss EAP
   copy: remote_src=True src={{gpte_reporting_home}}/gpte_shared_process/target/{{shared_process_war}} dest={{eap_home}}/standalone/deployments owner={{user}} group={{group}}
+
+- name: restart JBoss EAP
+  command: systemctl start gpte-integration.service 
+- command: sleep 15

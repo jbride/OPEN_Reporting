@@ -6,7 +6,7 @@
       private: no
 
 # Appears that this now works: https://github.com/ansible/ansible/issues/10942
-#   # As of ansible v.2.1.2.0
+# As of ansible v.2.1.2.0
   pre_tasks:
     - set_fact: gpte_env={{ gpte_env }}
   
@@ -27,3 +27,4 @@
     - { role: gpte_database_update, when: gpte_env != 'prod' }
     - gpte_reporting
     - gpte_integration
+    - accred-process

@@ -29,8 +29,8 @@
      - opentlc-user
 #    - mate
 #    - selinux
-#    - tools
-#    - java
+     - tools
+     - java
      - maven
      - systemd
      - mariadb

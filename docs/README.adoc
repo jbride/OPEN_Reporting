@@ -28,6 +28,7 @@ The intended audience of this document architects, developers and administrators
 === Skills
 
 . RHCSA or equivalent experience.
+. Experience with Ansible
 . Experience with Git.
 . Experience with Java development and its defacto build tool: Maven.
 . Experience with JBoss EAP administration.

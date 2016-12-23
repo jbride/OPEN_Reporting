@@ -28,6 +28,8 @@ The following binary files must be added to the playbook, to the `files` directo
 ** `apache-maven-3.2.5-bin.zip`
 * Role `opentlc-user`
 ** `id_ecdsa`
+* Role `java`
+** ca.crt  (from:  forge.opentlc.com:/etc/ipa/ca.crt)
 
 === Maven repository
 
@@ -53,3 +55,10 @@ The `zerofree` tool akllows to compact the virtual machine disk size by reclaimi
 The virtual machine has the `zerofree` tool in the `/usr/bin` directory.
 
 For a how-to: http://www.thelinuxdaily.com/2010/02/shrinking-a-dynamic-virtualbox-disk-image/
+
+== TO-DO
+
+. Stored proc
+. dashbuilder
+. Apache web server
+. phpmyadmin

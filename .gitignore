@@ -5,6 +5,7 @@
 *.war
 *.gz
 *.jar
+*.crt
 *~
 ~lock.*
 ~$*
