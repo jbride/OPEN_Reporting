@@ -17,7 +17,7 @@ gpte_reporting_home: /opt/OPEN_Reporting
 install_script_dir: /opt/install/scripts
 
 # General Database properties
-db_root_passwd: JJ8_3KVbD7co4F-qSj_-Yl9Q
+db_root_passwd: c-9XSHln8hJ_UH9YvNOgc9mH
 
 # lms_trans database properties
 lms_trans_module_name: com.mysql
@@ -25,7 +25,7 @@ lms_trans_driver_jar_dir: /usr/share/java
 lms_trans_driver_jar: mysql-connector-java.jar
 lms_trans_host_ip: localhost
 lms_trans_host_port: 3306
-lms_trans_db_name: lms_trans
+lms_trans_db_name: lms_transactional
 lms_trans_userId: lms
 lms_trans_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
 
@@ -48,6 +48,14 @@ dashbuilder_db_host_port: 3306
 dashbuilder_db_name: dashbuilder
 dashbuilder_db_userId: dashbuilder
 dashbuilder_db_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
+
+# Database update properties
+databases_to_update:
+  - "{{ lms_trans_db_name }}"
+  - "{{ dashbuilder_db_name }}"
+
+prod_dump_dir: /tmp/mysqlbackup
+target_bk_dir: /tmp/mysqlbackup_target/
 
 
 # GPTE Reporting parameters

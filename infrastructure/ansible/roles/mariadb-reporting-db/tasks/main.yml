@@ -2,7 +2,7 @@
 
 - name: create lms_reporting database and corresponding user
   mysql_db:
-    name: lms_reporting
+    name: "{{ lms_reporting_db_name }}"
     state: present
 - mysql_user:
     name: "{{lms_reporting_userId}}"
@@ -12,7 +12,7 @@
 
 - name: create dashbuilder database and corresponding user
   mysql_db:
-    name: dashbuilder
+    name: "{{ dashbuilder_db_name }}"
     state: present
 - mysql_user:
     name: "{{dashbuilder_db_userId}}"
@@ -22,10 +22,10 @@
 
 - name: create lms_trans database and corresponding user
   mysql_db:
-    name: lms_trans
+    name: "{{ lms_trans_db_name }}"
     state: present
 - mysql_user:
     name: "{{lms_trans_userId}}"
     password: "{{lms_trans_passwd}}"
-    priv: 'lms_trans.*:ALL'
+    priv: '{{ lms_trans_db_name }}.*:ALL'
     state: present

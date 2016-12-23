@@ -12,7 +12,6 @@
 
   tasks:
   - debug: 
-      # msg: "Will install the following environment: {{ hostvars['localhost']['gpte_env'] }}"
       msg: "Will install the following environment: {{ hostvars.localhost.gpte_env }}"
 
 - hosts: "{{ hostvars['localhost']['gpte_env'] }}"
