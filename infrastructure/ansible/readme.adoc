@@ -58,7 +58,7 @@ For a how-to: http://www.thelinuxdaily.com/2010/02/shrinking-a-dynamic-virtualbo
 
 == TO-DO
 
-. Stored proc
 . dashbuilder
 . Apache web server
 . phpmyadmin
+. Stored proc

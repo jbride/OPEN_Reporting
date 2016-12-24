@@ -20,5 +20,12 @@
     src: ca.crt
     dest: /etc/ipa
 
+- shell: keytool -list -storepass changeit -alias OPENTLC_IPA2 -keystore /etc/pki/ca-trust/extracted/java/cacerts
+  register: keytool_result
+  ignore_errors: True
+- debug: 
+    msg: "OPENTLC_IPA2 cert has been registered: {{ keytool_result }}"
+
 - name: import self-signed cert into JRE keystore
   command: keytool -import -trustcacerts -file /etc/ipa/ca.crt -alias OPENTLC_IPA2 -keystore /etc/pki/ca-trust/extracted/java/cacerts -storepass changeit -noprompt
+  when: "'OPENTLC_IPA2 cert has been registered' in keytool_result"
