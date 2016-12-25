@@ -35,6 +35,7 @@ public class GEHttpSSOProcessor extends HttpSSOProcessor {
 
     public static final String GE_IPA_FORGE_USERS="cn=forge-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_REPORT_CREATORS="cn=report-creators,cn=groups,cn=accounts,dc=opentlc,dc=com";
+    public static final String GE_IPA_POWER_REPORTING_USERS="cn=power-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_OPEN_REPORTING_USERS="cn=open-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_RHSE_REPORTING_USERS="cn=rhse-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
     public static final String GE_IPA_PARTNER_USERS="cn=partner-users,cn=groups,cn=accounts,dc=opentlc,dc=com";
@@ -69,6 +70,8 @@ public class GEHttpSSOProcessor extends HttpSSOProcessor {
                 us.initSessionAsRoot();
             } else if (request.isUserInRole(GE_IPA_REPORT_CREATORS)) {
                 initSession(login, us, GE_IPA_REPORT_CREATORS);
+            } else if (request.isUserInRole(GE_IPA_POWER_REPORTING_USERS)) {
+                initSession(login, us, GE_IPA_POWER_REPORTING_USERS);
             } else if (request.isUserInRole(GE_IPA_OPEN_REPORTING_USERS)) {
                 initSession(login, us, GE_IPA_OPEN_REPORTING_USERS);
             } else if (request.isUserInRole(GE_IPA_RHSE_REPORTING_USERS)) {
