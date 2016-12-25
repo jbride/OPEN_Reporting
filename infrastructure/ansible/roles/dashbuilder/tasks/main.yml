@@ -14,13 +14,17 @@
   when: st.stat.isdir is not defined
 
 - name: Create dashbuilder.war directory
-  file: "path={{wf_home}}/standalone/deployments/dashbuilder.war state=directory owner={{user}} group={{user}}"
+  file: "path={{dashbuilder_runtime_artifact}} state=directory owner={{user}} group={{user}}"
 
 - name: Deploy dashbuilder archive to wildfly as an exploded web artifact (if doesn't already exist)
   stat:
     path: "{{wf_home}}"
   register: st
-- unarchive: "src={{dashbuilder_distro}} dest={{wf_home}}/standalone/deployments/dashbuilder.war owner={{user}} group={{user}}"
+- unarchive: 
+    src: "{{dashbuilder_distro}}"
+    dest: "{{dashbuilder_runtime_artifact}}" 
+    owner: "{{user}}" 
+    group: "{{user}}"
   when: st.stat.isdir is not defined
 
 

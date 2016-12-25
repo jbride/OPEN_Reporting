@@ -14,6 +14,8 @@ mw_install_dir: /opt/jboss
 eap_home: "{{mw_install_dir}}/jboss-eap-6.4"
 wf_home: "{{mw_install_dir}}/wildfly-8.2.0.Final"
 gpte_reporting_home: /opt/OPEN_Reporting
+dashbuilder_customization_home: "{{gpte_reporting_home}}/reporting/dashbuilder_customizations/original/"
+dashbuilder_runtime_artifact: "{{wf_home}}/standalone/deployments/dashbuilder.war"
 install_script_dir: /opt/install/scripts
 
 # General Database properties

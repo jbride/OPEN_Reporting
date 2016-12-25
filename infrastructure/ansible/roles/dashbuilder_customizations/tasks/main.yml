@@ -1,1 +1,39 @@
 ---
+
+# GPTE Reporting extensions are developed using Java and built using Maven.
+# The Maven dependencies are found in non-standard repositories.
+# These non-standard maven repos are defined in community.xml
+- name: Copy community.xml to /tmp
+  copy:
+    src: templates/community.xml
+    dest: /tmp
+    owner: "{{user}}"
+    group: "{{group}}"
+
+- name: pull dashboard dependency
+  get_url:
+    dest: /tmp
+    url: http://repository.jboss.org/nexus/content/groups/public/org/jboss/dashboard-builder/dashboard-ui-core/6.2.0.Final/dashboard-ui-core-6.2.0.Final-classes.jar
+    owner: "{{user}}"
+    group: "{{group}}"
+
+- name: install dashboard-ui-core maven dependency (to allow GPTE Reporting customizations to compile)
+  shell: mvn install:install-file -Dfile=/tmp/dashboard-ui-core-6.2.0.Final.jar -DgroupId=org.jboss.dashboard-builder -DartifactId=dashboard-ui-core -Dversion=6.2.0.Final -Dpackaging=jar -DgeneratePom=true
+  args:
+     chdir: "{{dashbuilder_customization_home}}"
+  become: yes
+  become_user: "{{user}}"
+
+- name: Build GPTE customizations to Dashbuilder using maven
+  shell: /opt/{{mvn_root}}/bin/mvn clean package -DskipTests -s /tmp/community.xml
+  args:
+     chdir: "{{dashbuilder_customization_home}}"
+  become: yes
+  become_user: "{{user}}"
+
+- name: copy dashbuilder customization artifact to dashbuilder runtime
+  copy:
+    src: "{{dashbuilder_customization_home}}/target/ge-dashboard-1.0.jar"
+    dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/lib/"
+    owner: "{{user}}"
+    group: "{{group}}"
