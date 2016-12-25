@@ -1,0 +1,111 @@
+<!--
+
+    Copyright (C) 2014 JBoss Inc
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<web-app metadata-complete="false">
+
+  <display-name>dashboard</display-name>
+  <description>JBoss Dashboard-Builder Application</description>
+
+  <!-- Security configuration -->
+
+  <security-role>
+    <description>Workspace Admins</description>
+    <role-name>cn=forge-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>Report Creators</description>
+    <role-name>cn=report-creators,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>Red Hat Regional Managers</description>
+    <role-name>cn=rht-regional-managers,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>OPEN Reporting Users</description>
+    <role-name>cn=open-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>RHSE Reporting Users</description>
+    <role-name>cn=rhse-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>Reporting Power User (both OPEN and RHSE)</description>
+    <role-name>cn=power-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>Reporting Users</description>
+    <role-name>cn=reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-role>
+    <description>Partner WorkSpace</description>
+    <role-name>cn=partner-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+  </security-role>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Free access</web-resource-name>
+      <url-pattern>/images/jb_logo.png</url-pattern>
+    </web-resource-collection>
+  </security-constraint>
+
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Restricted access</web-resource-name>
+      <url-pattern>/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+      <role-name>cn=forge-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=report-creators,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=rht-regional-managers,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=power-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=partner-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=open-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+      <role-name>cn=rhse-reporting-users,cn=groups,cn=accounts,dc=opentlc,dc=com</role-name>
+    </auth-constraint>
+  </security-constraint>
+
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <form-login-config>
+      <form-login-page>/login.jsp</form-login-page>
+      <form-error-page>/login_failed.jsp</form-error-page>
+    </form-login-config>
+  </login-config>
+
+  <error-page>
+    <error-code>403</error-code>
+    <location>/not_authorized.jsp</location>
+  </error-page>
+
+  <!-- Application main data source definition -->
+
+  <resource-ref>
+    <description>Dashboard Builder Datasource</description>
+    <res-ref-name>jdbc/dashbuilder</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>
+    <res-auth>Container</res-auth>
+  </resource-ref>
+
+</web-app>

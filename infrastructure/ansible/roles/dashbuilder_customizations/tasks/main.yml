@@ -1,14 +1,18 @@
 ---
 
-# GPTE Reporting extensions are developed using Java and built using Maven.
-# The Maven dependencies are found in non-standard repositories.
-# These non-standard maven repos are defined in community.xml
-- name: Copy community.xml to /tmp
+- name: Copy customized web.xml and jboss-web.xml config files to dashbuilder runtime
   copy:
-    src: templates/community.xml
-    dest: /tmp
+    src: templates/jboss-web.xml
+    dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/"
     owner: "{{user}}"
     group: "{{group}}"
+- copy:
+    src: templates/web.xml
+    dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/"
+    owner: "{{user}}"
+    group: "{{group}}"
+
+# GPTE Reporting extensions are developed using Java and built using Maven.
 
 - name: pull dashboard dependency
   get_url:
@@ -25,7 +29,7 @@
   become_user: "{{user}}"
 
 - name: Build GPTE customizations to Dashbuilder using maven
-  shell: /opt/{{mvn_root}}/bin/mvn clean package -DskipTests -s /tmp/community.xml
+  shell: /opt/{{mvn_root}}/bin/mvn clean package -DskipTests
   args:
      chdir: "{{dashbuilder_customization_home}}"
   become: yes
@@ -37,3 +41,4 @@
     dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/lib/"
     owner: "{{user}}"
     group: "{{group}}"
+    remote_src: True
