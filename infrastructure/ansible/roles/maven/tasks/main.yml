@@ -6,3 +6,9 @@
   register: st
 - unarchive: src={{mvn_distro}} dest={{mvn_install_dir}} owner={{user}} group={{user}}
   when: st.stat.isdir is not defined
+
+- name: create soft link to Apache Maven install
+  file:
+    state: link
+    src: "{{mvn_install_dir}}/{{mvn_root}}/bin/mvn"
+    path: /usr/bin/mvn
