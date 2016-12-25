@@ -22,3 +22,53 @@
   register: st
 - unarchive: "src={{dashbuilder_distro}} dest={{wf_home}}/standalone/deployments/dashbuilder.war owner={{user}} group={{user}}"
   when: st.stat.isdir is not defined
+
+
+########        GPTE Reporting Customizations to Dashbuilder            ##################
+ 
+- name: Copy standalone.xml to target
+  copy: src=templates/standalone.xml dest={{wf_s_config}} owner={{user}} group={{user}}
+- name: Add system properties to JBoss EAP
+  blockinfile:
+    dest: "{{wf_home}}/bin/standalone.conf"
+    block: |
+      JAVA_OPTS="$JAVA_OPTS -Ddashbuilder_db_host_ip={{dashbuilder_db_host_ip}}"
+      JAVA_OPTS="$JAVA_OPTS -Ddashbuilder_db_name={{dashbuilder_db_name}}"
+      JAVA_OPTS="$JAVA_OPTS -Ddashbuilder_db_userId={{dashbuilder_db_userId}}"
+      JAVA_OPTS="$JAVA_OPTS -Ddashbuilder_db_passwd={{dashbuilder_db_passwd}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_host_ip={{lms_reporting_host_ip}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_db_name={{lms_reporting_db_name}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_userId={{lms_reporting_userId}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_passwd={{lms_reporting_passwd}}"
+
+- name: Copy CLI scripts to target
+  copy: src=templates/{{wildfly_generic_cli}} dest=/tmp owner={{user}} group={{user}}
+- name: Search and replace variables in CLI scripts
+  replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_module_name@@' replace={{lms_reporting_module_name}}
+- replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_driver_jar_dir@@' replace={{lms_reporting_driver_jar_dir}}
+- replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_driver_jar@@' replace={{lms_reporting_driver_jar}}
+- replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_module_name@@' replace={{lms_reporting_module_name}}
+
+- name: Ensure JBoss EAP has correct JVM settings and binds to ports that do not conflict with dashbuilder
+  replace: dest={{wf_home}}/bin/standalone.conf regexp='-Xms64m -Xmx512m' replace={{wildfly_jvm_props}}
+
+- name: Start EAP (as jboss user) in admin mode so as to be available for execution of CLI scripts
+  stat:
+    path: "{{wf_home}}/modules/com/mysql"
+  register: st
+- command: "{{wf_home}}/bin/standalone.sh --admin-only"
+  async:   15
+  poll:    0
+  become: yes
+  become_user: "{{user}}"
+- command: "sleep 3"
+
+- name: Now that EAP is executing, run CLI scripts
+  command: "{{wf_home}}/bin/jboss-cli.sh -c --controller=localhost:10090 --file=/tmp/{{wildfly_generic_cli}}"
+  become: yes
+  become_user: "{{user}}"
+  when: st.stat.isdir is not defined
+- command: "{{wf_home}}/bin/jboss-cli.sh -c :shutdown"
+  async:   5
+  poll:    0
+

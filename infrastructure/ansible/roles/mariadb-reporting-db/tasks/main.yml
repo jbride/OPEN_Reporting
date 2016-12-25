@@ -7,8 +7,14 @@
 - mysql_user:
     name: "{{lms_reporting_userId}}"
     password: "{{lms_reporting_passwd}}"
-    priv: 'lms_reporting.*:ALL'
+    priv: '{{ lms_reporting_db_name }}.*:ALL'
     state: present
+- mysql_user:
+    name: "{{lms_reporting_userId}}"
+    password: "{{lms_reporting_passwd}}"
+    priv: '{{ lms_reporting_db_name }}.*:ALL'
+    state: present
+    host: "%"
 
 - name: create dashbuilder database and corresponding user
   mysql_db:

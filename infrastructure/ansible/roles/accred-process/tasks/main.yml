@@ -2,4 +2,4 @@
 
 - name: bounce accred-process
   command: systemctl restart accred-process.service
-- command: sleep 15
+- command: sleep 30

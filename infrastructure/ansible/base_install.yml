@@ -1,3 +1,6 @@
+# Provisions the base components of GPTE Reporting that are not subject to change.
+# End state of having executed this ansible script is a single machine with all GPTE Reporting base components enabled but stopped.
+
 - hosts: localhost
   gather_facts: no
   vars_prompt:
@@ -21,20 +24,19 @@
   - set_fact: gpte_env={{ hostvars['localhost']['gpte_env'] }}
 
   roles:
-     - hostname
-     - os_update
-     - yum-clean
-     - reboot
-     - useradd
-     - opentlc-user
-#    - mate
-#    - selinux
-     - tools
-     - java
-     - maven
-     - systemd
-     - mariadb
-     - mariadb-reporting-db
-     - eap
-     - dashbuilder
-     - yum-clean
+    - hostname
+    - os_update
+    - yum-clean
+    - reboot
+    - useradd
+    - opentlc-user
+    - selinux
+    - tools
+    - java
+    - maven
+    - systemd
+    - mariadb
+    - mariadb-reporting-db
+    - eap
+    - dashbuilder
+    - yum-clean
