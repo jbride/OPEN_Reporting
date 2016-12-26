@@ -45,7 +45,6 @@ $ ansible-playbook -i hosts base_install.yml
 
 == TO-DO
 
-. phpmyadmin
 . Stored proc
 . QA email address
 . update dashbuilder on prod 

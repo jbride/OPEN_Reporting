@@ -57,7 +57,7 @@ databases_to_provision_from_prod:
 #  - "{{ dashbuilder_db_name }}"
 #  - "{{ lms_reporting_db_name }}"
 
-prod_databases_to_update
+prod_databases_to_update:
   - "{{ dashbuilder_db_name }}"
 
 prod_dump_dir: /tmp/mysqlbackup
@@ -70,3 +70,7 @@ course_completion_war: course-completion-process-1.0.war
 student_reg_war: student-registration-process-1.0.war
 shared_process_war: gpte-shared-process-1.0.war
 
+# epel
+epel_repo_url: "https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ ansible_distribution_major_version }}.noarch.rpm"
+epel_repo_gpg_key_url: "/etc/pki/rpm-gpg/RPM-GPG-KEY-EPEL-{{ ansible_distribution_major_version }}"
+epel_repofile_path: "/etc/yum.repos.d/epel.repo"

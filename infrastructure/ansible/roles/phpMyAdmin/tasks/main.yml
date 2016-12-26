@@ -1,0 +1,6 @@
+---
+
+- name: configure phpMyAdmin
+  template:
+    src: config.inc.php
+    dest: /etc/phpMyAdmin

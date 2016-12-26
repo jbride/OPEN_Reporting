@@ -22,3 +22,5 @@
 - command: systemctl stop accred-process.service
 - command: systemctl stop dashbuilder.service
 
+- name: bounce http service
+  command: systemctl restart httpd.service

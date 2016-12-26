@@ -24,21 +24,22 @@
   - set_fact: gpte_env={{ hostvars['localhost']['gpte_env'] }}
 
   roles:
-#    - hostname
-#    - os_update
-#    - yum-clean
-#    - firewalld
-#    - selinux
-#    - httpd
-#    - reboot
-#    - useradd
-#    - opentlc-user
-#    - tools
-#    - java
-#    - maven
-#    - systemd
-#    - mariadb
-#    - mariadb-reporting-db
-#    - eap
-    - dashbuilder
-#    - yum-clean
+     - hostname
+     - epel
+     - os_update
+     - yum-clean
+     - firewalld
+     - httpd
+     - reboot
+     - useradd
+     - opentlc-user
+     - tools
+     - java
+     - maven
+     - systemd
+     - mariadb
+     - mariadb-reporting-db
+     - eap
+     - dashbuilder
+     - phpMyAdmin
+     - yum-clean
