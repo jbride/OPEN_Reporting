@@ -47,3 +47,10 @@
     priv: '{{ lms_trans_db_name }}.*:ALL'
     state: present
     host: "%"
+
+- name: Support RHT data lake foks
+  blockinfile:
+    dest: "/etc/my.cnf"
+    block: |
+      # JA Bride:  Added to support RHT data lake folks
+      skip-name-resolve

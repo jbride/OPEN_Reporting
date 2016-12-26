@@ -1,0 +1,12 @@
+---
+
+- name: allow httpd connections to Apache Web Server
+  seboolean:
+    name: httpd_can_network_connect
+    state: yes
+    persistent: yes
+
+- name: httpd configuration; create dashbuilder.conf
+  template:
+    src: dashbuilder.conf
+    dest: /etc/httpd/conf.d

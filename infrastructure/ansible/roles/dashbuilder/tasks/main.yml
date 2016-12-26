@@ -30,9 +30,16 @@
 
 ########        GPTE Reporting Customizations to Dashbuilder            ##################
  
+- name: Configure jboss-deployment-structure.xml of dashbuilder to allow for integration with LDAP module
+  template:
+    src: jboss-deployment-structure.xml
+    dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/"
+    owner: "{{user}}" 
+    group: "{{user}}"
+ 
 - name: Copy standalone.xml to target
   copy: src=templates/standalone.xml dest={{wf_s_config}} owner={{user}} group={{user}}
-- name: Add system properties to JBoss EAP
+- name: Add system properties to JBoss Wildfly
   blockinfile:
     dest: "{{wf_home}}/bin/standalone.conf"
     block: |
@@ -53,10 +60,10 @@
 - replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_driver_jar@@' replace={{lms_reporting_driver_jar}}
 - replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_module_name@@' replace={{lms_reporting_module_name}}
 
-- name: Ensure JBoss EAP has correct JVM settings and binds to ports that do not conflict with dashbuilder
+- name: Ensure JBoss Wildfly has correct JVM settings and binds to ports that do not conflict with dashbuilder
   replace: dest={{wf_home}}/bin/standalone.conf regexp='-Xms64m -Xmx512m' replace={{wildfly_jvm_props}}
 
-- name: Start EAP (as jboss user) in admin mode so as to be available for execution of CLI scripts
+- name: Start Wildfly (as jboss user) in admin mode so as to be available for execution of CLI scripts
   stat:
     path: "{{wf_home}}/modules/com/mysql"
   register: st
@@ -65,9 +72,10 @@
   poll:    0
   become: yes
   become_user: "{{user}}"
+  when: st.stat.isdir is not defined
 - command: "sleep 3"
 
-- name: Now that EAP is executing, run CLI scripts
+- name: Now that Wildfly is executing, run CLI scripts
   command: "{{wf_home}}/bin/jboss-cli.sh -c --controller=localhost:10090 --file=/tmp/{{wildfly_generic_cli}}"
   become: yes
   become_user: "{{user}}"

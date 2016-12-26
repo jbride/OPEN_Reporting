@@ -1,0 +1,75 @@
+---
+
+- name: Allowing TCP connections through firewall on port 443
+  firewalld:
+    port: 443/tcp
+    permanent: true
+    state: enabled
+
+- name: Allowing TCP connections through firewall on port 3306 (in non-prod environments only)
+  firewalld:
+    port: 3306/tcp
+    permanent: true
+    state: enabled
+  when: gpte_env != 'prod'
+
+- name: Supporting RHT data lake folks by allowing TCP connections from specific ip addresses to 3306 (prod environment only)
+  firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.180.0/23" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.184.0/24" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+  
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.176.0/23" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="66.187.232.0/21" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.176.0/21" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.182.0/23" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="52.202.250.159/32" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.184.0/21" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="209.132.178.0/23" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'
+
+- firewalld:
+    rich_rule: 'rule family="ipv4" source address="66.187.224.0/21" port port="3306" protocol="tcp" accept'
+    permanent: true
+    state: enabled
+  when: gpte_env == 'prod'

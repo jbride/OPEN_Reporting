@@ -52,8 +52,12 @@ dashbuilder_db_userId: dashbuilder
 dashbuilder_db_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
 
 # Database update properties
-databases_to_update:
+databases_to_provision_from_prod:
   - "{{ lms_trans_db_name }}"
+#  - "{{ dashbuilder_db_name }}"
+#  - "{{ lms_reporting_db_name }}"
+
+prod_databases_to_update
   - "{{ dashbuilder_db_name }}"
 
 prod_dump_dir: /tmp/mysqlbackup
