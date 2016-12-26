@@ -25,6 +25,12 @@
     password: "{{dashbuilder_db_passwd}}"
     priv: 'dashbuilder.*:ALL'
     state: present
+- mysql_user:
+    name: "{{dashbuilder_db_userId}}"
+    password: "{{dashbuilder_db_passwd}}"
+    priv: 'dashbuilder.*:ALL'
+    state: present
+    host: "%"
 
 - name: create lms_trans database and corresponding user
   mysql_db:
@@ -35,3 +41,9 @@
     password: "{{lms_trans_passwd}}"
     priv: '{{ lms_trans_db_name }}.*:ALL'
     state: present
+- mysql_user:
+    name: "{{lms_trans_userId}}"
+    password: "{{lms_trans_passwd}}"
+    priv: '{{ lms_trans_db_name }}.*:ALL'
+    state: present
+    host: "%"

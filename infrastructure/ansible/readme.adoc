@@ -46,7 +46,7 @@ $ ansible-playbook -i hosts base_install.yml
 == TO-DO
 
 . dashbuilder:  ipa integration
-. dashbuilder_customizations
+. dashbuilder log debug
 . Apache web server
 . phpmyadmin
 . Stored proc

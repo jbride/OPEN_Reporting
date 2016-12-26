@@ -25,10 +25,10 @@
     - set_fact: gpte_env={{ hostvars['localhost']['gpte_env'] }}
 
   roles:
-    # Updating of database (from prod database) is only applicable to dev and qa environment
+    # Updating of target database (from prod database) is only applicable to dev and qa environment
     # Only execute this role if not updating production environment.
-#   - { role: gpte_database_update, when: gpte_env != 'prod' }
-#   - gpte_reporting
-#   - gpte_integration
-#   - accred-process
+    - { role: gpte_database_update, when: gpte_env != 'prod' }
+    - gpte_reporting
+    - gpte_integration
+    - accred-process
     - dashbuilder_customizations

@@ -42,3 +42,10 @@
     owner: "{{user}}"
     group: "{{group}}"
     remote_src: True
+
+- name: set dashbuilder.war as deployable
+  shell: touch {{dashbuilder_runtime_artifact}}.dodeploy
+
+- name: bounce dashbuilder service
+  command: systemctl restart dashbuilder.service
+- command: sleep 30
