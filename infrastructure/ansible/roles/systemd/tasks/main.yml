@@ -25,7 +25,7 @@
 - command: systemctl enable gpte-integration.service
 
 - name: enable systemd config for Apache Web Server
-- command: systemctl enable httpd.service
+  command: systemctl enable httpd.service
 
 - name: start systemd config for Apache Web Server
-- command: systemctl start httpd.service
+  command: systemctl start httpd.service

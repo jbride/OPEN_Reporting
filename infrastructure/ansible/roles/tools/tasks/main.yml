@@ -1,4 +1,10 @@
 ---
 
 - name: Install tools
-  yum: name=git,zip,bzip2,unzip,gettext,wget,curl,telnet,net-tools,httpd,mod_ssl,libsemanage-python,phpMyAdmin,php state=present
+  yum: name=git,zip,bzip2,unzip,gettext,wget,curl,telnet,net-tools,httpd,mod_ssl,libsemanage-python,php state=present
+
+- name: Install tools
+  yum: 
+    name: phpMyAdmin
+    disablerepo: "*"
+    enablerepo: epel,rhel-7-server-optional-rpms,rhel-7-server-rpms

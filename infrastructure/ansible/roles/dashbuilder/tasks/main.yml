@@ -18,7 +18,7 @@
 
 - name: Deploy dashbuilder archive to wildfly as an exploded web artifact (if doesn't already exist)
   stat:
-    path: "{{wf_home}}"
+    path: "{{dashbuilder_runtime_artifact}}/WEB-INF/web.xml"
   register: st
 - unarchive: 
     src: "{{dashbuilder_distro}}"

@@ -27,13 +27,13 @@
      - hostname
      - epel
      - os_update
+     - tools
      - yum-clean
      - firewalld
      - httpd
      - reboot
      - useradd
      - opentlc-user
-     - tools
      - java
      - maven
      - systemd
