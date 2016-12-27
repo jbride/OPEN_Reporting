@@ -22,7 +22,7 @@
     group: "{{group}}"
 
 - name: install dashboard-ui-core maven dependency (to allow GPTE Reporting customizations to compile)
-  shell: mvn install:install-file -Dfile=/tmp/dashboard-ui-core-6.2.0.Final.jar -DgroupId=org.jboss.dashboard-builder -DartifactId=dashboard-ui-core -Dversion=6.2.0.Final -Dpackaging=jar -DgeneratePom=true
+  shell: mvn install:install-file -Dfile=/tmp/dashboard-ui-core-6.2.0.Final-classes.jar -DgroupId=org.jboss.dashboard-builder -DartifactId=dashboard-ui-core -Dversion=6.2.0.Final -Dpackaging=jar -DgeneratePom=true
   args:
      chdir: "{{dashbuilder_customization_home}}"
   become: yes

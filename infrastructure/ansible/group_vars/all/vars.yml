@@ -51,12 +51,17 @@ dashbuilder_db_name: dashbuilder
 dashbuilder_db_userId: dashbuilder
 dashbuilder_db_passwd: S7K_3KVyD7co4F-qSj_-Yl9Q
 
-# Database update properties
+# The following property is only used during initial provisioning of a new GPTE Reporting environment
 databases_to_provision_from_prod:
   - "{{ lms_trans_db_name }}"
-#  - "{{ dashbuilder_db_name }}"
-#  - "{{ lms_reporting_db_name }}"
+  - "{{ dashbuilder_db_name }}"
+  - "{{ lms_reporting_db_name }}"
 
+# The following property is used when updating an environment that has been previously provisioned
+databases_to_update_from_prod:
+  - "{{ lms_trans_db_name }}"
+
+# The following property is used when updating production database from dev or qa 
 prod_databases_to_update:
   - "{{ dashbuilder_db_name }}"
 

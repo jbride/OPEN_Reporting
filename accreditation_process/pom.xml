@@ -12,7 +12,7 @@
     <version>1.0</version>
   </parent>
   <artifactId>accreditation-process</artifactId>
-  <packaging>war</packaging>
+  <packaging>jar</packaging>
   <name>GPTE Accreditation Process</name>
   <url>http://www.redhat.com</url>
   <properties>

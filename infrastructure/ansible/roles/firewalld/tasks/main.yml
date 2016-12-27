@@ -73,3 +73,6 @@
     permanent: true
     state: enabled
   when: gpte_env == 'prod'
+
+- name: bounce firewalld
+  command: systemctl restart firewalld.service

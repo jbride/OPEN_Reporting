@@ -11,7 +11,7 @@
   become_user: "{{user}}"
 
 # name: Build GPTE Reporting using maven
-- shell: /opt/{{mvn_root}}/bin/mvn clean package -DskipTests
+- shell: /opt/{{mvn_root}}/bin/mvn clean install -DskipTests
   args:
       chdir: "{{gpte_reporting_home}}"
   become: yes
