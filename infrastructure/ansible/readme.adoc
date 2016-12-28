@@ -2,13 +2,13 @@
 :data-uri:
 
 == Ansible playbook for Red Hat GPTE Reporting virtual machine
-
+*
 === Base image
 
 * OS : RHEL 7 x68_64
 * Disk: 60GB, dynamically allocated, qcow2 format
 * Memory : 4GB
-* Base images installation:
+** Base images installation:
 ** Hostname: rhel73base
 ** Network: on
 ** HDD Partitioning:
@@ -28,12 +28,22 @@ The following binary files must be added to the playbook, to the `files` directo
 ** `apache-maven-3.2.5-bin.zip`
 * Role `opentlc-user`
 ** `id_ecdsa`
+*** This is the private key of the ssh key pair that allows for authentication to github.
+*** Can be obtained from: forge.opentlc.com:/home/jenkins/.ssh/id_ecdsa .
 * Role `java`
-** ca.crt  (from:  forge.opentlc.com:/etc/ipa/ca.crt)
+** ca.crt
+*** This is the certificate that allows for ssl handshake with GPTE IPA LDAP.
+*** Can be obtained from:  forge.opentlc.com:/etc/ipa/ca.crt)
+* Role `eap`
+** fuse-eap-installer-6.2.1.redhat-084.jar  
+** jboss-eap-6.4.6-full-build.zip
+* Role `dashbuilder`
+** dashbuilder-6.3.0.Final-wildfly8.war
+** wildfly-8.2.0.Final.tar.gz
 
 === Inventory file
 
-Copy the `hosts.example` file to `hosts`, and replace `<ip address of virtual machine>` with the IP address of the virtual machine.
+Copy the `hosts.example` file to `hosts`, and edit as appropriate.
 
 === Provisioning
 
@@ -43,8 +53,16 @@ In the `ansible` directory, issue the following command:
 $ ansible-playbook -i hosts base_install.yml
 ----
 
+=== Updating
+
+In the `ansible` directory, issue the following command:
+
+----
+$ ansible-playbook -i hosts update.yml
+----
+
+
 == TO-DO
 
 . Stored proc
-. QA email address
 . update dashbuilder on prod 
