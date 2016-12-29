@@ -1,12 +1,12 @@
 ---
 
 - name: Copy customized web.xml and jboss-web.xml config files to dashbuilder runtime
-  copy:
+  template:
     src: templates/jboss-web.xml
     dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/"
     owner: "{{user}}"
     group: "{{group}}"
-- copy:
+- template:
     src: templates/web.xml
     dest: "{{dashbuilder_runtime_artifact}}/WEB-INF/"
     owner: "{{user}}"
