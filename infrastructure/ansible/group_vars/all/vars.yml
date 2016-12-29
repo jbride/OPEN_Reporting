@@ -61,11 +61,11 @@ databases_to_provision_from_prod:
 databases_to_update_from_prod:
   - "{{ lms_trans_db_name }}"
 
-# The following property is used when updating production database from dev or qa 
-prod_databases_to_update:
+# The following property is used when updating production or qa database from dev
+databases_to_update_from_dev:
   - "{{ dashbuilder_db_name }}"
 
-prod_dump_dir: /tmp/mysqlbackup
+src_dump_dir: /tmp/mysqlbackup
 target_bk_dir: /tmp/mysqlbackup_target/
 
 

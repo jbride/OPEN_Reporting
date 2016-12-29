@@ -53,7 +53,7 @@ In the `ansible` directory, issue the following command:
 $ ansible-playbook -i hosts base_install.yml
 ----
 
-=== Updating
+=== Updating:
 
 In the `ansible` directory, issue the following command:
 
@@ -65,4 +65,3 @@ $ ansible-playbook -i hosts update.yml
 == TO-DO
 
 . Stored proc
-. update dashbuilder on prod 

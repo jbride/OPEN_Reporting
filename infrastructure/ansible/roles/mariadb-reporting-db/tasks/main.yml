@@ -59,7 +59,7 @@
 # ############     Seed new environment databases from latest from prod     #######################
 
 - name: Create Backups folder on prod
-  file: path={{ prod_dump_dir }} state=directory
+  file: path={{ src_dump_dir }} state=directory
   run_once: true
   delegate_to: reporting.opentlc.com
 
@@ -70,7 +70,7 @@
     login_password: "{{ db_root_passwd }}"
     name: "{{ item }}"
     state: dump
-    target: "{{ prod_dump_dir }}/{{ item }}Db.sql.gz"
+    target: "{{ src_dump_dir }}/{{ item }}Db.sql.gz"
   with_items: databases_to_provision_from_prod
   delegate_to: reporting.opentlc.com
 
@@ -80,7 +80,7 @@
 
 - name: Copy database dump files from prod to local:{{target_bk_dir}}
   fetch:
-    src: "{{ prod_dump_dir }}/{{ item }}Db.sql.gz"
+    src: "{{ src_dump_dir }}/{{ item }}Db.sql.gz"
     dest: "{{ target_bk_dir }}"
     flat: yes
   with_items: databases_to_provision_from_prod

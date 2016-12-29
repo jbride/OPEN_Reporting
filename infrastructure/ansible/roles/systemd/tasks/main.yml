@@ -1,7 +1,7 @@
 ---
 
 # NOTE: systemd ansible module is only available in version 2.2
-#       As of 21 Dec, F25 only includes ansible 2.1.2
+#       fedora 24 only includes ansible 2.1.2
 
 - name: Create and enable systemd config for dashbuilder
   template:
