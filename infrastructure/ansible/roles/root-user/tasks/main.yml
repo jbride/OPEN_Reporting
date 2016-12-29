@@ -1,0 +1,13 @@
+---
+
+- name: Determine if jenkins public ssh key is already in authorized_keys file of {{gpte_env}}
+  command: "grep -q jenkins /root/.ssh/authorized_keys"
+  register: hasJenkinsPubKey
+  ignore_errors: True
+
+- name: Allow Jenkins to ssh into this target GPTE Reporting machine {{gpte_env}} by adding public ssh key if doesn't already exist
+  lineinfile: 
+    dest: /root/.ssh/authorized_keys
+    line: 'ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBACByDbaTzh27mLvCQycnYDJjfWa5DHxsQ5lZStUIGeW80sNvpvHeYmVcSm7rtEwmchgCYdeVLLEzVS0oVclU3kVFgCDmDfTzborwsixsm49chIc2KGPMcdqfjqrCj+3XNf2kIEaABCtGDSP8EvYZ/nUDRaTqkkkOUVIJbu9Vn3gumOarA== jenkins@forge.opentlc.com'
+  when: hasJenkinsPubKey.rc != 0
+

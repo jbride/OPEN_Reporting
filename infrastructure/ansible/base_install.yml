@@ -43,6 +43,7 @@
 
   roles:
       - hostname
+      - root-user
       - epel
       - os_update
       - tools
