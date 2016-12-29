@@ -1,8 +1,0 @@
-[prod]
-reporting.opentlc.com
-
-[qa]
-qa.opentlc.com
-
-[dev]
-dev.opentlc.com

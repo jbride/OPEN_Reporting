@@ -1,9 +1,13 @@
 :scrollbar:
 :data-uri:
 
-== Ansible playbook for Red Hat GPTE Reporting virtual machine
-*
-=== Base image
+= Ansible playbook for Red Hat GPTE Reporting virtual machine
+ 
+== Base Image Pre-reqs:
+
+The following are minimum requirements of the target GPTE Reporting environment to be provisioned and updated.
+
+NOTE:  All `*.opentlc.com` environments provisioned by Patrick meet these requirements.
 
 * OS : RHEL 7 x68_64
 * Disk: 60GB, dynamically allocated, qcow2 format
@@ -20,9 +24,11 @@
 * Post-installation tasks:
 ** copy public ssh key to virtual machine for user root
 
+== Provisioning Base Environment
+
 === Binary files
 
-The following binary files must be added to the playbook, to the `files` directory of the role:
+The following binary files must be added to the `files` directory of the role:
 
 * Role `maven`
 ** `apache-maven-3.2.5-bin.zip`
@@ -41,24 +47,19 @@ The following binary files must be added to the playbook, to the `files` directo
 ** dashbuilder-6.3.0.Final-wildfly8.war
 ** wildfly-8.2.0.Final.tar.gz
 
-=== Inventory file
+=== Execution:
+In the `ansible` directory, issue the following command:
 
-Copy the `hosts.example` file to `hosts`, and edit as appropriate.
+----
+$ ansible-playbook base_install.yml
+----
 
-=== Provisioning
+== Updating Environment
 
 In the `ansible` directory, issue the following command:
 
 ----
-$ ansible-playbook -i hosts base_install.yml
-----
-
-=== Updating:
-
-In the `ansible` directory, issue the following command:
-
-----
-$ ansible-playbook -i hosts update.yml
+$ ansible-playbook update.yml
 ----
 
 
