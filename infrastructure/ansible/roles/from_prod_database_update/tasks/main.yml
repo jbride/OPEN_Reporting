@@ -2,7 +2,6 @@
 
 # GPTE Reporting database update from prod
 
-
 - name: Create Backups folder on prod
   file: path={{ src_dump_dir }} state=directory
   run_once: true
@@ -16,7 +15,7 @@
     name: "{{ item }}"
     state: dump 
     target: "{{ src_dump_dir }}/{{ item }}Db.sql.gz"
-  with_items: databases_to_update_from_prod
+  with_items: "{{databases_to_update_from_prod}}"
   delegate_to: reporting.opentlc.com
 
 - name: Create following directory from which to put fetched database zips; local:{{target_bk_dir}}
@@ -28,7 +27,7 @@
     src: "{{ src_dump_dir }}/{{ item }}Db.sql.gz"
     dest: "{{ target_bk_dir }}"
     flat: yes
-  with_items: databases_to_update_from_prod
+  with_items: "{{databases_to_update_from_prod}}"
   delegate_to: reporting.opentlc.com
 
 - name: Create Backups folder on remote {{gpte_env}} environment
@@ -38,12 +37,12 @@
   copy:
     src: "{{ target_bk_dir }}/{{ item }}Db.sql.gz"
     dest: "{{ target_bk_dir }}"
-  with_items: databases_to_update_from_prod
+  with_items: "{{databases_to_update_from_prod}}"
 
 - name: import data into {{gpte_env}} RDBMS
   mysql_db:
     name: "{{ item }}"
     state: import 
     target: "{{ target_bk_dir }}/{{ item }}Db.sql.gz"
-  with_items: databases_to_update_from_prod
+  with_items: "{{databases_to_update_from_prod}}"
   
