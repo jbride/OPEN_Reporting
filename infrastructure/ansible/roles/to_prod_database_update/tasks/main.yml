@@ -85,3 +85,40 @@
     state: import
     target: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_trans_filename}}"
   when: "{{update_lms_trans_file.stat.exists}} == True"
+
+
+
+
+
+# refresh lms_reporting 
+- name: Determine if {{mysql_update_lms_reporting_filename}} file exists in dev environment
+  stat:
+    path: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
+  register: update_lms_reporting_file
+  delegate_to: dev.opentlc.com
+- debug:
+    msg: "Does the lms_reporting update file exist on dev ?  {{update_lms_reporting_file.stat.exists}}"
+
+- name: Copy {{mysql_update_lms_reporting_filename}} from dev to local:{{mysql_datadump_target_dir}}
+  fetch:
+    src: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
+    dest: "{{ mysql_datadump_target_dir }}"
+    flat: yes
+  delegate_to: dev.opentlc.com
+  when: "{{update_lms_reporting_file.stat.exists}} == True"
+
+- name: push {{mysql_update_lms_reporting_filename}} from local to remote {{gpte_env}} environment
+  copy:
+    src: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_reporting_filename}}"
+    dest: "{{ mysql_datadump_target_dir }}"
+  when: "{{update_lms_reporting_file.stat.exists}} == True"
+
+# refresh_lms_reporting SQL is actually executed within lms_transactional database
+- name: Execute commands in {{mysql_update_lms_reporting_filename}}
+  mysql_db:
+    login_user: "{{lms_trans_userId}}"
+    login_password: "{{ lms_trans_passwd }}"
+    name: "{{lms_trans_db_name}}"
+    state: import
+    target: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_reporting_filename}}"
+  when: "{{update_lms_reporting_file.stat.exists}} == True"
