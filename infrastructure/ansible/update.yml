@@ -46,8 +46,8 @@
     # Only execute this role if updating dev or qa environment.
     - { role: from_prod_database_update, when: gpte_env != 'prod' }
 
-    # Only execute this role if updating dev or qa environment.
-    - { role: to_prod_database_update, when: gpte_env != 'prod' }
+    # Only execute this role if updating qa or prod environment.
+    - { role: to_prod_database_update, when: gpte_env != 'dev' }
 
     - gpte_reporting
     - gpte_integration
