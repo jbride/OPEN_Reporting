@@ -22,6 +22,7 @@ gpte_reporting_home: /opt/OPEN_Reporting
 dashbuilder_customization_home: "{{gpte_reporting_home}}/reporting/dashbuilder_customizations/original/"
 dashbuilder_runtime_artifact: "{{wf_home}}/standalone/deployments/dashbuilder.war"
 install_script_dir: /opt/install/scripts
+database_update_script_dir: /tmp/gpte/databaseUpdates
 
 # General Database properties
 db_root_passwd: c-9XSHln8hJ_UH9YvNOgc9mH
@@ -70,8 +71,8 @@ databases_to_update_from_prod:
 databases_to_update_from_dev:
   - "{{ dashbuilder_db_name }}"
 
-src_dump_dir: /tmp/mysqlbackup
-target_bk_dir: /tmp/mysqlbackup_target/
+mysql_datadump_src_dir: /tmp/mysqlbackup
+mysql_datadump_target_dir: /tmp/mysqlbackup_target/
 
 
 # GPTE Reporting parameters

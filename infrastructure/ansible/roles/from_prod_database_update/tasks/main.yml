@@ -3,7 +3,7 @@
 # GPTE Reporting database update from prod
 
 - name: Create Backups folder on prod
-  file: path={{ src_dump_dir }} state=directory
+  file: path={{ mysql_datadump_src_dir }} state=directory
   run_once: true
   delegate_to: reporting.opentlc.com
 
@@ -14,35 +14,35 @@
     login_password: "{{ db_root_passwd }}"
     name: "{{ item }}"
     state: dump 
-    target: "{{ src_dump_dir }}/{{ item }}Db.sql.gz"
+    target: "{{ mysql_datadump_src_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_update_from_prod}}"
   delegate_to: reporting.opentlc.com
 
-- name: Create following directory from which to put fetched database zips; local:{{target_bk_dir}}
-  command: mkdir -p {{ target_bk_dir }}
+- name: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
+  command: mkdir -p {{ mysql_datadump_target_dir }}
   delegate_to: localhost
 
-- name: Copy database dump files from prod to local:{{target_bk_dir}}
+- name: Copy database dump files from prod to local:{{mysql_datadump_target_dir}}
   fetch:
-    src: "{{ src_dump_dir }}/{{ item }}Db.sql.gz"
-    dest: "{{ target_bk_dir }}"
+    src: "{{ mysql_datadump_src_dir }}/{{ item }}Db.sql.gz"
+    dest: "{{ mysql_datadump_target_dir }}"
     flat: yes
   with_items: "{{databases_to_update_from_prod}}"
   delegate_to: reporting.opentlc.com
 
 - name: Create Backups folder on remote {{gpte_env}} environment
-  file: path={{ target_bk_dir }} state=directory
+  file: path={{ mysql_datadump_target_dir }} state=directory
 
 - name: push database dump files from local to remote {{gpte_env}} environment
   copy:
-    src: "{{ target_bk_dir }}/{{ item }}Db.sql.gz"
-    dest: "{{ target_bk_dir }}"
+    src: "{{ mysql_datadump_target_dir }}/{{ item }}Db.sql.gz"
+    dest: "{{ mysql_datadump_target_dir }}"
   with_items: "{{databases_to_update_from_prod}}"
 
 - name: import data into {{gpte_env}} RDBMS
   mysql_db:
     name: "{{ item }}"
     state: import 
-    target: "{{ target_bk_dir }}/{{ item }}Db.sql.gz"
+    target: "{{ mysql_datadump_target_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_update_from_prod}}"
   
