@@ -101,3 +101,14 @@
     state: import
     target: "{{ mysql_datadump_target_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_provision_from_prod}}"
+
+
+
+
+- name: Ensure {{database_update_script_dir}}  directory exists
+  file:
+    path: "{{ database_update_script_dir}}"
+    state: directory
+    owner: "{{user}}"
+    group: "{{group}}"
+  run_once: true

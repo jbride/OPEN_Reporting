@@ -54,10 +54,34 @@
 #  These fine grained data changes are maintained in SQL scripts in the GPTE dev environment. 
 #  These SQL scripts need to get executed in in qa and prod
 
-- name: Ensure {{database_update_script_dir}}  directory exists on dev
-  file: 
-    path: "{{ database_update_script_dir}}" 
-    state: directory
-  run_once: true
+# lms_transactional updates
+- name: Determine if {{mysql_update_lms_trans_filename}} file exists in dev environment
+  stat:
+    path: "{{database_update_script_dir}}/{{mysql_update_lms_trans_filename}}"
+  register: update_lms_trans_file
   delegate_to: dev.opentlc.com
+- debug:
+    msg: "Does the lms_trans update file exist on dev ?  {{update_lms_trans_file.stat.exists}}"
 
+- name: Copy {{mysql_update_lms_trans_filename}} from dev to local:{{mysql_datadump_target_dir}}
+  fetch:
+    src: "{{database_update_script_dir}}/{{mysql_update_lms_trans_filename}}"
+    dest: "{{ mysql_datadump_target_dir }}"
+    flat: yes
+  delegate_to: dev.opentlc.com
+  when: "{{update_lms_trans_file.stat.exists}} == True"
+
+- name: push {{mysql_update_lms_trans_filename}} from local to remote {{gpte_env}} environment
+  copy:
+    src: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_trans_filename}}"
+    dest: "{{ mysql_datadump_target_dir }}"
+  when: "{{update_lms_trans_file.stat.exists}} == True"
+
+- name: Execute commands in {{mysql_update_lms_trans_filename}}
+  mysql_db:
+    login_user: "{{lms_trans_userId}}"
+    login_password: "{{ lms_trans_passwd }}"
+    name: "{{lms_trans_db_name}}"
+    state: import
+    target: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_trans_filename}}"
+  when: "{{update_lms_trans_file.stat.exists}} == True"
