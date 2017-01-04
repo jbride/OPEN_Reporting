@@ -136,6 +136,7 @@
                                     <setHeader headerName="Subject">
                                         <simple>GPTE Course Completion Service {{jboss.host.name}}: Problem processing ${header.CamelFileName}</simple>
                                     </setHeader>
+                                    <setBody><simple>${exception.message}</simple></setBody>
                                     <to uri="seda:send-generic-email"/>
                                 </doCatch>
                                 <doCatch>
