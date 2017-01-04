@@ -126,14 +126,27 @@
                             </when>
                             <doTry>
                                 <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-convert"/>
+                                <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
+                                <doCatch>
+                                    <exception>com.redhat.gpte.services.InvalidCourseException</exception>
+                                    <handled><constant>true</constant></handled>
+                                    <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdisrael@redhat.com,nihall@redhat.com</constant></setHeader>
+                                    <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
+                                    <to uri="bean:emailServiceBean?method=clearAttachments"/>
+                                    <setHeader headerName="Subject">
+                                        <simple>GPTE Course Completion Service {{jboss.host.name}}: Problem processing ${header.CamelFileName}</simple>
+                                    </setHeader>
+                                    <to uri="seda:send-generic-email"/>
+                                </doCatch>
                                 <doCatch>
                                     <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
+                                    <handled><constant>true</constant></handled>
                                     <log message="${body.email} : ${body.quizName} : ${body.assessmentDate} : Not found in Students table.  Will now add" loggingLevel="WARN" />
                                     <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenDokeosCourseCompletion" id="update-dokeos-student"/>
                                     <to uri="bean:cCompletionServiceBean?method=convertDokeosCourseCompletionToStudentCourse" id="dokeos-re-attempt-to-convert"/>
+                                    <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
                                 </doCatch>
                             </doTry>
-                            <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
                         </otherwise>
                     </choice>
                 </split>

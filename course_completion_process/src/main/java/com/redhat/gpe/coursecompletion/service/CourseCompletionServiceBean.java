@@ -462,7 +462,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     }
     
-    public CourseCompletion convertDokeosCourseCompletionToStudentCourse(@Body DokeosCourseCompletion dokeosCourseCompletion) {
+    public CourseCompletion convertDokeosCourseCompletionToStudentCourse(@Body DokeosCourseCompletion dokeosCourseCompletion) throws com.redhat.gpte.services.InvalidCourseException {
         if(StringUtils.isEmpty(dokeosCourseCompletion.getEmail()))
             throw new RuntimeException(ExceptionCodes.GPTE_CC1001+dokeosCourseCompletion.toString());
         
@@ -482,7 +482,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             sBuilder.append("\nCourse completion info as follows:");
             sBuilder.append("\n\temail: "+dokeosCourseCompletion.getEmail());
             sBuilder.append("\n\tassessmentDate: "+dokeosCourseCompletion.getAssessmentDate());
-            throw new RuntimeException(sBuilder.toString());
+            throw new com.redhat.gpte.services.InvalidCourseException(sBuilder.toString());
         }
         Language language = new Language();
         language.setLanguageid(ENGLISH);
