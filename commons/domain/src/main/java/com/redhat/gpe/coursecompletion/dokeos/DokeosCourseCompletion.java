@@ -12,6 +12,7 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     private static final long serialVersionUID = 1L;
     public static final SimpleDateFormat dokeosSDF = new SimpleDateFormat("MM-dd-yy");
     public static final String CC_DOKEOS_SUFFIX_PROPERTY = "cc_dokeos_suffixes";
+    public static final String PROJECT_HOURS="Project Hours";
     public static final String PERCENTAGE = "%";
 
     public static Object lockObject = new Object();
@@ -95,6 +96,11 @@ public class DokeosCourseCompletion implements java.io.Serializable {
     }
 
     public void pruneQuizName() {
+
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/183
+        if(quizName.indexOf(PROJECT_HOURS) > 0 )
+            return;
+
         for(String dSuffix : dokeosSuffixArray) {
             if(quizName.indexOf(dSuffix) > 0) {
                 String prunedQuizName = quizName.substring(0, quizName.indexOf(dSuffix));
