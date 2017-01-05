@@ -181,7 +181,7 @@ else
     readPropertiesFile
     checkRemotePort
     #deployJBossModules
-    #deployCC
+    deployCC
     #deploySReg
-    deployShared
+    #deployShared
 fi

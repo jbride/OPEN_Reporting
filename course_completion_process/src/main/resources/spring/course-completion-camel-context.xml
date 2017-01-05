@@ -33,19 +33,13 @@
         <bindy type="Csv" classType="com.redhat.gpe.coursecompletion.sumtotal.SumtotalCourseCompletion" id="bindySumtotal"/>
     </dataFormats>
 
-    <onException>
+    <!--onException>
         <exception>java.lang.Exception</exception>
-
-        <!-- Exception propogated to JUnit tests when set to false -->
-        <!-- Need to set to true, however, when running in JBoss.  Otherwise, infinite loop of emails will go out -->
-        <!-- Setting of sys property substition doesn't appear to take affect -->
-        <!-- handled><constant>{{sb_onexception_handled}}</constant></handled -->
         <handled><constant>true</constant></handled>
-
         <log message="Exception encountered: ${exception.message} : return-path = ${header.Return-Path} " loggingLevel="ERROR"/>
         <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
         <to uri="seda:send-email"/>
-    </onException>
+    </onException -->
 
     <route id="receive-sumtotal-course-completions">
         <description>
@@ -129,7 +123,7 @@
                                 <to uri="direct:add-student-course-to-db" id="cc_add-dokeos-student-course-to-db" />
                                 <doCatch>
                                     <exception>com.redhat.gpte.services.InvalidCourseException</exception>
-                                    <handled><constant>true</constant></handled>
+                                    <handled><constant>false</constant></handled>
                                     <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>jdisrael@redhat.com,nihall@redhat.com</constant></setHeader>
                                     <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
                                     <to uri="bean:emailServiceBean?method=clearAttachments"/>
