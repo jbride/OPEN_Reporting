@@ -6,5 +6,7 @@ batch
 # file logger should refresh after every bounce of server
 /subsystem=logging/periodic-rotating-file-handler=FILE:write-attribute(name=append,value=false)
 
+/subsystem=logging/logger=com.redhat.gpe.dao.DomainDAOImpl/:add(category=com.redhat.gpe.dao.DomainDAOImpl=INFO)
+
 run-batch
 
