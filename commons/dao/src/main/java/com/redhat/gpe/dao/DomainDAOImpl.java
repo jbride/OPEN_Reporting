@@ -245,11 +245,16 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         try {
             courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
         } catch(org.springframework.dao.EmptyResultDataAccessException x){
+
+            if(StringUtils.isNotEmpty(sourceName))
+                throw x;
             
             // 2) Second attempt:  retreive from CourseMappings table
             sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c, CourseMappings cm ");
             sBuilder.append("where cm.CourseId = c.CourseId ");
             sBuilder.append("and cm.oldCourseId=\""+courseName+"\" LIMIT 1");
+
+            // If not found, will throw:  org.springframework.dao.EmptyResultDataAccessException: Incorrect result size: expected 1, actual 0
             courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
         }
         return courseObj;

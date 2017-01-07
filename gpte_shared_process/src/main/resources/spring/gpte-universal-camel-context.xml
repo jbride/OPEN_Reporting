@@ -30,7 +30,12 @@
       <constructor-arg index="0" value="Unable to route email attachment"/>
   </bean>
 
+
   <camelContext trace="false" id="gpte-universal-process" xmlns="http://camel.apache.org/schema/spring">
+
+    <dataFormats>
+      <json id="courseUnmarshaller" library="Jackson" unmarshalTypeName="com.redhat.gpe.domain.canonical.Course"/>
+    </dataFormats>
     
     <onException>
         <exception>com.sun.mail.util.MailConnectException</exception>
@@ -73,29 +78,29 @@
 
     <restConfiguration component="servlet" bindingMode="json" />
 
-    <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/sanityCheck/-->
+    <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/sanityCheck/ -->
     <rest id="sanityCheck" path="" >
         <get uri="sanityCheck" >
             <route>
-                <transform><constant>Red HatGPTE\n</constant></transform>
+                <transform><constant>Red HatGPTE</constant></transform>
             </route>
         </get>
     </rest>
 
-    <bean id="courseUnmarshallBean" class="org.apache.camel.component.gson.GsonDataFormat">
-        <property name="unmarshalType" value="com.redhat.gpe.domain.canonical.Course"/>
-    </bean>
 
     <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/courses/<coursename> -->
     <rest id="getcourse" path="" >
         <get uri="courses/{courseName}" >
-            <to uri="vm:get-course-by-course-name"/>
-            <choice>
-                <when>
-                    <simple>${body} == null</simple>
+          <route>
+            <doTry>
+                <to uri="vm:get-course-by-course-name" />
+                <unmarshal ref="courseUnmarshaller" />
+                <doCatch>
+                    <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
                     <setHeader headerName="CamelHttpResponseCode"><constant>404</constant></setHeader>
-                </when>
-                <then><unmarshal ref="courseUnmarshallBean" /></then>
+                </doCatch>
+            </doTry>
+          </route>
         </get>
     </rest>
 
