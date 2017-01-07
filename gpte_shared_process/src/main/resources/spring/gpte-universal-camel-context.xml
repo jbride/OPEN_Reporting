@@ -82,6 +82,23 @@
         </get>
     </rest>
 
+    <bean id="courseUnmarshallBean" class="org.apache.camel.component.gson.GsonDataFormat">
+        <property name="unmarshalType" value="com.redhat.gpe.domain.canonical.Course"/>
+    </bean>
+
+    <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/courses/<coursename> -->
+    <rest id="getcourse" path="" >
+        <get uri="courses/{courseName}" >
+            <to uri="vm:get-course-by-course-name"/>
+            <choice>
+                <when>
+                    <simple>${body} == null</simple>
+                    <setHeader headerName="CamelHttpResponseCode"><constant>404</constant></setHeader>
+                </when>
+                <then><unmarshal ref="courseUnmarshallBean" /></then>
+        </get>
+    </rest>
+
     <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/student_registration/ipa_update/batch -->
     <rest id="studentRegUpdatePath" path="/student_registration/ipa_update/">
         <put uri="batch" produces="application/json" >

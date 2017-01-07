@@ -402,6 +402,10 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         }
         return course;
     }
+
+    public Course getCourseByCourseName(String courseName) {
+        return canonicalDAO.getCourseByCourseName(courseName, null);
+    }
     
     public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(Exchange exchange) throws IOException, InvalidCourseException {
 

@@ -186,6 +186,15 @@
 
     <!--    *************************************************************************************************   -->
 
+    <route id="get-course-by-course-name" >
+        <description>
+            1) Given a course name, looks up course in lms_transactional.Courses and returns Course object.
+            2) If course name not found, returns null
+        </description>
+        <from uri="vm:get-course-by-course-name" />
+        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName" id="getCourseByCourseName"/>
+    </route>
+
     <route id="send-email">
         <from uri="seda:send-email"/>
         <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
