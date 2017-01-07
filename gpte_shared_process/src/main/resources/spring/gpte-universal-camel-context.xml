@@ -34,7 +34,7 @@
   <camelContext trace="false" id="gpte-universal-process" xmlns="http://camel.apache.org/schema/spring">
 
     <dataFormats>
-      <json id="courseUnmarshaller" library="Jackson" unmarshalTypeName="com.redhat.gpe.domain.canonical.Course"/>
+      <json id="courseMarshaller" library="Jackson" unmarshalTypeName="com.redhat.gpe.domain.canonical.Course" />
     </dataFormats>
     
     <onException>
@@ -76,7 +76,12 @@
     </restConfiguration>
     -->
 
-    <restConfiguration component="servlet" bindingMode="json" />
+    <!-- Throws the following if not specified: Cannot find RestConsumerFactory in Registry or as a Component to use 
+        - if bindingMode=json, then REST DSL wil respond with garbled body such as:  "eyJjb3Vyc2VpZCI6Ik1XUy1URUNILUJQQS1FWEFNLUJQTVM2IiwiY291cnNlbmFtZSI6IkJ1c2luZXNzIExvZ2ljIERldmVsb3BtZW50IHdpdGggSkJvc3MgQlBNIFN1aXRlIDYifQ=="
+    -->
+    <restConfiguration component="servlet" bindingMode="off" >
+        <dataFormatProperty key="prettyPrint" value="true"/>
+    </restConfiguration>
 
     <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/sanityCheck/ -->
     <rest id="sanityCheck" path="" >
@@ -88,13 +93,15 @@
     </rest>
 
 
-    <!-- curl -v -X GET localhost:8205/gpte-reporting/rest/courses/<coursename> -->
+    <!-- curl -v -H "Accept: application/json" -X GET localhost:8205/gpte-reporting/rest/courses/<coursename> -->
     <rest id="getcourse" path="" >
         <get uri="courses/{courseName}" >
           <route>
+            <setBody><simple>${headers.courseName}</simple></setBody>
             <doTry>
                 <to uri="vm:get-course-by-course-name" />
-                <unmarshal ref="courseUnmarshaller" />
+                <marshal ref="courseMarshaller" />
+                <!-- log message="rest-dsl: response = ${body}" / -->
                 <doCatch>
                     <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
                     <setHeader headerName="CamelHttpResponseCode"><constant>404</constant></setHeader>

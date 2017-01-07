@@ -192,7 +192,8 @@
             2) If course name not found, returns null
         </description>
         <from uri="vm:get-course-by-course-name" />
-        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName" id="getCourseByCourseName"/>
+        <log message="get-course-by-course-name:  body = ${body}" />
+        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName(${body}, null)" id="getCourseByCourseName"/>
     </route>
 
     <route id="send-email">
