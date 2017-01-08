@@ -23,5 +23,7 @@
 
 - name: httpd configuration; create gpte-reporting.conf
   template:
-    src: gpte-reporting.conf
-    dest: /etc/httpd/conf.d
+    src: generate_gpte_certs.sh
+    dest: /tmp
+    mode: 755
+- shell: /tmp/generate_gpte_certs.sh

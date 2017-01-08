@@ -42,23 +42,23 @@
        msg: "Will install the following environment: {{ gpte_env }}"
 
   roles:
-      - hostname
-      - root-user
-      - epel
-      - os_update
-      - tools
-      - yum-clean
-      - firewalld
+#      - hostname
+#      - root-user
+#      - epel
+#      - os_update
+#      - tools
+#      - yum-clean
+#      - firewalld
       - httpd
-      - reboot
-      - useradd
-      - opentlc-user
-      - java
-      - maven
-      - systemd
-      - mariadb
-      - mariadb-reporting-db
-      - eap
-      - dashbuilder
+#      - reboot
+#      - useradd
+#      - opentlc-user
+#      - java
+#      - maven
+#      - systemd
+#      - mariadb
+#      - mariadb-reporting-db
+#      - eap
+#      - dashbuilder
       - phpMyAdmin
       - yum-clean
