@@ -1,0 +1,156 @@
+= Client auth SSL setup
+
+== Reference
+
+https://gist.github.com/mtigas/952344
+
+== terminology
+. `certificate`                                                         
++
+The public half of a public/private key pair with some additional metadata about who issued it etc.
+. `x.509`
++
+A specification governing the format and usage of certificates.
+
+. `certificate authority`
++
+A company (Symantec/Verisign/Thawte,Comodo,GoDaddy) that issues digital certificates.
+These certs are included by most browsers and operating systems.
+Serves purpse of a trusted third party
+
+. `Certificate Signing Request (CSR)`
++
+A file generated with a private key
+A CSR can be sent to a CA to request to be signed. 
+The CA uses its private key to digitally sign the CSR and create a signed cert. 
+Browsers can then use the CA’s cert to validate the new cert has been approved by the CA.
+
+== File formats for Certs and Keys
+
+. `Privacy-Enhanced Mail (PEM)`
++
+PEM is just Distinguished Encoding Rules (DER) that has been Base64 encoded. Used for keys and certificates.
+
+. `PKCS12`
++
+PKCS12 is a password-protected format that can contain multiple certificates and keys.
+
+. `Java KeyStore (JKS)`
++
+Java version of PKCS12 and also password protected. 
+Entries in a JKS file must have an “alias” that is unique. 
+If an alias is not specified, “mykey” is used by default. It’s like a database for certs and keys.
+
+
+== Two-way SSL authentication (server <-> client) workflow
+
+Client and server use 12 handshake messages to establish the encrypted channel prior to message exchanging:
+
+. Client sends ClientHello message proposing SSL options.
+. Server responds with ServerHello message selecting the SSL options.
+. Server sends Certificate message, which contains the server’s certificate.
+. Server requests client’s certificate in CertificateRequest message, so that the connection can be mutually authenticated.
+. Server concludes its part of the negotiation with ServerHelloDone message.
+. Client responds with Certificate message, which contains the client’s certificate.
+. Client sends session key information (encrypted with server’s public key) in ClientKeyExchange message.
+. Client sends a CertificateVerify message to let the server know it owns the sent certificate.
+. Client sends ChangeCipherSpec message to activate the negotiated options for all future messages it will send.
+. Client sends Finished message to let the server check the newly activated options.
+. Server sends ChangeCipherSpec message to activate the negotiated options for all future messages it will send.
+. Server sends Finished message to let the client check the newly activated options.
+
+== Setup procedure
+
+-----
+CERTS_HOME=/etc/gpte/certs
+mkdir -p $CERTS_HOME
+fqdn=`hostname --fqdn`
+
+#   generate unencrypted gpteserver.key  (by not passing -des3 flag)
+openssl genrsa -out $CERTS_HOME/gpteserver.key 4096
+
+# generate unencrpyted certificate aauthority root
+openssl req -nodes \
+            -new -x509 -days 3650 -key $CERTS_HOME/gpteserver.key \
+            -out $CERTS_HOME/gpteserver.crt \
+            -subj "/C=US/ST=NC/L=Raliegh/O=Red Hat/OU=GPTE/CN=$fqdn"
+
+# inspect server certificate
+openssl x509 -pubkey -subject -issuer -email -dates -noout -in $CERTS_HOME/gpteserver.crt
+
+# Verify server certificate
+openssl verify -verbose -CAfile $CERTS_HOME/gpteserver.crt $CERTS_HOME/gpteserver.crt
+
+
+# generate unencrypted gpteclient.key (by not passing -des3 flag)
+openssl genrsa -out $CERTS_HOME/gpteclient.key 4096
+
+# create client cert signing request using client key (no need to specify a challenge password)
+openssl req -nodes \
+        -new -key $CERTS_HOME/gpteclient.key \
+        -out $CERTS_HOME/gpteclient.csr \
+        -subj "/C=US/ST=NC/L=Raliegh/O=Red Hat/OU=GPTE/CN=$fqdn"
+
+# create client cert by self-signing using server cert and key
+openssl x509 -req -days 365 -in $CERTS_HOME/gpteclient.csr \
+                                -CA $CERTS_HOME/gpteserver.crt \
+                                -CAkey $CERTS_HOME/gpteserver.key -set_serial 01 \
+                                -out $CERTS_HOME/gpteclient.crt
+
+# convert to PKCS format (so that it may be installed on most browsers)
+openssl pkcs12 -export -clcerts \
+               -in $CERTS_HOME/gpteclient.crt \
+               -inkey $CERTS_HOME/gpteclient.key \
+               -out $CERTS_HOME/gpteclient.p12 \
+               -passout pass:
+
+# Combines client.crt and client.key into a single PEM file for programs using openssl.
+openssl pkcs12 -in $CERTS_HOME/gpteclient.p12 -out $CERTS_HOME/gpteclient.pem -clcerts -nokeys -passin pass:
+-----
+
+== Apache conf file
+
+. Add the following in: /etc/httpd/conf.d/gpte-reporting.conf
++
+-----
+# Set the CA certificate verification path where to find CA certificates for client authentication 
+# Or, alternatively one huge file containing all of them (file must be PEM encoded)
+SSLCACertificateFile "/etc/gpte/certs/gpteclient.crt"
+
+<Location /gpte-reporting>
+
+  # require a client certificate which has to be directly signed by our CA cert in ca.crt
+  SSLVerifyClient require
+  SSLVerifyDepth 1
+
+  ProxyPass http://localhost:8205/gpte-reporting
+  ProxyPassReverse http://localhost:8205/gpte-reporting
+  Order allow,deny
+  Allow from all
+</Location>
+-----
+
+. systemctl restart httpd.service
+
+== Test
+
+. establish a transparent connection with server using TLS:
++
+-----
+openssl s_client -showcerts -connect localhost:443 -key $CERTS_HOME/gpteclient.key
+-----
+
+. test GTPE Reporting RESTful API by not providing client cert
++
+-----
+curl -v -k -X GET https://localhost/gpte-reporting/rest/sanityCheck/
+-----
++
+expected results:  NSS: client certificate not found (nickname not specified)
+
+. test GPTE Reporting RESTful API using certs:
+-----
+curl --cert $CERTS_HOME/gpteclient.pem \
+     --key $CERTS_HOME/gpteclient.key -v -k \
+     -X GET https://localhost/gpte-reporting/rest/sanityCheck/
+-----

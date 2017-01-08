@@ -6,6 +6,16 @@
     state: yes
     persistent: yes
 
+- name: update /etc/httpd/conf.d/ssl.conf such that it is using GPTE self-signed cert and key
+  lineinfile:
+      dest: /etc/httpd/conf.d/ssl.conf
+      regexp: '^SSLCertificateFile'
+      line: 'SSLCertificateFile /etc/gpte/certs/gpteserver.crt'
+  - lineinfile
+      dest: /etc/httpd/conf.d/ssl.conf
+      regexp: '^SSLCertificateKeyFile'
+      line: 'SSLCertificateKeyFile /etc/gpte/certs/gpteserver.key'
+
 - name: httpd configuration; create dashbuilder.conf
   template:
     src: dashbuilder.conf
