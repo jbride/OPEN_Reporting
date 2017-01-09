@@ -1,7 +1,7 @@
 # hosts
 prod: reporting.opentlc.com
 qa: qa.opentlc.com
-dev: dev.opentlc.com
+dev: gptebuild.opentlc.com
 
 # Product artifacts
 eap_distro: jboss-eap-6.4.6-full-build.zip
