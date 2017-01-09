@@ -61,52 +61,7 @@ Client and server use 12 handshake messages to establish the encrypted channel p
 
 == Setup procedure
 
------
-CERTS_HOME=/etc/gpte/certs
-mkdir -p $CERTS_HOME
-fqdn=`hostname --fqdn`
-
-#   generate unencrypted gpteserver.key  (by not passing -des3 flag)
-openssl genrsa -out $CERTS_HOME/gpteserver.key 4096
-
-# generate unencrpyted certificate aauthority root
-openssl req -nodes \
-            -new -x509 -days 3650 -key $CERTS_HOME/gpteserver.key \
-            -out $CERTS_HOME/gpteserver.crt \
-            -subj "/C=US/ST=NC/L=Raliegh/O=Red Hat/OU=GPTE/CN=$fqdn"
-
-# inspect server certificate
-openssl x509 -pubkey -subject -issuer -email -dates -noout -in $CERTS_HOME/gpteserver.crt
-
-# Verify server certificate
-openssl verify -verbose -CAfile $CERTS_HOME/gpteserver.crt $CERTS_HOME/gpteserver.crt
-
-
-# generate unencrypted gpteclient.key (by not passing -des3 flag)
-openssl genrsa -out $CERTS_HOME/gpteclient.key 4096
-
-# create client cert signing request using client key (no need to specify a challenge password)
-openssl req -nodes \
-        -new -key $CERTS_HOME/gpteclient.key \
-        -out $CERTS_HOME/gpteclient.csr \
-        -subj "/C=US/ST=NC/L=Raliegh/O=Red Hat/OU=GPTE/CN=$fqdn"
-
-# create client cert by self-signing using server cert and key
-openssl x509 -req -days 365 -in $CERTS_HOME/gpteclient.csr \
-                                -CA $CERTS_HOME/gpteserver.crt \
-                                -CAkey $CERTS_HOME/gpteserver.key -set_serial 01 \
-                                -out $CERTS_HOME/gpteclient.crt
-
-# convert to PKCS format (so that it may be installed on most browsers)
-openssl pkcs12 -export -clcerts \
-               -in $CERTS_HOME/gpteclient.crt \
-               -inkey $CERTS_HOME/gpteclient.key \
-               -out $CERTS_HOME/gpteclient.p12 \
-               -passout pass:
-
-# Combines client.crt and client.key into a single PEM file for programs using openssl.
-openssl pkcs12 -in $CERTS_HOME/gpteclient.p12 -out $CERTS_HOME/gpteclient.pem -clcerts -nokeys -passin pass:
------
+See :  templates/generate_gpte_certs.sh
 
 == Apache conf file
 
@@ -132,7 +87,9 @@ SSLCACertificateFile "/etc/gpte/certs/gpteclient.crt"
 
 . systemctl restart httpd.service
 
-== Test
+
+
+== Test (localhost)
 
 . establish a transparent connection with server using TLS:
 +
@@ -149,8 +106,27 @@ curl -v -k -X GET https://localhost/gpte-reporting/rest/sanityCheck/
 expected results:  NSS: client certificate not found (nickname not specified)
 
 . test GPTE Reporting RESTful API using certs:
++
 -----
-curl --cert $CERTS_HOME/gpteclient.pem \
-     --key $CERTS_HOME/gpteclient.key -v -k \
+curl --cert $CERTS_HOME/prod_gpteclient.pem \
+     --key $CERTS_HOME/prod_gpteclient.key -v -k \
      -X GET https://localhost/gpte-reporting/rest/sanityCheck/
+-----
+
+== Test (remote)
+
+. sudo mkdir /etc/gpte/certs
+
+. Copy certs from prod to client filesystem:
++
+-----
+sudo scp -i ~/.ssh/id_zareason jbride-redhat.com@reporting.opentlc.com:/etc/gpte/certs/prod* /etc/gpte/certs
+-----
+
+. test GPTE Reporting RESTful API using certs:
++
+-----
+curl --cert /etc/gpte/certs/prod_gpteclient.pem \
+     --key /etc/gpte/certs/prod_gpteclient.key -v -k \
+     -X GET https://reporting.opentlc.com/gpte-reporting/rest/sanityCheck/
 -----
