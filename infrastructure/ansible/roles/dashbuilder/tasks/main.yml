@@ -38,7 +38,11 @@
     group: "{{user}}"
  
 - name: Copy standalone.xml to target
-  copy: src=templates/standalone.xml dest={{wf_s_config}} owner={{user}} group={{user}}
+  template: 
+    src: standalone.xml 
+    dest: "{{wf_s_config}}" 
+    owner: "{{user}}" 
+    group: "{{user}}"
 - name: Add system properties to JBoss Wildfly
   blockinfile:
     dest: "{{wf_home}}/bin/standalone.conf"
@@ -53,15 +57,17 @@
       JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_passwd={{lms_reporting_passwd}}"
 
 - name: Copy CLI scripts to target
-  copy: src=templates/{{wildfly_generic_cli}} dest=/tmp owner={{user}} group={{user}}
-- name: Search and replace variables in CLI scripts
-  replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_module_name@@' replace={{lms_reporting_module_name}}
-- replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_driver_jar_dir@@' replace={{lms_reporting_driver_jar_dir}}
-- replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_driver_jar@@' replace={{lms_reporting_driver_jar}}
-- replace: dest=/tmp/{{wildfly_generic_cli}} regexp='@@lms_reporting_module_name@@' replace={{lms_reporting_module_name}}
+  template: 
+    src: "{{wildfly_generic_cli}}" 
+    dest: "/tmp" 
+    owner: "{{user}}" 
+    group: "{{user}}"
 
 - name: Ensure JBoss Wildfly has correct JVM settings and binds to ports that do not conflict with dashbuilder
-  replace: dest={{wf_home}}/bin/standalone.conf regexp='-Xms64m -Xmx512m' replace={{wildfly_jvm_props}}
+  replace: 
+    dest: "{{wf_home}}/bin/standalone.conf" 
+    regexp: '-Xms64m -Xmx512m' 
+    replace: "{{wildfly_jvm_props}}"
 
 - name: Start Wildfly (as jboss user) in admin mode so as to be available for execution of CLI scripts
   stat:

@@ -35,16 +35,16 @@
 
 #########       GPTE Reporting Customizations to Fuse on EAP        ################
 - name: Copy JBoss EAP cli scripts to target
-  copy: src=templates/{{eap_generic_cli}} dest=/tmp owner={{user}} group={{user}}
-- copy: src=templates/{{lms_trans_cli}} dest=/tmp owner={{user}} group={{user}}
-
-- name: Search and replace variables in database CLI scripts
-  replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
-- replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_driver_jar_dir@@' replace={{lms_trans_driver_jar_dir}}
-- replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_driver_jar@@' replace={{lms_trans_driver_jar}}
-- replace: dest=/tmp/{{eap_generic_cli}} regexp='@@lms_trans_module_name@@' replace={{lms_trans_module_name}}
-- replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_userId@@' replace={{lms_trans_userId}}
-- replace: dest=/tmp/{{lms_trans_cli}} regexp='@@lms_trans_passwd@@' replace={{lms_trans_passwd}}
+  template: 
+    src: "{{eap_generic_cli}}" 
+    dest: /tmp 
+    owner: "{{user}}"
+    group: "{{user}}"
+- template: 
+    src: "{{lms_trans_cli}}" 
+    dest: /tmp 
+    owner: "{{user}}" 
+    group: "{{user}}"
 
 - name: Ensure JBoss EAP has correct JVM settings and binds to ports that do not conflict with dashbuilder
   replace: dest={{eap_home}}/bin/standalone.conf regexp='-Xms1303m -Xmx1303m' replace={{eap_jvm_props}}

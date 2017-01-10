@@ -47,7 +47,6 @@
       - epel
       - os_update
       - tools
-      - yum-clean
       - firewalld
       - httpd
       - reboot

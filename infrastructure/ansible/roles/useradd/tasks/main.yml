@@ -11,3 +11,10 @@
 
 - name: Ensure /opt directory is owned by jboss:jboss
   file: state=directory path=/opt owner={{user}} group={{group}}
+
+- name: Create {{gpte_reporting_file_system}} directory and have it owned by jboss:jboss
+  file:
+    state: directory
+    dest:  "{{gpte_reporting_file_system}}"
+    owner: "{{user}}"
+    group: "{{group}}"
