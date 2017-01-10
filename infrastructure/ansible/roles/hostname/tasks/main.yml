@@ -6,3 +6,10 @@
 - name: set hostname to reporting{{gpte_env}}
   hostname:
     name: reporting{{gpte_env}}
+
+- name: add entry to /etc/hosts
+  copy:
+    src: edit_hosts.sh
+    dest: /tmp
+    mode: 755
+- shell: /tmp/edit_hosts.sh
