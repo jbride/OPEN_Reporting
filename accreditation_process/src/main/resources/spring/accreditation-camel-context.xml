@@ -433,6 +433,7 @@
         <log message="####################      done" loggingLevel="INFO"/>
     </route>
 
+
     <route id="skills-base-webservice">
         <description>
             Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
@@ -440,14 +441,14 @@
             Emails Student to encourage them to create a SkillsBase account if student has not already done so
         </description>
         <from uri="direct:skills-base-webservice"/>
-        <to uri="bean:accreditationProcessBean?method=getToken" id="get-token"/>
+        <to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
         <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
         <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
         <choice>
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
-                <to uri="bean:accreditationProcessBean?method=addQualification" id="add-qualification"/>
+                <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
                 <!--to uri="bean:accreditationProcessBean?method=updateStudentcourses" id="update-student-assessment"/>
                 <to uri="bean:accreditationProcessBean?method=updateStudentStatusForOk" id="update-emp-status-ok"/ -->
             </when>

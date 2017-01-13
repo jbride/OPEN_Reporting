@@ -513,7 +513,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 
 /*  *************               SkillsBase Integration              ******************  */
-    public void getToken(Exchange exchange) {
+
+    public void getSkillsBaseToken(Exchange exchange) {
         
         Message in = exchange.getIn();
         try {
@@ -604,7 +605,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
     }
     
-    public void addQualification(Exchange exchange) {
+    public void postAccreditationToSkillsBase(Exchange exchange) {
 
         Message in = exchange.getIn();
         Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
