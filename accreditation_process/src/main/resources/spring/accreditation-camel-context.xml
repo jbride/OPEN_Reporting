@@ -139,6 +139,10 @@
             3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
             4) Persists student accreditations to database
             5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
+
+            NOTE:  It's possible that mulitple clients could be invoking this route at the same time.
+                   This route is synchronized to ensure that at any given time, only on thread executes through this route.
+
         </description> 
         <from uri="direct:determine-accreds-for-range"/>
         <log message="@@@@@@@@@@@@@@@       Starting determine-accreditations range: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>

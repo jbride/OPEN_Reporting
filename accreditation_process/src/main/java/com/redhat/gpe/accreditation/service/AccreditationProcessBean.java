@@ -123,6 +123,13 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         logger.info(sBuilder.toString()); 
     }
 
+
+
+
+
+
+
+/*  ****************        Accreditation Logic Processing locking mechanism        *******************  */
     public boolean isAccredLogicLocked() {
         return isLocked;
     }
@@ -145,8 +152,14 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     public void releaseAccredLogicLock() {
         isLocked = false;
     }
+/* *****************************************************************************************************  */
 
-/*  **********************    Student Accreditation     *************************** */
+
+
+
+
+
+/*  ************    Student Accreditation CRUD Operations     *************************** */
     
     public List<Accreditation> selectUnprocessedStudentAccreditations() {
         List<Accreditation> sAccreds = canonicalDAO.selectUnprocessedStudentAccreditationsByProcessStatus(StudentAccreditation.UNPROCESSED);
@@ -194,157 +207,15 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 /* ************************************************************************************ */
    
     
-    
-    public void getToken(Exchange exchange) {
-        
-        Message in = exchange.getIn();
-        try {
-                
-            HttpClient httpclient = new DefaultHttpClient();
-            httpclient = WebClientDevWrapper.wrapClient(httpclient);
-            
-            HttpPost post = new HttpPost(tokenUrl);
-            
-            // set up name value pairs
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("grant_type", grantType));
-            nvps.add(new BasicNameValuePair("client_id", clientId));
-            nvps.add(new BasicNameValuePair("client_secret", clientSecret));
+   
 
-            // set HTTP request message body
-            post.setEntity(new UrlEncodedFormEntity(nvps));
 
-            // send POST message
-            HttpResponse httpResponse = httpclient.execute(post);
 
-            // process response
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            JSONObject jsonResponse = new JSONObject(response);
-            String token = jsonResponse.getString("access_token");
 
-            in.setHeader(Constants.TOKEN, token);
-        } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
-        }
-    }
-    
-    public void getSkillsBasePersonId(Exchange exchange) {
 
-        Message in = exchange.getIn();
-        Accreditation studentAccredObj = in.getBody(Accreditation.class);
-        String theEmail = studentAccredObj.getStudent().getEmail();
-        logger.info(theEmail+" : Getting personId from Skills Base web service.");
-        
-        try {
-            HttpClient httpclient = new DefaultHttpClient();
-            httpclient = WebClientDevWrapper.wrapClient(httpclient);
-            HttpPost post = new HttpPost(personIdByEmailUrl);
 
-            // set up header
-            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
-            
-            // set up name value pairs
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("email", theEmail));
 
-            // set HTTP request message body
-            post.setEntity(new UrlEncodedFormEntity(nvps));
-
-            // send POST message
-            HttpResponse httpResponse = httpclient.execute(post);
-
-            // process response
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            JSONObject jsonResponse = new JSONObject(response);
-
-            String status = jsonResponse.getString("status");
-            
-            logger.info(theEmail+" : response: " + response+" : status = "+status);
-
-            // parse person id
-            String personId = null;
-            if (SUCCESS.equalsIgnoreCase(status)) {
-                JSONObject jsonData = jsonResponse.getJSONObject("data");
-                personId = jsonData.getString("id");
-
-                studentAccredObj.getStudent().setSkillsbasePersonId(personId);
-            } else if (ERROR.equalsIgnoreCase(status)) {
-                String message = jsonResponse.getString("message");
-
-                if (message.contains("No person found")) {
-                    studentAccredObj.getStudent().setSkillsbasePersonId(null);
-                } else {
-                    throw new RuntimeException(message);
-                }
-            }
-        } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
-        }
-    }
-    
-    public void addQualification(Exchange exchange) {
-
-        Message in = exchange.getIn();
-        Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
-        
-        Student studentObj = denormalizedStudentAccred.getStudent();
-        AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
-        StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
-
-        String accredName = accredObj.getAccreditationname();
-        
-        try {
-            HttpClient httpclient = new DefaultHttpClient();
-            httpclient = WebClientDevWrapper.wrapClient(httpclient);
-
-            HttpPost post = new HttpPost(addQualificationUrl);
-            logger.info(studentObj.getEmail() +" : Sending the following qualification to Skills Base web service : " + accredName);
-
-            // set up header
-            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
-            
-            // set up name value pairs
-            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
-            nvps.add(new BasicNameValuePair("name", accredName));
-            nvps.add(new BasicNameValuePair("person_id", studentObj.getSkillsbasePersonId()));
-            nvps.add(new BasicNameValuePair("status", Constants.COMPLETED));
-            
-            String startDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
-            nvps.add(new BasicNameValuePair("start_date", startDateStr));
-            
-            String endDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
-            nvps.add(new BasicNameValuePair("end_date", endDateStr));
-
-            // set HTTP request message body
-            post.setEntity(new UrlEncodedFormEntity(nvps));
-
-            // send POST message
-            HttpResponse httpResponse = httpclient.execute(post);
-
-            // process response
-            String response = EntityUtils.toString(httpResponse.getEntity());
-            JSONObject jsonResponse = new JSONObject(response);
-
-            String status = jsonResponse.getString("status");
-
-            logger.info(studentObj.getEmail() +" : addQualification() response: " + response+" : status = "+status);
-
-            if (!"success".equalsIgnoreCase(status)) {
-                String message = "Error sending qualification. Student email: " + studentObj.getEmail() + ",  qualification: " + accredName;
-                logger.error(message);
-                throw new RuntimeException(message);
-            }
-        } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
-        }
-    }
-    
+/*  ********************        Accreditation Rule Spreadsheet Processing   ************* */    
     public void validateSpreadsheetRules(Exchange exchange) {
 
         @SuppressWarnings("unchecked")
@@ -624,4 +495,174 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         
         exchange.getIn().setBody(jObject);
     }
+
+/* ************************************************************************************ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*  *************               SkillsBase Integration              ******************  */
+    public void getToken(Exchange exchange) {
+        
+        Message in = exchange.getIn();
+        try {
+                
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+            
+            HttpPost post = new HttpPost(tokenUrl);
+            
+            // set up name value pairs
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("grant_type", grantType));
+            nvps.add(new BasicNameValuePair("client_id", clientId));
+            nvps.add(new BasicNameValuePair("client_secret", clientSecret));
+
+            // set HTTP request message body
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+
+            // send POST message
+            HttpResponse httpResponse = httpclient.execute(post);
+
+            // process response
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            JSONObject jsonResponse = new JSONObject(response);
+            String token = jsonResponse.getString("access_token");
+
+            in.setHeader(Constants.TOKEN, token);
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+    }
+    
+    public void getSkillsBasePersonId(Exchange exchange) {
+
+        Message in = exchange.getIn();
+        Accreditation studentAccredObj = in.getBody(Accreditation.class);
+        String theEmail = studentAccredObj.getStudent().getEmail();
+        logger.info(theEmail+" : Getting personId from Skills Base web service.");
+        
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+            HttpPost post = new HttpPost(personIdByEmailUrl);
+
+            // set up header
+            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            
+            // set up name value pairs
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("email", theEmail));
+
+            // set HTTP request message body
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+
+            // send POST message
+            HttpResponse httpResponse = httpclient.execute(post);
+
+            // process response
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            JSONObject jsonResponse = new JSONObject(response);
+
+            String status = jsonResponse.getString("status");
+            
+            logger.info(theEmail+" : response: " + response+" : status = "+status);
+
+            // parse person id
+            String personId = null;
+            if (SUCCESS.equalsIgnoreCase(status)) {
+                JSONObject jsonData = jsonResponse.getJSONObject("data");
+                personId = jsonData.getString("id");
+
+                studentAccredObj.getStudent().setSkillsbasePersonId(personId);
+            } else if (ERROR.equalsIgnoreCase(status)) {
+                String message = jsonResponse.getString("message");
+
+                if (message.contains("No person found")) {
+                    studentAccredObj.getStudent().setSkillsbasePersonId(null);
+                } else {
+                    throw new RuntimeException(message);
+                }
+            }
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+    }
+    
+    public void addQualification(Exchange exchange) {
+
+        Message in = exchange.getIn();
+        Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
+        
+        Student studentObj = denormalizedStudentAccred.getStudent();
+        AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
+        StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
+
+        String accredName = accredObj.getAccreditationname();
+        
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+
+            HttpPost post = new HttpPost(addQualificationUrl);
+            logger.info(studentObj.getEmail() +" : Sending the following qualification to Skills Base web service : " + accredName);
+
+            // set up header
+            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            
+            // set up name value pairs
+            List<NameValuePair> nvps = new ArrayList<NameValuePair>();
+            nvps.add(new BasicNameValuePair("name", accredName));
+            nvps.add(new BasicNameValuePair("person_id", studentObj.getSkillsbasePersonId()));
+            nvps.add(new BasicNameValuePair("status", Constants.COMPLETED));
+            
+            String startDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+            nvps.add(new BasicNameValuePair("start_date", startDateStr));
+            
+            String endDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+            nvps.add(new BasicNameValuePair("end_date", endDateStr));
+
+            // set HTTP request message body
+            post.setEntity(new UrlEncodedFormEntity(nvps));
+
+            // send POST message
+            HttpResponse httpResponse = httpclient.execute(post);
+
+            // process response
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            JSONObject jsonResponse = new JSONObject(response);
+
+            String status = jsonResponse.getString("status");
+
+            logger.info(studentObj.getEmail() +" : addQualification() response: " + response+" : status = "+status);
+
+            if (!"success".equalsIgnoreCase(status)) {
+                String message = "Error sending qualification. Student email: " + studentObj.getEmail() + ",  qualification: " + accredName;
+                logger.error(message);
+                throw new RuntimeException(message);
+            }
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+    }
+
+/*  ********************************************************************************************** */
+
 }
