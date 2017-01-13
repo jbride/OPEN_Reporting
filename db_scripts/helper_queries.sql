@@ -28,6 +28,7 @@ alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 # select count(studentId), studentId from StudentAccreditations group by studentId order by count(studentId) asc;
 # select ad.AccreditationName, sa.AccreditationDate, sa.AccreditationType, sa.CourseId from StudentAccreditations sa, AccreditationDefinitions ad where sa.studentid=18836 and sa.AccreditationId=ad.AccreditationId;
 # select count(ad.AccreditationName), ad.AccreditationName from StudentAccreditations sa, AccreditationDefinitions ad where sa.AccreditationId=ad.AccreditationId group by ad.AccreditationName order by count(ad.AccreditationName) asc;
+# select count(sc.studentId) from StudentCourses sc, Students s where s.StudentId=sc.StudentId and s.email like "%@redhat.com";
 
 # select count(sc.studentId) from StudentCourses sc, Courses c where c.CourseId=sc.CourseId and c.CourseName="Red Hat Sales Specialist - Platform";
 
