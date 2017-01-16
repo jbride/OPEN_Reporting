@@ -144,6 +144,8 @@ public class StudentAccreditation implements Serializable {
         sb.append(", ").append(accreditationdate);
         sb.append(", ").append(accreditationtype);
         sb.append(", ").append(courseid);
+        sb.append(", ").append(processed);
+        sb.append(", ").append(ruleFired);
 
         sb.append(")");
         return sb.toString();

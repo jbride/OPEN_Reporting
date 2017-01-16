@@ -348,7 +348,7 @@ It will then re-calculate all accreditations for all students based on their exi
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
-                -H "TEST_RULES_ONLY: true" \
+                -H "IDENTIFY_FIRED_RULES_ONLY: true" \
                 -H "RESPOND_JSON: true" \
                 http://$HOSTNAME:9090/gpte_accreditation/students/10387
 -----
@@ -357,7 +357,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
-                -H "TEST_RULES_ONLY: true" \
+                -H "IDENTIFY_FIRED_RULES_ONLY: true" \
                 -H "RESPOND_JSON: true" \
                 http://$HOSTNAME:9090/gpte_accreditation/students/103899
 -----
@@ -366,7 +366,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
-                -H "TEST_RULES_ONLY: true" \
+                -H "IDENTIFY_FIRED_RULES_ONLY: true" \
                 -H "RESPOND_JSON: true" \
                 -H "LOW_STUDENT_ID: 10000" \
                 -H "HIGH_STUDENT_ID: 11000" \
