@@ -15,7 +15,7 @@ import com.redhat.gpte.util.PropertiesSupport;
 
 public class CheckForSkillsBaseSyncTest extends CamelSpringTestSupport {
     
-    public static final String CHECK_FOR_SB_SYNC_URI = "accred_process-new-student-accreds-uri";
+    public static final String CHECK_FOR_SB_SYNC_URI = "accred_process-update-accred-to-skillsbase-batch";
     private static final Logger logger = LoggerFactory.getLogger(CheckForSkillsBaseSyncTest.class);
     private String routeURI = null;
     
