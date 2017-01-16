@@ -68,17 +68,23 @@
     <dataFormats>
         <bindy type="Csv" classType="com.redhat.gpe.accreditation.util.SpreadsheetRule" id="bindyRules"/>
     </dataFormats>
-      
+    
     <onException>
-        <exception>java.lang.Exception</exception>
-
-        <handled><constant>true</constant></handled>
-
-        <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
-        <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
-        <to uri="seda:send-email"/>
+        <exception>com.sun.mail.util.MailConnectException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
     </onException>
-
+    <onException>
+        <exception>com.sun.mail.smtp.SMTPSendFailedException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
+    <onException>
+        <exception>javax.mail.MessagingException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
+    <onException>
+        <exception>java.lang.IllegalArgumentException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>  
     <onException>
         <exception>java.lang.NullPointerException</exception>
 
@@ -411,14 +417,14 @@
     <!--    *************************************************************************************************   -->
     <!--    *************                       SkillsBase                                      *************   -->
 
-    <route id="process-new-student-accreditations">
+    <route id="push-qualifications-to-skills-base-batch">
         <description>
             1)  Periodically checks for student accreditations that have not been processed
             2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SkillsBase with that student accreditation information
             3)  To-Do: aggregate results and send report
         </description>
-        <from uri="{{accred_process-new-student-accreds-uri}}"/>
-        <log message="####################      Starting .... process-new-student-accreds" loggingLevel="INFO"/>
+        <from uri="{{accred_process-push-qualification-to-skillsbase-batch}}"/>
+        <log message="####################      Starting .... push-qualifications-to-skillsbase-batch" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
         <split id="loop-for-each-student">
             <simple>${body}</simple>
@@ -426,21 +432,18 @@
                 <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
                 <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
                 <to uri="direct:skills-base-webservice" id="call-SkillsBase-ws"/>
-                <to uri="direct:update-pathgather-with-accreditation" id="call-pathgather" />
-                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
             </filter>
         </split>
         <log message="####################      done" loggingLevel="INFO"/>
     </route>
 
-
-    <route id="skills-base-webservice">
+    <route id="push-qual-to-skills-base">
         <description>
-            Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
-            Responsible for updating SkillsBase web service with StudentAccreditation
-            Emails Student to encourage them to create a SkillsBase account if student has not already done so
+            1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
+            2) Responsible for updating SkillsBase web service with StudentAccreditation
+            3) Emails Student to encourage them to create a SkillsBase account if student has not already done so
         </description>
-        <from uri="direct:skills-base-webservice"/>
+        <from uri="direct:push-qual-to-skills-base"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
         <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
@@ -451,6 +454,7 @@
                 <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
                 <!--to uri="bean:accreditationProcessBean?method=updateStudentcourses" id="update-student-assessment"/>
                 <to uri="bean:accreditationProcessBean?method=updateStudentStatusForOk" id="update-emp-status-ok"/ -->
+                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
             </when>
             <otherwise>
                 <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>

@@ -554,6 +554,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         Message in = exchange.getIn();
         Accreditation studentAccredObj = in.getBody(Accreditation.class);
         String theEmail = studentAccredObj.getStudent().getEmail();
+        if(StringUtils.isEmpty(theEmail))
+            throw new RuntimeException("getSkillsBasePersonId() Accreditation object passed to this function must have a student email");
+
         logger.info(theEmail+" : Getting personId from Skills Base web service.");
         
         try {

@@ -42,7 +42,7 @@ public class CheckExpiredAccredsTest extends CamelSpringTestSupport {
     @Before
     public void init() {}
 
-    //@Ignore
+    @Ignore
     @Test
     public void testExpiredAccredsTest() throws InterruptedException {
         String routeURI = System.getProperty(CHECK_EXPIRED_ACCREDS_URI);
