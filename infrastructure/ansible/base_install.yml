@@ -49,6 +49,7 @@
       - tools
       - firewalld
       - httpd
+      - postfix
       - reboot
       - useradd
       - opentlc-user
