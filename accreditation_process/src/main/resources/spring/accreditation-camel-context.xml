@@ -430,8 +430,13 @@
             <simple>${body}</simple>
             <filter>
                 <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
-                <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
-                <to uri="direct:skills-base-webservice" id="call-SkillsBase-ws"/>
+                <choice> 
+                    <when>
+                        <simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
+                        <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
+                        <to uri="direct:push-qual-to-skills-base" id="invoke-push-qual-to-skills-base"/>
+                    </when>
+                </choice> 
             </filter>
         </split>
         <log message="####################      done" loggingLevel="INFO"/>
@@ -452,8 +457,8 @@
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
                 <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
-                <!--to uri="bean:accreditationProcessBean?method=updateStudentcourses" id="update-student-assessment"/>
-                <to uri="bean:accreditationProcessBean?method=updateStudentStatusForOk" id="update-emp-status-ok"/ -->
+                <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
+                <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
                 <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
             </when>
             <otherwise>

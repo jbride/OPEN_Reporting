@@ -20,10 +20,10 @@ public class StudentAccreditation implements Serializable {
     public static final String ACCRED_TYPE = "accreditationtype";
     public static final String COURSE_ID = "courseid";
     public static final String PROCESSED = "processed";
-    public static final int UNPROCESSED = 0;
-    public static final int PROCESSED_SKILLS_BASE_ONLY = 1;
-    public static final int PROCESSED_SALESFORCE_ONLY = 2;
-    public static final int PROCESSED_ALL = 10;
+    public static final short UNPROCESSED = 0;
+    public static final short PROCESSED_SKILLS_BASE_ONLY = 1;
+    public static final short PROCESSED_SALESFORCE_ONLY = 2;
+    public static final short PROCESSED_ALL = 10;
     public static final String SELECT_CLAUSE = "sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed,sa.RulesFired";
 
     private Integer   studentid;

@@ -162,7 +162,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 /*  ************    Student Accreditation CRUD Operations     *************************** */
     
     public List<Accreditation> selectUnprocessedStudentAccreditations() {
-        List<Accreditation> sAccreds = canonicalDAO.selectUnprocessedStudentAccreditationsByProcessStatus(StudentAccreditation.UNPROCESSED);
+        List<Accreditation> sAccreds = canonicalDAO.selectUnprocessedStudentAccreditationsByProcessStatus(StudentAccreditation.UNPROCESSED, Student.RED_HAT_EMAIL_SUFFIX);
         if(sAccreds == null || sAccreds.isEmpty()) {
             logger.info("selectUnprocessedStudentAccreditations() no StudentAccreditation objects found with status = "+StudentAccreditation.UNPROCESSED);
         }
@@ -199,6 +199,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             logger.debug(saObj.getStudent().getEmail()+" : Not a Red Hat associate.  Will not update SkillsBase");
             return false;
         }
+    }
+    
+    public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
+    	accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
     }
     
     public int changeStatusOnExpiredStudentAccreditations() {

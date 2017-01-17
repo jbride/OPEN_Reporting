@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.Date;
 
+import org.apache.camel.Endpoint;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.Message;
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -25,7 +29,8 @@ import com.redhat.gpe.domain.canonical.Student;
 public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
     
     private static final Logger logger = LoggerFactory.getLogger(PushQualToSkillsBaseTest.class);
-    private String routeURI = "direct:push-qual-to-skills-base";
+    private String pushQualToSkillsBaseURI = "direct:push-qual-to-skills-base";
+    private String pushQualsToSkillsBaseBatchURI = "direct:push-qual-to-skillsbase-uri";
     
     public PushQualToSkillsBaseTest() throws IOException {
         PropertiesSupport.setupProps();
@@ -43,7 +48,19 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
 
     //@Ignore
     @Test
-    public void testAttachmentProcessing() throws InterruptedException {
+    public void testQueryForUnpushedQuals() throws InterruptedException {
+    	template.setDefaultEndpointUri(pushQualsToSkillsBaseBatchURI);
+    	Endpoint endpoint = context.getEndpoint(pushQualsToSkillsBaseBatchURI);
+        Exchange exchange = endpoint.createExchange();
+        exchange.setPattern(ExchangePattern.InOnly);
+        Message in = exchange.getIn();
+    	in.setHeader("DETERMINE_UNPROCESSED_ACCREDS_ONLY", true);
+    	template.send(pushQualsToSkillsBaseBatchURI, exchange);
+    }
+
+    @Ignore
+    @Test
+    public void testPushQualToSkillsBaseGivenKnownRHTStudent() throws InterruptedException {
 
         Course course2 = new Course();
         course2.setCoursename(DomainMockObjectHelper.CLOUDFORMS_IMPLEMENTATION);
@@ -68,7 +85,8 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
         accreditation.setStudentAccred(studentAccreditation);
         accreditation.setStudent(student);
 
-        template.setDefaultEndpointUri(routeURI);
+        template.setDefaultEndpointUri(pushQualToSkillsBaseURI);
         template.sendBody(accreditation);
     }
+    
 }

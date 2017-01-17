@@ -50,6 +50,8 @@ public class Student implements Serializable {
     public static final int IPA_UNSYNCHED = 0;
     public static final int IPA_SYNCHED = 1;
 
+    public static final String RED_HAT_EMAIL_SUFFIX="redhat.com";
+
 
     private Integer studentid = 0;
     private String  email;
