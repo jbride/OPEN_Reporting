@@ -1,6 +1,8 @@
 package com.redhat.gpe.integration.test;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.Date;
 
 import org.apache.camel.test.spring.CamelSpringTestSupport;
 import org.junit.Before;
@@ -61,6 +63,7 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
         studentAccreditation.setStudentid(student.getStudentid());
         studentAccreditation.setAccreditationtype(StudentAccreditation.Types.Active.name());
         studentAccreditation.setAccreditationid(1);
+        studentAccreditation.setAccreditationdate(new Timestamp(new Date().getTime()));
 
         accreditation.setStudentAccred(studentAccreditation);
         accreditation.setStudent(student);
