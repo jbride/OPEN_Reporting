@@ -24,7 +24,7 @@ public class StudentAccreditation implements Serializable {
     public static final short PROCESSED_SKILLS_BASE_ONLY = 1;
     public static final short PROCESSED_SALESFORCE_ONLY = 2;
     public static final short PROCESSED_ALL = 10;
-    public static final String SELECT_CLAUSE = "sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed,sa.RulesFired";
+    public static final String SELECT_CLAUSE = "sa.AccreditationID,sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed,sa.RuleFired";
 
     private Integer   studentid;
     private Integer   accreditationid;

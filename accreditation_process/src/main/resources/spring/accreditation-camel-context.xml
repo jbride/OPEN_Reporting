@@ -434,7 +434,7 @@
                     <when>
                         <simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
                         <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
-                        <to uri="direct:push-qual-to-skills-base" id="invoke-push-qual-to-skills-base"/>
+                        <to uri="direct:push-qual-to-skills-base" id="invoke-push-qual-to-skills-base" />
                     </when>
                 </choice> 
             </filter>
@@ -479,7 +479,6 @@
                 <log message="${body.email} : Not emailing the student. We've already emailed them before." loggingLevel="INFO"/>
             </when>
             <otherwise>
-                <to uri="bean:accreditationProcessBean?method=updateUserStatusForEmailedAlready"/>
                 <setHeader headerName="firstName">
                     <simple>${body.firstName}</simple>
                 </setHeader>
@@ -498,6 +497,7 @@
                 <to uri="velocity:emailTemplates/email-student-create-sb-account.vm"/>
                 <to uri="smtps://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email_to_student"/>
                 <log message="${header.to} : Sent email to: ${header.to}"/>
+                <to uri="bean:accreditationProcessBean?method=updateUserStatusForEmailedAlready"/>
             </otherwise>
         </choice>
     </route>

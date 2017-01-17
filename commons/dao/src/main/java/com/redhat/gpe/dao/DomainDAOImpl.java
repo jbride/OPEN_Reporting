@@ -199,14 +199,14 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
 
     public boolean hasThisStudentBeenEmailedBefore(String email) {
-        String sql = "select count(*) from Students_status where email=? and status_code=?";
-        Integer count = sbJdbcTemplate.queryForObject(sql, Integer.class, email.toLowerCase(), DAOConstants.USER_NOT_FOUND_IN_SKILLS_BASE_STATUS_CODE);
+        String sql = "select count(*) from Students where email=? and SkillsbaseStatus=?";
+        Integer count = sbJdbcTemplate.queryForObject(sql, Integer.class, email.toLowerCase(), Student.SKILLSBASE_PERSON_NOTIFIED_NO_ACCOUNT);
         boolean result = count > 0;
         return result;                
     }
 
     public void updateStudentStatusForEmailedAlready(String email) {
-        updateStudentStatus(email, DAOConstants.USER_NOT_FOUND_IN_SKILLS_BASE_STATUS_CODE, EMP_NOT_FOUND_IN_SB);    
+        updateStudentStatus(email, Student.SKILLSBASE_PERSON_NOTIFIED_NO_ACCOUNT, Student.SKILLSBASE_STATUS);    
     }
 
     public void updateStudentStatusForOk(String email) {
