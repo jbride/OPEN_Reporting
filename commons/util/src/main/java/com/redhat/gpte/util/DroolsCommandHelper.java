@@ -81,10 +81,20 @@ public class DroolsCommandHelper implements ApplicationContextAware {
         List<Accreditation> exchangeList = new ArrayList<Accreditation>();
         exchangeList.addAll(accreditationListFromRules);
         accreditationListFromRules.clear();
-        exchange.getIn().setBody(exchangeList);
-        if(exchangeList.size() > 0) {
-            logger.info("following # of accreditations created: "+exchangeList.size());
+        List<Accreditation> sortedAccreds = sortAccreditations(exchangeList);
+        exchange.getIn().setBody(sortedAccreds);
+        if(sortedAccreds.size() > 0) {
+            logger.info("following # of accreditations created: "+sortedAccreds.size());
         }
+    }
+
+    public List<Accreditation> sortAccreditations(List<Accreditation> accreditations) {
+        if(accreditations.size() == 1)
+          return accreditations;
+
+        Accreditation[] accredArray = accreditations.toArray(new Accreditation[0]);
+        Arrays.sort( accredArray, new AccreditationDateComparator() );
+        return Arrays.asList(accredArray);
     }
 
     public void dumpKieBase(Exchange exchange) {
