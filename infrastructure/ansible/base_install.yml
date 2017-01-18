@@ -42,6 +42,7 @@
        msg: "Will install the following environment: {{ gpte_env }}"
 
   roles:
+      - sshd
       - hostname
       - root-user
       - epel
