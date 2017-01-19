@@ -282,9 +282,12 @@ MariaDB [lms_transactional]>  update StudentAccreditations sa, Students s set sa
 MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=1 where Email like "%redhat.com";
 MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email="gpse.training+1@redhat.com";
 
-properties/dev.properties :  accred_process-push-qualification-to-skillsbase-batch=quartz2://accred_process-push-qualifications-to-skillsbase?cron=0 0/5 * 1/1 * ? *
+properties/dev.properties :  
+    sb_sendMailToStudentEnabled=true
+    accred_process-push-qualification-to-skillsbase-batch=quartz2://accred_process-push-qualifications-to-skillsbase?cron=0 0/5 * 1/1 * ? *
 
-bg
+ba
+ta
 -----
 
 

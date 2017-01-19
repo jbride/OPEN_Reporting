@@ -1,9 +1,9 @@
 Hello ${headers.firstName},
 
-As part of the Red Hat Skills Exchange program, you have earned the following new accreditation: ${headers.qualification}, congratulations!
+As part of the Red Hat Skills Exchange program, you have earned the following new accreditation: ${headers.accreditationName}, congratulations!
 When we attempted to add your accomplishment to your profile in Skills Base, we noticed that you have not yet logged in to Skills Base. 
 Please take a moment to log in to create your profile at:  http://app.skills-base.com/o/redhat
-Your Kerberos credentials should do the trick!
+Your Red Hat Kerberos credentials should do the trick!
 
 If you run into issues, please contact internal-enablement@redhat.com.
 
