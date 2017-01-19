@@ -1,5 +1,15 @@
 ---
 
+- name: clear accred-process logs
+  file:
+    path: "{{accred_process_log_dir}}"
+    state: absent
+  file:
+    path: "{{accred_process_log_dir}}"
+    state: directory
+    owner: "user"
+    group: "group"
+
 - name: bounce accred-process
   command: systemctl restart accred-process.service
 - command: sleep 30

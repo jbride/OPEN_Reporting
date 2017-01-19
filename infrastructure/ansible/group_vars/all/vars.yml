@@ -93,3 +93,6 @@ gpte_self_signed_certs_dir: "/etc/gpte/certs/"
 
 # GPTE Reporting file system
 gpte_reporting_file_system: /u01/gpte
+
+# GPTE Accreditation Service
+accred_process_log_dir=/var/log/gpte
