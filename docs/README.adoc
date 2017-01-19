@@ -93,36 +93,6 @@ mvn clean install -DskipTests
 
 === MySQL
 
-. Ensure the most recent version of the `mariadb-server` package is installed on your RHEL7 operating system.
-+
------
-# yum install -y mariadb-server
------
-
-. Enable and start the `mariadb-server` as an operating system service.
-+
------
-# systemctl enable mariadb-server.service
-# systemctl start mariadb-server.service
------
-
-. Log into the `mysql` database of the MariaDB RDBMS and create the following databases:
-+
------
-create database dashbuilder;
-create database lms_reporting;
-create database lms_transactional;
------
-
-. Create database users and affiliate to databases:
-+
------
-grant all on mysql.* to 'root'@'%' identified by 'c-9XSHln8hJ_UH9YvNOgc9mH';
-grant all on dashbuilder.* to 'dashbuilder'@'localhost' identified by 'dashbuilder';
-grant all on lms_reporting.* to 'lms_report'@'localhost' identified by 'lms_report';
-grant all on lms_transactional.* to 'lms_trans'@'localhost' identified by 'lms_trans';
------
-
 . Seed the `lms_transactional` database with test data
 +
 -----
@@ -138,70 +108,6 @@ mysqldump --no-create-db --no-create-info -u lms_trans -p'c-9XSHln8hJ_UH9YvNOgc9
 -----
 
 === JBoss Fuse on EAP
-
-==== installation and configuration
-
-NOTE: Execute all of the following as the `jboss` operating system user.
-
-. Download the following from the Red Hat Support Portal:
-.. *jboss-eap-6.4.4-full-build.zip*
-.. *fuse-eap-installer-6.2.1.redhat-084.jar*
-. unzip JBoss EAP into: `/opt/jboss/eap`
-+
-NOTE: For the purpose of this admin guide, the term `$JBOSS_HOME` will refer to the following path: `/opt/jboss/eap/jboss-eap-6.4`.
-. Change directories into: $JBOSS_HOME
-. java -jar /path/to/fuse-eap-installer-6.2.1.redhat-084.jar
-
-. Create `com.mysql.jdbc` JBoss module
-+
-----
-cd $JBOSS_HOME
-cp -r $PROJECT_HOME/config/modules/* modules
-cd modules/system/layers/base/com/mysql/jdbc/main
-ln -sf  /usr/share/java/mysql-connector-java.jar modules/system/layers/base/com/mysql/jdbc/main/mysql-connector-java.jar
-----
-
-. Modify JBoss start-up JAVA_OPTS :
-+
------
-cp $PROJECT_HOME/config/bin/standalone.conf $JBOSS_HOME/bin
------
-
-. Execute JBoss CLI based changes
-.. Start JBoss EAP in `admin-mode`:
-+
------
-./bin/standalone.sh -c standalone.xml --admin-only
------
-.. In another terminal window (again as the `jboss` operating system user), change directories to `$PROJECT_HOME`.
-.. Execute :
-+
------
-$JBOSS_HOME/bin/jboss-cli.sh -c --file=config/cli/eap-configs.cli
------
-
-==== Enable as an OS service
-Execute the following as the `root` operating system user:
-
-. Configure the service
-.. cp $PROJECT_HOME/config/service/gpte-integration.service /usr/lib/systemd/system
-.. Then enable the service
-+
------
-sudo systemctl enable gpte-integration.service
------
-
-. start
-+
------
-sudo systemctl start gpte-integration.service
------
-
-. check log
-+
------
-sudo journalctl -u gpte-integration -f
------
 
 ==== Gain access to `JBoss Command Line Interface`:
 +
@@ -221,19 +127,6 @@ $ mvn -Prelease install -DskipTests
 $ cd artemis-distribution/target/apache-artemis-1.4.0-SNAPSHOT-bin/apache-artemis-1.4.0-SNAPSHOT
 
 -----
-
-=== Hawtio Admin Console
-The `Hawtio` admin console can be reached by navigating to the following URL using your browser:
-
------
-http://docker1.ose.opentlc.com:8205/hawtio/http://docker1.ose.opentlc.com:8205/hawtio/
------
-
-NOTE: hawtio web app presents the `white screen of death` until all javascript client libraries have been downloaded.
-The size of this client side download is about 5.5MBs.
-Use a browser tool such as `Firebug` to monitor download progress of these client side libraries to your browser.
-
-Login using the following credentials: `admin / jb0ssredhat!`
 
 
 == GPTE Reporting Routing Process
@@ -372,6 +265,28 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 -H "HIGH_STUDENT_ID: 11000" \
                 http://$HOSTNAME:9090/gpte_accreditation/students/batch
 -----
+
+== SkillsBase Integration
+
+. Check # of Red Hat associates whose accreds need to be pushed to SkillsBase
++
+-----
+MariaDB [lms_transactional]> select count(sa.studentId) from StudentAccreditations sa, Students s where sa.Processed=0 and s.StudentId=sa.StudentID and s.email like "%redhat.com";
+-----
+
+. Prepare for end-to-end test using only student = gpse.training+1@redhat.com
++
+-----
+MariaDB [lms_transactional]>  update StudentAccreditations sa, Students s set sa.Processed=1 where s.StudentId=sa.StudentID and s.email like "%redhat.com";
+MariaDB [lms_transactional]>  update StudentAccreditations sa, Students s set sa.Processed=0 where s.StudentId=sa.StudentID and s.email="gpse.training+1@redhat.com";
+MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=1 where Email like "%redhat.com";
+MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email="gpse.training+1@redhat.com";
+
+properties/dev.properties :  accred_process-push-qualification-to-skillsbase-batch=quartz2://accred_process-push-qualifications-to-skillsbase?cron=0 0/5 * 1/1 * ? *
+
+bg
+-----
+
 
 ifdef::showscript[]
 endif::showscript[]
