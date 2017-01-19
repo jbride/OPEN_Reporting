@@ -30,6 +30,7 @@
         alias ta='sudo journalctl -u accred-process -f'
         alias td='sudo journalctl -u dashbuilder -f'
         alias tduf='sudo journalctl -u dashbuilderuf -f'
+        alias mroot='mysql -u root -p{{db_root_passwd}} mysql'
 
 - name: Add jboss user
   user: name={{user}} groups=wheel password={{password}}
