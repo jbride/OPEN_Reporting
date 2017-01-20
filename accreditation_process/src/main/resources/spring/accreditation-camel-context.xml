@@ -497,10 +497,13 @@
                 <setHeader headerName="to">
                     <simple>${body.email}</simple>
                 </setHeader>
+
+                <!-- update database before use of velocity component (becaue velocity changes payload to a string -->
+                <to uri="bean:accreditationProcessBean?method=updateUserStatusForEmailedAlready"/>
+
                 <to uri="velocity:emailTemplates/email-student-create-sb-account.vm"/>
                 <to uri="smtp://{{gpte_smtp_server}}:{{gpte_smtp_port}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_skillsbase_notification_to_student"/>
                 <log message="${header.to} : Sent email to: ${header.to}"/>
-                <to uri="bean:accreditationProcessBean?method=updateUserStatusForEmailedAlready"/>
             </otherwise>
         </choice>
     </route>
