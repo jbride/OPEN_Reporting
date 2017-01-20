@@ -453,6 +453,7 @@
         <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
         <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
+        <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
         <choice>
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
