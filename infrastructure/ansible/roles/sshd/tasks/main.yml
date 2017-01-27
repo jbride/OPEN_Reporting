@@ -1,0 +1,10 @@
+
+- name: Lock down sshd
+  lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: 'PasswordAuthentication yes'
+    line: 'PasswordAuthentication no'
+- lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: '#ChallengeResponseAuthentication no'
+    line: 'ChallengeResponseAuthentication no'

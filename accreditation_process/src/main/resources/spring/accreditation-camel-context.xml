@@ -453,6 +453,7 @@
         <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
         <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
+        <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
         <choice>
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
@@ -473,31 +474,36 @@
 
     <route id="user-not-found-in-skillsbase">
         <from uri="seda:user-not-found-in-skillsbase"/>
+        <setHeader headerName="accreditationName">
+            <simple>${body.accreditationName}</simple>
+        </setHeader>
+        <setBody><simple>${body.student}</simple></setBody>
         <choice id="have-we-emailed-before">
             <when>
                 <method ref="accreditationProcessBean" method="hasThisUserBeenEmailedBefore"></method>
                 <log message="${body.email} : Not emailing the student. We've already emailed them before." loggingLevel="INFO"/>
             </when>
             <otherwise>
+                <log message="${body.email} : Need to email student to sign into skillsbase." loggingLevel="INFO"/>
                 <setHeader headerName="firstName">
-                    <simple>${body.firstName}</simple>
-                </setHeader>
-                <setHeader headerName="qualification">
-                    <simple>${body.qualification}</simple>
+                    <simple>${body.firstname}</simple>
                 </setHeader>
                 <setHeader headerName="Subject">
                     <constant>ACTION REQUIRED: Please log into Skills Base!</constant>
                 </setHeader>
                 <setHeader headerName="From">
-                    <constant>Skills Base Integration App &lt;gpeskills.noreply@redhat.com&gt;</constant>
+                    <constant>GPTE Accreditation Processing &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
                 </setHeader>
                 <setHeader headerName="to">
                     <simple>${body.email}</simple>
                 </setHeader>
-                <to uri="velocity:emailTemplates/email-student-create-sb-account.vm"/>
-                <to uri="smtps://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email_to_student"/>
-                <log message="${header.to} : Sent email to: ${header.to}"/>
+
+                <!-- update database before use of velocity component (becaue velocity changes payload to a string -->
                 <to uri="bean:accreditationProcessBean?method=updateUserStatusForEmailedAlready"/>
+
+                <to uri="velocity:emailTemplates/email-student-create-sb-account.vm"/>
+                <to uri="smtp://{{gpte_smtp_server}}:{{gpte_smtp_port}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_skillsbase_notification_to_student"/>
+                <log message="${header.to} : Sent email to: ${header.to}"/>
             </otherwise>
         </choice>
     </route>
@@ -532,7 +538,7 @@
         </choice>
         <filter>
             <constant>{{gpte_enable_all_emails}}</constant>
-            <to uri="smtps://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
+            <to uri="smtp://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
             <log message="Sent reply email to: ${header.to}"/>
         </filter>
         <onException>

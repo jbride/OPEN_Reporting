@@ -1,0 +1,30 @@
+# https://mojo.redhat.com/docs/DOC-1014424
+
+# Manual steps on ipa.opentlc.com
+#   $ ssh jbride-redhat.com@ipa.opentlc.com
+#   $ kinit
+#   $ ipa service-add smtp/apps-iad00.opentlc.com
+
+- name: Add OpenTLC Mail configurations to postfix
+  blockinfile:
+    dest:  /etc/postfix/main.cf
+    block: |
+      smtp_tls_security_level = encrypt
+      smtp_tls_mandatory_ciphers = high
+      smtp_tls_ciphers = $smtp_tls_mandatory_ciphers
+      smtp_tls_mandatory_protocols = !SSLv2:!SSLv3
+      smtp_tls_protocols = $smtp_tls_mandatory_protocols
+      smtp_tls_CAfile = /etc/ipa/ca.crt
+      smtp_tls_cert_file = /etc/pki/tls/certs/smtp-@@HOSTNAME@@.crt
+      smtp_tls_key_file = /etc/pki/tls/private/smtp-@@HOSTNAME@@.key
+      relayhost = mx0.opentlc.com:19587
+
+- name: modify /etc/postfix/main.cf with correct hostname
+  shell: sed -i "s/@@HOSTNAME@@/$HOSTNAME/" /etc/postfix/main.cf
+
+- name: Ensure that GPTE mail relay certifate isn't already be tracked
+  shell: rm -f /etc/pki/tls/certs/smtp-${HOSTNAME}.crt; rm -rf /etc/pki/tls/private/smtp-${HOSTNAME}.key; ipa-getcert stop-tracking -i ${HOSTNAME}_SMTP_CERT
+  ignore_errors: yes
+
+- name: get the GPTE mail relay certifate
+  shell: ipa-getcert request -f /etc/pki/tls/certs/smtp-${HOSTNAME}.crt -k /etc/pki/tls/private/smtp-${HOSTNAME}.key -g 2048 -K smtp/${HOSTNAME} -I ${HOSTNAME}_SMTP_CERT
