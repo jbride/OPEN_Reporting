@@ -30,6 +30,13 @@ install_script_dir: /opt/install/scripts
 
 # General Database properties
 db_root_passwd: c-9XSHln8hJ_UH9YvNOgc9mH
+MYSQL_DATADIR: /var/lib/mysql
+MYSQL_LOWER_CASE_TABLE_NAMES: 0
+MYSQL_MAX_CONNECTIONS: 151
+MYSQL_FT_MIN_WORD_LEN: 4
+MYSQL_FT_MAX_WORD_LEN: 20
+MYSQL_AIO: 1
+
 
 # lms_trans database properties
 lms_trans_module_name: com.mysql

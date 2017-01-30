@@ -7,6 +7,11 @@
 - name: Create installation directory
   file: path={{install_script_dir}}/{{mysql_install_script_dir}} state=directory mode=0755
 
+- name: Copy my.cnf
+  template:
+    src: my.cnf
+    dest: /etc 
+
 - name : Copy installation files
   copy: src=install/ dest={{install_script_dir}}/{{mysql_install_script_dir}}
 
@@ -23,7 +28,6 @@
     '{{install_script_dir}}/{{mysql_install_script_dir}}/run-mysqld.sh >> {{install_script_dir}}/mysqld-install-log.txt
     creates={{install_script_dir}}/mysqld-install-log.txt'
   environment:
-    MYSQL_LOWER_CASE_TABLE_NAMES: 1
     MYSQL_ROOT_PASSWORD: "{{db_root_passwd}}"
 
 - name: Start Mariadb
