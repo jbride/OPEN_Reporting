@@ -10,8 +10,8 @@
 - name: Dump remote prod databases
   mysql_db: 
     login_user: root
-    login_host: localhost
-    login_password: "{{ db_root_passwd }}"
+#    login_host: localhost
+#    login_password: "{{ db_root_passwd }}"
     name: "{{ item }}"
     state: dump 
     target: "{{ mysql_datadump_src_dir }}/{{ item }}Db.sql.gz"
