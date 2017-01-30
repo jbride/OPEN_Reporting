@@ -5,7 +5,7 @@
 - name: Create Backups folder on dev
   file: path={{ mysql_datadump_src_dir }} state=directory
   run_once: true
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
 
 - name: Dump remote dev dashbuilder database
   mysql_db: 
@@ -16,7 +16,7 @@
     state: dump 
     target: "{{ mysql_datadump_src_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_update_from_dev}}"
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
 
 - name: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
   command: mkdir -p {{ mysql_datadump_target_dir }}
@@ -28,7 +28,7 @@
     dest: "{{ mysql_datadump_target_dir }}"
     flat: yes
   with_items: "{{databases_to_update_from_dev}}"
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
 
 - name: Create Backups folder on remote {{gpte_env}} environment
   file: path={{ mysql_datadump_target_dir }} state=directory
@@ -59,7 +59,7 @@
   stat:
     path: "{{database_update_script_dir}}/{{mysql_update_lms_trans_filename}}"
   register: update_lms_trans_file
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
 - debug:
     msg: "Does the lms_trans update file exist on dev ?  {{update_lms_trans_file.stat.exists}}"
 
@@ -68,7 +68,7 @@
     src: "{{database_update_script_dir}}/{{mysql_update_lms_trans_filename}}"
     dest: "{{ mysql_datadump_target_dir }}"
     flat: yes
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
   when: "{{update_lms_trans_file.stat.exists}} == True"
 
 - name: push {{mysql_update_lms_trans_filename}} from local to remote {{gpte_env}} environment
@@ -95,7 +95,7 @@
   stat:
     path: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
   register: update_lms_reporting_file
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
 - debug:
     msg: "Does the lms_reporting update file exist on dev ?  {{update_lms_reporting_file.stat.exists}}"
 
@@ -104,7 +104,7 @@
     src: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
     dest: "{{ mysql_datadump_target_dir }}"
     flat: yes
-  delegate_to: dev.opentlc.com
+  delegate_to: "{{dev}}"
   when: "{{update_lms_reporting_file.stat.exists}} == True"
 
 - name: push {{mysql_update_lms_reporting_filename}} from local to remote {{gpte_env}} environment

@@ -62,7 +62,7 @@
 - name: Create Backups folder on prod
   file: path={{ mysql_datadump_src_dir }} state=directory
   run_once: true
-  delegate_to: reporting.opentlc.com
+  delegate_to: "{{prod}}"
 
 - name: Dump remote prod databases
   mysql_db:
@@ -73,7 +73,7 @@
     state: dump
     target: "{{ mysql_datadump_src_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_provision_from_prod}}"
-  delegate_to: reporting.opentlc.com
+  delegate_to: "{{prod}}"
 
 - name: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
   command: mkdir -p {{ mysql_datadump_target_dir }}
@@ -85,7 +85,7 @@
     dest: "{{ mysql_datadump_target_dir }}"
     flat: yes
   with_items: "{{databases_to_provision_from_prod}}"
-  delegate_to: reporting.opentlc.com
+  delegate_to: "{{prod}}"
 
 - name: Create Backups folder on remote {{gpte_env}} environment
   file: path={{ mysql_datadump_target_dir }} state=directory
