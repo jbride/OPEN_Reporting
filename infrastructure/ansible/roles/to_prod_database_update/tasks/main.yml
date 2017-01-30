@@ -7,6 +7,11 @@
   run_once: true
   delegate_to: "{{dev}}"
 
+
+
+
+
+########         refresh dashbuilder database   ###############
 - name: Dump remote dev dashbuilder database
   mysql_db: 
     login_user: root
@@ -45,6 +50,58 @@
     state: import 
     target: "{{ mysql_datadump_target_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_update_from_dev}}"
+
+
+
+
+
+
+############         refresh lms_reporting      #################
+ 
+# Overview:
+#   lms_reporting database is dynamically built from a stored procedure that resides in lms_transactional:  refresh_lms_reporting.sql .
+#   This stored proc is copied from dev -> prod .
+#   Once copied to prod, it is imported into the lms_transactional database in prod .
+#   Subsequently, once imported into lms_transactional, it is executed periodically by camel based GTPE Reporting functionality .
+
+- name: Determine if {{mysql_update_lms_reporting_filename}} file exists in dev environment
+  stat:
+    path: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
+  register: update_lms_reporting_file
+  delegate_to: "{{dev}}"
+- debug:
+    msg: "Does the lms_reporting update file exist on dev ?  {{update_lms_reporting_file.stat.exists}}"
+
+- name: Copy {{mysql_update_lms_reporting_filename}} from dev to local:{{mysql_datadump_target_dir}}
+  fetch:
+    src: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
+    dest: "{{ mysql_datadump_target_dir }}"
+    flat: yes
+  delegate_to: "{{dev}}"
+  when: "{{update_lms_reporting_file.stat.exists}} == True"
+
+- name: push {{mysql_update_lms_reporting_filename}} from local to remote {{gpte_env}} environment
+  copy:
+    src: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_reporting_filename}}"
+    dest: "{{ mysql_datadump_target_dir }}"
+  when: "{{update_lms_reporting_file.stat.exists}} == True"
+
+# refresh_lms_reporting SQL is actually executed within lms_transactional database
+- name: Execute commands in {{mysql_update_lms_reporting_filename}}
+  mysql_db:
+    login_user: "{{lms_trans_userId}}"
+    login_password: "{{ lms_trans_passwd }}"
+    name: "{{lms_trans_db_name}}"
+    state: import
+    target: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_reporting_filename}}"
+  when: "{{update_lms_reporting_file.stat.exists}} == True"
+
+
+
+
+
+
+
  
 
 ######      Fine grained database updates from dev --> prod         ##############
@@ -52,7 +109,7 @@
 #  There are use cases where fine grained data changes are made in the GPTE Reporting development environment.
 #  One example is changes to: lms_transactional.CourseMappings .
 #  These fine grained data changes are maintained in SQL scripts in the GPTE dev environment. 
-#  These SQL scripts need to get executed in in qa and prod
+#  These SQL scripts need to get executed in both qa and prod
 
 # lms_transactional updates
 - name: Determine if {{mysql_update_lms_trans_filename}} file exists in dev environment
@@ -85,40 +142,3 @@
     state: import
     target: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_trans_filename}}"
   when: "{{update_lms_trans_file.stat.exists}} == True"
-
-
-
-
-
-# refresh lms_reporting 
-- name: Determine if {{mysql_update_lms_reporting_filename}} file exists in dev environment
-  stat:
-    path: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
-  register: update_lms_reporting_file
-  delegate_to: "{{dev}}"
-- debug:
-    msg: "Does the lms_reporting update file exist on dev ?  {{update_lms_reporting_file.stat.exists}}"
-
-- name: Copy {{mysql_update_lms_reporting_filename}} from dev to local:{{mysql_datadump_target_dir}}
-  fetch:
-    src: "{{database_update_script_dir}}/{{mysql_update_lms_reporting_filename}}"
-    dest: "{{ mysql_datadump_target_dir }}"
-    flat: yes
-  delegate_to: "{{dev}}"
-  when: "{{update_lms_reporting_file.stat.exists}} == True"
-
-- name: push {{mysql_update_lms_reporting_filename}} from local to remote {{gpte_env}} environment
-  copy:
-    src: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_reporting_filename}}"
-    dest: "{{ mysql_datadump_target_dir }}"
-  when: "{{update_lms_reporting_file.stat.exists}} == True"
-
-# refresh_lms_reporting SQL is actually executed within lms_transactional database
-- name: Execute commands in {{mysql_update_lms_reporting_filename}}
-  mysql_db:
-    login_user: "{{lms_trans_userId}}"
-    login_password: "{{ lms_trans_passwd }}"
-    name: "{{lms_trans_db_name}}"
-    state: import
-    target: "{{ mysql_datadump_target_dir }}/{{mysql_update_lms_reporting_filename}}"
-  when: "{{update_lms_reporting_file.stat.exists}} == True"
