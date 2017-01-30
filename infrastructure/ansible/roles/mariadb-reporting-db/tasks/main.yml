@@ -32,19 +32,20 @@
     state: present
     host: "%"
 
-- name: create lms_trans database and corresponding user
+- name: create lms_trans database
   mysql_db:
     name: "{{ lms_trans_db_name }}"
     state: present
-- mysql_user:
+- name: {{lms_trans_userId}} should have access to all GPTE Reporting databases
+  mysql_user:
     name: "{{lms_trans_userId}}"
     password: "{{lms_trans_passwd}}"
-    priv: '{{ lms_trans_db_name }}.*:ALL'
+    priv: 'lms_%.*:ALL'
     state: present
 - mysql_user:
     name: "{{lms_trans_userId}}"
     password: "{{lms_trans_passwd}}"
-    priv: '{{ lms_trans_db_name }}.*:ALL'
+    priv: 'lms_%.*:ALL'
     state: present
     host: "%"
 
