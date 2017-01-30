@@ -4,7 +4,7 @@
   file:
     path: "{{accred_process_log_dir}}"
     state: absent
-  file:
+- file:
     path: "{{accred_process_log_dir}}"
     state: directory
     owner: "{{user}}"
