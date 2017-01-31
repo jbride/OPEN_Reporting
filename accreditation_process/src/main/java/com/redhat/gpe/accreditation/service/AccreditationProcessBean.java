@@ -202,7 +202,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
     
     public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
-    	accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
+        accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
     }
     
     public int changeStatusOnExpiredStudentAccreditations() {

@@ -1,4 +1,4 @@
-package com.redhat.gpte.inbound_email;
+package com.redhat.gpte.email;
 
 import java.io.File;
 import java.io.IOException;

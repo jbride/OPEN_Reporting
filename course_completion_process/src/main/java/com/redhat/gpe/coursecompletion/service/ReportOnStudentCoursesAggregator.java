@@ -3,7 +3,6 @@ package com.redhat.gpe.coursecompletion.service;
 import org.apache.camel.Exchange;
 import org.apache.camel.Service;
 import org.apache.camel.impl.DefaultExchange;
-import org.apache.camel.processor.aggregate.AggregationStrategy;
 import org.apache.camel.processor.aggregate.CompletionAwareAggregationStrategy;
 import org.apache.log4j.Logger;
 

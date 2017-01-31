@@ -49,13 +49,13 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
     //@Ignore
     @Test
     public void testQueryForUnpushedQuals() throws InterruptedException {
-    	template.setDefaultEndpointUri(pushQualsToSkillsBaseBatchURI);
-    	Endpoint endpoint = context.getEndpoint(pushQualsToSkillsBaseBatchURI);
+        template.setDefaultEndpointUri(pushQualsToSkillsBaseBatchURI);
+        Endpoint endpoint = context.getEndpoint(pushQualsToSkillsBaseBatchURI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
-    	in.setHeader("DETERMINE_UNPROCESSED_ACCREDS_ONLY", true);
-    	template.send(pushQualsToSkillsBaseBatchURI, exchange);
+        in.setHeader("DETERMINE_UNPROCESSED_ACCREDS_ONLY", true);
+        template.send(pushQualsToSkillsBaseBatchURI, exchange);
     }
 
     @Ignore
