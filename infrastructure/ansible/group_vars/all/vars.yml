@@ -30,6 +30,7 @@ install_script_dir: /opt/install/scripts
 
 # General Database properties
 db_root_passwd: c-9XSHln8hJ_UH9YvNOgc9mH
+
 MYSQL_DATADIR: /var/lib/mysql
 MYSQL_LOWER_CASE_TABLE_NAMES: 0
 MYSQL_MAX_CONNECTIONS: 151
@@ -85,9 +86,6 @@ databases_to_update_from_dev:
 mysql_datadump_src_dir: /tmp/mysqlbackup
 mysql_datadump_target_dir: /tmp/mysqlbackup_target/
 database_update_script_dir: /tmp/gpte/databaseUpdates
-mysql_update_lms_trans_filename: lms_transactional_updates.sql
-mysql_update_lms_reporting_filename: refresh_lms_reporting.sql
-
 
 # GPTE Reporting parameters
 gpte_domain_jar: gpte-domain-1.0.jar
