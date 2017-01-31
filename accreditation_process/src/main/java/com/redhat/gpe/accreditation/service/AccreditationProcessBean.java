@@ -244,7 +244,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getBeginDate());
             problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getEndDate());
             
-            // 2)  Validate course completions
+            // 2) Validate optional accredition condition
+            problemNumber = checkAccredCondition(problemNumber, rNumber, sRule, eBuilder, sRule.getAccredCondition(), accredSet);
+            
+            // 3)  Validate course completions
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse1(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse2(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse3(), courseSet);
@@ -254,7 +257,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse7(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse8(), courseSet);
             
-            // 3)  Validate Accreditation
+            // 4)  Validate Accreditation
             problemNumber = checkAccreditation(problemNumber, rNumber, sRule, eBuilder, sRule.getAccredName(), accredSet);
  
             rNumber++;
@@ -416,6 +419,23 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         return problemNumber;
     }
     
+    private Integer checkAccredCondition(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String accredCondition, Set accredSet) {
+        if(!StringUtils.isEmpty(accredCondition)) {
+            try {
+                if(!accredSet.contains(accredCondition)) {
+                    accredSet.add(accredCondition);
+                    this.canonicalDAO.getAccreditationIdGivenName(accredCondition);
+                }
+            } catch(org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+                problemNumber++;
+                eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Accreditation condition name not found : \""+accredCondition+"\"");
+                eBuilder.append("\n"+sRule);
+            }
+        }
+        return problemNumber;
+        
+    }
+    
     private Integer checkAccreditation(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String accredName, Set accredSet) {
         if(StringUtils.isEmpty(accredName)){
             problemNumber++;
@@ -443,6 +463,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
            exchange.getIn().setHeader(SpreadsheetRule.BEGIN_DATE, sRule.getBeginDate());
            exchange.getIn().setHeader(SpreadsheetRule.END_DATE, sRule.getEndDate() == null?"":sRule.getEndDate());
            
+           if(StringUtils.isNotEmpty(sRule.getAccredCondition()))
+               exchange.getIn().setHeader(SpreadsheetRule.ACCRED_CONDITION, sRule.getAccredCondition());
+           
             exchange.getIn().setHeader(SpreadsheetRule.COURSE1, sRule.getCourse1());
             if(StringUtils.isNotEmpty(sRule.getCourse2()))
                 exchange.getIn().setHeader(SpreadsheetRule.COURSE2, sRule.getCourse2());
@@ -459,6 +482,11 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             
             exchange.getIn().setHeader(SpreadsheetRule.ACCRED_NAME, sRule.getAccredName());
             exchange.getIn().setHeader(SpreadsheetRule.RULE_NAME, sRule.getRuleName());
+    }
+    
+    public void weaveAccredConditionIntoRule(Exchange exchange) {
+        String drlRepresentation = (String)exchange.getIn().getBody();
+        logger.info("weaveAccredConditionIntoRule(); drlRepresentation = "+drlRepresentation);
     }
 
     public void changeSuffixOfRuleFileName(Exchange exchange) {

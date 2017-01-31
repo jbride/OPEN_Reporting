@@ -361,6 +361,11 @@
                 </when>
                 <otherwise><to uri="velocity:rulesTemplates/rule-template-8courses.vm"/></otherwise>
             </choice>
+            <choice>
+                <when><simple>${header.accredCondition} == null</simple>
+                    <to uri="bean:accreditationProcessBean?method=weaveAccredConditionIntoRule"/>
+                </when>
+            </choice>
             <to uri="file:{{accred_drl_rules_path}}?fileName=${header.CamelFileName}&amp;fileExist=Append"/>
         </split>
         <log message="create-drl-from-rules-spreadsheet:   Completed DRL generation to: {{accred_drl_rules_path}} ${header.CamelFileName}" />

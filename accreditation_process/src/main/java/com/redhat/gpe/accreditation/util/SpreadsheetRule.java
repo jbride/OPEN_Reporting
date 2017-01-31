@@ -12,6 +12,7 @@ public class SpreadsheetRule implements java.io.Serializable {
     public static final SimpleDateFormat rulesSDF = new SimpleDateFormat("dd-MMM-yyyy");
     public static final String BEGIN_DATE = "beginDate";
     public static final String END_DATE = "endDate";
+    public static final String ACCRED_CONDITION = "accredCondition";
     public static final String COURSE1 = "course1";
     public static final String COURSE2 = "course2";
     public static final String COURSE3 = "course3";
@@ -30,33 +31,36 @@ public class SpreadsheetRule implements java.io.Serializable {
     private String endDate;
     
     @DataField(pos=3)
-    private String course1;
+    private String accredCondition;
     
     @DataField(pos=4)
-    private String course2;
+    private String course1;
     
     @DataField(pos=5)
-    private String course3;
+    private String course2;
     
     @DataField(pos=6)
-    private String course4;
+    private String course3;
     
     @DataField(pos=7)
-    private String course5;
+    private String course4;
     
     @DataField(pos=8)
-    private String course6;
+    private String course5;
     
     @DataField(pos=9)
-    private String course7;
+    private String course6;
     
     @DataField(pos=10)
-    private String course8;
+    private String course7;
     
     @DataField(pos=11)
+    private String course8;
+    
+    @DataField(pos=12)
     private String accredName;
 
-    @DataField(pos=12)
+    @DataField(pos=13)
     private String notes;
     
     private String ruleName;
@@ -95,6 +99,14 @@ public class SpreadsheetRule implements java.io.Serializable {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getAccredCondition() {
+        return accredCondition;
+    }
+
+    public void setAccredCondition(String accredCondition) {
+        this.accredCondition = accredCondition;
     }
 
     public String getCourse1() {
@@ -179,7 +191,8 @@ public class SpreadsheetRule implements java.io.Serializable {
     @Override
     public String toString() {
         return "[ruleName="+ruleName+", beginDate=" + beginDate + ", endDate="
-                + endDate + ", course1=" + course1 + ", course2=" + course2
+                + endDate + ", accredCondition="+ accredCondition 
+                +", course1=" + course1 + ", course2=" + course2
                 + ", course3=" + course3 + ", course4=" + course4
                 + ", course5=" + course5 + ", course6=" + course6
                 + ", course7=" + course7 + ", course8=" + course8
