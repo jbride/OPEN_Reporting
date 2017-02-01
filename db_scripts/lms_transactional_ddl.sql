@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.6.24, for Win64 (x86_64)
+-- MySQL dump 10.14  Distrib 5.5.52-MariaDB, for Linux (x86_64)
 --
--- Host: docker1.ose.opentlc.com    Database: lms_transactional
+-- Host: localhost    Database: lms_transactional
 -- ------------------------------------------------------
--- Server version	5.5.47-MariaDB
+-- Server version	5.5.52-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -19,8 +19,6 @@
 -- Table structure for table `AccreditationDefinitions`
 --
 
-use lms_transactional;
-
 DROP TABLE IF EXISTS `AccreditationDefinitions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -32,9 +30,9 @@ CREATE TABLE `AccreditationDefinitions` (
   `Track` varchar(42) DEFAULT NULL,
   `Proficiency` varchar(30) DEFAULT NULL,
   `AccreditationExportID` varchar(30) DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`AccreditationID`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -50,14 +48,28 @@ CREATE TABLE `Companies` (
   `PartnerType` varchar(50) DEFAULT NULL,
   `PartnerTier` varchar(50) DEFAULT NULL,
   `LdapID` varchar(100) DEFAULT NULL,
-  `SfdcID` varchar(18) DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `SfdcId` varchar(18) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CompanyID`),
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),
   KEY `IDX_PartnerType` (`PartnerType`),
-  KEY `IDX_PartnerTier` (`PartnerTier`),
-  KEY `IDX_LdapID` (`LdapID`)
-) ENGINE=InnoDB AUTO_INCREMENT=26383 DEFAULT CHARSET=latin1;
+  KEY `IDX_PartnerTier` (`PartnerTier`)
+) ENGINE=InnoDB AUTO_INCREMENT=30073 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `CourseIdMappings`
+--
+
+DROP TABLE IF EXISTS `CourseIdMappings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `CourseIdMappings` (
+  `OldCourseId` varchar(50) NOT NULL DEFAULT '',
+  `NewCourseId` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`OldCourseId`),
+  KEY `IDX_NewCourseId` (`NewCourseId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,13 +80,13 @@ DROP TABLE IF EXISTS `CourseMappings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `CourseMappings` (
-  `OldCourseCode` varchar(50) NOT NULL,
-  `OldCourseId` varchar(50) DEFAULT NULL,
+  `OldCourseCode` varchar(100) NOT NULL,
+  `OldCourseId` varchar(100) DEFAULT NULL,
   `CourseID` varchar(50) NOT NULL,
   `Source` varchar(20) DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`OldCourseCode`),
-  KEY `IDX_OldCourseId` (`OldCourseId`),
+  KEY `IDX_NewCourseCode` (`OldCourseId`),
   KEY `IDX_Source` (`Source`),
   KEY `FK_CourseMappings_Courses` (`CourseID`),
   CONSTRAINT `FK_CourseMappings_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -91,8 +103,9 @@ DROP TABLE IF EXISTS `Courses`;
 CREATE TABLE `Courses` (
   `CourseID` varchar(50) NOT NULL DEFAULT '',
   `CourseName` varchar(200) DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CourseID`),
+  UNIQUE KEY `CourseName` (`CourseName`),
   KEY `IDX_CourseName` (`CourseName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -107,10 +120,32 @@ DROP TABLE IF EXISTS `Languages`;
 CREATE TABLE `Languages` (
   `LanguageID` varchar(5) NOT NULL,
   `LanguageName` varchar(100) DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`LanguageID`),
   UNIQUE KEY `IDX_LanguageName` (`LanguageName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Lookup`
+--
+
+DROP TABLE IF EXISTS `Lookup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Lookup` (
+  `studentid` tinyint(4) NOT NULL,
+  `email` tinyint(4) NOT NULL,
+  `accreditationid` tinyint(4) NOT NULL,
+  `accreditationname` tinyint(4) NOT NULL,
+  `accreditationdate` tinyint(4) NOT NULL,
+  `accreditationtype` tinyint(4) NOT NULL,
+  `courseid` tinyint(4) NOT NULL,
+  `coursename` tinyint(4) NOT NULL,
+  `assessmentdate` tinyint(4) NOT NULL,
+  `lastname` tinyint(4) NOT NULL,
+  `firstname` tinyint(4) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,8 +162,8 @@ CREATE TABLE `StudentAccreditations` (
   `AccreditationType` varchar(20) NOT NULL,
   `CourseID` varchar(50) NOT NULL,
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
-  `RuleFired` varchar(200) NOT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `RuleFired` varchar(200) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`StudentID`,`AccreditationID`),
   KEY `IDX_StudentAccreditations_Students` (`StudentID`),
   KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),
@@ -137,8 +172,8 @@ CREATE TABLE `StudentAccreditations` (
   KEY `IDX_StudentAccreditations_Processed` (`Processed`),
   KEY `IDX_StudentAccreditations_RuleFired` (`RuleFired`),
   CONSTRAINT `FK_StudentAccreditations_AccreditationDefinitions` FOREIGN KEY (`AccreditationID`) REFERENCES `AccreditationDefinitions` (`AccreditationID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_StudentAccreditations_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_StudentAccreditations_StudentCourses` FOREIGN KEY (`StudentID`, `CourseID`) REFERENCES `StudentCourses` (`StudentID`, `CourseID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_StudentAccreditations_StudentCourses` FOREIGN KEY (`StudentID`, `CourseID`) REFERENCES `StudentCourses` (`StudentID`, `CourseID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_StudentAccreditations_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -158,17 +193,17 @@ CREATE TABLE `StudentCourses` (
   `AssessmentResult` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `AssessmentScore` tinyint(4) NOT NULL DEFAULT '100',
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`StudentCourseID`),
   KEY `IDX_StudentCourses_Students` (`StudentID`),
   KEY `IDX_StudentCourses_Courses` (`CourseID`),
   KEY `IDX_StudentCourses_Languages` (`LanguageID`),
   KEY `IDX_StudentCourses_StudentID_CourseID` (`StudentID`,`CourseID`),
   KEY `IDX_StudentCourses_Processed` (`Processed`),
+  CONSTRAINT `FK_StudentCourses_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Languages` FOREIGN KEY (`LanguageID`) REFERENCES `Languages` (`LanguageID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_StudentCourses_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_StudentCourses_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=141070 DEFAULT CHARSET=latin1;
+  CONSTRAINT `FK_StudentCourses_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=165497 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -182,7 +217,7 @@ CREATE TABLE `StudentMappings` (
   `OldEmail` varchar(100) NOT NULL DEFAULT '',
   `NewEmail` varchar(100) DEFAULT NULL,
   `StudentID` int(11) DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`OldEmail`),
   KEY `IDX_NewEmail` (`NewEmail`),
   KEY `IDX_StudentID` (`StudentID`),
@@ -215,15 +250,13 @@ CREATE TABLE `Students` (
   `IpaStatus` tinyint(1) NOT NULL DEFAULT '0',
   `ActivationDate` datetime DEFAULT NULL,
   `DeActivationDate` datetime DEFAULT NULL,
-  `CreateDate` timestamp DEFAULT CURRENT_TIMESTAMP,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `SalesForceUserName` varchar(80) DEFAULT NULL,
   `SalesForceManagerID` varchar(18) DEFAULT NULL,
   `SalesForceAccountName` varchar(255) DEFAULT NULL,
-  `SalesForcePartnerType` varchar(40) DEFAULT NULL,
-  `SalesForcePartnerTier` varchar(40) DEFAULT NULL,
   `SalesForceJobFunctions` varchar(80) DEFAULT NULL,
   PRIMARY KEY (`StudentID`),
-  UNIQUE KEY `IDX_Unique_Email` (`Email`),
+  UNIQUE KEY `Email` (`Email`),
   KEY `IDX_Email` (`Email`),
   KEY `IDX_FirstName` (`FirstName`),
   KEY `IDX_LastName` (`LastName`),
@@ -241,7 +274,7 @@ CREATE TABLE `Students` (
   KEY `IDX_ActivationDate` (`ActivationDate`),
   KEY `IDX_DeActivationDate` (`DeActivationDate`),
   CONSTRAINT `FK_Students_Companies` FOREIGN KEY (`CompanyID`) REFERENCES `Companies` (`CompanyID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=42767 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=60126 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -253,4 +286,4 @@ CREATE TABLE `Students` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-03-25 11:11:16
+-- Dump completed on 2017-02-01 17:35:49
