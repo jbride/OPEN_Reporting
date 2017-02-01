@@ -97,14 +97,14 @@ mvn clean install -DskipTests
 +
 -----
 mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
-mysql -u lms_trans -pc-9XSHln8hJ_UH9YvNOgc9mH lms_transactional < db_scripts/lms_transactional_data.sql
+mysql -u root lms_transactional < db_scripts/lms_transactional_data.sql
 -----
 
 . Periodically, create a new test datafile from a current snapshot of your `lms_transactional` database:
 +
 -----
-mysql -u root -pc-9XSHln8hJ_UH9YvNOgc9mH mysql -e "use lms_transactional; delete from lms_transactional.Students where StudentID > 10399"
-mysqldump --no-create-db --no-create-info -u lms_trans -p'c-9XSHln8hJ_UH9YvNOgc9mH' lms_transactional > db_scripts/lms_transactional_data.sql
+mysql -u root mysql -e "use lms_transactional; delete from lms_transactional.Students where StudentID > 10399"
+mysqldump --no-create-db --no-create-info -u root lms_transactional > db_scripts/lms_transactional_data.sql
 -----
 
 === JBoss Fuse on EAP
