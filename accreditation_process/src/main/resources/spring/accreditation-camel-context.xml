@@ -362,7 +362,7 @@
                 <otherwise><to uri="velocity:rulesTemplates/rule-template-8courses.vm"/></otherwise>
             </choice>
             <choice>
-                <when><simple>${header.accredCondition} == null</simple>
+                <when><simple>${header.accredCondition} != null</simple>
                     <to uri="bean:accreditationProcessBean?method=weaveAccredConditionIntoRule"/>
                 </when>
             </choice>

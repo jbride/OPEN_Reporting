@@ -67,6 +67,12 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final Object OPEN_BRACKET = "[";
     private static final Object CLOSED_BRACKET = "]";
     private static final String GAINED_ACCRED_LOCK="gainedAccredLock";
+    private static final String WHEN = "when";
+    private static final String DOUBLE_CLOSE_PARENS = "))";
+    private static final String SINGLE_CLOSE_PAREN = ")";
+    private static final String EVAL = "eval(";
+    private static final String NEW_LINE = "\n";
+    private static final String CONSEQUENCE_FUNCTION = "determineMostRecentCourseCompletion";
     
     private static Object accredProcessLock = new Object();
     private static boolean isLocked = false;
@@ -485,8 +491,30 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
     
     public void weaveAccredConditionIntoRule(Exchange exchange) {
-        String drlRepresentation = (String)exchange.getIn().getBody();
-        logger.info("weaveAccredConditionIntoRule(); drlRepresentation = "+drlRepresentation);
+        String drl = (String)exchange.getIn().getBody();
+        String accredCondition = (String)exchange.getIn().getHeader(SpreadsheetRule.ACCRED_CONDITION);
+        logger.info("weaveAccredConditionIntoRule(); accredCondition = "+accredCondition);
+
+        // 1) weave accred fact fact into rule
+        drl = drl.replace(WHEN, WHEN+"\n    $ac:Accreditation(accreditationName == \""+accredCondition+"\")");
+
+        // 2) weave accred fact into date evaluation condition
+        int startPos = drl.indexOf(EVAL) - 5;
+        int endPos = drl.indexOf(NEW_LINE, startPos+1);
+        String evalLine = drl.substring(startPos, endPos);
+        String modifiedEvalLine = evalLine.replace(DOUBLE_CLOSE_PARENS, ", $ac"+DOUBLE_CLOSE_PARENS);
+        logger.info("weaveAccredConditionIntoRule() startPos = "+startPos+" : endPos = "+endPos+" : evalLine = "+evalLine);
+        drl = drl.replace(evalLine, modifiedEvalLine);
+
+        // 3) weave accred fact into consequence
+        startPos = drl.indexOf(CONSEQUENCE_FUNCTION);
+        endPos = drl.indexOf(SINGLE_CLOSE_PAREN, startPos)+1;
+        String consequenceString = drl.substring(startPos, endPos);
+        logger.info("weaveAccredConditionIntoRule() startPos = "+startPos+" : endPos = "+endPos+" : consequenceString = "+consequenceString);
+        String modifiedString = consequenceString.replace(SINGLE_CLOSE_PAREN, ", $ac"+SINGLE_CLOSE_PAREN);
+        drl = drl.replace(consequenceString, modifiedString);
+
+        exchange.getIn().setBody(drl);
     }
 
     public void changeSuffixOfRuleFileName(Exchange exchange) {

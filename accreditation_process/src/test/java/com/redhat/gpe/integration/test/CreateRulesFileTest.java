@@ -22,7 +22,9 @@ import java.util.List;
 public class CreateRulesFileTest extends CamelSpringTestSupport {
 
     private static final String CREATE_DRL_FROM_RULES_SPREADSHEET_URI = "direct:create-drl-from-rules-spreadsheet";
+    private static final String ACCRED_CONDITION = "Red Hat Delivery Specialist - Business Process Automation";
     private static final String HEADER_NAME_FILE = "CamelFileName";
+    private static final String DRL_SUFFIX = ".drl";
 
     public CreateRulesFileTest() throws IOException {
         PropertiesSupport.setupProps();
@@ -39,15 +41,31 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
     @Ignore
     @Test
     public void testCreate1CourseDRLFile() throws IOException {
-        String TEST_RULE_FILE_NAME = "TEST_1Course_CI_ACCREDITATION_RULES.drl";
+        String TEST_RULE_FILE_NAME = "TEST_1Course_CI_ACCREDITATION_RULES";
         Endpoint endpoint = context.getEndpoint(CREATE_DRL_FROM_RULES_SPREADSHEET_URI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
-        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME);
+        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME+DRL_SUFFIX);
 
         List<SpreadsheetRule> sRules = new ArrayList<SpreadsheetRule>();
-        addRule(sRules, 1);
+        addRule(sRules, 1, TEST_RULE_FILE_NAME);
+        in.setBody(sRules);
+        template.send(CREATE_DRL_FROM_RULES_SPREADSHEET_URI, exchange);
+    }
+
+    //@Ignore
+    @Test
+    public void testCreate1CourseWithAccredConditionDRLFile() throws IOException {
+        String TEST_RULE_FILE_NAME = "TEST_1Course_With_Accred_Condition_CI_ACCREDITATION_RULES";
+        Endpoint endpoint = context.getEndpoint(CREATE_DRL_FROM_RULES_SPREADSHEET_URI);
+        Exchange exchange = endpoint.createExchange();
+        exchange.setPattern(ExchangePattern.InOnly);
+        Message in = exchange.getIn();
+        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME+DRL_SUFFIX);
+
+        List<SpreadsheetRule> sRules = new ArrayList<SpreadsheetRule>();
+        addRule(sRules, 1, TEST_RULE_FILE_NAME, ACCRED_CONDITION);
         in.setBody(sRules);
         template.send(CREATE_DRL_FROM_RULES_SPREADSHEET_URI, exchange);
     }
@@ -61,10 +79,10 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
-        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME);
+        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME+DRL_SUFFIX);
 
         List<SpreadsheetRule> sRules = new ArrayList<SpreadsheetRule>();
-        addRule(sRules, 2);
+        addRule(sRules, 2, TEST_RULE_FILE_NAME);
         in.setBody(sRules);
         template.send(CREATE_DRL_FROM_RULES_SPREADSHEET_URI, exchange);
     }
@@ -78,10 +96,10 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
-        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME);
+        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME+DRL_SUFFIX);
 
         List<SpreadsheetRule> sRules = new ArrayList<SpreadsheetRule>();
-        addRule(sRules, 3);
+        addRule(sRules, 3, TEST_RULE_FILE_NAME);
         in.setBody(sRules);
         template.send(CREATE_DRL_FROM_RULES_SPREADSHEET_URI, exchange);
     }
@@ -95,20 +113,26 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
-        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME);
+        in.setHeader(HEADER_NAME_FILE, TEST_RULE_FILE_NAME+DRL_SUFFIX);
 
         List<SpreadsheetRule> sRules = new ArrayList<SpreadsheetRule>();
-        addRule(sRules, 4);
+        addRule(sRules, 4, TEST_RULE_FILE_NAME);
         in.setBody(sRules);
         template.send(CREATE_DRL_FROM_RULES_SPREADSHEET_URI, exchange);
     }
     
     
+    private void addRule(List<SpreadsheetRule> sRules, int numOfRules, String ruleName){
+        addRule(sRules, numOfRules, null);
+    }
     
-    private void addRule(List<SpreadsheetRule> sRules, int numOfRules){
+    private void addRule(List<SpreadsheetRule> sRules, int numOfRules, String ruleName, String accredCondition){
         SpreadsheetRule rule = new SpreadsheetRule();
         rule.setAccredName(numOfRules+"Red Hat Delivery Specialist - Cloud Management");
+        if(accredCondition != null) 
+            rule.setAccredCondition(accredCondition);
         rule.setBeginDate("01-Feb-2014");
+        rule.setRuleName(ruleName);
         for(int x=1; x<=numOfRules; x++ ){
             if(x == 1)
                 rule.setCourse1(x+"CloudForms FASTRAX");
