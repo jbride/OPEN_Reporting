@@ -61,7 +61,16 @@ public class SpreadsheetRule implements java.io.Serializable {
     private String accredName;
 
     @DataField(pos=13)
-    private String notes;
+    private String note0;
+
+    @DataField(pos=14)
+    private String note1;
+
+    @DataField(pos=15)
+    private String note2;
+
+    @DataField(pos=16)
+    private String note3;
     
     private String ruleName;
     private int spreadsheetRowNumber;
@@ -181,11 +190,30 @@ public class SpreadsheetRule implements java.io.Serializable {
         this.accredName = accredName;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getNote0() {
+        return note0;
     }
-    public void setNotes(String x) {
-        this.notes = x;
+    public void setNote0(String x) {
+        this.note0 = x;
+    }
+    public String getNote1() {
+        return note1;
+    }
+    public void setNote1(String x) {
+        this.note1 = x;
+    }
+    public String getNote2() {
+        return note2;
+    }
+    public void setNote2(String x) {
+        this.note2 = x;
+    }
+
+    public String getNote3() {
+        return note3;
+    }
+    public void setNote3(String x) {
+        this.note3 = x;
     }
 
     @Override

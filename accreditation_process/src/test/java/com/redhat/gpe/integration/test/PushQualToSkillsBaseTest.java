@@ -46,7 +46,7 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/accreditation-camel-context.xml");
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testQueryForUnpushedQuals() throws InterruptedException {
         template.setDefaultEndpointUri(pushQualsToSkillsBaseBatchURI);
