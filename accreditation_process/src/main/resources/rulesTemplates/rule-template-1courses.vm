@@ -13,7 +13,7 @@ then
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
     accreditation.setCourseName(latestCC.getName());
-    accreditation.setAccreditationDate(latestCC.getAssessmentDate());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
     accreditation.setAccreditationType("Active");
     accreditation.setRuleFired(drools.getRule().getName());
 

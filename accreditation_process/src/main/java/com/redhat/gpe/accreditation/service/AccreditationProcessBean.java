@@ -496,7 +496,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         logger.info("weaveAccredConditionIntoRule(); accredCondition = "+accredCondition);
 
         // 1) weave accred fact fact into rule
-        drl = drl.replace(WHEN, WHEN+"\n    $ac:Accreditation(accreditationName == \""+accredCondition+"\")");
+        drl = drl.replace(WHEN, WHEN+"\n    $ac:Accreditation(name == \""+accredCondition+"\")");
 
         // 2) weave accred fact into date evaluation condition
         int startPos = drl.indexOf(EVAL) - 5;
