@@ -147,6 +147,10 @@ public class GPTEBaseServiceBean {
             StringBuilder sBuilder = new StringBuilder(studentId+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
             sBuilder.append(" Most recent = "+mostRecent.getName() );
             logger.info(sBuilder.toString());
+            
+            // https://github.com/redhat-gpe/OPEN_Reporting/issues/170
+            List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId);
+            sCourses.addAll(accreds);
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
         }
         return sCourses;

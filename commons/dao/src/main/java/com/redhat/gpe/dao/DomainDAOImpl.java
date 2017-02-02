@@ -455,6 +455,20 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return sAccreds;
     }
     
+    public List<Accreditation> selectStudentAccreditationByStudentId(int studentId) {
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append("SELECT "+Student.SELECT_CLAUSE+","+AccreditationDefinition.SELECT_CLAUSE+","+StudentAccreditation.SELECT_CLAUSE+","+Course.SELECT_CLAUSE+" "); 
+        sBuilder.append("FROM Students s, AccreditationDefinitions a, StudentAccreditations sa, Courses c ");
+        sBuilder.append("WHERE sa.StudentID = s.StudentID ");
+        sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
+        sBuilder.append("AND sa.CourseID = c.CourseID ");
+        sBuilder.append("AND sa.Processed = 0 ");
+        sBuilder.append("AND s.StudentID="+studentId);
+        
+        List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
+        return sAccreds;
+    }
+    
     public int changeStatusOnExpiredStudentAccreditations() {
         
         StringBuilder sBuilder = new StringBuilder();
@@ -504,6 +518,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         logger.info("triggerStoredProcedure simpleJdbcCall = "+this.simpleJdbcCall+" : storedProcCall = "+storedProcCall);
         sbJdbcTemplate.update(storedProcCall);
     }
+
 
     
     
