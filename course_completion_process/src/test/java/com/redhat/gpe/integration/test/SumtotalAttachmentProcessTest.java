@@ -61,7 +61,7 @@ public class SumtotalAttachmentProcessTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/course-completion-camel-context.xml");
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testAttachmentProcessing() throws InterruptedException, IOException {
         

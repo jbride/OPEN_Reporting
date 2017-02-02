@@ -54,7 +54,7 @@ public class CreateRulesFileTest extends CamelSpringTestSupport {
         template.send(CREATE_DRL_FROM_RULES_SPREADSHEET_URI, exchange);
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testCreate1CourseWithAccredConditionDRLFile() throws IOException {
         String TEST_RULE_FILE_NAME = "TEST_1Course_With_Accred_Condition_CI_ACCREDITATION_RULES";

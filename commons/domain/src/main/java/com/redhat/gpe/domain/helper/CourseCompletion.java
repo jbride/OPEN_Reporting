@@ -14,7 +14,7 @@ import java.util.Date;
 public class CourseCompletion extends GPTEBaseCondition{
     
     private Course course;
-    private Student student;
+    
     private Language language;
     private StudentCourse studentCourse;
     
@@ -48,9 +48,6 @@ public class CourseCompletion extends GPTEBaseCondition{
         this.course = course;
         this.courseId = course.getCourseid();
         this.setName(course.getCoursename());
-    }
-    public Student getStudent() {
-        return student;
     }
     
     public StudentCourse getStudentCourse() {

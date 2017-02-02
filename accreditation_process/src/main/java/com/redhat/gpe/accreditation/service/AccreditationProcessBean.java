@@ -9,6 +9,7 @@ import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentAccreditation;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import org.apache.camel.Body;
@@ -521,18 +522,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
 
     public void setStudentAccreditationsJSONResponse(Exchange exchange) throws org.json.JSONException {
-        List<CourseCompletion> studentCourses = (List<CourseCompletion>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
+        List<GPTEBaseCondition> studentCourses = (List<GPTEBaseCondition>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
         JSONObject jObject = new JSONObject();
         if(studentCourses != null) {
             
             // 1)  add email
-            CourseCompletion firstCCObj = studentCourses.get(0);
+            GPTEBaseCondition firstCCObj = studentCourses.get(0);
             Student studentObj = firstCCObj.getStudent();
             jObject.put("email", studentObj.getEmail());
             
             // 2)  add List of CourseCompletion names
             List<String> courseCompletions = new ArrayList<String>();
-            for(CourseCompletion cc : studentCourses){
+            for(GPTEBaseCondition cc : studentCourses){
                 courseCompletions.add(cc.getName());
             }
             jObject.put("courseCompletions", courseCompletions);

@@ -13,7 +13,6 @@ import com.redhat.gpe.domain.canonical.StudentAccreditation;
  */
 public class Accreditation extends GPTEBaseCondition{
     private AccreditationDefinition accreditationDefinition;
-    private Student student;
     private Course course;
     private StudentAccreditation studentAccred;
     
@@ -50,11 +49,8 @@ public class Accreditation extends GPTEBaseCondition{
         this.accreditationId = accredObj.getAccreditationid();
         this.setName(accredObj.getAccreditationname());
     }
-    public Student getStudent() {
-        return student;
-    }
     public void setStudent(Student student) {
-        this.student = student;
+        super.setStudent(student);
         this.email = student.getEmail();
     }
     public Course getCourse() {
@@ -87,7 +83,7 @@ public class Accreditation extends GPTEBaseCondition{
     }
     
     public void setName(String accreditationName) {
-        this.setName(accreditationName);
+        super.setName(accreditationName);
         this.accreditationDefinition.setAccreditationname(accreditationName);
     }
     public Integer getStudentId() {
@@ -121,7 +117,7 @@ public class Accreditation extends GPTEBaseCondition{
         this.course.setCoursename(courseName);
     }
     public void setCompletionDate(Date cDate) {
-        this.setCompletionDate(cDate);
+        super.setCompletionDate(cDate);
         this.studentAccred.setAccreditationdate(new Timestamp(cDate.getTime()));
     }
     public String getAccreditationType() {

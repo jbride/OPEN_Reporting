@@ -193,7 +193,9 @@
         </description>
         <from uri="vm:get-course-by-course-name" />
         <log message="get-course-by-course-name:  body = ${body}" />
-        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName(${body}, null)" id="getCourseByCourseName"/>
+
+        <!-- This known to bomb when executing non-related unit testing.  Not sure why.  Comment out during unit testing -->
+        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName(${body}, null)" id="getCourseByCourseName"/> 
     </route>
 
     <route id="send-email">

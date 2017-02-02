@@ -142,16 +142,18 @@ public class GPTEBaseServiceBean {
         if(sCourses == null || sCourses.isEmpty()) {
             logger.warn("selectStudentCoursesByStudent() no student courses found of studentId = "+studentId);
         }else {
+
             GPTEBaseCondition mostRecent = sCourses.get(0);
-            //sCourses.get(0).setMostRecentCourseCompletion(true);
-            StringBuilder sBuilder = new StringBuilder(studentId+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
-            sBuilder.append(" Most recent = "+mostRecent.getName() );
-            logger.info(sBuilder.toString());
-            
+           
             // https://github.com/redhat-gpe/OPEN_Reporting/issues/170
             List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId);
             sCourses.addAll(accreds);
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
+
+            //sCourses.get(0).setMostRecentCourseCompletion(true);
+            StringBuilder sBuilder = new StringBuilder(studentId+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
+            sBuilder.append(" Most recent = "+mostRecent.getName() );
+            logger.info(sBuilder.toString());
         }
         return sCourses;
     }

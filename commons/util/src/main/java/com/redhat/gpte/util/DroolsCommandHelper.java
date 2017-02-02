@@ -49,7 +49,7 @@ public class DroolsCommandHelper implements ApplicationContextAware {
 
     public void insertAndFireAll(Exchange exchange) {
         final Message in = exchange.getIn();
-        List<CourseCompletion> factList = (List<CourseCompletion>) in.getBody();
+        List<GPTEBaseCondition> factList = (List<GPTEBaseCondition>) in.getBody();
         if(factList.size() == 0)
             throw new RuntimeException("DroolsCommandHelper() No facts are being inserted into session");
         
@@ -59,7 +59,7 @@ public class DroolsCommandHelper implements ApplicationContextAware {
         final List<GenericCommand<?>> commands = command.getCommands();
         commands.add(new InsertObjectCommand(studentObj));
 
-        for (CourseCompletion courseCompletion : factList) {
+        for (GPTEBaseCondition courseCompletion : factList) {
             commands.add(new InsertObjectCommand(courseCompletion));
         }
         commands.add(new FireAllRulesCommand());
