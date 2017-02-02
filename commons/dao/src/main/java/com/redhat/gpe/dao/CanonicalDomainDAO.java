@@ -11,6 +11,7 @@ import com.redhat.gpe.domain.canonical.StudentAccreditation;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 
 public interface CanonicalDomainDAO {
     
@@ -44,7 +45,7 @@ public interface CanonicalDomainDAO {
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus);
     public List<Integer> selectStudentIdsWithStudentCoursesByStatus(int processedStatus, int lowStudentId, int highStudentId);
     public List<Integer> selectStudentCourseIdsByStatus(int processedStatus);
-    public List<CourseCompletion> selectPassedStudentCoursesByStudent(int studentId);
+    public List<GPTEBaseCondition> selectPassedStudentCoursesByStudent(int studentId);
     public boolean isNewStudentCourseForStudent(StudentCourse sCourse);
     public int getUniqueStudentCourseCount(StudentCourse scObj);
     

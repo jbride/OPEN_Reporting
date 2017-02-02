@@ -4,6 +4,7 @@ import com.redhat.gpe.domain.canonical.*;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.lang3.StringUtils;
@@ -352,7 +353,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return sCourseIds;
     }
 
-    public List<CourseCompletion> selectPassedStudentCoursesByStudent(int studentId) {
+    public List<GPTEBaseCondition> selectPassedStudentCoursesByStudent(int studentId) {
         StringBuilder sBuilder = new StringBuilder();
         
         // StudentCourse has both CourseID and CourseName
@@ -385,7 +386,11 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             }
         }
         
-        return sCourses;
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/170
+        List<GPTEBaseCondition> coursesAndAccreds = new ArrayList<GPTEBaseCondition>();
+        coursesAndAccreds.addAll(sCourses);
+        
+        return coursesAndAccreds;
     }
 
     public int getUniqueStudentCourseCount(StudentCourse scObj) {

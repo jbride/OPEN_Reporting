@@ -1,7 +1,6 @@
 package com.redhat.gpe.accreditation.service;
 
 import com.redhat.gpe.accreditation.util.Constants;
-import com.redhat.gpe.accreditation.util.ListSizeComparator;
 import com.redhat.gpe.accreditation.util.SpreadsheetRule;
 import com.redhat.gpe.accreditation.util.WebClientDevWrapper;
 import com.redhat.gpe.domain.canonical.AccreditationDefinition;
@@ -12,8 +11,6 @@ import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
-import com.sun.xml.bind.v2.util.QNameMap.Entry;
-
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -32,7 +29,6 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,7 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AccreditationProcessBean extends GPTEBaseServiceBean {
 

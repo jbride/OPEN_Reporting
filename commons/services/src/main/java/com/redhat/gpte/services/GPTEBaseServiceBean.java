@@ -19,6 +19,7 @@ import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentCourse;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 
 public class GPTEBaseServiceBean {
     
@@ -127,7 +128,7 @@ public class GPTEBaseServiceBean {
         canonicalDAO.triggerStoredProcedure(storedProcName);
     }
     
-    public List<CourseCompletion> selectStudentCoursesByStudent(Exchange exchange) {
+    public List<GPTEBaseCondition> selectStudentCoursesByStudent(Exchange exchange) {
         Object studentIdObj = exchange.getIn().getBody();
         Integer studentId = 0;
         if(studentIdObj instanceof String)
@@ -137,13 +138,13 @@ public class GPTEBaseServiceBean {
         if(studentId == null || studentId == 0)
             throw new RuntimeException("selectStudentCoursesByStudent() must pass a studentId");
 
-        List<CourseCompletion> sCourses = canonicalDAO.selectPassedStudentCoursesByStudent(studentId);
+        List<GPTEBaseCondition> sCourses = canonicalDAO.selectPassedStudentCoursesByStudent(studentId);
         if(sCourses == null || sCourses.isEmpty()) {
             logger.warn("selectStudentCoursesByStudent() no student courses found of studentId = "+studentId);
         }else {
-            CourseCompletion mostRecent = sCourses.get(0);
-            sCourses.get(0).setMostRecentCourseCompletion(true);
-            StringBuilder sBuilder = new StringBuilder(mostRecent.getStudent().getEmail()+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
+            GPTEBaseCondition mostRecent = sCourses.get(0);
+            //sCourses.get(0).setMostRecentCourseCompletion(true);
+            StringBuilder sBuilder = new StringBuilder(studentId+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
             sBuilder.append(" Most recent = "+mostRecent.getName() );
             logger.info(sBuilder.toString());
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
