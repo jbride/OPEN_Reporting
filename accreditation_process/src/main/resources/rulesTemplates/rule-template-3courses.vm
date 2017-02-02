@@ -2,19 +2,19 @@
 rule "${headers.ruleName}_with_3_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "${headers.course1}")
-    $cc2:CourseCompletion(this != $cc1, courseName == "${headers.course2}")
-    $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "${headers.course3}")
+    $cc1:CourseCompletion(name == "${headers.course1}")
+    $cc2:CourseCompletion(this != $cc1, name == "${headers.course2}")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "${headers.course3}")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "${headers.beginDate}", "${headers.endDate}", $cc1, $cc2, $cc3))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3);
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("${headers.accredName}");
+    accreditation.setName("${headers.accredName}");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
-    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setCourseName(latestCC.getName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
     accreditation.setRuleFired(drools.getRule().getName());

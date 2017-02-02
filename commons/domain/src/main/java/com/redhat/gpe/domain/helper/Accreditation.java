@@ -11,20 +11,18 @@ import com.redhat.gpe.domain.canonical.StudentAccreditation;
 /* 
  * Denormalized wrapper of a student accrediation
  */
-public class Accreditation {
+public class Accreditation extends GPTEBaseCondition{
     private AccreditationDefinition accreditationDefinition;
     private Student student;
     private Course course;
     private StudentAccreditation studentAccred;
     
     private Integer accreditationId = 0;
-    private String  accreditationName;
     private Integer studentId = 0;
     private String  email;
     private String courseId;
     private String courseName;
     
-    private Date accreditationDate;
     private String accreditationType = StudentAccreditation.Types.Active.name();
     private String ruleFired;  // name of rule that instantiated this Accreditation object
     
@@ -34,8 +32,8 @@ public class Accreditation {
         this.course = new Course();
         this.studentAccred = new StudentAccreditation();
         
-        if(accreditationDate == null)
-            this.setAccreditationDate(new Timestamp(new Date().getTime()));
+        if(completionDate == null)
+            this.setCompletionDate(new Timestamp(new Date().getTime()));
     }
     public String getRuleFired() {
         return ruleFired;
@@ -50,7 +48,7 @@ public class Accreditation {
     public void setAccreditation(AccreditationDefinition accredObj) {
         this.accreditationDefinition = accredObj;
         this.accreditationId = accredObj.getAccreditationid();
-        this.accreditationName = accredObj.getAccreditationname();
+        this.setName(accredObj.getAccreditationname());
     }
     public Student getStudent() {
         return student;
@@ -72,7 +70,7 @@ public class Accreditation {
     }
     public void setStudentAccred(StudentAccreditation sAccredObj) {
         this.studentAccred = sAccredObj;
-        this.accreditationDate = sAccredObj.getAccreditationdate();
+        this.completionDate = sAccredObj.getAccreditationdate();
         this.accreditationType = sAccredObj.getAccreditationtype();
     }
     
@@ -87,11 +85,9 @@ public class Accreditation {
         accreditationDefinition.setAccreditationid(accreditationId);
         studentAccred.setAccreditationid(accreditationId);
     }
-    public String getAccreditationName() {
-        return accreditationName;
-    }
-    public void setAccreditationName(String accreditationName) {
-        this.accreditationName = accreditationName;
+    
+    public void setName(String accreditationName) {
+        this.setName(accreditationName);
         this.accreditationDefinition.setAccreditationname(accreditationName);
     }
     public Integer getStudentId() {
@@ -124,12 +120,9 @@ public class Accreditation {
         this.courseName = courseName;
         this.course.setCoursename(courseName);
     }
-    public Date getAccreditationDate() {
-        return accreditationDate;
-    }
-    public void setAccreditationDate(Date accreditationDate) {
-        this.accreditationDate = accreditationDate;
-        this.studentAccred.setAccreditationdate(new Timestamp(accreditationDate.getTime()));
+    public void setCompletionDate(Date cDate) {
+        this.setCompletionDate(cDate);
+        this.studentAccred.setAccreditationdate(new Timestamp(cDate.getTime()));
     }
     public String getAccreditationType() {
         return accreditationType;

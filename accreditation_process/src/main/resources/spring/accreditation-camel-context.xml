@@ -288,7 +288,7 @@
 
 
     <!--    *************************************************************************************************   -->
-    <!--    *************       RULES SPREADSHEET VALIDATION AND TRANSFORMACTION TO DRL         *************   -->
+    <!--    *************       RULES SPREADSHEET VALIDATION AND TRANSFORMATION TO DRL         *************   -->
 
     <route id="receive-new-accreditation-spreadsheet">
         <description>

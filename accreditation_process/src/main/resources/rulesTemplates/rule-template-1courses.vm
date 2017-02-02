@@ -2,17 +2,17 @@
 rule "${headers.ruleName}_with_1_course"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "${headers.course1}")
+    $cc1:CourseCompletion(name == "${headers.course1}")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "${headers.beginDate}", "${headers.endDate}", $cc1))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1);
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("${headers.accredName}");
+    accreditation.setName("${headers.accredName}");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
-    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setCourseName(latestCC.getName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
     accreditation.setRuleFired(drools.getRule().getName());

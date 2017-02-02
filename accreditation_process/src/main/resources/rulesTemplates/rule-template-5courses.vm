@@ -2,21 +2,21 @@
 rule "${headers.ruleName}_with_5_courses"
 when
     $student:Student()
-    $cc1:CourseCompletion(courseName == "${headers.course1}")
-    $cc2:CourseCompletion(this != $cc1, courseName == "${headers.course2}")
-    $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "${headers.course3}")
-    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, courseName == "${headers.course4}")
-    $cc5:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, courseName == "${headers.course5}")
+    $cc1:CourseCompletion(name == "${headers.course1}")
+    $cc2:CourseCompletion(this != $cc1, name == "${headers.course2}")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "${headers.course3}")
+    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "${headers.course4}")
+    $cc5:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, name == "${headers.course5}")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "${headers.beginDate}", "${headers.endDate}", $cc1, $cc2, $cc3, $cc4, $cc5 ))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4, $cc5 );
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("${headers.accredName}");
+    accreditation.setName("${headers.accredName}");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
-    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setCourseName(latestCC.getName());
     accreditation.setAccreditationDate(latestCC.getAssessmentDate());
     accreditation.setAccreditationType("Active");
     accreditation.setRuleFired(drools.getRule().getName());

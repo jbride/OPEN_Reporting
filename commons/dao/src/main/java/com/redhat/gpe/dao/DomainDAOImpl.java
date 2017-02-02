@@ -377,8 +377,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 boolean courseRemoved = sCourses.remove(ccObj);
                 sBuilder = new StringBuilder();
                 sBuilder.append(ccObj.getStudent().getEmail());
-                sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName());
-                sBuilder.append(" : "+sdfObj.format(ccObj.getAssessmentDate())+" : removed = "+courseRemoved);
+                sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getName());
+                sBuilder.append(" : "+sdfObj.format(ccObj.getCompletionDate())+" : removed = "+courseRemoved);
                 logger.info(sBuilder.toString());
             }else {
                 courseSet.add(ccObj.getCourseId());

@@ -1,0 +1,17 @@
+package com.redhat.gpe.accreditation.rules;
+
+import java.util.ArrayList;
+
+dialect "mvel"
+
+global ArrayList accreditationList
+
+
+// Purpose:  
+//   AccreditionService requires at least one rule to be present
+//   Ensures that (in particular during dev and test scenarious) the rulebase is seeded with at least 1 rule
+rule "SanityCheck"
+when
+then
+    System.out.println("SanityCheck fired");
+end

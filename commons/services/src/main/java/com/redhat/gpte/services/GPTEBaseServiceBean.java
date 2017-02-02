@@ -144,7 +144,7 @@ public class GPTEBaseServiceBean {
             CourseCompletion mostRecent = sCourses.get(0);
             sCourses.get(0).setMostRecentCourseCompletion(true);
             StringBuilder sBuilder = new StringBuilder(mostRecent.getStudent().getEmail()+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");
-            sBuilder.append(" Most recent = "+mostRecent.getCourseName() );
+            sBuilder.append(" Most recent = "+mostRecent.getName() );
             logger.info(sBuilder.toString());
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
         }

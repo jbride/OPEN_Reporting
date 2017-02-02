@@ -11,7 +11,7 @@ import java.util.Date;
 /*
  * Denormalized wrapper of a student course completion
  */
-public class CourseCompletion {
+public class CourseCompletion extends GPTEBaseCondition{
     
     private Course course;
     private Student student;
@@ -19,13 +19,11 @@ public class CourseCompletion {
     private StudentCourse studentCourse;
     
     private String courseId;
-    private String courseName;
     
     private String languageId;
     private String languageName;
     
     private int studentCourseId = 0;
-    private Date assessmentDate;
     private String formattedAssessmentDate;
     private String assessmentResult;
     private byte assessmentScore;
@@ -49,7 +47,7 @@ public class CourseCompletion {
     public void setCourse(Course course) {
         this.course = course;
         this.courseId = course.getCourseid();
-        this.courseName = course.getCoursename();
+        this.setName(course.getCoursename());
     }
     public Student getStudent() {
         return student;
@@ -61,7 +59,7 @@ public class CourseCompletion {
     public void setStudentCourse(StudentCourse studentCourse) {
         this.studentCourse = studentCourse;
         this.studentCourseId = studentCourse.getStudentcourseid();
-        this.assessmentDate = studentCourse.getAssessmentdate();
+        this.completionDate = studentCourse.getAssessmentdate();
         this.assessmentResult = studentCourse.getAssessmentresult();
         this.assessmentScore = studentCourse.getAssessmentscore();
         this.processed  = studentCourse.isProcessed();
@@ -82,15 +80,7 @@ public class CourseCompletion {
     public void setCourseId(String courseId) {
         this.courseId = courseId;
     }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
-
+    
     public String getLanguageId() {
         return languageId;
     }
@@ -113,14 +103,6 @@ public class CourseCompletion {
 
     public void setStudentCourseId(int studentCourseId) {
         this.studentCourseId = studentCourseId;
-    }
-
-    public Date getAssessmentDate() {
-        return assessmentDate;
-    }
-
-    public void setAssessmentDate(Date assessmentDate) {
-        this.assessmentDate = assessmentDate;
     }
 
     public String getAssessmentResult() {
@@ -158,9 +140,9 @@ public class CourseCompletion {
     public String toString() {
         return "CourseCompletion [course=" + course + ", student=" + student
                 + ", language=" + language + ", studentCourse=" + studentCourse
-                + ", courseName=" + courseName + ", languageId=" + languageId
+                + ", courseName=" + name + ", languageId=" + languageId
                 + ", languageName=" + languageName + ", studentCourseId="
-                + studentCourseId + ", assessmentDate=" + assessmentDate
+                + studentCourseId + ", assessmentDate=" + completionDate
                 + ", assessmentResult=" + assessmentResult
                 + ", assessmentScore=" + assessmentScore + ", processed="
                 + processed + ", mostRecentCourseCompletion="
@@ -168,7 +150,7 @@ public class CourseCompletion {
     }
 
     public String getFormattedAssessmentDate() {
-        return sdf.format(assessmentDate);
+        return sdf.format(completionDate);
     }
 
     public void setFormattedAssessmentDate(String formattedAssessmentDate) {

@@ -182,8 +182,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         if(accredObj.getAccreditationId() != null && accredObj.getAccreditationId() != 0)
             return;
         
-        int accredId = canonicalDAO.getAccreditationIdGivenName(accredObj.getAccreditationName());
-        logger.debug(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getAccreditationName());
+        int accredId = canonicalDAO.getAccreditationIdGivenName(accredObj.getName());
+        logger.debug(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getName());
         accredObj.setAccreditationId(accredId);
     }
     
@@ -538,7 +538,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             // 2)  add List of CourseCompletion names
             List<String> courseCompletions = new ArrayList<String>();
             for(CourseCompletion cc : studentCourses){
-                courseCompletions.add(cc.getCourseName());
+                courseCompletions.add(cc.getName());
             }
             jObject.put("courseCompletions", courseCompletions);
         
