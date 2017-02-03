@@ -36,6 +36,7 @@ public interface CanonicalDomainDAO {
     public Course getCourseByCourseId(String courseId);
     public List<Course> listCanonicalCourses();
     public int[] deleteAllFromCoursesAndCourseMappings();
+    public void insertIntoCourseAndMappings(String courseId, String courseName, String prunedMappedName);
     
     
     /* *******  Student Courses  ********/

@@ -41,7 +41,7 @@ import java.util.HashSet;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
-    
+    private static final String COURSE_REFRESH_COUNTER = "COURSE_REFRESH_COUNTER";    
     private static final String ENGLISH = "EN_US";
     private static final String SUMTOTAL_COMPLETED = "COMPLETED";
     private static final byte coursePassingValue = 70;
@@ -62,6 +62,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String COURSE_MAPPING_ROWS_AFFECTED = "COURSE_MAPPING_ROWS_AFFECTED";
 
     private static final String COMMA = ",";
+    private static final String TAB = "\\t";
+    private static final String SINGLE_TAB = "\t";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = true;
@@ -406,7 +408,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         return course;
     }
 
-    public Course getCourseByCourseName(String courseName) {
+    public Course getCourseByCourseName(@Body String courseName) {
         return canonicalDAO.getCourseByCourseName(courseName, null);
     }
     
@@ -560,6 +562,27 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         exchange.getIn().setHeader(COURSE_MAPPING_ROWS_AFFECTED, new Integer(result[1]).toString());
     }
 
+    public void processCourseRefreshSpreadsheetRecord(Exchange exchange) {
+        String ssRecord = (String)exchange.getIn().getBody();
+
+        if(StringUtils.isEmpty(ssRecord) || (ssRecord.indexOf(COURSE_MAPPINGS_FIRST_LINE) > 0) || ssRecord.startsWith(SINGLE_TAB))
+            return;
+
+        Integer counter = (Integer)exchange.getProperty("CamelSplitIndex");
+
+        //logger.info("processCourseRefreshSpreadsheetRecord() ssRecord = "+ssRecord);
+        String[] courseMFields = ssRecord.split(TAB);
+        String prunedMappedName = courseMFields[0].trim();
+        String courseId = courseMFields[1].trim();
+        String courseName = courseMFields[2].trim();
+
+        if(StringUtils.isEmpty(prunedMappedName) || StringUtils.isEmpty(courseId) || StringUtils.isEmpty(courseName) )
+            throw new RuntimeException(counter+" : processCourseRefreshSpreadsheetRecord() empty field: "+prunedMappedName+" : "+courseId+" : "+courseName);
+
+        canonicalDAO.insertIntoCourseAndMappings(courseId, courseName, prunedMappedName);
+ 
+        //logger.info(counter+" processCourseRefreshSpreadsheetRecord() ssRecord = "+ssRecord);
+    }
     
     
  
