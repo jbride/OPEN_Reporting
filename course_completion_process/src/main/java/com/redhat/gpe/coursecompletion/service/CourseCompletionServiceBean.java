@@ -58,6 +58,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String STUDENT_ISSUES_OUTPUT_DIR="/tmp/gpte/studentIssues";
     private static final String STUDENT_ISSUES_OUTPUT = "gpte_student_issues.txt";
 
+    private static final String COURSE_ROWS_AFFECTED = "COURSE_ROWS_AFFECTED";
+    private static final String COURSE_MAPPING_ROWS_AFFECTED = "COURSE_MAPPING_ROWS_AFFECTED";
+
     private static final String COMMA = ",";
 
     private Logger logger = Logger.getLogger(getClass());
@@ -542,9 +545,20 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         boolean result = canonicalDAO.isNewStudentCourseForStudent(sCourse);
         return result;
     }
+
 /* ****************************************************************************** */
 
-    
+
+
+
+/* **************           Courses and CourseMappings              *************   */
+
+
+    public void deleteAllFromCoursesAndCourseMappings(Exchange exchange) {
+        int[] result = canonicalDAO.deleteAllFromCoursesAndCourseMappings();
+        exchange.getIn().setHeader(COURSE_ROWS_AFFECTED, new Integer(result[0]).toString());
+        exchange.getIn().setHeader(COURSE_MAPPING_ROWS_AFFECTED, new Integer(result[1]).toString());
+    }
 
     
     

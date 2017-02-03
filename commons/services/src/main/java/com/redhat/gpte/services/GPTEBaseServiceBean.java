@@ -35,6 +35,7 @@ public class GPTEBaseServiceBean {
     public static final String CAMEL_FILE_NAME="CamelFileName";
     public static final String QUERY_LDAP = "queryldap";
     public static final String UPDATE_COMPANY = "updatecompany";
+    public static final String COURSE_MAPPINGS_FIRST_LINE = "PrunedCourseId    CourseId    CourseName";
     
     private Logger logger = Logger.getLogger(getClass());
 

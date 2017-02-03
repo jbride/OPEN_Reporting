@@ -288,6 +288,22 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         List<Course> courses = sbJdbcTemplate.query(sBuilder.toString(), new CourseRowMapper());
         return courses;
     }
+
+    /*
+     * Deletes all from both Courses and CourseMappings tables;
+     * Returns:
+     *   int[0] = # of records deleted from Courses
+     *   int[1] = # of records deleted from CourseMappings
+     */
+    public int[] deleteAllFromCoursesAndCourseMappings() {
+        int[] affectedRows = new int[2];
+        StringBuilder sBuilder = new StringBuilder("delete from Courses");
+        affectedRows[0] = sbJdbcTemplate.update(sBuilder.toString());
+
+        sBuilder = new StringBuilder("delete from CourseMappings");
+        affectedRows[1] = sbJdbcTemplate.update(sBuilder.toString());
+        return affectedRows;
+    }
     
 /* ******************************************************************************* */
     
@@ -503,5 +519,6 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
     
 /*****************************************************/
-    
+
+
 }

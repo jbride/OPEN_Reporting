@@ -173,6 +173,41 @@
         </choice>
     </route>
 
+
+
+    <!--    **********                    COURSE and COURSE MAPPINGS maintenance                    *********   -->
+
+    <route id="process-new-courses-and-mappings" >
+        <description>
+            https://github.com/redhat-gpe/OPEN_Reporting/issues/197
+            Provide ops team with ability to make changes to Courses and CourseMappings tables
+
+            Overview:
+                - GPTE Reporting rules accreditation spreadsheet includes the following tab:   Courses and CourseMappings
+                - This spreadsheet can be downloaded as a tab separated value (tsv) file and emailed to the GPTE Reporting email account used in development:  rhtgptetest@yahoo.com
+                - The Course and CourseMappings spreadsheet is processed by this service.
+                - The contents of the spreadsheet will completely replace any and all data in both Courses and CourseMappings tables of lms_transactional database.
+        </description>
+        <from uri="vm:cc_process-new-courses-and-mappings-uri" />
+        <to uri="bean:cCompletionServiceBean?method=deleteAllFromCoursesAndCourseMappings" /> 
+
+        <!-- 1)  Blow away existing data in both Courses and CourseMappings -->
+        <log message="Following # of records deleted from Course and CourseMappings tables: ${header.COURSE_ROWS_AFFECTED} :  ${header.COURSE_MAPPING_ROWS_AFFECTED}" />
+
+        <!-- 2)  Iterate through each row of spreadsheet -->
+        <split streaming="true" >
+            <tokenize token="\n" />
+            <log message="${body}" />
+        </split>
+    </route>
+
+    <!--    *************************************************************************************************   -->
+
+
+
+
+
+
     <!--    *************************************************************************************************   -->
     <!--    *************                       Pathgather                                      *************   -->
     <route id="update-pathgather-with-accreditation" >
