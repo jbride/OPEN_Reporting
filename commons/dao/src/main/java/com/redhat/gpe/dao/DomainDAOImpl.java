@@ -236,7 +236,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append("where c.CourseName = \""+courseName+"\"");
         }else {
             sBuilder.append(", CourseMappings cm ");
-            sBuilder.append("where c.CourseID = cm.CourseID and cm.OldCourseId=\"");
+            sBuilder.append("where c.CourseID = cm.CourseID and cm.PrunedCourseID=\"");
             sBuilder.append(courseName);
             sBuilder.append("\" LIMIT 1");
         }
@@ -252,7 +252,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             // 2) Second attempt:  retreive from CourseMappings table
             sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c, CourseMappings cm ");
             sBuilder.append("where cm.CourseId = c.CourseId ");
-            sBuilder.append("and cm.oldCourseId=\""+courseName+"\" LIMIT 1");
+            sBuilder.append("and cm.PrunedCourseID=\""+courseName+"\" LIMIT 1");
 
             // If not found, will throw:  org.springframework.dao.EmptyResultDataAccessException: Incorrect result size: expected 1, actual 0
             courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
@@ -275,7 +275,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             // 2) Second attempt:  retreive from CourseMappings table
             sBuilder = new StringBuilder("select c.CourseID, c.CourseName from Courses c, CourseMappings cm ");
             sBuilder.append("where cm.CourseId = c.CourseId ");
-            sBuilder.append("and cm.oldCourseId=\""+courseId+"\" LIMIT 1");
+            sBuilder.append("and cm.PrunedCourseID=\""+courseId+"\" LIMIT 1");
             courseObj = sbJdbcTemplate.queryForObject(sBuilder.toString(), new CourseRowMapper());
         }
         return courseObj;

@@ -71,7 +71,7 @@ mvn clean install -DskipTests
 . Seed the `lms_transactional` database with test data
 +
 -----
-mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
+mysql -u root lms_transactional <  db_scripts/lms_transactional_ddl.sql
 mysql -u root lms_transactional < db_scripts/lms_transactional_data.sql
 -----
 
