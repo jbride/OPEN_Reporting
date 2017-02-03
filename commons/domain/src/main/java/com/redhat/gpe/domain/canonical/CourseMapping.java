@@ -15,7 +15,6 @@ public class CourseMapping implements Serializable {
 
     private static final long serialVersionUID = 391429063;
 
-    private String oldcoursecode;
     private String newcoursecode;
     private String courseid;
     private String source;
@@ -23,30 +22,19 @@ public class CourseMapping implements Serializable {
     public CourseMapping() {}
 
     public CourseMapping(CourseMapping value) {
-        this.oldcoursecode = value.oldcoursecode;
         this.newcoursecode = value.newcoursecode;
         this.courseid = value.courseid;
         this.source = value.source;
     }
 
     public CourseMapping(
-        String oldcoursecode,
         String newcoursecode,
         String courseid,
         String source
     ) {
-        this.oldcoursecode = oldcoursecode;
         this.newcoursecode = newcoursecode;
         this.courseid = courseid;
         this.source = source;
-    }
-
-    public String getOldcoursecode() {
-        return this.oldcoursecode;
-    }
-
-    public void setOldcoursecode(String oldcoursecode) {
-        this.oldcoursecode = oldcoursecode;
     }
 
     public String getNewcoursecode() {
@@ -77,7 +65,6 @@ public class CourseMapping implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder("Coursemappings (");
 
-        sb.append(oldcoursecode);
         sb.append(", ").append(newcoursecode);
         sb.append(", ").append(courseid);
         sb.append(", ").append(source);
