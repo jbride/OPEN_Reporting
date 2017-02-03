@@ -52,6 +52,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String STUDENT_REG = "student_registration";
     private static final Object STUDENT_UPDATE = "student_update";
     private static final Object RULES_SPREADSHEET = "rules_spreadsheet";
+    private static final String COURSE_MAPPINGS_SPREADSHEET = "course_mappings_spreadsheet";
     private static final String ROUTE_SPECIFIC_EMAILS="ROUTE_SPECIFIC_EMAILS";
 
     private Logger logger = Logger.getLogger(getClass());
@@ -180,6 +181,8 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
             exchange.getIn().setBody(body);
         }else if(body.startsWith(RULES_SPREADSHEET_FIRST_LINE)){
             exchange.getIn().setHeader(ATTACHMENT_TYPE, RULES_SPREADSHEET);
+        }else if(body.startsWith(COURSE_MAPPINGS_FIRST_LINE)){
+            exchange.getIn().setHeader(ATTACHMENT_TYPE, COURSE_MAPPINGS_SPREADSHEET);
         }else {
             String theReturnEmail = null;
             Object inObj = exchange.getIn().getHeader(RETURN_PATH);

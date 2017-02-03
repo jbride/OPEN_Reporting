@@ -31,7 +31,7 @@
   </bean>
 
 
-  <camelContext trace="false" id="gpte-universal-process" xmlns="http://camel.apache.org/schema/spring">
+  <camelContext trace="false" id="gpte-shared-process" xmlns="http://camel.apache.org/schema/spring">
 
     <dataFormats>
       <json id="courseMarshaller" library="Jackson" unmarshalTypeName="com.redhat.gpe.domain.canonical.Course" />
@@ -159,6 +159,10 @@
                 <when>
                     <simple>${header.ATTACHMENT_TYPE} == "student_update"</simple>
                     <to uri="vm:sr_process-student-updates-uri" />
+                </when>
+                <when>
+                    <simple>${header.ATTACHMENT_TYPE} == "course_mappings_spreadsheet"</simple>
+                    <to uri="vm:cc_process-new-courses-and-mappings-uri" />
                 </when>
                 <otherwise>
                     <throwException ref="invalidTypeEx" />

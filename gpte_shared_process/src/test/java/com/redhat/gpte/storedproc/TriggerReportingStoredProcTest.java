@@ -27,7 +27,7 @@ public class TriggerReportingStoredProcTest extends CamelSpringTestSupport {
 
     @Override
     protected AbstractApplicationContext createApplicationContext() {
-        return new ClassPathXmlApplicationContext("/spring/gpte-universal-camel-context.xml");
+        return new ClassPathXmlApplicationContext("/spring/gpte-shared-camel-context.xml");
     }
 
 
