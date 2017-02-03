@@ -174,14 +174,24 @@ function deploySReg() {
     fi
 }
 
+function deployNew() {
+    mvn clean install -DskipTests
+    cp commons/domain/target/gpte-domain-1.0.jar /opt/jboss/jboss-eap-6.4/modules/com/redhat/gpte/main/
+    cp course_completion_process/target/course-completion-process-1.0.war /opt/jboss/jboss-eap-6.4/standalone/deployments/
+    cp gpte_shared_process/target/gpte-shared-process-1.0.war /opt/jboss/jboss-eap-6.4/standalone/deployments/
+    cp student_registration_process/target/student-registration-process-1.0.war /opt/jboss/jboss-eap-6.4/standalone/deployments/
+}
+
 if [ ! -z "$HELP" ]; then
     help
 else
-    ensurePreReqs
-    readPropertiesFile
-    checkRemotePort
+    #ensurePreReqs
+    #readPropertiesFile
+    #checkRemotePort
     #deployJBossModules
-    deployCC
-    deploySReg
-    deployShared
+    #deployCC
+    #deploySReg
+    #deployShared
+
+    deployNew
 fi
