@@ -80,14 +80,10 @@ DROP TABLE IF EXISTS `CourseMappings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `CourseMappings` (
-  `OldCourseCode` varchar(100) NOT NULL,
-  `OldCourseId` varchar(100) DEFAULT NULL,
+  `PrunedCourseID` varchar(100) NOT NULL,
   `CourseID` varchar(50) NOT NULL,
-  `Source` varchar(20) DEFAULT NULL,
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`OldCourseCode`),
-  KEY `IDX_NewCourseCode` (`OldCourseId`),
-  KEY `IDX_Source` (`Source`),
+  KEY `IDX_NewCourseCode` (`PrunedCourseID`),
   KEY `FK_CourseMappings_Courses` (`CourseID`),
   CONSTRAINT `FK_CourseMappings_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
@@ -124,28 +120,6 @@ CREATE TABLE `Languages` (
   PRIMARY KEY (`LanguageID`),
   UNIQUE KEY `IDX_LanguageName` (`LanguageName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Lookup`
---
-
-DROP TABLE IF EXISTS `Lookup`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Lookup` (
-  `studentid` tinyint(4) NOT NULL,
-  `email` tinyint(4) NOT NULL,
-  `accreditationid` tinyint(4) NOT NULL,
-  `accreditationname` tinyint(4) NOT NULL,
-  `accreditationdate` tinyint(4) NOT NULL,
-  `accreditationtype` tinyint(4) NOT NULL,
-  `courseid` tinyint(4) NOT NULL,
-  `coursename` tinyint(4) NOT NULL,
-  `assessmentdate` tinyint(4) NOT NULL,
-  `lastname` tinyint(4) NOT NULL,
-  `firstname` tinyint(4) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -286,4 +260,4 @@ CREATE TABLE `Students` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-01 17:35:49
+-- Dump completed on 2017-02-03 11:25:32

@@ -36,62 +36,37 @@ The intended audience of this document architects, developers and administrators
 . Experience with the Drools and Dashbuilder components of JBoss BPMS.
 . Experience with database development and administration using MariaDB.
 
+== GPTE Reporting URLs
+
+GPTE Reporting has three environments:  prod, qa and dev.
+
+FQDN of each environment is as follows:
+
+. *prod* :   reporting.opentlc.com
+. *qa*   :   qa.opentlc.com
+. *dev*  :   dev.opentlc.com
+
+Each of these environments runs the same GPTE Reporting services.
+
+
+URLs to each GPTE Reporting service are as follows:
+
+. *Dashbuilder* :  https://<fqdn>/dashbuilder
+
+
+== Provisioning
+Review `base_install.yml` and `update.yml` scripts in _$PROJECT_HOME/infrastructure/ansible_ directory.
+
 == Administration
 
-=== Operating System
-. Ensure that a `jboss` operating system user (with groupId = 100) exists.
-. As root:  chown -R jboss:100 /opt
-. Install mysql JDBC :
-+
------
-yum install -y mysql-connector-java.noarch
------
-. Install JDK 8 :
-+
------
-yum install java-1.8.0-openjdk-devel.x86_64
------
-. Install mariadb-server :
-+
------
-yum install mariadb-server
------
-
-==== Maven
-
-Maven is the build tool used by GPTE Reporting solution.
-
-RHEL based package repositories tend to provide older (buggy) versions of Maven.
-
-Manually install the latest maven from:  `maven.apache.org`.
-
-Ensure that the downloaded version of Maven is on the $PATH of both the `jboss` and `root` operating system users.
-
-=== OPEN_Reporting project
-Execute everything in this section as the `jboss` operating system user.
-
-==== Clone
-The source code of the `GPTE Reporting` solution is maintained in private github organization at: `github.com/redhat-gpe`.
-
-Execute the following:
-
------
-git clone https://github.com/redhat-gpe/OPEN_Reporting.git
------
-
-The above command will prompt you for your github userId and password.
-Ensure that you provide your github userId that has at least `viewer` credentials to the `github.com/redhat-gpe` organization.
-
-NOTE: For the purposes of this project, the term `$PROJECT_HOME` refers to the following directory: `/path/to/cloned/OPEN_Reporting/`
-
-==== Build
+=== Manual Build
 
 -----
 cd $PROJECT_HOME
 mvn clean install -DskipTests
 -----
 
-=== MySQL
+=== Manual tasks to _lms_transactional_ database
 
 . Seed the `lms_transactional` database with test data
 +
@@ -100,11 +75,19 @@ mysql -u root -p mysql <  db_scripts/lms_transactional_ddl.sql
 mysql -u root lms_transactional < db_scripts/lms_transactional_data.sql
 -----
 
-. Periodically, create a new test datafile from a current snapshot of your `lms_transactional` database:
+. Periodically, create a new test datafile from a current snapshot of your `lms_transactional` database.
++
+This database is used to support development and unit testing of GPTE Reporting project:
 +
 -----
-mysql -u root mysql -e "use lms_transactional; delete from lms_transactional.Students where StudentID > 10399"
+# slim down size of lms_transactional database 
+mysql -u root lms_transactional -e "delete from Students where StudentID > 10399"
+
+# Data dump to a file
 mysqldump --no-create-db --no-create-info -u root lms_transactional > db_scripts/lms_transactional_data.sql
+
+# Dump of lms_transactional schema
+mysqldump -d -u root lms_transactional > db_scripts/lms_transactional_ddl.sql
 -----
 
 === JBoss Fuse on EAP
@@ -115,23 +98,10 @@ mysqldump --no-create-db --no-create-info -u root lms_transactional > db_scripts
 $JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
 -----
 
-=== activemq-artemis install
-
------
-# sudo yum install -y libaio-devel
-# sudo su - jboss
-$ cd /opt
-$ git clone https://github.com/apache/activemq-artemis.git
-$ cd activemq-artemis
-$ mvn -Prelease install -DskipTests
-$ cd artemis-distribution/target/apache-artemis-1.4.0-SNAPSHOT-bin/apache-artemis-1.4.0-SNAPSHOT
-
------
-
 
 == GPTE Reporting Routing Process
 
-GPTE Reporting includes a service called: `gpte_universal_process`.
+GPTE Reporting includes a service called: `gpte_shared_process`.
 This service executes within JBoss Fuse on EAP and its purpose is the following:
 
 . Consume data feeds sent to GPTE Reporting from external systems and users.
@@ -187,18 +157,15 @@ In particular, the `accred-process` background job periodically determines new a
 
 === Start Accreditation Process
 
------
-sudo cp $PROJECT_HOME/config/service/accred-process.service /usr/lib/systemd/system
-sudo systemctl enable accred-process.service
-sudo systemctl restart accred-process.service
-sudo systemctl status accred-process.service
------
+Shell aliases have been provided to easily bounce all GPTE Reporting services.
+
+Take a look at the aliases found in:  `/etc/bashrc`.
 
 === Monitor Accreditation Process log
 
------
-sudo journalctl -u accred-process -f
------
+Shell aliases have been provided to easily tail log files of all GPTE Reporting services.
+
+Take a look at the aliases found in:  `/etc/bashrc`.
 
 === Execute Rules Spreadsheet Validation and Parsing to DRL
 
@@ -292,4 +259,19 @@ ta
 
 
 ifdef::showscript[]
+
+=== activemq-artemis install
+
+NOTE:  artemis is not yet used.  Disregard this section
+
+-----
+# sudo yum install -y libaio-devel
+# sudo su - jboss
+$ cd /opt
+$ git clone https://github.com/apache/activemq-artemis.git
+$ cd activemq-artemis
+$ mvn -Prelease install -DskipTests
+$ cd artemis-distribution/target/apache-artemis-1.4.0-SNAPSHOT-bin/apache-artemis-1.4.0-SNAPSHOT
+-----
+
 endif::showscript[]
