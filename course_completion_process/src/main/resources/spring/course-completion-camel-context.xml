@@ -197,8 +197,12 @@
         <!-- 2)  Iterate through each row of spreadsheet -->
         <split streaming="true" >
             <tokenize token="\n" />
-            <log message="${body}" />
+            <to uri="bean:cCompletionServiceBean?method=processCourseRefreshSpreadsheetRecord" /> 
+            <choice><when><simple>${property.CamelSplitComplete} == true</simple>
+                <log message="Just refreshed Course and CourseMappings using the following # of records:  ${property.CamelSplitIndex}" />
+            </when></choice>
         </split>
+
     </route>
 
     <!--    *************************************************************************************************   -->
@@ -228,9 +232,7 @@
         </description>
         <from uri="vm:get-course-by-course-name" />
         <log message="get-course-by-course-name:  body = ${body}" />
-
-        <!-- This known to bomb when executing non-related unit testing.  Not sure why.  Comment out during unit testing -->
-        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName(${body}, null)" id="getCourseByCourseName"/> 
+        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName()" id="getCourseByCourseName"/>
     </route>
 
     <route id="send-email">

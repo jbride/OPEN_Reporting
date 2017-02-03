@@ -305,6 +305,15 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         affectedRows[1] = sbJdbcTemplate.update(sBuilder.toString());
         return affectedRows;
     }
+
+    public void insertIntoCourseAndMappings(String courseId, String courseName, String prunedMappedName) {
+        // Specify a warning only if record already exists in Courses table
+        StringBuilder sBuilder = new StringBuilder("INSERT IGNORE into Courses values (?,?,?)");
+        sbJdbcTemplate.update(sBuilder.toString(), courseId, courseName,null);
+
+        sBuilder = new StringBuilder("INSERT into CourseMappings value(?,?,?)");
+        sbJdbcTemplate.update(sBuilder.toString(), prunedMappedName, courseId, null);
+    }
     
 /* ******************************************************************************* */
     
