@@ -90,6 +90,13 @@ mysqldump --no-create-db --no-create-info -u root lms_transactional > db_scripts
 mysqldump -d -u root lms_transactional > db_scripts/lms_transactional_ddl.sql
 -----
 
+. Export Courses and Mappings as tsv for upload into Accreditation Rules Spreadsheet
++
+-----
+echo 'select cm.PrunedCourseId, cm.CourseId, c.CourseName from CourseMappings cm, Courses c where cm.courseId = c.courseId' | mysql -u root -p -B lms_transactional > /tmp/Courses_\&_Mappings.tsv
+-----
+
+
 === JBoss Fuse on EAP
 
 ==== Gain access to `JBoss Command Line Interface`:
