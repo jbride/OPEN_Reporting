@@ -28,6 +28,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     private static final String EMP_NOT_FOUND_IN_SB = "Student not found in Skills Base";
     private int rht_company_id = 0;
     private static final DateFormat sdfObj = new SimpleDateFormat("MMM dd, yyyy");
+    private static final String NULL = "NULL";
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -310,8 +311,12 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         StringBuilder sBuilder = new StringBuilder("INSERT IGNORE into Courses values (?,?,?)");
         sbJdbcTemplate.update(sBuilder.toString(), courseId, courseName,null);
 
-        sBuilder = new StringBuilder("INSERT into CourseMappings value(?,?,?)");
-        sbJdbcTemplate.update(sBuilder.toString(), prunedMappedName, courseId, null);
+        if(StringUtils.isNotEmpty(prunedMappedName) && !NULL.equals(prunedMappedName) ) {
+            sBuilder = new StringBuilder("INSERT into CourseMappings value(?,?,?)");
+            sbJdbcTemplate.update(sBuilder.toString(), prunedMappedName, courseId, null);
+        } else {
+            logger.info("insertIntoCourseAndMappings() no mapping found for: "+courseId);
+        }
     }
     
 /* ******************************************************************************* */
