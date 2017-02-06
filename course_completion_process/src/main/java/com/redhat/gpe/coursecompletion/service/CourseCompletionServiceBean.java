@@ -576,7 +576,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         String courseId = courseMFields[1].trim();
         String courseName = courseMFields[2].trim();
 
-        if(StringUtils.isEmpty(prunedMappedName) || StringUtils.isEmpty(courseId) || StringUtils.isEmpty(courseName) )
+        // Allow prunedMapped Name to be null, a mapping to a courseId is not mandatory
+        if( StringUtils.isEmpty(courseId) || StringUtils.isEmpty(courseName) )
             throw new RuntimeException(counter+" : processCourseRefreshSpreadsheetRecord() empty field: "+prunedMappedName+" : "+courseId+" : "+courseName);
 
         canonicalDAO.insertIntoCourseAndMappings(courseId, courseName, prunedMappedName);
