@@ -105,6 +105,25 @@ echo 'select cm.PrunedCourseId, cm.CourseId, c.CourseName from CourseMappings cm
 $JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
 -----
 
+== Refresh Course Completions
+
+. Make changes to the _Courses & Mappings_ sheet of {rulesspreadsheet}.
+. File -> Download As -> Tab-separated values (*.tsv, current sheet)
+. Using your Red Hat email account, create an email with the following:
+.. *To*:  rhtgptetest@yahoo.com
+.. *Subject*: Course Refresh
+.. *Attachment*: attached previously downloaded tsv.
+. Tail log of GPTE Reporting server of  development environment.
+. Send email
+. Expects results similar to the following in the log file:
++
+-----
+imaps://imap.mail.yahoo.com) Received file from: [<jbride@redhat.com>, <jbride@redhat.com>], subject course refresh
+imaps://imap.mail.yahoo.com) moveAttachmentsToBodyAndSendToGPTEProcessingRoute() received the following # of attachments: 1
+imaps://imap.mail.yahoo.com) determineAttachmentType() attachment type = course_mappings_spreadsheet
+vm://cc_process-new-courses-and-mappings-uri) Following # of records deleted from Course and CourseMappings tables: 89 :  0
+vm://cc_process-new-courses-and-mappings-uri) Just refreshed Course and CourseMappings using the following # of records:  453
+-----
 
 == GPTE Reporting Routing Process
 
