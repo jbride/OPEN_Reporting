@@ -105,12 +105,12 @@ echo 'select cm.PrunedCourseId, c.CourseId, c.CourseName from Courses c left joi
 $JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
 -----
 
-== Refresh Course Completions
+== Refresh `Courses` & `CourseMappings` tables
 
 . Make changes to the _Courses & Mappings_ sheet of {rulesspreadsheet}.
 +
 NOTE: Not every courseId is going to have a corresponding mapping.
-For those courses without a mapping, the _PrunedCourseId can either have a value of `NULL` or can be blank.
+For those courses without a mapping, the _PrunedCourseId_ field can either have a value of `NULL` or can be blank.
 
 . File -> Download As -> Tab-separated values (*.tsv, current sheet)
 . Using your Red Hat email account, create an email with the following:
