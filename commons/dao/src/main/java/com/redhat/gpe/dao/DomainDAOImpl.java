@@ -291,24 +291,19 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
 
     /*
-     * Deletes all from both Courses and CourseMappings tables;
+     * Deletes all from CourseMappings table;
      * Returns:
-     *   int[0] = # of records deleted from Courses
      *   int[1] = # of records deleted from CourseMappings
      */
-    public int[] deleteAllFromCoursesAndCourseMappings() {
-        int[] affectedRows = new int[2];
-        StringBuilder sBuilder = new StringBuilder("delete from Courses");
-        affectedRows[0] = sbJdbcTemplate.update(sBuilder.toString());
-
-        sBuilder = new StringBuilder("delete from CourseMappings");
-        affectedRows[1] = sbJdbcTemplate.update(sBuilder.toString());
+    public int deleteAllFromCourseMappings() {
+        StringBuilder sBuilder = new StringBuilder("delete from CourseMappings");
+        int affectedRows = sbJdbcTemplate.update(sBuilder.toString());
         return affectedRows;
     }
 
     public void insertIntoCourseAndMappings(String courseId, String courseName, String prunedMappedName) {
-        // Specify a warning only if record already exists in Courses table
-        StringBuilder sBuilder = new StringBuilder("INSERT IGNORE into Courses values (?,?,?)");
+        StringBuilder sBuilder = new StringBuilder("INSERT into Courses values (?,?,?) ");
+        sBuilder.append("on duplicate key update CourseName=values(CourseName)");
         sbJdbcTemplate.update(sBuilder.toString(), courseId, courseName,null);
 
         if(StringUtils.isNotEmpty(prunedMappedName) && !NULL.equals(prunedMappedName) ) {
