@@ -72,7 +72,7 @@ public class SumtotalAttachmentProcessTest extends CamelSpringTestSupport {
         exchange.setPattern(ExchangePattern.InOut);
         Message in = exchange.getIn();
         in.setBody("Test");
-        headers.put(CAMEL_FILE_NAME, inbox_file.getPath());
+        headers.put(CAMEL_FILE_NAME, GOOD_TEST_FILE);
         headers.put(RETURN_PATH, adminEmail);
         headers.put(SUBJECT, SUMTOTAL_SUBJECT);
         in.setHeaders(headers);
