@@ -61,7 +61,7 @@ public class SumtotalAttachmentProcessTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/course-completion-camel-context.xml");
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testAttachmentProcessing() throws InterruptedException, IOException {
         
@@ -76,12 +76,10 @@ public class SumtotalAttachmentProcessTest extends CamelSpringTestSupport {
         headers.put(RETURN_PATH, adminEmail);
         headers.put(SUBJECT, SUMTOTAL_SUBJECT);
         in.setHeaders(headers);
-        Map<String, String> attachments = new HashMap<String, String>();
         FileInputStream fStream = fStream = new FileInputStream(inbox_file);
         String attachment = IOUtils.toString(fStream);
         fStream.close();
-        attachments.put(GOOD_TEST_FILE, attachment);
-        in.setBody(attachments);
+        in.setBody(attachment);
         exchange = template.send(routeURI, exchange);
         
         //Student object is currently composed of all String fields.  Subsequently, all types passed in csv are valid and don't throw a Parse Exception
