@@ -977,7 +977,30 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "46_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_2_courses"
+rule "46_Red Hat Delivery Specialist - Middleware Integration Services_with_2_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(courseName == "Camel Development with JBoss Fuse")
+    $cc2:CourseCompletion(this != $cc1, courseName == "Enterprise Integration Foundations")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Feb-2017", "", $cc1, $cc2))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2);
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setAccreditationName("Red Hat Delivery Specialist - Middleware Integration Services");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setAccreditationDate(latestCC.getAssessmentDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "47_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Camel Development with JBoss Fuse")
@@ -1000,7 +1023,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "47_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_4_courses"
+rule "48_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_4_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1025,7 +1048,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "48_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_4_courses"
+rule "49_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_4_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1050,7 +1073,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "49_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_4_courses"
+rule "50_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_4_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1075,7 +1098,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "50_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_3_courses"
+rule "51_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1099,7 +1122,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "51_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_2_courses"
+rule "52_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Middleware Integration Services for Sales")
@@ -1122,7 +1145,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "52_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_3_courses"
+rule "53_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1146,7 +1169,31 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "53_Red Hat Sales Engineer Specialist - Middleware Migration_with_3_courses"
+rule "54_Red Hat Sales Engineer Specialist - Middleware Integration Services_with_3_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(courseName == "JBoss Fuse")
+    $cc2:CourseCompletion(this != $cc1, courseName == "JBoss A-MQ")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, courseName == "Enterprise Integration Foundations")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Feb-2017", "", $cc1, $cc2, $cc3))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3);
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setAccreditationName("Red Hat Sales Engineer Specialist - Middleware Integration Services");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setAccreditationDate(latestCC.getAssessmentDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "55_Red Hat Sales Engineer Specialist - Middleware Migration_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Middleware Migration for Salesperson")
@@ -1170,7 +1217,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "54_Red Hat Sales Engineer Specialist - Mobility_with_3_courses"
+rule "56_Red Hat Sales Engineer Specialist - Mobility_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Red Hat Mobile Application Platform Sales")
@@ -1194,7 +1241,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "55_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
+rule "57_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Platform-as-a-Service (PaaS) Solution for Sales")
@@ -1217,7 +1264,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "56_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
+rule "58_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Platform-as-a-Service (PaaS) Solution for Sales")
@@ -1240,7 +1287,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "57_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
+rule "59_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Platform-as-a-Service (PaaS) Solution for Sales")
@@ -1263,7 +1310,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "58_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
+rule "60_Red Hat Sales Engineer Specialist - Platform as a Service_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Platform-as-a-Service (PaaS) Solution for Sales")
@@ -1286,7 +1333,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "59_Red Hat Sales Engineer Specialist - Red Hat 3scale API Management Platform_with_1_course"
+rule "61_Red Hat Sales Engineer Specialist - Red Hat 3scale API Management Platform_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "3scale Foundations")
@@ -1308,7 +1355,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "60_Red Hat Sales Specialist - Business Process Automation_with_1_course"
+rule "62_Red Hat Sales Specialist - Business Process Automation_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Business Process Automation for Salesperson")
@@ -1330,7 +1377,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "61_Red Hat Sales Specialist - Business Process Automation_with_1_course"
+rule "63_Red Hat Sales Specialist - Business Process Automation_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Automation Sales")
@@ -1352,7 +1399,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "62_Red Hat Sales Specialist - MIddleware Application Development_with_1_course"
+rule "64_Red Hat Sales Specialist - MIddleware Application Development_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Middleware Sales Overview")
@@ -1374,7 +1421,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "63_Red Hat Sales Specialist - MIddleware Application Development_with_2_courses"
+rule "65_Red Hat Sales Specialist - MIddleware Application Development_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Middleware Sales Overview")
@@ -1397,7 +1444,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "64_Red Hat Sales Specialist - MIddleware Application Development_with_1_course"
+rule "66_Red Hat Sales Specialist - MIddleware Application Development_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Middleware Sales Overview")
@@ -1419,7 +1466,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "65_Red Hat Sales Specialist - MIddleware Application Development_with_2_courses"
+rule "67_Red Hat Sales Specialist - MIddleware Application Development_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Middleware Sales Overview")
@@ -1442,7 +1489,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "66_Red Hat Sales Specialist - Middleware Integration Services_with_2_courses"
+rule "68_Red Hat Sales Specialist - Middleware Integration Services_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1465,7 +1512,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "67_Red Hat Sales Specialist - Middleware Integration Services_with_1_course"
+rule "69_Red Hat Sales Specialist - Middleware Integration Services_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Middleware Integration Services for Sales")
@@ -1487,7 +1534,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "68_Red Hat Sales Specialist - Middleware Integration Services_with_2_courses"
+rule "70_Red Hat Sales Specialist - Middleware Integration Services_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "JBoss Fuse")
@@ -1510,7 +1557,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "69_Red Hat Sales Specialist - Middleware Migration_with_1_course"
+rule "71_Red Hat Sales Specialist - Middleware Migration_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Middleware Migration for Salesperson")
@@ -1532,7 +1579,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "70_Red Hat Sales Specialist - Mobility_with_2_courses"
+rule "72_Red Hat Sales Specialist - Mobility_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Red Hat Mobile Application Platform Sales")
@@ -1555,7 +1602,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "71_Red Hat Sales Specialist - Platform as a Service_with_1_course"
+rule "73_Red Hat Sales Specialist - Platform as a Service_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(courseName == "Platform-as-a-Service (PaaS) Solution for Sales")
