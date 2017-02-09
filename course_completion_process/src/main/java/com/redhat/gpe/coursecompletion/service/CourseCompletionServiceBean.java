@@ -472,7 +472,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     }
     
     public CourseCompletion convertDokeosCourseCompletionToStudentCourse(Exchange exchange) throws com.redhat.gpte.services.InvalidCourseException {
-    DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion)exchange.getIn().getBody();
+        DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion)exchange.getIn().getBody();
         if(StringUtils.isEmpty(dokeosCourseCompletion.getEmail()))
             throw new RuntimeException(ExceptionCodes.GPTE_CC1001+dokeosCourseCompletion.toString());
         
