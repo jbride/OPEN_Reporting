@@ -172,7 +172,7 @@
 
     <route id="trigger_lms_reporting_stored_proc">
       <from uri="{{gpte_trigger_lms_reporting_stored_proc}}"/>
-      <setBody><constant>call lms_transactional.refresh_lms_reporting</constant></setBody>
+      <setBody><constant>call lms_transactional.refresh_lms_reporting(null)</constant></setBody>
       <to uri="bean:baseServiceBean?method=triggerStoredProcedure" id="trigger-lms-reporting-stored-proc" />
     </route>
 
