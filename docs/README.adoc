@@ -96,14 +96,33 @@ mysqldump -d -u root lms_transactional > db_scripts/lms_transactional_ddl.sql
 echo 'select cm.PrunedCourseId, c.CourseId, c.CourseName from Courses c left join CourseMappings cm on cm.courseId = c.courseId' | mysql -u root -p -B lms_transactional > /tmp/Courses_\&_Mappings.tsv
 -----
 
+== Refresh `Accreditation Spreadsheets`
 
-=== JBoss Fuse on EAP
-
-==== Gain access to `JBoss Command Line Interface`:
+. Makes changes to any of the three following tabs of the {rulesspreadsheet}
+.. `DCI Accreditation Rules`
+.. `MWS Accreditation Rules`
+.. `CI Accreditation Rules`
+. For those spreadsheets that have changed, download them to your local workstation
+.. File -> Download As -> Tab-separated values (*.tsv, current sheet)
+. Using your Red Hat email account, create an email with the following:
+.. *To*:  rhtgptetest@yahoo.com
+.. *Subject*: <DCI | MWS | CI> Accreditation Rule Refresh
+.. *Attachment*: attach previously downloaded tsv.
+. Tail log of GPTE `Accreditation Service` of development environment.
+.. ssh <opentlc userId>@dev.opentlc.com
+.. Execute the following:  ta
+. Send email
+. Expect results similar to the following in the log file:
 +
 -----
-$JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
+INFO  -new-accreditation-spreadsheet - Received rules spreadsheet.  name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.tsv : from= , subject=
+INFO  AccreditationProcessBean       - changeSuffixOfRuleFileName() new rule file name = GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
+INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  will create the following # of rules: 54 .
+INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  DRL path= src/main/resources/rules   : file name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
+INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:   Completed DRL generation to: src/main/resources/rules GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
 -----
+. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`
+.. At the command line of the dev environment, execute:  ba
 
 == Refresh `Courses` & `CourseMappings` tables
 
@@ -116,10 +135,12 @@ For those courses without a mapping, the _PrunedCourseId_ field can either have 
 . Using your Red Hat email account, create an email with the following:
 .. *To*:  rhtgptetest@yahoo.com
 .. *Subject*: Course Refresh
-.. *Attachment*: attached previously downloaded tsv.
+.. *Attachment*: attach previously downloaded tsv.
 . Tail log of GPTE Reporting server of  development environment.
+.. ssh <opentlc userId>@dev.opentlc.com
+.. Execute the following: tg
 . Send email
-. Expects results similar to the following in the log file:
+. Expect results similar to the following in the log file:
 +
 -----
 imaps://imap.mail.yahoo.com) Received file from: [<jbride@redhat.com>, <jbride@redhat.com>], subject course refresh
