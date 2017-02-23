@@ -29,6 +29,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     private static final String EMP_NOT_FOUND_IN_SB = "Student not found in Skills Base";
     private int rht_company_id = 0;
     private static final DateFormat sdfObj = new SimpleDateFormat("MMM dd, yyyy");
+    private static final String NULL = "NULL";
 
     private Logger logger = Logger.getLogger(getClass());
 
@@ -291,28 +292,27 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
 
     /*
-     * Deletes all from both Courses and CourseMappings tables;
+     * Deletes all from CourseMappings table;
      * Returns:
-     *   int[0] = # of records deleted from Courses
      *   int[1] = # of records deleted from CourseMappings
      */
-    public int[] deleteAllFromCoursesAndCourseMappings() {
-        int[] affectedRows = new int[2];
-        StringBuilder sBuilder = new StringBuilder("delete from Courses");
-        affectedRows[0] = sbJdbcTemplate.update(sBuilder.toString());
-
-        sBuilder = new StringBuilder("delete from CourseMappings");
-        affectedRows[1] = sbJdbcTemplate.update(sBuilder.toString());
+    public int deleteAllFromCourseMappings() {
+        StringBuilder sBuilder = new StringBuilder("delete from CourseMappings");
+        int affectedRows = sbJdbcTemplate.update(sBuilder.toString());
         return affectedRows;
     }
 
     public void insertIntoCourseAndMappings(String courseId, String courseName, String prunedMappedName) {
-        // Specify a warning only if record already exists in Courses table
-        StringBuilder sBuilder = new StringBuilder("INSERT IGNORE into Courses values (?,?,?)");
+        StringBuilder sBuilder = new StringBuilder("INSERT into Courses values (?,?,?) ");
+        sBuilder.append("on duplicate key update CourseName=values(CourseName)");
         sbJdbcTemplate.update(sBuilder.toString(), courseId, courseName,null);
 
-        sBuilder = new StringBuilder("INSERT into CourseMappings value(?,?,?)");
-        sbJdbcTemplate.update(sBuilder.toString(), prunedMappedName, courseId, null);
+        if(StringUtils.isNotEmpty(prunedMappedName) && !NULL.equals(prunedMappedName) ) {
+            sBuilder = new StringBuilder("INSERT into CourseMappings value(?,?,?)");
+            sbJdbcTemplate.update(sBuilder.toString(), prunedMappedName, courseId, null);
+        } else {
+            logger.info("insertIntoCourseAndMappings() no mapping found for: "+courseId);
+        }
     }
     
 /* ******************************************************************************* */

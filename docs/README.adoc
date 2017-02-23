@@ -93,7 +93,7 @@ mysqldump -d -u root lms_transactional > db_scripts/lms_transactional_ddl.sql
 . Export Courses and Mappings as tsv for upload into Accreditation Rules Spreadsheet
 +
 -----
-echo 'select cm.PrunedCourseId, cm.CourseId, c.CourseName from CourseMappings cm, Courses c where cm.courseId = c.courseId' | mysql -u root -p -B lms_transactional > /tmp/Courses_\&_Mappings.tsv
+echo 'select cm.PrunedCourseId, c.CourseId, c.CourseName from Courses c left join CourseMappings cm on cm.courseId = c.courseId' | mysql -u root -p -B lms_transactional > /tmp/Courses_\&_Mappings.tsv
 -----
 
 
@@ -105,6 +105,32 @@ echo 'select cm.PrunedCourseId, cm.CourseId, c.CourseName from CourseMappings cm
 $JBOSS_HOME/bin/jboss-cli.sh --controller=localhost:10124 --connect
 -----
 
+== Refresh `Courses` & `CourseMappings` tables
+
+. Make changes to the _Courses & Mappings_ sheet of {rulesspreadsheet}.
++
+NOTE: Not every courseId is going to have a corresponding mapping.
+For those courses without a mapping, the _PrunedCourseId_ field can either have a value of `NULL` or can be blank.
+
+. File -> Download As -> Tab-separated values (*.tsv, current sheet)
+. Using your Red Hat email account, create an email with the following:
+.. *To*:  rhtgptetest@yahoo.com
+.. *Subject*: Course Refresh
+.. *Attachment*: attached previously downloaded tsv.
+. Tail log of GPTE Reporting server of  development environment.
+. Send email
+. Expects results similar to the following in the log file:
++
+-----
+imaps://imap.mail.yahoo.com) Received file from: [<jbride@redhat.com>, <jbride@redhat.com>], subject course refresh
+imaps://imap.mail.yahoo.com) moveAttachmentsToBodyAndSendToGPTEProcessingRoute() received the following # of attachments: 1
+imaps://imap.mail.yahoo.com) determineAttachmentType() attachment type = course_mappings_spreadsheet
+vm://cc_process-new-courses-and-mappings-uri) Following # of records deleted from Course and CourseMappings tables: 89 :  0
+vm://cc_process-new-courses-and-mappings-uri) insertIntoCourseAndMappings() no mapping found for: CLI-DEL-ADCM-5593-AST
+vm://cc_process-new-courses-and-mappings-uri) insertIntoCourseAndMappings() no mapping found for: MWS-DEL-ADEI-1626-AST
+vm://cc_process-new-courses-and-mappings-uri) insertIntoCourseAndMappings() no mapping found for: MWS-DEL-ADMOB-7543-AST
+vm://cc_process-new-courses-and-mappings-uri) Just refreshed Course and CourseMappings using the following # of records:  453
+-----
 
 == GPTE Reporting Routing Process
 
@@ -241,6 +267,23 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 -----
 
 == SkillsBase Integration
+
+. Authentication
+ 
+.. GPTE currently has two Skills Base instances:
++
+-----
+Production instance: https://app.skills-base.com/o/redhat
+Test instance: https://app.skills-base.com/o/redhattest
+-----
+ 
+.. Each Skills Base instance can have one unique key pair active at any time.
++
+The key pair is used to request OAuth2 access tokens via the Skills Base API that can then be used to make API requests.
+ 
+.. Note that a maximum of one access token per instance can be active at any one time.
++
+More information is available here: http://wiki.skills-base.net/index.php?title=API_introduction#Authentication
 
 . Check # of Red Hat associates whose accreds need to be pushed to SkillsBase
 +

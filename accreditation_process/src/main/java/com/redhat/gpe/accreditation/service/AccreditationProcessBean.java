@@ -57,7 +57,6 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String DRL_PATH = "accred_drl_rules_path";
     private static final String TSV = "tsv";
     private static final String DRL = "drl";
-    private static final String LMS_REFRESH_STORED_PROC = "call lms_transactional.refresh_lms_reporting";
     private static final String OPEN_PAREN = "{";
     private static final String CLOSED_PAREN = "}";
     private static final Object OPEN_BRACKET = "[";
