@@ -288,7 +288,7 @@
 
 
     <!--    *************************************************************************************************   -->
-    <!--    *************       RULES SPREADSHEET VALIDATION AND TRANSFORMACTION TO DRL         *************   -->
+    <!--    *************       RULES SPREADSHEET VALIDATION AND TRANSFORMATION TO DRL         *************   -->
 
     <route id="receive-new-accreditation-spreadsheet">
         <description>
@@ -360,6 +360,11 @@
                     <to uri="velocity:rulesTemplates/rule-template-7courses.vm"/>
                 </when>
                 <otherwise><to uri="velocity:rulesTemplates/rule-template-8courses.vm"/></otherwise>
+            </choice>
+            <choice>
+                <when><simple>${header.accredCondition} != null</simple>
+                    <to uri="bean:accreditationProcessBean?method=weaveAccredConditionIntoRule"/>
+                </when>
             </choice>
             <to uri="file:{{accred_drl_rules_path}}?fileName=${header.CamelFileName}&amp;fileExist=Append"/>
         </split>

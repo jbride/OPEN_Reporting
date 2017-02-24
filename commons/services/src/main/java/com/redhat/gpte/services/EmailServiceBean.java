@@ -45,7 +45,7 @@ public class EmailServiceBean extends GPTEBaseServiceBean {
     private static final String PARTNER_FIRST_LINE = "undefined";
     private static final String STUDENT_REG_FIRST_LINE = "Name,Email,Company,Region | Subregion,USERID,Region.Partner Tier.Partner Type,SFDC User ID: Partner Company ID";
     private static final String STUDENT_UPDATE_FIRST_LINE = "Email,FirstName,LastName,Region,Country,Role";
-    private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition    Condition";
+    private static final String RULES_SPREADSHEET_FIRST_LINE = "Condition";
     private static final String DOKEOS = "dokeos_cc";
     private static final String SUMTOTAL = "sumtotal_cc";
     private static final String PARTNER = "partner_cc";

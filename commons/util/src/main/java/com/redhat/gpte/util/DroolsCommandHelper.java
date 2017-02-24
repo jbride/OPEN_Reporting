@@ -3,6 +3,7 @@ package com.redhat.gpte.util;
 import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -48,7 +49,7 @@ public class DroolsCommandHelper implements ApplicationContextAware {
 
     public void insertAndFireAll(Exchange exchange) {
         final Message in = exchange.getIn();
-        List<CourseCompletion> factList = (List<CourseCompletion>) in.getBody();
+        List<GPTEBaseCondition> factList = (List<GPTEBaseCondition>) in.getBody();
         if(factList.size() == 0)
             throw new RuntimeException("DroolsCommandHelper() No facts are being inserted into session");
         
@@ -58,7 +59,7 @@ public class DroolsCommandHelper implements ApplicationContextAware {
         final List<GenericCommand<?>> commands = command.getCommands();
         commands.add(new InsertObjectCommand(studentObj));
 
-        for (CourseCompletion courseCompletion : factList) {
+        for (GPTEBaseCondition courseCompletion : factList) {
             commands.add(new InsertObjectCommand(courseCompletion));
         }
         commands.add(new FireAllRulesCommand());
@@ -126,38 +127,38 @@ public class DroolsCommandHelper implements ApplicationContextAware {
     public static boolean isLatestCourseCompletionWithinDates(boolean dumpCourseCompletions, 
                                                               String olderDateBoundary, 
                                                               String recentDateBoundary, 
-                                                              CourseCompletion... completions) throws ParseException {
-        CourseCompletion latestCC = determineMostRecentCourseCompletion(dumpCourseCompletions, completions);
+                                                              GPTEBaseCondition... completions) throws ParseException {
+        GPTEBaseCondition latestCC = determineMostRecentCourseCompletion(dumpCourseCompletions, completions);
         SimpleDateFormat formatter = new SimpleDateFormat(DATE_PATTERN);
         if(StringUtils.isNotEmpty(olderDateBoundary)){
             Date olderDateObjBoundary = formatter.parse(olderDateBoundary);
-            if(olderDateObjBoundary.after(latestCC.getAssessmentDate()))
+            if(olderDateObjBoundary.after(latestCC.getCompletionDate()))
                 return false;
         }
         if(StringUtils.isNotEmpty(recentDateBoundary)){
             Date recentDateObjBoundary = formatter.parse(recentDateBoundary);
-            if(recentDateObjBoundary.before(latestCC.getAssessmentDate()))
+            if(recentDateObjBoundary.before(latestCC.getCompletionDate()))
                 return false;
         }
         return true;
     }
     
-    public static CourseCompletion determineMostRecentCourseCompletion(boolean dumpCourseCompletions, CourseCompletion... completions) {
+    public static GPTEBaseCondition determineMostRecentCourseCompletion(boolean dumpCourseCompletions, GPTEBaseCondition... completions) {
         if(completions.length == 1)
             return completions[0];
         
         Arrays.sort(completions, new CourseCompletionDateComparator());
-        CourseCompletion latestCC = completions[completions.length - 1];
+        GPTEBaseCondition latestCC = completions[completions.length - 1];
         if(dumpCourseCompletions)
             dumpCourseCompletionDates(completions);
         return latestCC;
     }
     
-    private static void dumpCourseCompletionDates(CourseCompletion[] completions) {
+    private static void dumpCourseCompletionDates(GPTEBaseCondition[] completions) {
         Collections.reverse(Arrays.asList(completions));
         StringBuilder sBuilder = new StringBuilder("dumpCourseCompletionDates() dates as follows:");
-        for(CourseCompletion ccObj : completions){
-            sBuilder.append("\n\t"+ccObj.getCourseName()+"\t: "+ccObj.getAssessmentDate());
+        for(GPTEBaseCondition ccObj : completions){
+            sBuilder.append("\n\t"+ccObj.getName()+"\t: "+ccObj.getCompletionDate());
         }
         logger.info(sBuilder.toString());
     }

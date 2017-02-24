@@ -12,6 +12,7 @@ public class SpreadsheetRule implements java.io.Serializable {
     public static final SimpleDateFormat rulesSDF = new SimpleDateFormat("dd-MMM-yyyy");
     public static final String BEGIN_DATE = "beginDate";
     public static final String END_DATE = "endDate";
+    public static final String ACCRED_CONDITION = "accredCondition";
     public static final String COURSE1 = "course1";
     public static final String COURSE2 = "course2";
     public static final String COURSE3 = "course3";
@@ -30,34 +31,46 @@ public class SpreadsheetRule implements java.io.Serializable {
     private String endDate;
     
     @DataField(pos=3)
-    private String course1;
+    private String accredCondition;
     
     @DataField(pos=4)
-    private String course2;
+    private String course1;
     
     @DataField(pos=5)
-    private String course3;
+    private String course2;
     
     @DataField(pos=6)
-    private String course4;
+    private String course3;
     
     @DataField(pos=7)
-    private String course5;
+    private String course4;
     
     @DataField(pos=8)
-    private String course6;
+    private String course5;
     
     @DataField(pos=9)
-    private String course7;
+    private String course6;
     
     @DataField(pos=10)
-    private String course8;
+    private String course7;
     
     @DataField(pos=11)
+    private String course8;
+    
+    @DataField(pos=12)
     private String accredName;
 
-    @DataField(pos=12)
-    private String notes;
+    @DataField(pos=13)
+    private String note0;
+
+    @DataField(pos=14)
+    private String note1;
+
+    @DataField(pos=15)
+    private String note2;
+
+    @DataField(pos=16)
+    private String note3;
     
     private String ruleName;
     private int spreadsheetRowNumber;
@@ -95,6 +108,14 @@ public class SpreadsheetRule implements java.io.Serializable {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getAccredCondition() {
+        return accredCondition;
+    }
+
+    public void setAccredCondition(String accredCondition) {
+        this.accredCondition = accredCondition;
     }
 
     public String getCourse1() {
@@ -169,17 +190,37 @@ public class SpreadsheetRule implements java.io.Serializable {
         this.accredName = accredName;
     }
 
-    public String getNotes() {
-        return notes;
+    public String getNote0() {
+        return note0;
     }
-    public void setNotes(String x) {
-        this.notes = x;
+    public void setNote0(String x) {
+        this.note0 = x;
+    }
+    public String getNote1() {
+        return note1;
+    }
+    public void setNote1(String x) {
+        this.note1 = x;
+    }
+    public String getNote2() {
+        return note2;
+    }
+    public void setNote2(String x) {
+        this.note2 = x;
+    }
+
+    public String getNote3() {
+        return note3;
+    }
+    public void setNote3(String x) {
+        this.note3 = x;
     }
 
     @Override
     public String toString() {
         return "[ruleName="+ruleName+", beginDate=" + beginDate + ", endDate="
-                + endDate + ", course1=" + course1 + ", course2=" + course2
+                + endDate + ", accredCondition="+ accredCondition 
+                +", course1=" + course1 + ", course2=" + course2
                 + ", course3=" + course3 + ", course4=" + course4
                 + ", course5=" + course5 + ", course6=" + course6
                 + ", course7=" + course7 + ", course8=" + course8
