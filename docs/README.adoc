@@ -226,6 +226,7 @@ This service consumes data files from a variety of endpoints such as email and l
 
 === Sumtotal Batch upload
 
+==== Course Completion Processing Report
 The following provides instructions on how to review a summary of the processing of a batch of Sumtotal course competions in GPTE Reporting:
 
 . ssh into the dev environment of GPTE Reporting
@@ -245,6 +246,13 @@ It will appear similar to the following:
 # of course completions to persist = 3340
 ****************************************
 -----
+
+NOTE:  The above report does not list number of duplicate course completions that may or may not have been in the course completion attachment.
+That information is not available from GPTE Reporting.
+
+==== Course Completion Error detail files
+
+Various text files that provide more details of problems that may have occurred during processing of Sumtotal batch course completion attachment files can be found on the dev machine at: `/tmp/gpte/courseCompletionIssues/` .
 
 == Accreditation Process
 
