@@ -224,6 +224,26 @@ This service consumes data files from a variety of endpoints such as email and l
 
 == Course Completion Process
 
+=== Sumtotal Batch upload
+
+The following provides instructions on how to review a summary of the processing of a batch of Sumtotal course competions in GPTE Reporting:
+
+. ssh into the dev environment of GPTE Reporting
+. Tail the JBoss EAP log file by executing:  `tg`
+
+. Email the batch file of Sumtotal course completions to the dev email address: 
+`rhtgptetest@yahoo.com`
+. Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
+It will appear similar to the following:
++
+`********** validateSumtotalCourseCompletions report:   **********
+# of initial course completions  = 3348
+# of rejected course completions = 0
+# of course validation problems = 0
+# of unknownCourseProblems = 8
+# of course completions to persist = 3340
+****************************************`
+
 == Accreditation Process
 
 The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel based, Java process.
