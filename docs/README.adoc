@@ -57,6 +57,29 @@ URLs to each GPTE Reporting service are as follows:
 == Provisioning
 Review `base_install.yml` and `update.yml` scripts in _$PROJECT_HOME/infrastructure/ansible_ directory.
 
+== Updating
+
+It is possible to update all GPTE Reporting environment (prod, qa & dev) via GPTE's Jenkins environment.
+
+A Jenkins pipeline has been created that triggers the ansible provisioning and updating functionaility of GPTE Reporting.
+
+To update a GPTE Reporting environment, execute the following:
+
+. Point your browser to:  `https://forge.opentlc.com/jenkins`
+. Authenticate using your _OPENTLC_ userId and password.
+. Navigate to `GPTE Reporting -> update_gpte_reporting`
++
+image::images/click_update_gpte_reporting.png[]
+
+. In the left panel, click: `Build with Parameters`.
+. In the _gpte_env_ parameter, specify the environment that should be updated (prod, qa, dev):
++
+image::images/update_build.png[]
+. Click: `Build`.
+. Click the _build #_ for the Jenkins build that is now in progress.
+. From the left panel, click: `Console Output` 
+. Monitor the output of the update process
+
 == Production Database Disaster Recovery
 
 === Backup
