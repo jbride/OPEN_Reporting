@@ -236,13 +236,15 @@ The following provides instructions on how to review a summary of the processing
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
 +
-`********** validateSumtotalCourseCompletions report:   **********
+-----
+********** validateSumtotalCourseCompletions report:   **********
 # of initial course completions  = 3348
 # of rejected course completions = 0
 # of course validation problems = 0
 # of unknownCourseProblems = 8
 # of course completions to persist = 3340
-****************************************`
+****************************************
+-----
 
 == Accreditation Process
 
