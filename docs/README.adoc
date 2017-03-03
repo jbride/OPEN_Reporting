@@ -74,7 +74,7 @@ image::images/click_update_gpte_reporting.png[]
 . In the left panel, click: `Build with Parameters`.
 . In the _gpte_env_ parameter, specify the environment that should be updated (prod, qa, dev):
 +
-image::images/update_build.png[]
+image::images/updated_build.png[]
 . Click: `Build`.
 . Click the _build #_ for the Jenkins build that is now in progress.
 . From the left panel, click: `Console Output` 
