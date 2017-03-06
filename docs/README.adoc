@@ -139,34 +139,6 @@ mysqldump -d -u root lms_transactional > db_scripts/lms_transactional_ddl.sql
 echo 'select cm.PrunedCourseId, c.CourseId, c.CourseName from Courses c left join CourseMappings cm on cm.courseId = c.courseId' | mysql -u root -p -B lms_transactional > /tmp/Courses_\&_Mappings.tsv
 -----
 
-== Refresh `Accreditation Spreadsheets`
-
-. Makes changes to any of the three following tabs of the {rulesspreadsheet}
-.. `DCI Accreditation Rules`
-.. `MWS Accreditation Rules`
-.. `CI Accreditation Rules`
-. For those spreadsheets that have changed, download them to your local workstation
-.. File -> Download As -> Tab-separated values (*.tsv, current sheet)
-. Using your Red Hat email account, create an email with the following:
-.. *To*:  rhtgptetest@yahoo.com
-.. *Subject*: <DCI | MWS | CI> Accreditation Rule Refresh
-.. *Attachment*: attach previously downloaded tsv.
-. Tail log of GPTE `Accreditation Service` of development environment.
-.. ssh <opentlc userId>@dev.opentlc.com
-.. Execute the following:  ta
-. Send email
-. Expect results similar to the following in the log file:
-+
------
-INFO  -new-accreditation-spreadsheet - Received rules spreadsheet.  name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.tsv : from= , subject=
-INFO  AccreditationProcessBean       - changeSuffixOfRuleFileName() new rule file name = GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
-INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  will create the following # of rules: 54 .
-INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  DRL path= src/main/resources/rules   : file name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
-INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:   Completed DRL generation to: src/main/resources/rules GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
------
-. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`
-.. At the command line of the dev environment, execute:  ba
-
 == Refresh `Courses` & `CourseMappings` tables
 
 . Make changes to the _Courses & Mappings_ sheet of {rulesspreadsheet}.
@@ -280,19 +252,31 @@ Take a look at the aliases found in:  `/etc/bashrc`.
 
 ==== Execute Rules Spreadsheet Validation and Parsing to DRL
 
-. SSH into GPTE Reporting operating system as the `jboss` operating system user:
-. Change directories to OPEN_Reporting
-. Ensure that `accred-process` JVM is running.
-. Download `DCI`, `MW` and `CI` tabs from {rulesspreadsheet}
-.. For all three spreadsheet tabs, navigate to `File -> Download As -> Tab Separated Value (.tsv, current sheet)
-.. Save all three spreadsheets to your local file system, ie:  $HOME/Downloads
-. Secure copy latest *.tsv files to dev environment at: `dev.opentlc.com`
+. Makes changes to any of the three following tabs of the {rulesspreadsheet}
+.. `DCI Accreditation Rules`
+.. `MWS Accreditation Rules`
+.. `CI Accreditation Rules`
+. For those spreadsheets that have changed, download them to your local workstation
+.. File -> Download As -> Tab-separated values (*.tsv, current sheet)
+. Using your Red Hat email account, create an email with the following:
+.. *To*:  rhtgptetest@yahoo.com
+.. *Subject*: <DCI | MWS | CI> Accreditation Rule Refresh
+.. *Attachment*: attach previously downloaded tsv.
+. Tail log of GPTE `Accreditation Service` of development environment.
+.. ssh <opentlc userId>@dev.opentlc.com
+.. Execute the following:  ta
+. Send email
+. Expect results similar to the following in the log file:
 +
 -----
-scp $HOME/Downloads/*.tsv jboss@dev,opentlc.com:/tmp/gpte/inbox-for-rules-spreadsheets
+INFO  -new-accreditation-spreadsheet - Received rules spreadsheet.  name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.tsv : from= , subject=
+INFO  AccreditationProcessBean       - changeSuffixOfRuleFileName() new rule file name = GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
+INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  will create the following # of rules: 54 .
+INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  DRL path= src/main/resources/rules   : file name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
+INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:   Completed DRL generation to: src/main/resources/rules GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
 -----
-
-. Monitor the `accred-process` log file for errors.
+. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`
+.. At the command line of the dev environment, execute:  ba
 
 ==== Invoke accreditation logic REST service
 By default, the `accred-process` service runs as a background job that periodically determines accreditations.
