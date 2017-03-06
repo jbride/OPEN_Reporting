@@ -13,11 +13,11 @@ then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4, $cc5, $cc6 );
 
     Accreditation accreditation = new Accreditation();
-    accreditation.setAccreditationName("${headers.accredName}");
+    accreditation.setName("${headers.accredName}");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
-    accreditation.setCourseName(latestCC.getCourseName());
+    accreditation.setCourseName(latestCC.getName());
     accreditation.setCompletionDate(latestCC.getCompletionDate());
     accreditation.setAccreditationType("Active");
     accreditation.setRuleFired(drools.getRule().getName());
