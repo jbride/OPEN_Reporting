@@ -206,7 +206,7 @@ The following provides instructions on how to review a summary of the processing
 
 . Email the batch file of Sumtotal course completions to the dev email address: 
 `rhtgptetest@yahoo.com`
-. Wait for anywhere between 5 - 45 seconds.
+. Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot emails>> if nothing is observed.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
 +
@@ -222,8 +222,6 @@ It will appear similar to the following:
 
 NOTE:  The above report does not list number of duplicate course completions that may or may not have been in the course completion attachment.
 That information is not available from GPTE Reporting.
-
-NOTE:  If after having sent the course completion email with attachment, nothing related to the processing of this course completion email appears to have occurred after about 45 seconds or so, the GPTE Server may need to be bounced.  The camel mail component used in GPTE Reporting) may have gone stale.  This rarely happens however.  The same functionality found in production has run for months without having to be bounced.
 
 ==== Course Completion Error detail files
 
@@ -371,6 +369,29 @@ properties/dev.properties :
 ba
 ta
 -----
+
+[[troubleshoot emails]]
+== Troubleshoot emails
+
+GPTE Reporting consumes, parses and processes the data from emails to support various functionality, ie:  course completions and student registrations.
+
+While tailing the log file of GPTE Reporting (ie:  `tg` ), if no indication of the consumption of that email appears, one of the following may be the root problem:
+
+. *Unknown attachment type*
++
+GPTE Reporting's email inboxes receive spam.
+If the email attachment is of an unknown type, the email is not processed and no log is written.
+Make sure you are sending a known attachment type.
+If working with the GPTE Reporting dev environment, try sending a known working email attachment:  ie, resend a single test course completion.
+
+. *Camel Mail component connection is stale*
+.. The Camel _mail_ component is used to consume emails.
+More often than not, consumption of those emails occurs with out issue.  ie: The camel mail component has been running fine in production for months.
+.. Occasionally, however, it might appear that the Camel _mail_ component may have gone stale.
++
+Log into the email provider and mark your email as unsent.
+
+.. If you still don't observe any indication of the email being processed, bounce GPTE Reporting (ie:   `bg`).
 
 
 ifdef::showscript[]
