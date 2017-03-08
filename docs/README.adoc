@@ -389,7 +389,8 @@ If working with the GPTE Reporting dev environment, try sending a known working 
 More often than not, consumption of those emails occurs with out issue.  ie: The camel mail component has been running fine in production for months.
 .. Occasionally, however, it might appear that the Camel _mail_ component may have gone stale.
 +
-Log into the email provider and mark your email as unsent.
+To troubleshoot, start by logging into the email provider and: `mark your email as unsent`.
+The camel mail provider should detect the presence of this email.
 
 .. If you still don't observe any indication of the email being processed, bounce GPTE Reporting (ie:   `bg`).
 
