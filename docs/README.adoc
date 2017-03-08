@@ -206,7 +206,7 @@ The following provides instructions on how to review a summary of the processing
 
 . Email the batch file of Sumtotal course completions to the dev email address: 
 `rhtgptetest@yahoo.com`
-. Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot emails>> if nothing is observed.
+. Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot_emails>> if nothing is observed.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
 +
@@ -370,7 +370,7 @@ ba
 ta
 -----
 
-[[troubleshoot emails]]
+[[troubleshoot_emails]]
 == Troubleshoot emails
 
 GPTE Reporting consumes, parses and processes the data from emails to support various functionality, ie:  course completions and student registrations.
