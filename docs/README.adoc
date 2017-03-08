@@ -206,6 +206,7 @@ The following provides instructions on how to review a summary of the processing
 
 . Email the batch file of Sumtotal course completions to the dev email address: 
 `rhtgptetest@yahoo.com`
+. Wait for anywhere between 5 - 45 seconds.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
 +
@@ -221,6 +222,8 @@ It will appear similar to the following:
 
 NOTE:  The above report does not list number of duplicate course completions that may or may not have been in the course completion attachment.
 That information is not available from GPTE Reporting.
+
+NOTE:  If after having sent the course completion email with attachment, nothing related to the processing of this course completion email appears to have occurred after about 45 seconds or so, the GPTE Server may need to be bounced.  The camel mail component used in GPTE Reporting) may have gone stale.  This rarely happens however.  The same functionality found in production has run for months without having to be bounced.
 
 ==== Course Completion Error detail files
 
