@@ -206,6 +206,7 @@ The following provides instructions on how to review a summary of the processing
 
 . Email the batch file of Sumtotal course completions to the dev email address: 
 `rhtgptetest@yahoo.com`
+. Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot_emails>> if nothing is observed.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
 +
@@ -368,6 +369,30 @@ properties/dev.properties :
 ba
 ta
 -----
+
+[[troubleshoot_emails]]
+== Troubleshoot emails
+
+GPTE Reporting consumes, parses and processes the data from emails to support various functionality, ie:  course completions and student registrations.
+
+While tailing the log file of GPTE Reporting (ie:  `tg` ), if no indication of the consumption of that email appears, one of the following may be the root problem:
+
+. *Unknown attachment type*
++
+GPTE Reporting's email inboxes receive spam.
+If the email attachment is of an unknown type, the email is not processed and no log is written.
+Make sure you are sending a known attachment type.
+If working with the GPTE Reporting dev environment, try sending a known working email attachment:  ie, resend a single test course completion.
+
+. *Camel Mail component connection is stale*
+.. The Camel _mail_ component is used to consume emails.
+More often than not, consumption of those emails occurs with out issue.  ie: The camel mail component has been running fine in production for months.
+.. Occasionally, however, it might appear that the Camel _mail_ component may have gone stale.
++
+To troubleshoot, start by logging into the email provider and: `mark your email as unsent`.
+The camel mail provider should detect the presence of this email.
+
+.. If you still don't observe any indication of the email being processed, bounce GPTE Reporting (ie:   `bg`).
 
 
 ifdef::showscript[]
