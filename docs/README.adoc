@@ -200,13 +200,15 @@ This service consumes data files from a variety of endpoints such as email and l
 Dokeos tends to send course completions to GPTE Reporting in near real-time.
 In particular, an email with a single course completion attachment file is sent as soon a student completes a course in rh.dokeos.com.
 
+An example of a dokeos course completion can be found link:https://github.com/redhat-gpe/OPEN_Reporting/blob/master/course_completion_process/src/test/resources/sample-spreadsheets/dokeos/app_dev_eap_new.csv[here].
+
 Upon consumption of the course completion email from dokeos, GPTE Reporting will :
 
 . Validate the course completion.  In particular, ensure that the course referenced in the course completion is a known GPTE canonical course name as specified in lms_transactional.Courses.
 . Persist the course completion (assuming the course completion validates).
 
 Since course completions from dokeos are typically processed individually and in real time, there has not been a need to log a _Summary_ report with the processing of each course completion.
-Instead, statements similar to the following are currently all that will be written to the log file:
+Instead, statements similar to the following are currently all that will be written to the GPTE Reporting log file (execute:  `tg` ):
 
 -----
 akropachev@bellintegrator.com : Adding student course to db: 'Red Hat OpenStack Platform for Sales' '100'
