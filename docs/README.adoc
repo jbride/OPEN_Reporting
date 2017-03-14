@@ -196,6 +196,26 @@ This service consumes data files from a variety of endpoints such as email and l
 
 == Course Completion Process
 
+=== Dokeos Course Completions
+Dokeos tends to send course completions to GPTE Reporting in near real-time.
+In particular, an email with a single course completion attachment file is sent as soon a student completes a course in rh.dokeos.com.
+
+Upon consumption of the course completion email from dokeos, GPTE Reporting will :
+
+. Validate the course completion.  In particular, ensure that the course referenced in the course completion is a known GPTE canonical course name as specified in lms_transactional.Courses.
+. Persist the course completion (assuming the course completion validates).
+
+Since course completions from dokeos are typically processed individually and in real time, there has not been a need to log a _Summary_ report with the processing of each course completion.
+Instead, statements similar to the following are currently all that will be written to the log file:
+
+-----
+akropachev@bellintegrator.com : Adding student course to db: 'Red Hat OpenStack Platform for Sales' '100'
+akropachev@bellintegrator.com : converting from sumtotal course completion to canonical StudentCourse. ActivityCode = CLI-SSE-IAS-11410-AST
+Adding student course to db: 'Red Hat OpenStack Platform for Sales' '100'
+-----
+
+If an error occurs during either the validation or persistence of a course completion from rh.dokeos.com, an email will be sent out to GPTE Reporting system admins.
+
 === Sumtotal Batch upload
 
 ==== Course Completion Processing Report
