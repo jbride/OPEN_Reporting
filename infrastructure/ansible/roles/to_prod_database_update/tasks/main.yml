@@ -2,8 +2,13 @@
 
 ########     Use mysql_db ansible plugin to dump databases from dev and push to downstream environments:  qa and/or prod        ##########
 
-- name: Create Backups folder on dev
+- name: Create {{ mysql_datadump_src_dir }} folder on dev
   file: path={{ mysql_datadump_src_dir }} state=directory
+  run_once: true
+  delegate_to: "{{dev}}"
+
+- name: Create {{ database_update_script_dir }} folder on dev
+  file: path={{ database_update_script_dir }} state=directory
   run_once: true
   delegate_to: "{{dev}}"
 
