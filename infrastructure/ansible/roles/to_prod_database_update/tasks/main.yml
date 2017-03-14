@@ -7,7 +7,7 @@
   run_once: true
   delegate_to: "{{dev}}"
 
-- name: locahost: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
+- name: Create following directory on localhost for which to put fetched database zips; local:{{mysql_datadump_target_dir}}
   command: mkdir -p {{ mysql_datadump_target_dir }}
   delegate_to: localhost
 
