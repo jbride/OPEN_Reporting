@@ -7,9 +7,13 @@
   run_once: true
   delegate_to: "{{dev}}"
 
-- name: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
+- name: locahost: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
   command: mkdir -p {{ mysql_datadump_target_dir }}
   delegate_to: localhost
+
+- name: Create Backups folder on {{gpte_env}}
+  file: path={{ mysql_datadump_target_dir }} state=directory
+
 
 
 
