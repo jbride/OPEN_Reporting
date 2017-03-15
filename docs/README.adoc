@@ -376,7 +376,16 @@ More information is available here: http://wiki.skills-base.net/index.php?title=
 MariaDB [lms_transactional]> select count(sa.studentId) from StudentAccreditations sa, Students s where sa.Processed=0 and s.StudentId=sa.StudentID and s.email like "%redhat.com";
 -----
 
-. Prepare for end-to-end test using only student = gpse.training+1@redhat.com
+. SkillsBase data schema
+
+.. The `SkillsBase Integration Service` of GPTE Reporting maintains state (in the lms_transactional database) regarding if a student is known to have a SkillsBase account and if a particular accreditation has been pushed to skillsbase.
++
+This database state is found in the following fields:
+
+... *Students.SkillsbaseStatus* :   boolean; 0 if student does not have a skillsbase account
+... *StudentAccreditations.Processed* : boolean; 0 if student accreditation has been pushed to SkillsBase 
+
+.. Prepare for end-to-end test using only student = gpse.training+1@redhat.com
 +
 -----
 MariaDB [lms_transactional]>  update StudentAccreditations sa, Students s set sa.Processed=1 where s.StudentId=sa.StudentID and s.email like "%redhat.com";
