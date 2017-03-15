@@ -353,6 +353,8 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 
 == SkillsBase Integration
 
+The following are steps and considerations for conducting QA of SkillsBase Integration functionality.
+
 . Authentication
 
 .. GPTE currently has two Skills Base instances:
@@ -407,6 +409,8 @@ MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email
 ba
 ta
 -----
+. Send one or more course completions to GPTE Reporting that lead to an existing accreditation.
+
 
 [[troubleshoot_emails]]
 == Troubleshoot emails
