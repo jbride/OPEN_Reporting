@@ -411,9 +411,30 @@ ta
 -----
 . Send one or more course completions to GPTE Reporting that lead to an existing accreditation.
 
+== Emails
+GPTE Reporting has services that for various business use cases both sends and consumes emails.
+
+=== Sending emails
+
+GPTE Reporting has the ability enable / disable the delivery of emails.
+This feature is may be useful in the `dev` and/or `qa` environment.
+
+. Edit /opt/OPEN_Reporting/properties/<env>.properties.
+. Change value of the following property:
++
+-----
+gpte_enable_all_emails=<true/false>
+-----
+.  Save the change.
+.  Bounce GPTE Reporting service:  `bg`
+. OPTIONAL:  view delivery of emails to remote mail router:
++
+-----
+$ tail -f /var/log/maillog
+-----
 
 [[troubleshoot_emails]]
-== Troubleshoot emails
+=== Troubleshoot Consumption of Emails
 
 GPTE Reporting consumes, parses and processes the data from emails to support various functionality, ie:  course completions and student registrations.
 
