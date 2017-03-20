@@ -480,7 +480,7 @@
     <route id="user-not-found-in-skillsbase">
         <from uri="seda:user-not-found-in-skillsbase"/>
         <setHeader headerName="accreditationName">
-            <simple>${body.accreditationName}</simple>
+            <simple>${body.name}</simple>
         </setHeader>
         <setBody><simple>${body.student}</simple></setBody>
         <choice id="have-we-emailed-before">

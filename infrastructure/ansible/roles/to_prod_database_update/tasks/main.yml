@@ -2,14 +2,23 @@
 
 ########     Use mysql_db ansible plugin to dump databases from dev and push to downstream environments:  qa and/or prod        ##########
 
-- name: Create Backups folder on dev
+- name: Create {{ mysql_datadump_src_dir }} folder on dev
   file: path={{ mysql_datadump_src_dir }} state=directory
   run_once: true
   delegate_to: "{{dev}}"
 
-- name: Create following directory from which to put fetched database zips; local:{{mysql_datadump_target_dir}}
+- name: Create {{ database_update_script_dir }} folder on dev
+  file: path={{ database_update_script_dir }} state=directory
+  run_once: true
+  delegate_to: "{{dev}}"
+
+- name: Create following directory on localhost for which to put fetched database zips; local:{{mysql_datadump_target_dir}}
   command: mkdir -p {{ mysql_datadump_target_dir }}
   delegate_to: localhost
+
+- name: Create Backups folder on {{gpte_env}}
+  file: path={{ mysql_datadump_target_dir }} state=directory
+
 
 
 
