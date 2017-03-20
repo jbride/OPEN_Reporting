@@ -20,6 +20,10 @@
     <property name="dataSource" ref="transactionalDS" />
   </bean>
 
+  <bean id="tsJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+    <property name="dataSource" ref="totaraShadowDS" />
+  </bean>
+
   <bean id="canonicalDAO" class="com.redhat.gpe.dao.DomainDAOImpl" />
 
   <bean id="cCompletionServiceBean"         class="com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean" />
@@ -32,14 +36,6 @@
         <bindy type="Csv" classType="com.redhat.gpe.coursecompletion.dokeos.DokeosCourseCompletion" id="bindyDokeos" />
         <bindy type="Csv" classType="com.redhat.gpe.coursecompletion.sumtotal.SumtotalCourseCompletion" id="bindySumtotal"/>
     </dataFormats>
-
-    <!--onException>
-        <exception>java.lang.Exception</exception>
-        <handled><constant>true</constant></handled>
-        <log message="Exception encountered: ${exception.message} : return-path = ${header.Return-Path} " loggingLevel="ERROR"/>
-        <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
-        <to uri="seda:send-email"/>
-    </onException -->
 
     <route id="receive-sumtotal-course-completions">
         <description>
