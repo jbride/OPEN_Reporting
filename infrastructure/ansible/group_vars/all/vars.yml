@@ -112,3 +112,11 @@ accred_process_log_dir: /var/log/gpte
 # postfix mail relay settings
 mail_relay_host: mx00.opentlc.com
 mail_relay_port: 19587
+
+# totara shadow db settings
+totara_shadow_db_module_name: org.postgresql
+totara_shadow_db_driver_jar_dir: /usr/share/java
+totara_shadow_db_driver_jar: postgresql-jdbc.jar
+totara_shadow_host_ip: 23.253.23.27 
+totara_shadow_host_port: 5432
+totara_shadow_db_name: totara_redhat_reporting

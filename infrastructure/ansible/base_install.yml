@@ -60,6 +60,7 @@
       - mariadb
       - mariadb-reporting-db
       - eap
+      - totara-shadow
       - dashbuilder
       - phpMyAdmin
       - yum-clean
