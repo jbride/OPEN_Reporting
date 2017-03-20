@@ -144,9 +144,12 @@
                 </split>
     </route>
 
-    <route id="receive-partner-course-completions">
-        <from uri="{{cc_receive_partner_input_uri}}" />
-        <log message="Received partner email. from: ${header.Return-Path}, subject ${header.subject}" id="log_partner_receive"/>
+    <route id="process-totara-course-completions">
+        <from uri="{{cc_process_totara_course_completions_input_uri}}" />
+        <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionKnownByGPTE"/>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body}" loggingLevel="INFO"/>
+        <to uri="bean:cCompletionServiceBean?method=countNewTotaraCourseCompletions"/>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      # of new totara CCs = ${body}" loggingLevel="INFO"/>
     </route>
 
     <route id="add-student-course-to-db">

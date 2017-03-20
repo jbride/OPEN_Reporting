@@ -50,6 +50,7 @@ public interface CanonicalDomainDAO {
     public List<GPTEBaseCondition> selectPassedStudentCoursesByStudent(int studentId);
     public boolean isNewStudentCourseForStudent(StudentCourse sCourse);
     public int getUniqueStudentCourseCount(StudentCourse scObj);
+    public int getMostRecentTotaraCourseCompletionKnownByGPTE();
     
     
     /* *******  Accreditations  ********/

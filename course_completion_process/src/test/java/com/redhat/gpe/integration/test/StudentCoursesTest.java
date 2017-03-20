@@ -39,7 +39,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
     /* verification:   select * from StudentCourses where StudentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
             cleanup:        delete from StudentCourses where studentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
     */
-    //@Ignore
+    @Ignore
     @Test
     public void testPersistNewStudentCoursesToSupportAccreditationConditionTest() throws InterruptedException {
        Endpoint endpoint = context.getEndpoint(PERSIST_STUDENT_COURSE_URI);

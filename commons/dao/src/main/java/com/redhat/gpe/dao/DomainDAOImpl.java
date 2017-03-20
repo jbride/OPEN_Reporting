@@ -435,6 +435,10 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         Integer count = 0; //sbJdbcTemplate.queryForObject(sql, Integer.class, theStudent.getEmail().toLowerCase(), assessmentId);
         return count == 0;
     }
+
+    public int getMostRecentTotaraCourseCompletionKnownByGPTE() {
+        return 0;
+    }
 /* ******************************************************************************* */
     
     

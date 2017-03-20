@@ -22,5 +22,11 @@
     <property name="username" value="${lms_transactional_username}" />
     <property name="password" value="${lms_transactional_password}" />
   </bean>
+  <bean id="totaraShadowDS" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+    <property name="driverClassName" value="${totara_shadow_db_driverClassName}" />
+    <property name="url" value="${totara_shadow_db_url}" />
+    <property name="username" value="${totara_shadow_db_username}" />
+    <property name="password" value="${totara_shadow_db_password}" />
+  </bean>
 
 </beans>
