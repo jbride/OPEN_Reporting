@@ -25,6 +25,7 @@
   </bean>
 
   <bean id="canonicalDAO" class="com.redhat.gpe.dao.DomainDAOImpl" />
+  <bean id="totaraShadowDAO" class="com.redhat.gpe.coursecompletion.dao.TotaraShadowDAOImpl" />
 
   <bean id="cCompletionServiceBean"         class="com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean" />
   <bean id="emailServiceBean"               class="com.redhat.gpte.services.EmailServiceBean" />

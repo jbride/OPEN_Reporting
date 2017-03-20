@@ -1263,3 +1263,53 @@ then
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
+
+rule "57_Red Hat Sales Engineer Specialist - Storage_with_5_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
+    $cc2:CourseCompletion(this != $cc1, name == "Gluster Sales")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Ceph Sales")
+    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Red Hat Gluster Storage 3 Foundations")
+    $cc5:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, name == "Red Hat Ceph Storage 2 Foundations")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2017", "", $cc1, $cc2, $cc3, $cc4, $cc5 ))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4, $cc5 );
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setName("Red Hat Sales Engineer Specialist - Storage");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getName());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "58_Red Hat Sales Specialist - Storage_with_3_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
+    $cc2:CourseCompletion(this != $cc1, name == "Gluster Sales")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Ceph Sales")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2017", "", $cc1, $cc2, $cc3))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3);
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setName("Red Hat Sales Specialist - Storage");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getName());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end

@@ -2,6 +2,7 @@ package com.redhat.gpe.coursecompletion.service;
 
 import com.redhat.gpe.coursecompletion.dokeos.DokeosCourseCompletion;
 import com.redhat.gpe.coursecompletion.sumtotal.SumtotalCourseCompletion;
+import com.redhat.gpe.coursecompletion.dao.TotaraShadowDAO;
 import com.redhat.gpe.domain.canonical.*;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.ExceptionCodes;
@@ -18,6 +19,8 @@ import org.apache.camel.Producer;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Logger;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -78,9 +81,13 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static int rhtCompanyId = 0;
     private static Set sumtotalRejectCodeSet = new HashSet<String>();
     private File courseIssuesDir = new File(COURSE_ISSUES_OUTPUT_DIR);
+
+    @Autowired
+    protected TotaraShadowDAO totaraShadowDAO;
     
    
     public CourseCompletionServiceBean() throws IOException {
+
 
         // 1) make sure COURSE_ISSUES_OUTPUT_DIR is created on filesystem
         courseIssuesDir.mkdirs();
@@ -590,5 +597,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     }
     
     
+    public int countNewCourseCompletions() {
+        return totaraShadowDAO.countNewCourseCompletions();
+    }
  
 }
