@@ -1,8 +1,8 @@
 ---
 
-- name: Install postgresql-jdbc driver to support queries to totarra shadow database
+- name: Install postgresql-jdbc driver and postgresql packages to support queries to totarra shadow database
   yum: 
-    name: postgresql-jdbc
+    name: postgresql-jdbc,postgresql
     state: present
 
 - name: Add totara shadow db related system properties to JBoss EAP
