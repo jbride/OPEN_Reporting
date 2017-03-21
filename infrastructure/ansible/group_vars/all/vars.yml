@@ -120,3 +120,5 @@ totara_shadow_db_driver_jar: postgresql-jdbc.jar
 totara_shadow_host_ip: 23.253.23.27 
 totara_shadow_host_port: 5432
 totara_shadow_db_name: totara_redhat_reporting
+totara_shadow_db_username: totara_redhat_reporting
+totara_shadow_db_password: 87IW1o1zWff94CUXm+5w
