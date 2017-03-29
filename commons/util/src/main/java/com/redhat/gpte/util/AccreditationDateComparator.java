@@ -7,7 +7,7 @@ import com.redhat.gpe.domain.helper.Accreditation;
 public class AccreditationDateComparator implements Comparator<Accreditation> {
 
     public int compare(Accreditation accred0, Accreditation accred1) {
-        return Long.compare(accred0.getAccreditationDate().getTime(), accred1.getAccreditationDate().getTime());
+        return Long.compare(accred0.getCompletionDate().getTime(), accred1.getCompletionDate().getTime());
     }
 
 }

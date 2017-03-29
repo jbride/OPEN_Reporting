@@ -37,6 +37,43 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
     }
     
     /* verification:   select * from StudentCourses where StudentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
+            cleanup:        delete from StudentCourses where studentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
+    */
+    @Ignore
+    @Test
+    public void testPersistNewStudentCoursesToSupportAccreditationConditionTest() throws InterruptedException {
+       Endpoint endpoint = context.getEndpoint(PERSIST_STUDENT_COURSE_URI);
+       Exchange exchange = endpoint.createExchange();
+       exchange.setPattern(ExchangePattern.InOnly);
+       Message in = exchange.getIn();
+
+       Student studentObj = DomainMockObjectHelper.getMockStudent();
+       Language langObj = DomainMockObjectHelper.getMockLanguage();
+       
+       // BPMS Implementation Course
+       Course courseObj = DomainMockObjectHelper.getBPMSImplementationCourse();
+       StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
+       CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
+       in.setBody(scWrapper);
+       template.send(PERSIST_STUDENT_COURSE_URI, exchange);
+       
+       // BPMS Project Hours
+       courseObj = DomainMockObjectHelper.getBPMSProjectHoursCourse();
+       sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
+       scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
+       in.setBody(scWrapper);
+       template.send(PERSIST_STUDENT_COURSE_URI, exchange);
+       
+       // BPMS Advanced Course
+       courseObj = DomainMockObjectHelper.getBPMSAdvancedCourse();
+       sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
+       scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
+       in.setBody(scWrapper);
+       template.send(PERSIST_STUDENT_COURSE_URI, exchange);
+       
+    }
+    
+    /* verification:   select * from StudentCourses where StudentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
        cleanup:        delete from StudentCourses where studentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
      */
     @Ignore
@@ -50,7 +87,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         Student studentObj = DomainMockObjectHelper.getMockStudent();
         Course courseObj = DomainMockObjectHelper.getMockCourse();
         Language langObj = DomainMockObjectHelper.getMockLanguage();
-        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse();
+        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
 
         CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
         in.setBody(scWrapper);
@@ -71,7 +108,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         Student studentObj = DomainMockObjectHelper.getMockStudent();
         Course courseObj = DomainMockObjectHelper.getMockCourse();
         Language langObj = DomainMockObjectHelper.getMockLanguage();
-        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse();
+        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
         sCourse.setAssessmentscore((byte) 65);
 
         CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
@@ -95,7 +132,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         Student studentObj = DomainMockObjectHelper.getMockStudent();
         Course courseObj = DomainMockObjectHelper.getMockCourse();
         Language langObj = DomainMockObjectHelper.getMockLanguage();
-        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse();
+        StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
         sCourse.setAssessmentscore((byte) 90);
 
         CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);

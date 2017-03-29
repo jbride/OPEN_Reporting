@@ -17,7 +17,7 @@
       smtp_tls_CAfile = /etc/ipa/ca.crt
       smtp_tls_cert_file = /etc/pki/tls/certs/smtp-@@HOSTNAME@@.crt
       smtp_tls_key_file = /etc/pki/tls/private/smtp-@@HOSTNAME@@.key
-      relayhost = mx0.opentlc.com:19587
+      relayhost = {{mail_relay_host}}:{{mail_relay_port}}
 
 - name: modify /etc/postfix/main.cf with correct hostname
   shell: sed -i "s/@@HOSTNAME@@/$HOSTNAME/" /etc/postfix/main.cf

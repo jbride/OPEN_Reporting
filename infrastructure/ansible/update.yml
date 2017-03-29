@@ -37,9 +37,12 @@
   remote_user: root
 
   pre_tasks:
-    - set_fact: gpte_env={{ hostvars['localhost']['gpte_env'] }}
+    - set_fact: 
+        gpte_env: "{{ hostvars['localhost']['gpte_env'] }}"
+        prod_backup_only: false
     - debug:
         msg: "Will install the following environment: {{ hostvars.localhost.gpte_env }}"
+
 
   roles:
 

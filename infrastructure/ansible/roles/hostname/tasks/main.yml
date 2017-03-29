@@ -3,9 +3,10 @@
 - name: check gpte_env variable
   shell: if [[ "{{gpte_env}}" != "prod" ]] && [ {{gpte_env}} != "qa" ] && [ {{gpte_env}} != "dev" ]; then echo "Value of gpte_env must be one of prod, qa or dev"; exit 1; fi
 
-- name: set hostname to reporting{{gpte_env}}
-  hostname:
-    name: reporting{{gpte_env}}
+# NOTE: This causes problems later on when setting up postfix to relay through opentlc
+#- name: set hostname to reporting{{gpte_env}}
+#  hostname:
+#    name: reporting{{gpte_env}}
 
 - name: add entry to /etc/hosts
   copy:

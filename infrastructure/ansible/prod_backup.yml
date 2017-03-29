@@ -1,0 +1,14 @@
+# Creates back-up of GPTE Reporting production machine.
+# Relies on provisioned machine as per _base_install.yml_ Ansible script.
+
+- hosts: localhost
+  remote_user: root
+
+  pre_tasks:
+    - set_fact: 
+        gpte_env: localhost
+        prod_backup_only: true
+
+  roles:
+
+    - from_prod_database_update

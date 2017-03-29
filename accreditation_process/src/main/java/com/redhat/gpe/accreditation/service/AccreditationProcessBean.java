@@ -1,7 +1,6 @@
 package com.redhat.gpe.accreditation.service;
 
 import com.redhat.gpe.accreditation.util.Constants;
-import com.redhat.gpe.accreditation.util.ListSizeComparator;
 import com.redhat.gpe.accreditation.util.SpreadsheetRule;
 import com.redhat.gpe.accreditation.util.WebClientDevWrapper;
 import com.redhat.gpe.domain.canonical.AccreditationDefinition;
@@ -10,10 +9,9 @@ import com.redhat.gpe.domain.canonical.Student;
 import com.redhat.gpe.domain.canonical.StudentAccreditation;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 import com.redhat.gpte.services.AttachmentValidationException;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
-import com.sun.xml.bind.v2.util.QNameMap.Entry;
-
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
@@ -32,7 +30,6 @@ import org.json.JSONObject;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -44,7 +41,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
@@ -66,6 +62,12 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final Object OPEN_BRACKET = "[";
     private static final Object CLOSED_BRACKET = "]";
     private static final String GAINED_ACCRED_LOCK="gainedAccredLock";
+    private static final String WHEN = "when";
+    private static final String DOUBLE_CLOSE_PARENS = "))";
+    private static final String SINGLE_CLOSE_PAREN = ")";
+    private static final String EVAL = "eval(";
+    private static final String NEW_LINE = "\n";
+    private static final String CONSEQUENCE_FUNCTION = "determineMostRecentCourseCompletion";
     
     private static Object accredProcessLock = new Object();
     private static boolean isLocked = false;
@@ -175,8 +177,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         if(accredObj.getAccreditationId() != null && accredObj.getAccreditationId() != 0)
             return;
         
-        int accredId = canonicalDAO.getAccreditationIdGivenName(accredObj.getAccreditationName());
-        logger.debug(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getAccreditationName());
+        int accredId = canonicalDAO.getAccreditationIdGivenName(accredObj.getName());
+        logger.debug(accredObj.getEmail()+" setAccreditationIdOnAccreditationObj() : accredId = "+accredId+" : accredName = "+accredObj.getName());
         accredObj.setAccreditationId(accredId);
     }
     
@@ -243,7 +245,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getBeginDate());
             problemNumber = checkDate(problemNumber, rNumber, sRule, eBuilder, sRule.getEndDate());
             
-            // 2)  Validate course completions
+            // 2) Validate optional accredition condition
+            problemNumber = checkAccredCondition(problemNumber, rNumber, sRule, eBuilder, sRule.getAccredCondition(), accredSet);
+            
+            // 3)  Validate course completions
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse1(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse2(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse3(), courseSet);
@@ -253,7 +258,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse7(), courseSet);
             problemNumber = checkCourse(problemNumber, rNumber, sRule, eBuilder, sRule.getCourse8(), courseSet);
             
-            // 3)  Validate Accreditation
+            // 4)  Validate Accreditation
             problemNumber = checkAccreditation(problemNumber, rNumber, sRule, eBuilder, sRule.getAccredName(), accredSet);
  
             rNumber++;
@@ -415,6 +420,23 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         return problemNumber;
     }
     
+    private Integer checkAccredCondition(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String accredCondition, Set accredSet) {
+        if(!StringUtils.isEmpty(accredCondition)) {
+            try {
+                if(!accredSet.contains(accredCondition)) {
+                    accredSet.add(accredCondition);
+                    this.canonicalDAO.getAccreditationIdGivenName(accredCondition);
+                }
+            } catch(org.springframework.dao.IncorrectResultSizeDataAccessException e) {
+                problemNumber++;
+                eBuilder.append("\n\n"+problemNumber+") Row "+rNumber+" : Accreditation condition name not found : \""+accredCondition+"\"");
+                eBuilder.append("\n"+sRule);
+            }
+        }
+        return problemNumber;
+        
+    }
+    
     private Integer checkAccreditation(Integer problemNumber, int rNumber, SpreadsheetRule sRule, StringBuilder eBuilder, String accredName, Set accredSet) {
         if(StringUtils.isEmpty(accredName)){
             problemNumber++;
@@ -442,6 +464,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
            exchange.getIn().setHeader(SpreadsheetRule.BEGIN_DATE, sRule.getBeginDate());
            exchange.getIn().setHeader(SpreadsheetRule.END_DATE, sRule.getEndDate() == null?"":sRule.getEndDate());
            
+           if(StringUtils.isNotEmpty(sRule.getAccredCondition()))
+               exchange.getIn().setHeader(SpreadsheetRule.ACCRED_CONDITION, sRule.getAccredCondition());
+           
             exchange.getIn().setHeader(SpreadsheetRule.COURSE1, sRule.getCourse1());
             if(StringUtils.isNotEmpty(sRule.getCourse2()))
                 exchange.getIn().setHeader(SpreadsheetRule.COURSE2, sRule.getCourse2());
@@ -459,6 +484,33 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             exchange.getIn().setHeader(SpreadsheetRule.ACCRED_NAME, sRule.getAccredName());
             exchange.getIn().setHeader(SpreadsheetRule.RULE_NAME, sRule.getRuleName());
     }
+    
+    public void weaveAccredConditionIntoRule(Exchange exchange) {
+        String drl = (String)exchange.getIn().getBody();
+        String accredCondition = (String)exchange.getIn().getHeader(SpreadsheetRule.ACCRED_CONDITION);
+        logger.info("weaveAccredConditionIntoRule(); accredCondition = "+accredCondition);
+
+        // 1) weave accred fact fact into rule
+        drl = drl.replace(WHEN, WHEN+"\n    $ac:Accreditation(name == \""+accredCondition+"\")");
+
+        // 2) weave accred fact into date evaluation condition
+        int startPos = drl.indexOf(EVAL) - 5;
+        int endPos = drl.indexOf(NEW_LINE, startPos+1);
+        String evalLine = drl.substring(startPos, endPos);
+        String modifiedEvalLine = evalLine.replace(DOUBLE_CLOSE_PARENS, ", $ac"+DOUBLE_CLOSE_PARENS);
+        logger.info("weaveAccredConditionIntoRule() startPos = "+startPos+" : endPos = "+endPos+" : evalLine = "+evalLine);
+        drl = drl.replace(evalLine, modifiedEvalLine);
+
+        // 3) weave accred fact into consequence
+        startPos = drl.indexOf(CONSEQUENCE_FUNCTION);
+        endPos = drl.indexOf(SINGLE_CLOSE_PAREN, startPos)+1;
+        String consequenceString = drl.substring(startPos, endPos);
+        logger.info("weaveAccredConditionIntoRule() startPos = "+startPos+" : endPos = "+endPos+" : consequenceString = "+consequenceString);
+        String modifiedString = consequenceString.replace(SINGLE_CLOSE_PAREN, ", $ac"+SINGLE_CLOSE_PAREN);
+        drl = drl.replace(consequenceString, modifiedString);
+
+        exchange.getIn().setBody(drl);
+    }
 
     public void changeSuffixOfRuleFileName(Exchange exchange) {
 
@@ -469,19 +521,19 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
 
     public void setStudentAccreditationsJSONResponse(Exchange exchange) throws org.json.JSONException {
-        List<CourseCompletion> studentCourses = (List<CourseCompletion>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
+        List<GPTEBaseCondition> studentCourses = (List<GPTEBaseCondition>) exchange.getIn().getHeader(STUDENT_COURSES_HEADER);
         JSONObject jObject = new JSONObject();
         if(studentCourses != null) {
             
             // 1)  add email
-            CourseCompletion firstCCObj = studentCourses.get(0);
+            GPTEBaseCondition firstCCObj = studentCourses.get(0);
             Student studentObj = firstCCObj.getStudent();
             jObject.put("email", studentObj.getEmail());
             
             // 2)  add List of CourseCompletion names
             List<String> courseCompletions = new ArrayList<String>();
-            for(CourseCompletion cc : studentCourses){
-                courseCompletions.add(cc.getCourseName());
+            for(GPTEBaseCondition cc : studentCourses){
+                courseCompletions.add(cc.getName());
             }
             jObject.put("courseCompletions", courseCompletions);
         

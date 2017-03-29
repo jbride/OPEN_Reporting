@@ -2,7 +2,7 @@
 
 # GPTE Reporting database update from prod
 
-- name: Create Backups folder on prod
+- name: Create Backups folder on prod; prod backup only = {{ prod_backup_only }}
   file: path={{ mysql_datadump_src_dir }} state=directory
   run_once: true
   delegate_to: "{{prod}}"
@@ -10,8 +10,6 @@
 - name: Dump remote prod databases
   mysql_db: 
     login_user: root
-#    login_host: localhost
-#    login_password: "{{ db_root_passwd }}"
     name: "{{ item }}"
     state: dump 
     target: "{{ mysql_datadump_src_dir }}/{{ item }}Db.sql.gz"
@@ -29,15 +27,18 @@
     flat: yes
   with_items: "{{databases_to_update_from_prod}}"
   delegate_to: "{{prod}}"
+    
 
 - name: Create Backups folder on remote {{gpte_env}} environment
   file: path={{ mysql_datadump_target_dir }} state=directory
+  when: not prod_backup_only
 
 - name: push database dump files from local to remote {{gpte_env}} environment
   copy:
     src: "{{ mysql_datadump_target_dir }}/{{ item }}Db.sql.gz"
     dest: "{{ mysql_datadump_target_dir }}"
   with_items: "{{databases_to_update_from_prod}}"
+  when: not prod_backup_only
 
 - name: import data into {{gpte_env}} RDBMS
   mysql_db:
@@ -45,4 +46,5 @@
     state: import 
     target: "{{ mysql_datadump_target_dir }}/{{ item }}Db.sql.gz"
   with_items: "{{databases_to_update_from_prod}}"
+  when: not prod_backup_only
   

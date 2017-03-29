@@ -23,6 +23,8 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import java.io.IOException;
 
+import com.redhat.gpe.domain.helper.DomainMockObjectHelper;
+
 
 public class StudentAccreditationTest extends CamelSpringTestSupport {
     
@@ -51,7 +53,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     public void init() {}
 
 
-    @Ignore
+    //@Ignore
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 
@@ -65,7 +67,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
         Endpoint endpoint = context.getEndpoint(DETERMINE_ACCREDITATION_FOR_STUDENT_URI);
         Exchange exchange = endpoint.createExchange();
         Message in = exchange.getIn();
-        in.setBody(studentId);
+        in.setBody(DomainMockObjectHelper.partnerStudentId);
         in.setHeader(IDENTIFY_FIRED_RULES_ONLY_HEADER, "false");
         in.setHeader(RESPOND_JSON_HEADER, "true");
         Exchange outE = template.send(DETERMINE_ACCREDITATION_FOR_STUDENT_URI, exchange);

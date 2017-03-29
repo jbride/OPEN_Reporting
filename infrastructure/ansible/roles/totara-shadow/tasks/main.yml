@@ -1,0 +1,42 @@
+---
+
+- name: Install postgresql-jdbc driver and postgresql packages to support queries to totarra shadow database
+  yum: 
+    name: postgresql-jdbc,postgresql
+    state: present
+
+- name: Add totara shadow db related system properties to JBoss EAP
+  blockinfile:
+    dest: "{{eap_home}}/bin/standalone.conf"
+    block: |
+      JAVA_OPTS="$JAVA_OPTS -Dtotara_shadow_host_ip={{totara_shadow_host_ip}}"
+      JAVA_OPTS="$JAVA_OPTS -Dtotara_shadow_host_port={{totara_shadow_host_port}}"
+      JAVA_OPTS="$JAVA_OPTS -Dtotara_shadow_db_name={{totara_shadow_db_name}}"
+
+- name: Copy JBoss EAP cli scripts to target
+  template:
+    src: "totara_shadow_cli.sh"
+    dest: /tmp
+    owner: "{{user}}"
+    group: "{{user}}"
+
+- name: Start EAP (as jboss user) in admin mode so as to be available for execution of CLI scripts
+  stat:
+    path: "{{eap_home}}/modules/org/postgresql"
+  register: st
+- command: "{{eap_home}}/bin/standalone.sh --admin-only"
+  async:   15
+  poll:    0
+  become: yes
+  become_user: "{{user}}"
+- command: "sleep 3"
+
+- name: Now that EAP is executing, run CLI scripts
+  command: "{{eap_home}}/bin/jboss-cli.sh -c --controller=localhost:10124 --file=/tmp/totara_shadow_cli.sh"
+  become: yes
+  become_user: "{{user}}"
+  when: st.stat.isdir is not defined
+- command: "{{eap_home}}/bin/jboss-cli.sh -c :shutdown"
+  async:   5
+  poll:    0
+

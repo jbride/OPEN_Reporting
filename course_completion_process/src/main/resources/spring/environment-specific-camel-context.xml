@@ -14,4 +14,8 @@
     <property name="jndiName" value="java:jboss/datasources/transactionalDS"/>
   </bean>
 
+  <bean id="totaraShadowDS" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <property name="jndiName" value="java:jboss/datasources/totaraShadowDS"/>
+  </bean>
+
 </beans>

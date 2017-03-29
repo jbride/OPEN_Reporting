@@ -4,6 +4,7 @@ import com.redhat.gpe.domain.canonical.*;
 import com.redhat.gpe.domain.helper.Accreditation;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpe.domain.helper.DenormalizedStudent;
+import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 
 import org.apache.log4j.Logger;
 import org.apache.commons.lang3.StringUtils;
@@ -377,7 +378,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return sCourseIds;
     }
 
-    public List<CourseCompletion> selectPassedStudentCoursesByStudent(int studentId) {
+    public List<GPTEBaseCondition> selectPassedStudentCoursesByStudent(int studentId) {
         StringBuilder sBuilder = new StringBuilder();
         
         // StudentCourse has both CourseID and CourseName
@@ -402,15 +403,19 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 boolean courseRemoved = sCourses.remove(ccObj);
                 sBuilder = new StringBuilder();
                 sBuilder.append(ccObj.getStudent().getEmail());
-                sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getCourseName());
-                sBuilder.append(" : "+sdfObj.format(ccObj.getAssessmentDate())+" : removed = "+courseRemoved);
+                sBuilder.append(" : selectPassedStudentCoursesByStudent() purging old course completion: "+ ccObj.getName());
+                sBuilder.append(" : "+sdfObj.format(ccObj.getCompletionDate())+" : removed = "+courseRemoved);
                 logger.info(sBuilder.toString());
             }else {
                 courseSet.add(ccObj.getCourseId());
             }
         }
         
-        return sCourses;
+        // https://github.com/redhat-gpe/OPEN_Reporting/issues/170
+        List<GPTEBaseCondition> coursesAndAccreds = new ArrayList<GPTEBaseCondition>();
+        coursesAndAccreds.addAll(sCourses);
+        
+        return coursesAndAccreds;
     }
 
     public int getUniqueStudentCourseCount(StudentCourse scObj) {
@@ -429,6 +434,10 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         int assessmentId = 0; //getAssessmentId(theStudent.getAssessment());
         Integer count = 0; //sbJdbcTemplate.queryForObject(sql, Integer.class, theStudent.getEmail().toLowerCase(), assessmentId);
         return count == 0;
+    }
+
+    public int getMostRecentTotaraCourseCompletionKnownByGPTE() {
+        return 0;
     }
 /* ******************************************************************************* */
     
@@ -471,6 +480,20 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append(studentEmailSuffix);
             sBuilder.append("\"");
         }
+        List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
+        return sAccreds;
+    }
+    
+    public List<Accreditation> selectStudentAccreditationByStudentId(int studentId) {
+        StringBuilder sBuilder = new StringBuilder();
+        sBuilder.append("SELECT "+Student.SELECT_CLAUSE+","+AccreditationDefinition.SELECT_CLAUSE+","+StudentAccreditation.SELECT_CLAUSE+","+Course.SELECT_CLAUSE+" "); 
+        sBuilder.append("FROM Students s, AccreditationDefinitions a, StudentAccreditations sa, Courses c ");
+        sBuilder.append("WHERE sa.StudentID = s.StudentID ");
+        sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
+        sBuilder.append("AND sa.CourseID = c.CourseID ");
+        sBuilder.append("AND sa.Processed = 0 ");
+        sBuilder.append("AND s.StudentID="+studentId);
+        
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
         return sAccreds;
     }
@@ -524,6 +547,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         logger.info("triggerStoredProcedure simpleJdbcCall = "+this.simpleJdbcCall+" : storedProcCall = "+storedProcCall);
         sbJdbcTemplate.update(storedProcCall);
     }
+
 
     
     
