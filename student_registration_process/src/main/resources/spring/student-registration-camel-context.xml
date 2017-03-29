@@ -176,7 +176,7 @@
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
         <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
         <setHeader headerName="ROUTE_SPECIFIC_SUBJECT"><simple>OPENTLC Daily Import Exceptions: ${date:now:MM-dd-yy} : {{jboss.host.name}}  : ${header.CamelFileName}</simple></setHeader>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>open-program@redhat.com</constant></setHeader>
+        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>mawisner@redhat.com,open-program@redhat.com</constant></setHeader>
         <unmarshal ref="studentRegBindy"/>
         <doTry>
                 <!--potentially throws this exception:
