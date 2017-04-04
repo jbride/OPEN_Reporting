@@ -1,6 +1,6 @@
 ---
 
-- name: update GPTE Reporting as the jboss user using opentlc-user github account
+- name: update GPTE Reporting as the jboss user using opentlc-user github account.  gpte_env = {{gpte_env}}
   git:
     repo: git@github.com:redhat-gpe/OPEN_Reporting.git
     dest: "{{gpte_reporting_home}}"
@@ -9,6 +9,7 @@
     key_file: /home/{{user}}/.ssh/id_ecdsa
   become: yes
   become_user: "{{user}}"
+  when: gpte_env != 'dev'
 
 # name: Build GPTE Reporting using maven
 - shell: /opt/{{mvn_root}}/bin/mvn clean install -DskipTests
