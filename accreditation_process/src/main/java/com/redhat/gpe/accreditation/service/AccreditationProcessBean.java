@@ -31,8 +31,10 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -692,8 +694,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             
             String startDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
             nvps.add(new BasicNameValuePair("start_date", startDateStr));
-            
-            String endDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+           
+            Date accredEndDate = addYearsToDate(sAccredObj.getAccreditationdate(), 2); 
+            String endDateStr = dateFormatter.format(accredEndDate);
             nvps.add(new BasicNameValuePair("end_date", endDateStr));
 
             // set HTTP request message body
@@ -720,6 +723,13 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             logger.error(message, exc);
             throw (new RuntimeException(message, exc));
         }
+    }
+
+    private Date addYearsToDate(Date originalDate, int yearsToAdd) {
+        Calendar calObj = Calendar.getInstance();
+        calObj.setTime(originalDate);
+        calObj.add( Calendar.YEAR, yearsToAdd );
+        return calObj.getTime();
     }
 
 /*  ********************************************************************************************** */
