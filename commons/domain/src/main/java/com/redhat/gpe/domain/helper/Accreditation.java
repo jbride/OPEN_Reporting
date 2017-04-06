@@ -24,6 +24,8 @@ public class Accreditation extends GPTEBaseCondition{
     
     private String accreditationType = StudentAccreditation.Types.Active.name();
     private String ruleFired;  // name of rule that instantiated this Accreditation object
+
+    private boolean skillsBaseQualExists = false;
     
     public Accreditation() {
         this.accreditationDefinition = new AccreditationDefinition();
@@ -126,5 +128,12 @@ public class Accreditation extends GPTEBaseCondition{
     public void setAccreditationType(String accreditationType) {
         this.accreditationType = accreditationType;
         this.studentAccred.setAccreditationtype(accreditationType);
+    }
+
+    public boolean getSkillsBaseQualExists() {
+        return skillsBaseQualExists;
+    }
+    public void setSkillsBaseQualExists(boolean x) {
+        skillsBaseQualExists = x;
     }
 }

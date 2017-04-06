@@ -462,10 +462,19 @@
         <choice>
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
-                <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
-                <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
-                <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
-                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+                <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="postAccreditationToSkillsBase"/>
+                <choice>
+                    <when>
+                        <simple>${body.skillsBaseQualExists} == false</simple>
+                        <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                        <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
+                        <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                        <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+                    </when>
+                    <otherwise>
+                        <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditationDefinition.accreditationname}" loggingLevel="INFO"/>
+                    </otherwise>
+                </choice>
             </when>
             <otherwise>
                 <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>

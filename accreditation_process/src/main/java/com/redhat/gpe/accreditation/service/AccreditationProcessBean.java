@@ -21,6 +21,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
@@ -50,6 +51,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String PERSON_EMAIL = "sb_personIdByEmailURL";
     private static final String Q_URL = "sb_addQualificationUrl";
     private static final String GRANT_TYPE = "sb_grantType";
+    private static final String GET_Q_URL = "sb_getQualificationUrl";
+    private static final String EXPIRED_MONTHS = "sb_qualificationEndDateDurationInMonths";
 
     private static final String CLIENT_ID = "sb_skillsbase_clientId";
     private static final String CLIENT_SECRET = "sb_skillsbase_clientSecret";
@@ -79,6 +82,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private String tokenUrl;
     private String personIdByEmailUrl;
     private String addQualificationUrl;
+    private String getQualificationUrl;
+    private int expiredMonths = 24;
 
     private String grantType;
     private String clientId;
@@ -100,6 +105,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         if(StringUtils.isEmpty(addQualificationUrl))
             throw new RuntimeException("must set system property: "+Q_URL);
 
+        getQualificationUrl = System.getProperty(GET_Q_URL);
+        if(StringUtils.isEmpty(getQualificationUrl))
+            throw new RuntimeException("must set system property: "+GET_Q_URL);
+
         clientId = System.getProperty(CLIENT_ID);
         if(StringUtils.isEmpty(clientId))
             throw new RuntimeException("must set system property: "+CLIENT_ID);
@@ -116,6 +125,11 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         if(StringUtils.isEmpty(drlPath))
             throw new RuntimeException("must set system property: "+DRL_PATH);
 
+        String emString = System.getProperty(EXPIRED_MONTHS);
+        if(StringUtils.isEmpty(emString))
+            throw new RuntimeException("must set system property: "+EXPIRED_MONTHS);
+        expiredMonths = Integer.parseInt(emString);
+
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("init() \n    tokenUrl = "+tokenUrl);
         sBuilder.append("\n    personIdByEmailUrl = "+personIdByEmailUrl);
@@ -123,6 +137,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         sBuilder.append("\n    clientId = "+clientId);
         sBuilder.append("\n    clientSecret = "+clientSecret);
         sBuilder.append("\n    grantType = "+grantType);
+        sBuilder.append("\n    expiredMonths = "+expiredMonths);
         logger.info(sBuilder.toString()); 
     }
 
@@ -664,6 +679,30 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             throw (new RuntimeException(message, exc));
         }
     }
+
+    public void checkSkillsBaseForExistingAccred(Exchange exchange) {
+        Message in = exchange.getIn();
+        Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
+        
+        Student studentObj = denormalizedStudentAccred.getStudent();
+        AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
+        StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
+
+        String accredName = accredObj.getAccreditationname();
+
+        try {
+            HttpClient httpclient = new DefaultHttpClient();
+            httpclient = WebClientDevWrapper.wrapClient(httpclient);
+
+            HttpGet get = new HttpGet(getQualificationUrl);
+
+        } catch (Exception exc) {
+            String message = "Failure making REST API CALL!";
+            logger.error(message, exc);
+            throw (new RuntimeException(message, exc));
+        }
+
+    }
     
     public void postAccreditationToSkillsBase(Exchange exchange) {
 
@@ -695,7 +734,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             String startDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
             nvps.add(new BasicNameValuePair("start_date", startDateStr));
            
-            Date accredEndDate = addYearsToDate(sAccredObj.getAccreditationdate(), 2); 
+            Date accredEndDate = addMonthsToDate(sAccredObj.getAccreditationdate(), expiredMonths); 
             String endDateStr = dateFormatter.format(accredEndDate);
             nvps.add(new BasicNameValuePair("end_date", endDateStr));
 
@@ -725,10 +764,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
     }
 
-    private Date addYearsToDate(Date originalDate, int yearsToAdd) {
+    private Date addMonthsToDate(Date originalDate, int monthsToAdd) {
         Calendar calObj = Calendar.getInstance();
         calObj.setTime(originalDate);
-        calObj.add( Calendar.YEAR, yearsToAdd );
+        calObj.add( Calendar.MONTH, monthsToAdd );
         return calObj.getTime();
     }
 
