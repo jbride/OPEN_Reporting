@@ -145,6 +145,9 @@
     </route>
 
     <route id="process-totara-course-completions">
+        <description> 
+            Query Totara Shadow database for any new course completions
+        </description>
         <from uri="{{cc_process_totara_course_completions_input_uri}}" />
         <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionKnownByGPTE"/>
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body}" loggingLevel="INFO"/>
