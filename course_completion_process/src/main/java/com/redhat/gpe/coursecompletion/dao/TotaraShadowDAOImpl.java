@@ -6,11 +6,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 public class TotaraShadowDAOImpl implements TotaraShadowDAO {
 
+    private static final String TOTARA_SHADOW_DB_TEST_SQL = "totara_shadow_db_test_sql";
+
     @Autowired
     private JdbcTemplate tsJdbcTemplate;
 
     public int countNewCourseCompletions(int lastCC) {
-        return 0;
+
+        String testSql = System.getProperty(TOTARA_SHADOW_DB_TEST_SQL);
+        int ccCount = tsJdbcTemplate.queryForInt(testSql);
+        return ccCount;
     }
 
 }

@@ -13,6 +13,8 @@
     <spring.version>4.1.6.RELEASE</spring.version>
     <drools.kie.version>6.3.0.Final-redhat-7</drools.kie.version>
     <jetty.version>9.2.9.v20150224</jetty.version>
+    <version.postgresql>9.4.1212</version.postgresql>
+    <!--version.postgresql>9.2-1004-jdbc4</version.postgresql -->
 
     <version.gpte.ops.project>1.0</version.gpte.ops.project>
 
@@ -322,6 +324,12 @@
         <groupId>mysql</groupId>
         <artifactId>mysql-connector-java</artifactId>
         <version>5.1.31</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${version.postgresql}</version>
         <scope>test</scope>
       </dependency>
       <dependency>
