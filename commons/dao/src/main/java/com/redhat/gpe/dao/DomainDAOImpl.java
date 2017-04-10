@@ -424,8 +424,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         String dayStart = wholeDate+" 00:00:00";
         String dayEnd = wholeDate+" 23:59:59";
         //logger.info("getUniqueStudentCourseCount() dayStart = "+dayStart+" : dayEnd = "+dayEnd );
-        String sql = "select count(*) from StudentCourses where studentId=? and CourseId=? and assessmentScore=? and AssessmentDate between ? and ?";
-        return sbJdbcTemplate.queryForObject(sql, Integer.class, scObj.getStudentid(), scObj.getCourseid(), scObj.getAssessmentscore(), dayStart, dayEnd );
+        String sql = "select count(*) from StudentCourses where studentId=? and CourseId=? and AssessmentDate between ? and ?";
+        return sbJdbcTemplate.queryForObject(sql, Integer.class, scObj.getStudentid(), scObj.getCourseid(), dayStart, dayEnd );
     }
 
     public boolean isNewStudentCourseForStudent(StudentCourse theStudent) {
