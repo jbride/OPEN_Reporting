@@ -38,6 +38,8 @@ public class DomainMockObjectHelper {
     
     static String bpmsAdvancedProcessDevCourseId = "MWS-DEL-ADBA-4238-AST-EN_US";
     static String bpmsAdvancedProcessDevCourseName = "Advanced Process Development";
+
+    static Integer totaraCourseCompletionId = 109436;
     
     public static Company getMockRHTCompany() {
         Company company = new Company();
@@ -105,6 +107,7 @@ public class DomainMockObjectHelper {
         sCourse.setCourseid(courseId);
         sCourse.setAssessmentdate(new Timestamp(new Date().getTime()));
         sCourse.setAssessmentresult(StudentCourse.ResultTypes.Pass.name());
+        sCourse.setTotaraCourseCompletionId(totaraCourseCompletionId);
         return sCourse;
     }
     

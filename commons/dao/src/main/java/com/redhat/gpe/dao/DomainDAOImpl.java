@@ -323,7 +323,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
 
     public void addStudentCourse(StudentCourse cCompletion) {
-        StringBuilder sBuilder = new StringBuilder("insert into StudentCourses values (NULL,?,?,?,?,?,?,?,?)");
+        StringBuilder sBuilder = new StringBuilder("insert into StudentCourses values (NULL,?,?,?,?,?,?,?,?,?)");
         
         sbJdbcTemplate.update(sBuilder.toString(),
             cCompletion.getStudentid(),
@@ -333,7 +333,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             cCompletion.getAssessmentresult(),
             cCompletion.getAssessmentscore(),
             StudentCourse.UNPROCESSED,
-            null
+            null,
+            cCompletion.getTotaraCourseCompletionId()
         );
     }
     
