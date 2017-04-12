@@ -360,8 +360,8 @@ The following are steps and considerations for conducting QA of SkillsBase Integ
 .. GPTE currently has two Skills Base instances:
 +
 -----
-Production instance: https://app.skills-base.com/o/redhat
 Test instance: https://app.skills-base.com/o/redhattest
+Production instance: https://app.skills-base.com/o/redhat
 -----
 
 .. Each Skills Base instance can have one unique key pair active at any time.

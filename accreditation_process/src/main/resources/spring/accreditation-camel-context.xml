@@ -466,9 +466,13 @@
                 <choice>
                     <when>
                         <simple>${body.skillsBaseQualExists} == false</simple>
+                        <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
+                        <when>
+                            <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
                         <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
                         <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
-                        <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                            <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                        </when>
                         <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
                     </when>
                     <otherwise>

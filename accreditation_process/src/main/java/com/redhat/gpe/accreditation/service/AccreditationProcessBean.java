@@ -17,6 +17,7 @@ import org.apache.camel.Exchange;
 import org.apache.camel.Message;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -134,6 +135,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         sBuilder.append("init() \n    tokenUrl = "+tokenUrl);
         sBuilder.append("\n    personIdByEmailUrl = "+personIdByEmailUrl);
         sBuilder.append("\n    addQualificationUrl = "+addQualificationUrl);
+        sBuilder.append("\n    getQualificationUrl = "+getQualificationUrl);
         sBuilder.append("\n    clientId = "+clientId);
         sBuilder.append("\n    clientSecret = "+clientSecret);
         sBuilder.append("\n    grantType = "+grantType);
@@ -687,6 +689,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         Student studentObj = denormalizedStudentAccred.getStudent();
         AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
         StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
+        String sEmail = studentObj.getEmail();
+        String personId = studentObj.getSkillsbasePersonId();
 
         String accredName = accredObj.getAccreditationname();
 
@@ -694,7 +698,27 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpClient httpclient = new DefaultHttpClient();
             httpclient = WebClientDevWrapper.wrapClient(httpclient);
 
-            HttpGet get = new HttpGet(getQualificationUrl);
+            String getStudentQualUrl = getQualificationUrl+personId;
+            logger.info(sEmail+" : checkSkillsBaseForExistingAccred() getStudentQualUrl = "+getStudentQualUrl);
+
+            HttpGet get = new HttpGet(getStudentQualUrl);
+
+            // set up header
+            get.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+
+            HttpResponse httpResponse = httpclient.execute(get);
+
+            // process response
+            long responseLength = httpResponse.getEntity().getContentLength();
+            String response = EntityUtils.toString(httpResponse.getEntity());
+            StatusLine sLine = httpResponse.getStatusLine();
+            logger.info(sEmail+" : skillsbase personId = "+personId+"\n\tstatusCode = "+sLine.getStatusCode()+"\n\tresponse content length = "+responseLength+"\n\tresponse reason phrase = "+sLine.getReasonPhrase()+"\n\tresponse: " + response);
+            //logger.info(sEmail+" : skillsbase personId = "+personId+"\n\tstatusCode = "+sLine.getStatusCode()+"\n\trespnse reason phrase = "+sLine.getReasonPhrase()+"\n\tresponse: " + response+"\n\tstatus = "+status);
+
+            //JSONObject jsonResponse = new JSONObject(response);
+
+            //String status = jsonResponse.getString("status");
+            
 
         } catch (Exception exc) {
             String message = "Failure making REST API CALL!";
@@ -750,7 +774,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
             String status = jsonResponse.getString("status");
 
-            logger.info(studentObj.getEmail() +" : addQualification() response: " + response+" : status = "+status);
+            logger.info(studentObj.getEmail() +" : addQualification() \n\tendDate = "+endDateStr+"\n\tresponse: " + response+" : status = "+status);
 
             if (!"success".equalsIgnoreCase(status)) {
                 String message = "Error sending qualification. Student email: " + studentObj.getEmail() + ",  qualification: " + accredName;
