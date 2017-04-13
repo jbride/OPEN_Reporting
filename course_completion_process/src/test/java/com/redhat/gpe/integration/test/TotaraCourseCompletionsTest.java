@@ -56,7 +56,7 @@ public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
        Exchange exchange = endpoint.createExchange();
        exchange.setPattern(ExchangePattern.InOnly);
        Message in = exchange.getIn();
-       in.setHeader(TOTARA_COURSE_COMPLETION_LIMIT, "5");
+       in.setHeader(TOTARA_COURSE_COMPLETION_LIMIT, "1");
 
        in.setBody(new Object());
        template.send(PROCESS_NEW_TOTARA_COURSE_COMPLETIONS_URI, exchange);

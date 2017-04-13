@@ -163,7 +163,7 @@
             <doTry>
                 <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion"/>
                 <doCatch>
-                    <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
+                    <exception>com.redhat.gpte.services.InvalidStudentException</exception>
                     <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
                     <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenTotaraCourseCompletion" id="update-totara-student"/>
                     <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>

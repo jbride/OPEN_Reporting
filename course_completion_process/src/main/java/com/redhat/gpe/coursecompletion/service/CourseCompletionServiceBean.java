@@ -8,6 +8,7 @@ import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.ExceptionCodes;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.services.InvalidCourseException;
+import com.redhat.gpte.services.InvalidStudentException;
 import com.redhat.gpe.coursecompletion.domain.TotaraCourseCompletion;
 
 import org.apache.camel.Body;
@@ -630,12 +631,22 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         return totaraCourseCompletions;
     }
 
-    public CourseCompletion convertTotaraCourseCompletion(Exchange exchange) {
+    public CourseCompletion convertTotaraCourseCompletion(Exchange exchange) throws InvalidStudentException, InvalidCourseException {
         TotaraCourseCompletion tCC = (TotaraCourseCompletion)exchange.getIn().getBody();
         
-        Student studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
+        Student studentObj = null;
+        try {
+            studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail()); 
+        } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+            throw new InvalidStudentException(tCC.getEmail());
+        }
         
-        Course courseObj = canonicalDAO.getCourseByCourseName(tCC.getCourseFullName(), null);
+        Course courseObj = null;
+        try {
+            courseObj = canonicalDAO.getCourseByCourseName(tCC.getCourseFullName(), null);
+        } catch(org.springframework.dao.EmptyResultDataAccessException x) {
+            throw new InvalidCourseException(tCC.getCourseFullName());
+        }
         
         Language langObj = new Language();
         langObj.setLanguageid(Language.EN_US);
