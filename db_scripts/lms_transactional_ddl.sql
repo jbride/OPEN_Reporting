@@ -16,6 +16,21 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
+-- Table structure for table `AD`
+--
+
+DROP TABLE IF EXISTS `AD`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `AD` (
+  `accreditationname` varchar(150) NOT NULL,
+  `role` varchar(20) DEFAULT NULL,
+  `specialization` varchar(32) DEFAULT NULL,
+  `track` varchar(42) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `AccreditationDefinitions`
 --
 
@@ -32,7 +47,7 @@ CREATE TABLE `AccreditationDefinitions` (
   `AccreditationExportID` varchar(30) DEFAULT NULL,
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`AccreditationID`)
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=98 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -54,7 +69,23 @@ CREATE TABLE `Companies` (
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),
   KEY `IDX_PartnerType` (`PartnerType`),
   KEY `IDX_PartnerTier` (`PartnerTier`)
-) ENGINE=InnoDB AUTO_INCREMENT=30073 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=30280 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Countries`
+--
+
+DROP TABLE IF EXISTS `Countries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Countries` (
+  `CountryID` varchar(2) NOT NULL,
+  `CountryName` varchar(100) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`CountryID`),
+  KEY `IDX_CountryName` (`CountryName`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -69,6 +100,20 @@ CREATE TABLE `CourseIdMappings` (
   `NewCourseId` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`OldCourseId`),
   KEY `IDX_NewCourseId` (`NewCourseId`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `CourseIds_20160901`
+--
+
+DROP TABLE IF EXISTS `CourseIds_20160901`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `CourseIds_20160901` (
+  `CourseName` varchar(200) DEFAULT NULL,
+  `OldCourseID` varchar(50) NOT NULL DEFAULT '',
+  `NewCourseId` varchar(50) NOT NULL DEFAULT ''
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -90,6 +135,52 @@ CREATE TABLE `CourseMappings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `CourseMappingsTemp`
+--
+
+DROP TABLE IF EXISTS `CourseMappingsTemp`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `CourseMappingsTemp` (
+  `courseid` varchar(50) NOT NULL DEFAULT '',
+  `coursetype` varchar(4) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `activitycode` varchar(150) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `CourseMappings_20160622`
+--
+
+DROP TABLE IF EXISTS `CourseMappings_20160622`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `CourseMappings_20160622` (
+  `OldCourseCode` varchar(50) NOT NULL,
+  `NewCourseCode` varchar(50) DEFAULT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `Source` varchar(20) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `CourseMappings_20160901`
+--
+
+DROP TABLE IF EXISTS `CourseMappings_20160901`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `CourseMappings_20160901` (
+  `OldCourseCode` varchar(100) NOT NULL,
+  `OldCourseId` varchar(100) DEFAULT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `Source` varchar(20) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Courses`
 --
 
@@ -107,6 +198,46 @@ CREATE TABLE `Courses` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `CoursesBak`
+--
+
+DROP TABLE IF EXISTS `CoursesBak`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `CoursesBak` (
+  `CourseID` varchar(50) NOT NULL DEFAULT '',
+  `CourseName` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Courses_20160513`
+--
+
+DROP TABLE IF EXISTS `Courses_20160513`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Courses_20160513` (
+  `CourseID` varchar(50) NOT NULL DEFAULT '',
+  `CourseName` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Courses_20160901`
+--
+
+DROP TABLE IF EXISTS `Courses_20160901`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Courses_20160901` (
+  `CourseID` varchar(50) NOT NULL DEFAULT '',
+  `CourseName` varchar(200) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `Languages`
 --
 
@@ -120,6 +251,115 @@ CREATE TABLE `Languages` (
   PRIMARY KEY (`LanguageID`),
   UNIQUE KEY `IDX_LanguageName` (`LanguageName`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Lookup`
+--
+
+DROP TABLE IF EXISTS `Lookup`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Lookup` (
+  `studentid` tinyint(4) NOT NULL,
+  `email` tinyint(4) NOT NULL,
+  `accreditationid` tinyint(4) NOT NULL,
+  `accreditationname` tinyint(4) NOT NULL,
+  `accreditationdate` tinyint(4) NOT NULL,
+  `accreditationtype` tinyint(4) NOT NULL,
+  `courseid` tinyint(4) NOT NULL,
+  `coursename` tinyint(4) NOT NULL,
+  `assessmentdate` tinyint(4) NOT NULL,
+  `lastname` tinyint(4) NOT NULL,
+  `firstname` tinyint(4) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `NewMappings_20161201`
+--
+
+DROP TABLE IF EXISTS `NewMappings_20161201`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `NewMappings_20161201` (
+  `OldCourseCode` varchar(30) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `CourseId` varchar(27) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `OldCourseId` varchar(50) DEFAULT NULL,
+  `flag` varchar(1) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `QvExport`
+--
+
+DROP TABLE IF EXISTS `QvExport`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `QvExport` (
+  `Month` varchar(8) CHARACTER SET utf8 DEFAULT NULL,
+  `Year` int(4) DEFAULT NULL,
+  `FY` varchar(5) CHARACTER SET utf8 DEFAULT NULL,
+  `Full Name` varchar(102) DEFAULT NULL,
+  `companyname` varchar(100),
+  `User Primary Job` varchar(40) DEFAULT NULL,
+  `User Primary Organization` varchar(50) DEFAULT NULL,
+  `User Primary Domain` varchar(8) DEFAULT NULL,
+  `Country Code` char(2) DEFAULT NULL,
+  `Email` varchar(100) NOT NULL,
+  `Code` varchar(50) NOT NULL DEFAULT '',
+  `Start Date` datetime,
+  `End Date` datetime,
+  `RedHat` varchar(3) CHARACTER SET utf8 DEFAULT NULL,
+  `Is Certification` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `In Progress` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `Role` varchar(20) DEFAULT NULL,
+  `Skills Track` varchar(42) DEFAULT NULL,
+  `Specialization` varchar(32) DEFAULT NULL,
+  `AccreditationName` varchar(150),
+  `Geo` varchar(16) DEFAULT NULL,
+  `Channel Mix` varchar(6) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `Split Business Unit` varchar(4) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `tier` varchar(50) DEFAULT NULL,
+  `alliancecode` varchar(15) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `QvExportMarch`
+--
+
+DROP TABLE IF EXISTS `QvExportMarch`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `QvExportMarch` (
+  `Month` varchar(8) CHARACTER SET utf8 DEFAULT NULL,
+  `Year` int(4) DEFAULT NULL,
+  `FY` varchar(5) CHARACTER SET utf8 DEFAULT NULL,
+  `Full Name` varchar(102) DEFAULT NULL,
+  `companyname` varchar(100),
+  `User Primary Job` varchar(40) DEFAULT NULL,
+  `User Primary Organization` varchar(50) DEFAULT NULL,
+  `User Primary Domain` varchar(8) DEFAULT NULL,
+  `Country Code` char(2) DEFAULT NULL,
+  `Email` varchar(100) NOT NULL,
+  `Code` varchar(50) NOT NULL DEFAULT '',
+  `Start Date` datetime,
+  `End Date` datetime,
+  `RedHat` varchar(3) CHARACTER SET utf8 DEFAULT NULL,
+  `Is Certification` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `In Progress` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `Role` varchar(20) DEFAULT NULL,
+  `Skills Track` varchar(42) DEFAULT NULL,
+  `Specialization` varchar(32) DEFAULT NULL,
+  `AccreditationName` varchar(150),
+  `Geo` varchar(16) DEFAULT NULL,
+  `Channel Mix` varchar(6) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `Split Business Unit` varchar(4) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `tier` varchar(50) DEFAULT NULL,
+  `alliancecode` varchar(15) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,6 +392,94 @@ CREATE TABLE `StudentAccreditations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `StudentAccreditationsDrools`
+--
+
+DROP TABLE IF EXISTS `StudentAccreditationsDrools`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StudentAccreditationsDrools` (
+  `StudentID` int(11) NOT NULL,
+  `AccreditationID` int(11) NOT NULL,
+  `AccreditationDate` datetime NOT NULL,
+  `AccreditationType` varchar(20) NOT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `Processed` tinyint(1) NOT NULL DEFAULT '0',
+  `RuleFired` varchar(100) NOT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`StudentID`,`AccreditationID`),
+  KEY `IDX_StudentAccreditations_Students` (`StudentID`),
+  KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),
+  KEY `IDX_StudentAccreditations_AccreditationDate` (`AccreditationDate`),
+  KEY `IDX_StudentAccreditations_StudentID_CourseID` (`StudentID`,`CourseID`),
+  KEY `IDX_StudentAccreditations_Processed` (`Processed`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StudentAccreditationsScott`
+--
+
+DROP TABLE IF EXISTS `StudentAccreditationsScott`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StudentAccreditationsScott` (
+  `StudentID` int(11) NOT NULL,
+  `AccreditationID` int(11) NOT NULL,
+  `AccreditationDate` datetime NOT NULL,
+  `AccreditationType` varchar(20) NOT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `Processed` tinyint(1) NOT NULL DEFAULT '0',
+  `RuleFired` varchar(100) NOT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`StudentID`,`AccreditationID`),
+  KEY `IDX_StudentAccreditations_Students` (`StudentID`),
+  KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),
+  KEY `IDX_StudentAccreditations_AccreditationDate` (`AccreditationDate`),
+  KEY `IDX_StudentAccreditations_StudentID_CourseID` (`StudentID`,`CourseID`),
+  KEY `IDX_StudentAccreditations_Processed` (`Processed`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StudentAccreditationsScottBak`
+--
+
+DROP TABLE IF EXISTS `StudentAccreditationsScottBak`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StudentAccreditationsScottBak` (
+  `StudentID` int(11) NOT NULL,
+  `AccreditationID` int(11) NOT NULL,
+  `AccreditationDate` datetime NOT NULL,
+  `AccreditationType` varchar(20) NOT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `Processed` tinyint(1) NOT NULL DEFAULT '0',
+  `RuleFired` varchar(100) NOT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StudentAccreditations_20160901`
+--
+
+DROP TABLE IF EXISTS `StudentAccreditations_20160901`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StudentAccreditations_20160901` (
+  `StudentID` int(11) NOT NULL,
+  `AccreditationID` int(11) NOT NULL,
+  `AccreditationDate` datetime NOT NULL,
+  `AccreditationType` varchar(20) NOT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `Processed` tinyint(1) NOT NULL DEFAULT '0',
+  `RuleFired` varchar(200) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `StudentCourses`
 --
 
@@ -168,6 +496,7 @@ CREATE TABLE `StudentCourses` (
   `AssessmentScore` tinyint(4) NOT NULL DEFAULT '100',
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `totaraCourseCompletionId` int(11) DEFAULT '0',
   PRIMARY KEY (`StudentCourseID`),
   KEY `IDX_StudentCourses_Students` (`StudentID`),
   KEY `IDX_StudentCourses_Courses` (`CourseID`),
@@ -177,7 +506,46 @@ CREATE TABLE `StudentCourses` (
   CONSTRAINT `FK_StudentCourses_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Languages` FOREIGN KEY (`LanguageID`) REFERENCES `Languages` (`LanguageID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=165497 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=178317 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StudentCoursesBefore37`
+--
+
+DROP TABLE IF EXISTS `StudentCoursesBefore37`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StudentCoursesBefore37` (
+  `StudentCourseID` int(11) NOT NULL DEFAULT '0',
+  `StudentID` int(11) NOT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `LanguageID` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `AssessmentDate` datetime NOT NULL,
+  `AssessmentResult` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `AssessmentScore` tinyint(4) NOT NULL DEFAULT '100',
+  `Processed` tinyint(1) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `StudentCourses_20160901`
+--
+
+DROP TABLE IF EXISTS `StudentCourses_20160901`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `StudentCourses_20160901` (
+  `StudentCourseID` int(11) NOT NULL DEFAULT '0',
+  `StudentID` int(11) NOT NULL,
+  `CourseID` varchar(50) NOT NULL,
+  `LanguageID` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `AssessmentDate` datetime NOT NULL,
+  `AssessmentResult` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `AssessmentScore` tinyint(4) NOT NULL DEFAULT '100',
+  `Processed` tinyint(1) NOT NULL DEFAULT '0',
+  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -248,7 +616,117 @@ CREATE TABLE `Students` (
   KEY `IDX_ActivationDate` (`ActivationDate`),
   KEY `IDX_DeActivationDate` (`DeActivationDate`),
   CONSTRAINT `FK_Students_Companies` FOREIGN KEY (`CompanyID`) REFERENCES `Companies` (`CompanyID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=60126 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=62608 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `Summary`
+--
+
+DROP TABLE IF EXISTS `Summary`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Summary` (
+  `region` varchar(8) DEFAULT NULL,
+  `sort1` int(1) DEFAULT NULL,
+  `sort2` int(1) DEFAULT NULL,
+  `role` varchar(20) DEFAULT NULL,
+  `specialization` varchar(32) DEFAULT NULL,
+  `track` varchar(42) DEFAULT NULL,
+  `accreditationname` varchar(150) NOT NULL,
+  `FY15` bigint(21) NOT NULL DEFAULT '0',
+  `FY16` bigint(21) NOT NULL DEFAULT '0',
+  `FY17` bigint(21) NOT NULL DEFAULT '0',
+  `total` bigint(21) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `SummaryRedHat`
+--
+
+DROP TABLE IF EXISTS `SummaryRedHat`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `SummaryRedHat` (
+  `region` varchar(8) DEFAULT NULL,
+  `sort1` int(1) DEFAULT NULL,
+  `sort2` int(1) DEFAULT NULL,
+  `role` varchar(20) DEFAULT NULL,
+  `specialization` varchar(32) DEFAULT NULL,
+  `track` varchar(42) DEFAULT NULL,
+  `accreditationname` varchar(150) NOT NULL,
+  `FY15` bigint(21) NOT NULL DEFAULT '0',
+  `FY16` bigint(21) NOT NULL DEFAULT '0',
+  `FY17` bigint(21) NOT NULL DEFAULT '0',
+  `total` bigint(21) NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `cm`
+--
+
+DROP TABLE IF EXISTS `cm`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `cm` (
+  `oldcoursecode` varchar(50) NOT NULL DEFAULT '',
+  `newcoursecode` varchar(50) DEFAULT NULL,
+  `courseid` varchar(50) DEFAULT NULL,
+  `source` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `fedsled_20170117`
+--
+
+DROP TABLE IF EXISTS `fedsled_20170117`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `fedsled_20170117` (
+  `email` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
+  `usernumber` varchar(100) CHARACTER SET utf8 DEFAULT NULL,
+  `active` varchar(100) CHARACTER SET utf8 DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `newcourses`
+--
+
+DROP TABLE IF EXISTS `newcourses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `newcourses` (
+  `assessment` varchar(200) NOT NULL DEFAULT '',
+  `code` varchar(200) DEFAULT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `newcode` varchar(200) DEFAULT NULL,
+  `comment` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `sample`
+--
+
+DROP TABLE IF EXISTS `sample`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `sample` (
+  `LearnerName` varchar(150) NOT NULL,
+  `Email` varchar(150) NOT NULL,
+  `CourseName` varchar(150) NOT NULL,
+  `CourseCode` varchar(150) NOT NULL,
+  `CompletionStatus` varchar(150) NOT NULL,
+  `CompletionDate` varchar(150) NOT NULL,
+  `JobTitle` varchar(150) NOT NULL,
+  `Region` varchar(150) NOT NULL,
+  `SubRegion` varchar(150) NOT NULL,
+  `Country` varchar(150) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -260,4 +738,4 @@ CREATE TABLE `Students` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2017-02-03 11:25:32
+-- Dump completed on 2017-04-12 22:46:17

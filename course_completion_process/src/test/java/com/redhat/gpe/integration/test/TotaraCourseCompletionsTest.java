@@ -35,7 +35,7 @@ public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
     public void init() {
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testNewTotaraCourseCompletionsTest() throws InterruptedException {
        Endpoint endpoint = context.getEndpoint(PROCESS_NEW_TOTARA_COURSE_COMPLETIONS_URI);
