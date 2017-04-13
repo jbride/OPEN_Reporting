@@ -52,7 +52,7 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/accreditation-camel-context.xml");
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testPersonQualificationsParsing() throws org.json.JSONException {
         JSONObject jsonResponse = new JSONObject(personQualifications);
@@ -81,7 +81,7 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
         template.send(pushQualsToSkillsBaseBatchURI, exchange);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testPushQualToSkillsBaseGivenKnownRHTStudent() throws InterruptedException {
 

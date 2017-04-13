@@ -28,6 +28,7 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -74,6 +75,10 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String EVAL = "eval(";
     private static final String NEW_LINE = "\n";
     private static final String CONSEQUENCE_FUNCTION = "determineMostRecentCourseCompletion";
+    private static final String SB_END_DATE = "end_date";
+    private static final String SB_NAME = "name";
+    private static final String SB_STATUS = "status";
+    private static final String SB_START_DATE = "start_date";
     
     private static Object accredProcessLock = new Object();
     private static boolean isLocked = false;
@@ -699,7 +704,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             httpclient = WebClientDevWrapper.wrapClient(httpclient);
 
             String getStudentQualUrl = getQualificationUrl+personId;
-            logger.info(sEmail+" : checkSkillsBaseForExistingAccred() getStudentQualUrl = "+getStudentQualUrl);
+            //logger.info(sEmail+" : checkSkillsBaseForExistingAccred() getStudentQualUrl = "+getStudentQualUrl);
 
             HttpGet get = new HttpGet(getStudentQualUrl);
 
@@ -713,12 +718,22 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             String response = EntityUtils.toString(httpResponse.getEntity());
             StatusLine sLine = httpResponse.getStatusLine();
             logger.info(sEmail+" : skillsbase personId = "+personId+"\n\tstatusCode = "+sLine.getStatusCode()+"\n\tresponse content length = "+responseLength+"\n\tresponse reason phrase = "+sLine.getReasonPhrase()+"\n\tresponse: " + response);
-            //logger.info(sEmail+" : skillsbase personId = "+personId+"\n\tstatusCode = "+sLine.getStatusCode()+"\n\trespnse reason phrase = "+sLine.getReasonPhrase()+"\n\tresponse: " + response+"\n\tstatus = "+status);
 
-            //JSONObject jsonResponse = new JSONObject(response);
-
-            //String status = jsonResponse.getString("status");
-            
+            JSONObject jsonResponse = new JSONObject(response);
+            JSONArray jArray = jsonResponse.optJSONArray("data");
+            if(jArray.length() < 1) {
+                logger.warn(sEmail+" checkSkillsBaseForExistingAccred() no qualifications found");
+            } else {
+                for(int i=0; i < jArray.length(); i++) {
+                    JSONObject jObj = jArray.getJSONObject(i);
+                    String existingQual = jObj.getString(SB_NAME);
+                    //log.info("testPersonQualificationsParsing() existingQual = "+existingQual+"\n\tobj = "+jObj.toString());
+                    if(existingQual.equals(accredName)) {
+                        denormalizedStudentAccred.setSkillsBaseQualExists(true);
+                        return;
+                    }
+                }
+            }
 
         } catch (Exception exc) {
             String message = "Failure making REST API CALL!";

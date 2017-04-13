@@ -353,6 +353,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 
 == SkillsBase Integration
 
+=== QA
 The following are steps and considerations for conducting QA of SkillsBase Integration functionality.
 
 . Authentication
@@ -410,6 +411,37 @@ ba
 ta
 -----
 . Send one or more course completions to GPTE Reporting that lead to an existing accreditation.
+
+=== SkillsBase Log Statements
+
+The following can be expected in the log file of the GPTE Reporting _accreditation process_ (execute: `ta`):
+
+. *Qual does not already exist in SkillsBase*
++
+-----
+INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId = 295
+    statusCode = 200
+    response content length = -1
+    response reason phrase = OK
+    response: {"status":"success","data":[{"name":"Bachelor of Science in Material Science Engineering, Univ. of Michigan, Ann Arbor","person_id":295,"status":"completed","start_date":"Sep-03-1990","end_date":"Apr-30-1994"}]}
+INFO  push-qual-to-skills-base       - jbride@redhat.com : Red Hat Advanced Delivery Specialist - Cloud Management : Does not already exist in skillsbase.  Will now post to skillsbase
+INFO  AccreditationProcessBean       - jbride@redhat.com : Sending the following qualification to Skills Base web service : Red Hat Advanced Delivery Specialist - Cloud Management
+INFO  AccreditationProcessBean       - jbride@redhat.com : addQualification() 
+    endDate = 2019-04-13
+    response: {"status":"success","message":null,"data":null} : status = success
+INFO  push-qual-to-skills-base       - jbride@redhat.com : Student qualification complete:  assessment=Red Hat Advanced Delivery Specialist - Cloud Management
+-----
+
+. *Qual already exists in SkillsBase*
++
+-----
+INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId = 295
+    statusCode = 200
+    response content length = -1
+    response reason phrase = OK
+    response: {"status":"success","data":[{"name":"Bachelor of Science in Material Science Engineering, Univ. of Michigan, Ann Arbor","person_id":295,"status":"completed","start_date":"Sep-03-1990","end_date":"Apr-30-1994"},{"name":"Red Hat Advanced Delivery Specialist - Cloud Management","person_id":295,"status":"completed","start_date":"Apr-13-2017","end_date":"Apr-13-2019"}]}
+INFO  push-qual-to-skills-base       - jbride@redhat.com : Qualification already exists in SkillsBase: Red Hat Advanced Delivery Specialist - Cloud Management.  Will not post to Skills Base
+-----
 
 == Emails
 GPTE Reporting has services that for various business use cases both sends and consumes emails.
