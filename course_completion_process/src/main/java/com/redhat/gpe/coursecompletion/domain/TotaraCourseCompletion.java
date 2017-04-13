@@ -7,6 +7,8 @@ public class TotaraCourseCompletion {
     private String totaraCourseId;
     private String courseFullName;
     private String courseShortName;
+    private String studentFirstName;
+    private String studentLastName;
 
     public TotaraCourseCompletion(int totaraCCId, String email, String totaraCourseId, String courseFullName, String courseShortName) {
         this.totaraCCId = totaraCCId;
@@ -26,6 +28,22 @@ public class TotaraCourseCompletion {
     public void setCourseFullName(String x) { courseFullName = x; }
     public String getCourseShortName() { return courseShortName; }
     public void setCourseShortName(String x) { courseShortName = x; }
+
+	public String getStudentLastName() {
+		return studentLastName;
+	}
+
+	public void setStudentLastName(String studentLastName) {
+		this.studentLastName = studentLastName;
+	}
+
+	public void setStudentFirstName(String studentFirstName) {
+		this.studentFirstName = studentFirstName;
+	}
+
+	public String getStudentFirstName() {
+		return this.studentFirstName;
+	}
 }
 
 

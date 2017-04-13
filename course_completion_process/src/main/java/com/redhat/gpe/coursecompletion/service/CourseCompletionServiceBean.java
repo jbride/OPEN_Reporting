@@ -201,6 +201,17 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         insertNewStudent(exchange, sObj);
     }
     
+    public void insertNewStudentGivenTotaraCourseCompletion(Exchange exchange) throws Exception {
+        
+        TotaraCourseCompletion tCourseCompletion = (TotaraCourseCompletion) exchange.getIn().getBody();
+        Student sObj = new Student();
+        sObj.setEmail(tCourseCompletion.getEmail());
+        sObj.setFirstname(tCourseCompletion.getStudentFirstName());
+        sObj.setLastname(tCourseCompletion.getStudentLastName());
+        sObj.setIpaStatus(1);
+        insertNewStudent(exchange, sObj);
+    }
+    
     private void insertNewStudent(Exchange exchange, Student studentIn) throws Exception {
         int companyId = 0;
         String studentEmail = studentIn.getEmail();
@@ -622,7 +633,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public CourseCompletion convertTotaraCourseCompletion(Exchange exchange) {
         TotaraCourseCompletion tCC = (TotaraCourseCompletion)exchange.getIn().getBody();
         
-        Student studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail());
+        Student studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
         
         Course courseObj = canonicalDAO.getCourseByCourseName(tCC.getCourseFullName(), null);
         

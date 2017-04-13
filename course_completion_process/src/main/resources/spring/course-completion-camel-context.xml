@@ -160,7 +160,15 @@
         <to uri="bean:cCompletionServiceBean?method=getLatestTotaraCourseCompletions"/>
         <split>
             <simple>${body}</simple>
-            <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion"/>
+            <doTry>
+                <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion"/>
+                <doCatch>
+                    <exception>org.springframework.dao.EmptyResultDataAccessException</exception>
+                    <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
+                    <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenTotaraCourseCompletion" id="update-totara-student"/>
+                    <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>
+                </doCatch>
+            </doTry>
             <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
         </split>
     </route>
