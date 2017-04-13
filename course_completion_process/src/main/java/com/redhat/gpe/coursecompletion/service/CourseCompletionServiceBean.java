@@ -68,6 +68,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private static final String TAB = "\\t";
     private static final String SINGLE_TAB = "\t";
 
+    private static final String TOTARA_COURSE_COMPLETION_LIMIT = "TOTARA_COURSE_COMPLETION_LIMIT";
+
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = true;
     private boolean cc_append_student_issues_to_file = false;
@@ -606,8 +608,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     public  List<CourseCompletion> getLatestTotaraCourseCompletions(Exchange exchange) {
         int latestKnownCC = (Integer)exchange.getIn().getBody();
+        int totaraCourseCompletionLimit = -1;
+        String headerVal = (String)exchange.getIn().getHeader(TOTARA_COURSE_COMPLETION_LIMIT);
+        if(headerVal != null)
+            totaraCourseCompletionLimit = Integer.parseInt(headerVal);
 
-        List<CourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC);
+        List<CourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC, totaraCourseCompletionLimit);
         logger.info("getLatestTotaraCourseCompletions() # of totaraCourseCompletions = "+totaraCourseCompletions.size());
         return totaraCourseCompletions;
     }

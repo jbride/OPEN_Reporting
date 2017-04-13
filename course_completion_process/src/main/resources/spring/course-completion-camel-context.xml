@@ -156,7 +156,7 @@
         </description>
         <from uri="{{cc_process_totara_course_completions_input_uri}}" />
         <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionId"/>
-        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body}" loggingLevel="INFO"/>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body} : TOTARA_COURSE_COMPLETION_LIMIT = ${header.TOTARA_COURSE_COMPLETION_LIMIT}" loggingLevel="INFO"/>
         <to uri="bean:cCompletionServiceBean?method=getLatestTotaraCourseCompletions"/>
         <split>
             <simple>${body}</simple>
