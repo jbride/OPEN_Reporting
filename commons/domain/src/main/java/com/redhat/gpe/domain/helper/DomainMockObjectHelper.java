@@ -27,7 +27,6 @@ public class DomainMockObjectHelper {
     static String accredName = "Red Hat Delivery Specialist – Business Process Automation";
     static String courseId = "MWS-SE-BPA-ASM-BRMS";
     static String coursename = "Authoring Rules in BRMS Guided Rule Editor Lab";
-    static String languageId = "EN_US";
     static String accredType = StudentAccreditation.Types.Active.name();
     
     static String bpmsImplementationCourseId = "MWS-DEL-BPA-2074-AST";
@@ -68,7 +67,7 @@ public class DomainMockObjectHelper {
     
     public static Language getMockLanguage() {
         Language langObj = new Language();
-        langObj.setLanguageid(languageId);
+        langObj.setLanguageid(Language.EN_US);
         return langObj;
     }
 
@@ -103,7 +102,7 @@ public class DomainMockObjectHelper {
     public static StudentCourse getMockStudentCourse(Integer studentId, String courseId) {
         StudentCourse sCourse = new StudentCourse();
         sCourse.setStudentid(studentId);
-        sCourse.setLanguageid(languageId);
+        sCourse.setLanguageid(Language.EN_US);
         sCourse.setCourseid(courseId);
         sCourse.setAssessmentdate(new Timestamp(new Date().getTime()));
         sCourse.setAssessmentresult(StudentCourse.ResultTypes.Pass.name());

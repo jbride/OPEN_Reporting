@@ -621,8 +621,26 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     public CourseCompletion convertTotaraCourseCompletion(Exchange exchange) {
         TotaraCourseCompletion tCC = (TotaraCourseCompletion)exchange.getIn().getBody();
+        
+        Student studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail());
+        
+        Course courseObj = canonicalDAO.getCourseByCourseName(tCC.getCourseFullName(), null);
+        
+        Language langObj = new Language();
+        langObj.setLanguageid(Language.EN_US);
+        
+        StudentCourse sCourseObj = new StudentCourse();
+        sCourseObj.setAssessmentdate( new Timestamp( new Date().getTime()) );
+        sCourseObj.setAssessmentresult(StudentCourse.ResultTypes.Pass.toString());
+        sCourseObj.setAssessmentscore((byte) 100);
+        sCourseObj.setCourseid(courseObj.getCourseid());
+        sCourseObj.setLanguageid(langObj.getLanguageid());
+        sCourseObj.setStudentid(studentObj.getStudentid());
 
         CourseCompletion ccObj = new CourseCompletion();
+        ccObj.setStudent(studentObj);
+        ccObj.setLanguage(langObj);
+        ccObj.setStudentCourse(sCourseObj);
         return ccObj;
     }
  
