@@ -45,4 +45,4 @@ alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 
 # Totara
 # select count(u.email), c.fullname from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status=50 and ci.data='GPTE' group by c.fullname;
-# select cc.id, u.email, cc.userid, cc.course, c.fullname, c.shortname from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status=50 and ci.data='GPTE' order by cc.id desc limit 10;
+# select cc.id, u.email, u.firstname, u.lastname, cc.userid, cc.course, c.fullname, c.shortname from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status=50 and ci.data='GPTE' order by cc.id desc limit 10;
