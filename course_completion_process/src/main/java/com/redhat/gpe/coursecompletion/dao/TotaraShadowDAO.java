@@ -2,13 +2,12 @@ package com.redhat.gpe.coursecompletion.dao;
 
 import java.util.List;
 
-import com.redhat.gpe.domain.helper.CourseCompletion;
-import com.redhat.gpe.domain.canonical.StudentCourse;
+import com.redhat.gpe.coursecompletion.domain.TotaraCourseCompletion;
 
 public interface TotaraShadowDAO {
 
     int testTotaraJDBCConnection();
 
-    List<CourseCompletion> getLatestCourseCompletions(int lastCC, int totaraCCLimit);
+    List<TotaraCourseCompletion> getLatestCourseCompletions(int lastCC, int totaraCCLimit);
 
 }

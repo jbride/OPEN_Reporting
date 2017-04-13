@@ -8,6 +8,7 @@ import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpte.services.ExceptionCodes;
 import com.redhat.gpte.services.GPTEBaseServiceBean;
 import com.redhat.gpte.services.InvalidCourseException;
+import com.redhat.gpe.coursecompletion.domain.TotaraCourseCompletion;
 
 import org.apache.camel.Body;
 import org.apache.camel.CamelContext;
@@ -606,16 +607,23 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         return totaraShadowDAO.testTotaraJDBCConnection();
     }
 
-    public  List<CourseCompletion> getLatestTotaraCourseCompletions(Exchange exchange) {
+    public  List<TotaraCourseCompletion> getLatestTotaraCourseCompletions(Exchange exchange) {
         int latestKnownCC = (Integer)exchange.getIn().getBody();
         int totaraCourseCompletionLimit = -1;
         String headerVal = (String)exchange.getIn().getHeader(TOTARA_COURSE_COMPLETION_LIMIT);
         if(headerVal != null)
             totaraCourseCompletionLimit = Integer.parseInt(headerVal);
 
-        List<CourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC, totaraCourseCompletionLimit);
+        List<TotaraCourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC, totaraCourseCompletionLimit);
         logger.info("getLatestTotaraCourseCompletions() # of totaraCourseCompletions = "+totaraCourseCompletions.size());
         return totaraCourseCompletions;
+    }
+
+    public CourseCompletion convertTotaraCourseCompletion(Exchange exchange) {
+        TotaraCourseCompletion tCC = (TotaraCourseCompletion)exchange.getIn().getBody();
+
+        CourseCompletion ccObj = new CourseCompletion();
+        return ccObj;
     }
  
 }
