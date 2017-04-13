@@ -595,16 +595,21 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             x.printStackTrace();
         }
     }
-    
-   
-    public int getMostRecentTotaraCourseCompletionKnownByGPTE() {
-        return canonicalDAO.getMostRecentTotaraCourseCompletionKnownByGPTE();
+
+    public int getMostRecentTotaraCourseCompletionId() {
+        return canonicalDAO.getMostRecentTotaraCourseCompletionId();
     }
- 
-    public int countNewTotaraCourseCompletions(Exchange exchange) {
+   
+    public int testTotaraJDBCConnection() {
+        return totaraShadowDAO.testTotaraJDBCConnection();
+    }
+
+    public  List<CourseCompletion> getLatestTotaraCourseCompletions(Exchange exchange) {
         int latestKnownCC = (Integer)exchange.getIn().getBody();
 
-        return totaraShadowDAO.countNewCourseCompletions(latestKnownCC);
+        List<CourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC);
+        logger.info("getLatestTotaraCourseCompletions() # of totaraCourseCompletions = "+totaraCourseCompletions.size());
+        return totaraCourseCompletions;
     }
  
 }

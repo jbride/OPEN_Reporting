@@ -144,15 +144,24 @@
                 </split>
     </route>
 
+    <route id="test-totara-jdbc-connection">
+        <from uri="direct:test-totara-jdbc-connection" />
+        <to uri="bean:cCompletionServiceBean?method=testTotaraJDBCConnection"/>
+        <log message="test-totara-jdbc-connection:  ${body}" loggingLevel="INFO"/>
+    </route>
+
     <route id="process-totara-course-completions">
         <description> 
             Query Totara Shadow database for any new course completions
         </description>
         <from uri="{{cc_process_totara_course_completions_input_uri}}" />
-        <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionKnownByGPTE"/>
+        <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionId"/>
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body}" loggingLevel="INFO"/>
-        <to uri="bean:cCompletionServiceBean?method=countNewTotaraCourseCompletions"/>
-        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      # of new totara CCs = ${body}" loggingLevel="INFO"/>
+        <to uri="bean:cCompletionServiceBean?method=getLatestTotaraCourseCompletions"/>
+        <split>
+            <simple>${body}</simple>
+            <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
+        </split>
     </route>
 
     <route id="add-student-course-to-db">
@@ -221,12 +230,12 @@
 
     <!--    *************************************************************************************************   -->
     <!--    *************                       Pathgather                                      *************   -->
-    <route id="update-pathgather-with-accreditation" >
+    <route id="update-pathgather-with-course-completion" >
         <description>
             1) Expects the following payload:  CourseCompletion
             2) Responsible for ?????
         </description>
-        <from uri="direct:update-pathgather-with-accreditation" />
+        <from uri="direct:update-pathgather-with-course-completion" />
         <log message="******** Invoking pathgatherer     done" loggingLevel="INFO"/>
     </route>
 

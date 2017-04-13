@@ -437,8 +437,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return count == 0;
     }
 
-    public int getMostRecentTotaraCourseCompletionKnownByGPTE() {
-        return 0;
+    public int getMostRecentTotaraCourseCompletionId() {
+        String sql = "select totaraCourseCompletionId from StudentCourses order by totaraCourseCompletionId asc limit 1";
+        return sbJdbcTemplate.queryForObject(sql, Integer.class);
     }
 /* ******************************************************************************* */
     
