@@ -20,7 +20,8 @@ import java.io.IOException;
 
 public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
     
-    private static final String PROCESS_NEW_TOTARA_COURSE_COMPLETIONS_URI = "direct:process_totara_course_completions";
+    private static final String POLL_NEW_TOTARA_COURSE_COMPLETIONS_URI = "direct:poll_totara_course_completions";
+    private static final String PROCESS_TOTARA_COURSE_COMPLETIONS_BY_RANGE_URI = "direct:process-totara-course-completions-by-range";
     private static final String TEST_TOTARA_JDBC_CONNECTION_URI = "direct:test-totara-jdbc-connection";
     private static final String TOTARA_COURSE_COMPLETION_LIMIT = "TOTARA_COURSE_COMPLETION_LIMIT";
 
@@ -48,18 +49,24 @@ public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
        in.setBody(new Object());
        template.send(TEST_TOTARA_JDBC_CONNECTION_URI, exchange);
     }
+
+    @Ignore
+    @Test
+    public void testProcessTotaraCourseCompletionsByRangeTest() throws InterruptedException {
+       Endpoint endpoint = context.getEndpoint(PROCESS_TOTARA_COURSE_COMPLETIONS_BY_RANGE_URI);
+    }
     
     //@Ignore
     @Test
-    public void testNewTotaraCourseCompletionsTest() throws InterruptedException {
-       Endpoint endpoint = context.getEndpoint(PROCESS_NEW_TOTARA_COURSE_COMPLETIONS_URI);
+    public void testPollTotaraCourseCompletionsTest() throws InterruptedException {
+       Endpoint endpoint = context.getEndpoint(POLL_NEW_TOTARA_COURSE_COMPLETIONS_URI);
        Exchange exchange = endpoint.createExchange();
        exchange.setPattern(ExchangePattern.InOnly);
        Message in = exchange.getIn();
        in.setHeader(TOTARA_COURSE_COMPLETION_LIMIT, "1");
 
        in.setBody(new Object());
-       template.send(PROCESS_NEW_TOTARA_COURSE_COMPLETIONS_URI, exchange);
+       template.send(POLL_NEW_TOTARA_COURSE_COMPLETIONS_URI, exchange);
        
     }
 }
