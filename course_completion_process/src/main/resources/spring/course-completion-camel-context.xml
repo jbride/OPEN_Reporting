@@ -152,11 +152,13 @@
 
     <route id="poll-totara-course-completions">
         <description> 
-            Purpose: Periodically poll query Totara Shadow database for any new course completions
+            Purpose: 
+                - Periodically poll query Totara Shadow database for any new course completions.  
+                - Process each Totara course completion.
         </description>
         <from uri="{{cc_poll_totara_course_completions_input_uri}}" />
         <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionId"/>
-        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body} : TOTARA_COURSE_COMPLETION_LIMIT = ${header.TOTARA_COURSE_COMPLETION_LIMIT}" loggingLevel="INFO"/>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... poll-totara-course-completions:  most recent totara CC = ${body} : TOTARA_COURSE_COMPLETION_LIMIT = ${header.TOTARA_COURSE_COMPLETION_LIMIT}" loggingLevel="INFO"/>
         <to uri="bean:cCompletionServiceBean?method=getLatestTotaraCourseCompletions"/>
         <split>
             <simple>${body}</simple>
@@ -164,11 +166,11 @@
         </split>
     </route>
 
-    <route id="query-totara-course-completions-by-range">
+    <route id="process-totara-course-completions-by-range">
         <description> 
-            Purpose: Query Totara shadow database for course completions given a range of totara course completion IDs
+            Purpose: Process Totara shadow database for course completions given a range of totara course completion IDs
         </description>
-        <from uri="direct:query-totara-course-completions-by-range" />
+        <from uri="direct:process-totara-course-completions-by-range" />
         <log message="@@@@@@@@@@@@@@@       Starting query-totara-course-completions-by-range: ${header.LOW_CC_ID} ${header.HIGH_CC_ID}" loggingLevel="INFO"/>
         <to uri="bean:cCompletionServiceBean?method=getTotaraCourseCompletionsByRange"/>
         <split>

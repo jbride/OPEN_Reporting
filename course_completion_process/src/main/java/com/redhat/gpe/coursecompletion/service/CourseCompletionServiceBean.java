@@ -635,8 +635,20 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     }
 
     public List<TotaraCourseCompletion> getTotaraCourseCompletionsByRange(Exchange exchange) {
-        int lowId = (Integer)exchange.getIn().getHeader(TOTARA_LOW_CC_ID);
-        int highId = (Integer)exchange.getIn().getHeader(TOTARA_HIGH_CC_ID);
+        int lowId;
+        int highId;
+        Object lowIdObject = (Integer)exchange.getIn().getHeader(TOTARA_LOW_CC_ID);
+        if(lowIdObject == null)
+            throw new RuntimeException("getTotaraCourseCompletionsByRange() please ensure that the following header is set: "+TOTARA_LOW_CC_ID );
+        else
+            lowId = (Integer)lowIdObject;
+
+        Object highIdObject = (Integer)exchange.getIn().getHeader(TOTARA_HIGH_CC_ID);
+        if(highIdObject == null)
+            throw new RuntimeException("getTotaraCourseCompletionsByRange() please ensure that the following header is set: "+TOTARA_HIGH_CC_ID );
+        else
+            highId = (Integer)highIdObject;
+
         if(lowId < 1 || highId < 1 || highId < lowId)
             throw new RuntimeException("getTotaraCourseCompletionsByRange() please ensure that lowId and highId are set and that highId >= lowId "+lowId+" : "+highId);
 

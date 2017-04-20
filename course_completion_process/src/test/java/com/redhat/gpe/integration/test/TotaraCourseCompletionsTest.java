@@ -24,6 +24,8 @@ public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
     private static final String PROCESS_TOTARA_COURSE_COMPLETIONS_BY_RANGE_URI = "direct:process-totara-course-completions-by-range";
     private static final String TEST_TOTARA_JDBC_CONNECTION_URI = "direct:test-totara-jdbc-connection";
     private static final String TOTARA_COURSE_COMPLETION_LIMIT = "TOTARA_COURSE_COMPLETION_LIMIT";
+    private static final String TOTARA_LOW_CC_ID="LOW_CC_ID";
+    private static final String TOTARA_HIGH_CC_ID="HIGH_CC_ID";
 
     public TotaraCourseCompletionsTest() throws IOException {
         PropertiesSupport.setupProps();
@@ -50,13 +52,21 @@ public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
        template.send(TEST_TOTARA_JDBC_CONNECTION_URI, exchange);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testProcessTotaraCourseCompletionsByRangeTest() throws InterruptedException {
        Endpoint endpoint = context.getEndpoint(PROCESS_TOTARA_COURSE_COMPLETIONS_BY_RANGE_URI);
+       Exchange exchange = endpoint.createExchange();
+       exchange.setPattern(ExchangePattern.InOnly);
+       Message in = exchange.getIn();
+       in.setHeader(TOTARA_LOW_CC_ID, 110756);
+       in.setHeader(TOTARA_HIGH_CC_ID, 110757);
+
+       in.setBody(new Object());
+       template.send(PROCESS_TOTARA_COURSE_COMPLETIONS_BY_RANGE_URI, exchange);
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testPollTotaraCourseCompletionsTest() throws InterruptedException {
        Endpoint endpoint = context.getEndpoint(POLL_NEW_TOTARA_COURSE_COMPLETIONS_URI);

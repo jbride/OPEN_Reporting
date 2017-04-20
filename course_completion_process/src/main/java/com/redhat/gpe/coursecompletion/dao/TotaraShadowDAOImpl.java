@@ -31,10 +31,10 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
     public List<TotaraCourseCompletion> getCourseCompletionsByRange(int lowCCId, int highCCId) {
         String totaraCCSQL = "select cc.id, u.email, u.firstname, u.lastname, cc.course, c.fullname, c.shortname from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status=50 and ci.data='GPTE' ";
         StringBuilder totaraCCSQLBuilder = new StringBuilder(totaraCCSQL);
-        totaraCCSQLBuilder.append(" and cc.course => "+lowCCId);
-        totaraCCSQLBuilder.append(" and cc.course <= "+highCCId);
+        totaraCCSQLBuilder.append(" and cc.id >= "+lowCCId);
+        totaraCCSQLBuilder.append(" and cc.id <= "+highCCId);
         totaraCCSQLBuilder.append(" order by cc.id desc");
-        logger.debug("getCourseCompletionsByRange() sql = "+totaraCCSQLBuilder.toString());
+        logger.info("getCourseCompletionsByRange() sql = "+totaraCCSQLBuilder.toString());
         return queryAndReturnCourseCompletions(totaraCCSQLBuilder.toString());
     }
 
@@ -63,7 +63,7 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
                 String totaraCourseId = rowSet.getString(5);
                 String courseFullName = rowSet.getString(6);
                 String courseShortName = rowSet.getString(7);
-                logger.info("getLatestCourseCompletions() "+totaraCCId+" :" +email+" : "+totaraCourseId+" : "+courseFullName+" : "+courseShortName);
+                logger.info("queryAndReturnCourseCompletions() "+totaraCCId+" :" +email+" : "+totaraCourseId+" : "+courseFullName+" : "+courseShortName);
                 TotaraCourseCompletion tCC = new TotaraCourseCompletion(totaraCCId, email, firstName, lastName, totaraCourseId, courseFullName, courseShortName);
                 sCourses.add(tCC);
             }
