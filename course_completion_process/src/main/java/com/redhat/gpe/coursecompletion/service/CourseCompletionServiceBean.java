@@ -72,6 +72,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     private static final String TOTARA_COURSE_COMPLETION_LIMIT = "TOTARA_COURSE_COMPLETION_LIMIT";
 
+    private static final String TOTARA_LOW_CC_ID="LOW_CC_ID";
+    private static final String TOTARA_HIGH_CC_ID="HIGH_CC_ID";
+
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = true;
     private boolean cc_append_student_issues_to_file = false;
@@ -628,6 +631,14 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
         List<TotaraCourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC, totaraCourseCompletionLimit);
         logger.info("getLatestTotaraCourseCompletions() # of totaraCourseCompletions = "+totaraCourseCompletions.size());
+        return totaraCourseCompletions;
+    }
+
+    public List<TotaraCourseCompletion> getTotaraCourseCompletionsByRange(Exchange exchange) {
+        int lowId = exchange.getIn().getHeader(TOTARA_LOW_CC_ID);
+        int highId = exchange.getIn().getHeader(TOTARA_HIGH_CC_ID);
+        List<TotaraCourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getCourseCompletionsByRange(latestKnownCC, totaraCourseCompletionLimit);
+        logger.info("getTotaraCourseCompletionsByRange() # of totaraCourseCompletions = "+totaraCourseCompletions.size());
         return totaraCourseCompletions;
     }
 

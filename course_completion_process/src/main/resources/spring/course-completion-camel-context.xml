@@ -150,27 +150,48 @@
         <log message="test-totara-jdbc-connection:  ${body}" loggingLevel="INFO"/>
     </route>
 
-    <route id="process-totara-course-completions">
+    <route id="poll-totara-course-completions">
         <description> 
-            Query Totara Shadow database for any new course completions
+            Purpose: Periodically poll query Totara Shadow database for any new course completions
         </description>
-        <from uri="{{cc_process_totara_course_completions_input_uri}}" />
+        <from uri="{{cc_poll_totara_course_completions_input_uri}}" />
         <to uri="bean:cCompletionServiceBean?method=getMostRecentTotaraCourseCompletionId"/>
         <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... process-totara-course-completions:  most recent totara CC = ${body} : TOTARA_COURSE_COMPLETION_LIMIT = ${header.TOTARA_COURSE_COMPLETION_LIMIT}" loggingLevel="INFO"/>
         <to uri="bean:cCompletionServiceBean?method=getLatestTotaraCourseCompletions"/>
         <split>
             <simple>${body}</simple>
-            <doTry>
-                <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion"/>
-                <doCatch>
+            <to uri="direct:process-single-totara-course-completion" />
+        </split>
+    </route>
+
+    <route id="query-totara-course-completions-by-range">
+        <description> 
+            Purpose: Query Totara shadow database for course completions given a range of totara course completion IDs
+        </description>
+        <from uri="direct:query-totara-course-completions-by-range" />
+        <log message="@@@@@@@@@@@@@@@       Starting query-totara-course-completions-by-range: ${header.LOW_CC_ID} ${header.HIGH_CC_ID}" loggingLevel="INFO"/>
+        <to uri="bean:cCompletionServiceBean?method=getTotaraCourseCompletionsByRange"/>
+        <split>
+            <simple>${body}</simple>
+            <to uri="direct:process-single-totara-course-completion" />
+        </split>
+    </route>
+
+    <route id="process-single-totara-course-completion">
+        <description> 
+            Purpose:  Process a single Totara Course Completion
+        </description>
+        <from uri="direct:process-single-totara-course-completion" />
+        <doTry>
+            <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion"/>
+            <doCatch>
                     <exception>com.redhat.gpte.services.InvalidStudentException</exception>
                     <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
                     <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenTotaraCourseCompletion" id="update-totara-student"/>
                     <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>
-                </doCatch>
-            </doTry>
-            <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
-        </split>
+            </doCatch>
+        </doTry>
+        <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
     </route>
 
     <route id="add-student-course-to-db">

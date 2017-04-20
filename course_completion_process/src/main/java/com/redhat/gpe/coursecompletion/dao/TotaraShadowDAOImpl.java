@@ -28,14 +28,26 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
         return ccCount;
     }
 
+    List<TotaraCourseCompletion> getCourseCompletionsByRange(int lowCCId, int highCCId) {
+        StringBuilder totaraCCSQLBuilder = new StringBuilder("select cc.id, u.email, cc.course, c.fullname, c.shortname from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and u.id = cc.userid and status=50 and ci.data='GPTE'");
+        totaraCCSQLBuilder.append(" and cc.course => "+lowCCId);
+        totaraCCSQLBuilder.append(" and cc.course <= "+highCCId);
+        totaraCCSQLBuilder.append(" order by cc.id desc");
+        logger.debug("getCourseCompletionsByRange() sql = "+totaraCCSQLBuilder.toString());
+        return queryAndReturnCourseCompletions(totaraCCSQLBuilder.toString());
+    }
+
     public List<TotaraCourseCompletion> getLatestCourseCompletions(int lastCC, int totaraCCLimit) {
 
-        List<TotaraCourseCompletion> sCourses = new ArrayList<TotaraCourseCompletion>();
         String totaraCCSQL = "select cc.id, u.email, cc.course, c.fullname, c.shortname from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status=50 and ci.data='GPTE' order by cc.id desc";
 
         if(totaraCCLimit > 0)
             totaraCCSQL = totaraCCSQL+" limit "+totaraCCLimit;
+        return queryAndReturnCourseCompletions(totaraCCSQL);
+    }
 
+    private List<TotaraCourseCompletion> queryAndReturnCourseCompletions(String totaraCCSQL) {
+        List<TotaraCourseCompletion> sCourses = new ArrayList<TotaraCourseCompletion>();
         SqlRowSet rowSet = tsJdbcTemplate.queryForRowSet(totaraCCSQL);
         if(!rowSet.isLast()) {
             while(rowSet.next()) {
@@ -50,7 +62,6 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
             }
         }
         return sCourses;
-
     }
 
 }
