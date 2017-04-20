@@ -118,6 +118,14 @@
         </put>
     </rest>
 
+    <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/course_completions/totara -->
+    <rest id="process-totara-course-completions-by-range-vm" path="/course_completions/totara/">
+        <put uri="batch" produces="application/json" >
+            <to uri="vm:process-totara-course-completions-by-range"/>
+        </put>
+    </rest>
+
+
     <route id="receive-gpte-operation-files-via-email">
         <from uri="{{gpte_receive_ops_files_uri}}"/>
         <log message="Received file from: ${header.Return-Path}, subject ${header.subject}" id="log_receive_file"/>

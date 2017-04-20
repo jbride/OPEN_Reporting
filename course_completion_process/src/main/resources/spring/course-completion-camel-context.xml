@@ -166,6 +166,10 @@
         </split>
     </route>
 
+    <route id="process-totara-course-completions-by-range-vm">
+        <from uri="vm:process-totara-course-completions-by-range" />
+        <to uri="direct:process-totara-course-completions-by-range" />
+    </route>
     <route id="process-totara-course-completions-by-range">
         <description> 
             Purpose: Process Totara shadow database for course completions given a range of totara course completion IDs
