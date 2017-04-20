@@ -7,7 +7,7 @@ end-if
 
 if (outcome != success) of /subsystem=datasources/data-source=totaraShadowDS:read-attribute(name=enabled)
   # totaraShadowDS
-  data-source add --name=totaraShadowDS --jndi-name="java:jboss/datasources/totaraShadowDS" --driver-name=postgresql --user-name={{totara_shadow_db_username}} --password={{totara_shadow_db_password}} --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --connection-url="jdbc:postgresql://{{totara.shadow.host.ip}}:{{totara.shadow.host.port}}/{{totara.shadow.db.name}}"
+  data-source add --name=totaraShadowDS --jndi-name="java:jboss/datasources/totaraShadowDS" --driver-name=postgresql --user-name={{totara_shadow_db_username}} --password={{totara_shadow_db_password}} --exception-sorter-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter --valid-connection-checker-class-name=org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker --connection-url="jdbc:postgresql://{{totara.shadow.host.ip}}:{{totara.shadow.host.port}}/{{totara.shadow.db.name}}?sslmode=require&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory"
   /subsystem=datasources/data-source=totaraShadowDS:enable
 
 end-if

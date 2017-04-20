@@ -87,7 +87,7 @@
     <rest id="sanityCheck" path="" >
         <get uri="sanityCheck" >
             <route>
-                <transform><constant>Red HatGPTE</constant></transform>
+                <transform><constant>Red Hat GPTE</constant></transform>
             </route>
         </get>
     </rest>
@@ -118,10 +118,16 @@
         </put>
     </rest>
 
-    <!-- curl -v -X PUT localhost:8205/gpte-reporting/rest/course_completions/totara -->
-    <rest id="process-totara-course-completions-by-range-vm" path="/course_completions/totara/">
-        <put uri="batch" produces="application/json" >
-            <to uri="vm:process-totara-course-completions-by-range"/>
+    <!-- 
+        curl -v -X PUT -H "LOW_CC_ID: 110756" -H "HIGH_CC_ID: 110757" \
+                       localhost:8205/gpte-reporting/rest/course_completions/totara \
+    -->
+    <rest id="process-totara-course-completions-by-range-vm" path="/course_completions/">
+        <put uri="totara" produces="application/json" >
+            <route>
+                <to uri="vm:process-totara-course-completions-by-range"/>
+                <transform><constant>Totara Course Completions Processed: ${body}</constant></transform>
+            </route>
         </put>
     </rest>
 

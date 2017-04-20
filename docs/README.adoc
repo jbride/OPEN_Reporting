@@ -249,6 +249,13 @@ That information is not available from GPTE Reporting.
 
 Various text files that provide more details of problems that may have occurred during processing of Sumtotal batch course completion attachment files can be found on the dev machine at: `/tmp/gpte/courseCompletionIssues/` .
 
+=== Totara Course Completions
+
+-----
+$ curl -v -X PUT -H "LOW_CC_ID: 110756" -H "HIGH_CC_ID: 110757" \
+          localhost:8205/gpte-reporting/rest/course_completions/totara
+-----
+
 == Accreditation Process
 
 The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel based, Java process.
