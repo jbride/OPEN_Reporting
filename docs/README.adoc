@@ -53,6 +53,9 @@ URLs to each GPTE Reporting service are as follows:
 
 . *Dashbuilder* :  https://<fqdn>/dashbuilder
 
+== RESTful APIs
+
+https://reporting.opentlc.com/gpte-reporting-swagger/
 
 == Provisioning
 Review `base_install.yml` and `update.yml` scripts in _$PROJECT_HOME/infrastructure/ansible_ directory.
