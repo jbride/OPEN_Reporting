@@ -122,3 +122,5 @@ totara_shadow_host_port: 5432
 totara_shadow_db_name: totara_redhat_reporting
 totara_shadow_db_username: totara_redhat_reporting
 totara_shadow_db_password: 87IW1o1zWff94CUXm+5w
+
+path_to_swagger_ui: /opt/swagger-ui/

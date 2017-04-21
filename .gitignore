@@ -25,3 +25,4 @@ build.metadata
 target/
 .camel/
 *retry
+test.yml
