@@ -251,10 +251,23 @@ Various text files that provide more details of problems that may have occurred 
 
 === Totara Course Completions
 
+==== Manual processing
+. Manually pull and process Totara Course Completions (from their _shadow database_) given a range of totara course completion Ids:
++
 -----
 $ curl -v -X PUT -H "LOW_CC_ID: 110756" -H "HIGH_CC_ID: 110757" \
           localhost:8205/gpte-reporting/rest/course_completions/totara
 -----
+
+==== Exception Handling
+
+. For those Totara Course Completions that are not using a GPTE canonical course name, exception will be logged to log file (ie: _tg_ ) similar to the following:
++
+-----
+ERROR [process-single-totara-course-completion] ariahi@redhat.com : Totara course not found: 'How to Sell Red Hat OpenShift Container Platform'
+-----
++
+NOTES:  single quotes around course name are intentional and added by GPTE Reporting to highlight if/when there might be blank spaces before or after an unknown course name in Totara.
 
 == Accreditation Process
 

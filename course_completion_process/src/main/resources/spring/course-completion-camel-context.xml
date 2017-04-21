@@ -186,18 +186,24 @@
     <route id="process-single-totara-course-completion">
         <description> 
             Purpose:  Process a single Totara Course Completion
+            Inbound:  com.redhat.gpe.coursecompletion.domain.TotaraCourseCompletion
+            Outbound: com.redhat.gpe.domain.helper.CourseCompletion
         </description>
         <from uri="direct:process-single-totara-course-completion" />
         <doTry>
             <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion"/>
+            <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
             <doCatch>
-                    <exception>com.redhat.gpte.services.InvalidStudentException</exception>
-                    <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
-                    <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenTotaraCourseCompletion" id="update-totara-student"/>
-                    <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>
+                <exception>com.redhat.gpte.services.InvalidStudentException</exception>
+                <log message="${body.email} : Not found in Students table.  Will now add" loggingLevel="WARN" />
+                <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenTotaraCourseCompletion" id="update-totara-student"/>
+                <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>
+            </doCatch>
+            <doCatch>
+                <exception>com.redhat.gpte.services.InvalidCourseException</exception>
+                <log message="${body.email} : Totara course not found: '${body.courseFullName}'" loggingLevel="ERROR" />
             </doCatch>
         </doTry>
-        <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
     </route>
 
     <route id="add-student-course-to-db">
