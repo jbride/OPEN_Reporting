@@ -118,7 +118,7 @@ curl --cert $CERTS_HOME/prod_gpteclient.pem \
 
 == Test (remote)
 
-. sudo mkdir /etc/gpte/certs
+. sudo mkdir -p /etc/gpte/certs
 
 . Copy certs from prod to client filesystem:
 +
