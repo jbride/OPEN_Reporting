@@ -1,0 +1,37 @@
+<HEAD>
+  <TITLE>GPTE Reporting Mutual Authentication</TITLE>
+</HEAD>
+<BODY>
+<CENTER>
+<H1>GPTE Reporting 2 Way TLS Authentication</H1> 
+</CENTER>
+<P>Please execute the following to be able to participate in <a href="https://en.wikipedia.org/wiki/Mutual_authentication">2-Way TLS authentication</a> with the GPTE Reporting RESTful API:</P>
+
+<BR>
+
+<B>1. Create new directory to store the GPTE client key:</B>
+
+<BR>
+<BLOCKQUOTE>
+sudo mkdir -p /etc/gpte/certs
+</BLOCKQUOTE>
+
+<br>
+<B>2. Copy certs from prod to client filesystem:</B>
+
+<br>
+<BLOCKQUOTE>
+sudo scp  &#60;your gpte opentlc userId&#62;@reporting.opentlc.com:/etc/gpte/certs/prod* &#160; /etc/gpte/certs
+</BLOCKQUOTE>
+</td>
+
+<br>
+<B>3. test GPTE Reporting RESTful API using certs:</B>
+
+<BR>
+<BLOCKQUOTE>
+curl --cert /etc/gpte/certs/prod_gpteclient.pem \<br>
+&#160;--key /etc/gpte/certs/prod_gpteclient.key -v -k \<br>
+&#160;-X GET https://reporting.opentlc.com/gpte-reporting/rest/sanityCheck/
+</BLOCKQUOTE>
+</BODY>

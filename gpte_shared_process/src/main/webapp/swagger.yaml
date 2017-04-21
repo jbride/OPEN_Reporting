@@ -1,0 +1,28 @@
+---
+swagger: "2.0"
+info:
+  description: "The RESTful API for the GPTE Reporting project. <br>Note that your client will need to participate in two-way mutual authentication as described in the following:  <a href=\"https://reporting.opentlc.com/swagger/gpte-reporting-mutual-auth.html\">GPTE Reporting Mutual Auth</a> "
+  version: "1.0.0"
+  title: "RHT GPTE Reporting RESTful API"
+host: https://reporting.opentlc.com
+basePath: /gpte-reporting/rest/
+schemes:
+- "https"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /sanityCheck:
+    get:
+      tags:
+      - "Sanity Check"
+      description: "Simple test to valid connectivity with GPTE Reporting"
+      operationId: "sanityCheck"
+      parameters: []
+      responses:
+        200:
+          description: "Good to go!"
+        404:
+          description: "Resource not found"
+definitions: {}
