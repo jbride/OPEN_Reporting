@@ -1,4 +1,3 @@
 <jboss-web>
-    <!-- <security-domain>other</security-domain> -->
     <context-root>gpte-reporting</context-root>
 </jboss-web>
