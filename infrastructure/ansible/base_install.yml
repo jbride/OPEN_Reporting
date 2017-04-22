@@ -63,4 +63,5 @@
       - totara-shadow
       - dashbuilder
       - phpMyAdmin
+      - swagger
       - yum-clean
