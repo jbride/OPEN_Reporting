@@ -5,13 +5,14 @@ info:
   version: "1.0.0"
   title: "RHT GPTE Reporting RESTful API"
 host: reporting.opentlc.com
-basePath: /gpte-reporting/rest/
+#basePath: /gpte-reporting/rest/
+basePath: /
 schemes:
 - "https"
 produces:
 - "application/json"
 paths:
-  /sanityCheck:
+  /gpte-reporting/rest/sanityCheck:
     get:
       tags:
       - "Sanity Check"
@@ -37,12 +38,39 @@ paths:
               Red Hat GPTE
         404:
           description: "Resource not found"
-  /courses/{courseName}:
+  /gpte-reporting/rest/course_completions/totara:
+    put:
+      summary: Initiate processing of Totara course completions in GPTE Reporting.
+      operationId: "processTotaraCourseCompletions"
+      tags:
+        - "Process Totara Course Completions Given Range of Totara Course Completion IDs"
+      parameters:
+        - name: LOW_CC_ID
+          in: header
+          required: true
+          description: "Low Totara Course Completion Id"
+          type: int
+        - name: HIGH_CC_ID
+          in: header
+          required: true
+          description: "High Totara Course Completion Id"
+          type: int
+      produces:
+      - "text/plain"
+      responses:
+        200:
+          description: "Response with # of Totara Course Completions successfully processed"
+          examples:
+            text/plain: 
+              55
+        404:
+          description: "Resource not found"
+  /gpte-reporting/rest/courses/{courseName}:
     get:
       summary: Validate existance of RHT GPTE Canonical course name.
       operationId: "validateByCourseName"
       tags:
-        - "Canonical Course Name"
+        - "Validate Canonical Course Name"
       parameters:
         - name: courseName
           in: path
@@ -56,6 +84,29 @@ paths:
             $ref: '#/definitions/Course'
         404:
           description: "Resource not found"
+  /gpte-accreditation/students/{gpteReportingStudentId}:
+    put:
+      summary: Invoke accreditation logic on student given a GPTE studentId.
+      operationId: "invokeAccreditationLogicGivenStudentId"
+      tags:
+        - "Trigger Accreditation Logic By GPTE Student Id"
+      parameters:
+        - name: gpteReportingStudentId
+          in: path
+          required: true
+          description: "GPTE Reporting StudentId"
+          type: string
+        - name: IDENTIFY_FIRED_RULES_ONLY
+          in: header
+          description: If set to true, GPTE Accreditation Service will only identify the accreditation rules that should be fired without actually firing them.<br>
+                       If set to false, GPTE Accreditation Service will identify and fire the accreditation rules.
+          required: false
+          type: boolean
+      responses:
+        200:
+          description: "Expected response to a valid request"
+          schema:
+            $ref: '#/definitions/FiredAccreditationResults'
 definitions:
   Course:
     required:
@@ -65,4 +116,20 @@ definitions:
       courseid:
         type: string
       coursename:
+        type: string
+  FiredAccreditationResults:
+    required:
+      - accredRulesFired
+      - courseCompletions
+      - email
+    properties:
+      accredRulesFired: 
+        type: array
+        items:
+          type: string
+      courseCompletions: 
+        type: array
+        items:
+          type: string
+      email:
         type: string
