@@ -35,5 +35,5 @@
 
 - name: create gpte-reporting-swagger.conf
   template:
-    src: gpte-reporting.conf
+    src: gpte-reporting-swagger.conf
     dest: /etc/httpd/conf.d
