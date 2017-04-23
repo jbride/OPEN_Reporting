@@ -351,7 +351,7 @@ It will then re-calculate all accreditations for all students based on their exi
 curl -v -X PUT  -H "ACCEPT: application/json" \
                 -H "IDENTIFY_FIRED_RULES_ONLY: true" \
                 -H "RESPOND_JSON: true" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/10387
+                http://$HOSTNAME:9090/gpte-accreditation/students/10387
 -----
 
 . Invoke accreditation logic on a non existent student
@@ -360,7 +360,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 curl -v -X PUT  -H "ACCEPT: application/json" \
                 -H "IDENTIFY_FIRED_RULES_ONLY: true" \
                 -H "RESPOND_JSON: true" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/103899
+                http://$HOSTNAME:9090/gpte-accreditation/students/103899
 -----
 
 . Invoke accreditation logic on all students whose studentid > 10000 and < 11000
@@ -371,7 +371,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 -H "RESPOND_JSON: true" \
                 -H "LOW_STUDENT_ID: 10000" \
                 -H "HIGH_STUDENT_ID: 11000" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/batch
+                http://$HOSTNAME:9090/gpte-accreditation/students/batch
 -----
 
 == SkillsBase Integration

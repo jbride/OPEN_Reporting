@@ -141,7 +141,7 @@ public class GPTEBaseServiceBean {
 
         List<GPTEBaseCondition> sCourses = canonicalDAO.selectPassedStudentCoursesByStudent(studentId);
         if(sCourses == null || sCourses.isEmpty()) {
-            logger.warn("selectStudentCoursesByStudent() no student courses found of studentId = "+studentId);
+            logger.warn("selectStudentCoursesByStudent() no student courses found for studentId = "+studentId);
         }else {
 
             GPTEBaseCondition mostRecent = sCourses.get(0);

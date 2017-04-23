@@ -93,7 +93,7 @@
     </rest>
 
 
-    <!-- curl -v -H "Accept: application/json" -X GET localhost:8205/gpte-reporting/rest/courses/<coursename> -->
+    <!-- curl -v -H "Accept: application/json" -X GET localhost:8205/gpte-reporting/rest/courses/Advanced%20Process%20Development -->
     <rest id="getcourse" path="" >
         <get uri="courses/{courseName}" >
           <route>

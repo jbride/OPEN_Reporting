@@ -30,8 +30,9 @@ sudo scp  &#60;your gpte opentlc userId&#62;@reporting.opentlc.com:/etc/gpte/cer
 
 <BR>
 <BLOCKQUOTE>
-curl --cert /etc/gpte/certs/prod_gpteclient.pem \<br>
-&#160;--key /etc/gpte/certs/prod_gpteclient.key -v -k \<br>
+curl -v -k \
+&#160;--cert /etc/gpte/certs/prod_gpteclient.pem \<br>
+&#160;--key /etc/gpte/certs/prod_gpteclient.key \<br>
 &#160;-X GET https://reporting.opentlc.com/gpte-reporting/rest/sanityCheck/
 </BLOCKQUOTE>
 </BODY>

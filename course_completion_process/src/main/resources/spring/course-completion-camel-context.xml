@@ -290,7 +290,7 @@
         </description>
         <from uri="vm:get-course-by-course-name" />
         <log message="get-course-by-course-name:  body = ${body}" />
-        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName()" id="getCourseByCourseName"/>
+        <to uri="bean:cCompletionServiceBean?method=getCourseByCourseName(${body})" id="getCourseByCourseName"/>
     </route>
 
     <route id="send-email">

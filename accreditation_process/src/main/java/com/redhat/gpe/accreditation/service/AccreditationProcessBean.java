@@ -569,7 +569,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             }
             jObject.put("accredRulesFired", rulesFired);
         } else {
-            jObject.put("email", "Student not found");
+            //jObject.put("email", "Student not found");
         }
         
         exchange.getIn().setBody(jObject);
