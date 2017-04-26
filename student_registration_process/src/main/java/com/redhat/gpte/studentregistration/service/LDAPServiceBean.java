@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -71,7 +74,7 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private Logger logger = Logger.getLogger("LDAPServiceBean");
     
     // Data structure of userIds that have been verified to exist in LDAP
-    // private Set<String> verifiedUsers = new HashSet<String>();
+    private Set<String> verifiedLADPRegisteredUsers = new HashSet<String>();
     
     // This cache can go stale if/when the underlying database is reloaded with new data
     // The data in this cache will no longer reflect this data
@@ -511,9 +514,16 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
        
         // 2) Iterate through list and filter out potential duplicates by email address
         for(StudentRegistrationBindy sBindy : sBindyList){
-            if(noDupsStudentMap.containsKey(sBindy.getEmail()) || exceptions.containsKey(sBindy.getEmail())) {
+        	String email = sBindy.getEmail();
+            if(noDupsStudentMap.containsKey(email) || exceptions.containsKey(sBindy.getEmail())) {
                 dupsCounter++;
             }else {
+            	
+            	//Prune any entries that are known to have recently been successfully pushed to IPA
+            	if(this.verifiedLADPRegisteredUsers.contains(email) ) {
+            		logger.info(email+" : convertStudentRegBindy() Already verified to have been successfully pushed to IPA LDAP.  Will not process again");
+            		continue;
+            	}
                 
                 try {
                     // 3) Grab student and company data as parsed by bindy
@@ -552,6 +562,40 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
 
         exchange.getIn().setHeader(SR_DENORMALIZED_STUDENTS_TO_PROCESS, dStudents);
         exchange.getIn().setBody(noDupsStudentMap.values());
+    }
+    
+    public void updateIPAFlagOnStudents(Exchange exchange) {
+        List<DenormalizedStudent> students = (List<DenormalizedStudent>)exchange.getIn().getBody();
+        Map<String, String> uploadExceptionMap = (Map<String,String>)exchange.getIn().getHeader(UPLOAD_EXCEPTION_MAP);
+        exchange.getIn().removeHeader(UPLOAD_EXCEPTION_MAP);
+        
+        int count = 0;
+        for(DenormalizedStudent sObj : students) {
+            String email = sObj.getStudentObj().getEmail();
+            if(uploadExceptionMap.containsKey(email)){
+                logger.error(email+" : will not update ipaStatus because of upload issues");
+            }else {
+                int sUpdate = this.canonicalDAO.updateStudentStatus(email, 1, Student.IPA_STATUS);
+                count = count + sUpdate;
+                
+                // Set verifiedLDAPRegisteredUsers so that future processing of student registrations can skip this student
+                this.verifiedLADPRegisteredUsers.add(email);
+            }
+        }
+        logger.info("updateIPAFlagOnStudents() # of students to update = "+students.size()+" : total updated = "+count);
+        
+        if(uploadExceptionMap.size() > 0){
+            StringBuilder sBuilder = new StringBuilder("updateIPAFlagOnStudents() following students not updated due to upload issues with LDAP: \n\n");
+            Iterator emailIt = uploadExceptionMap.keySet().iterator();
+            while(emailIt.hasNext()){
+                String email = (String)emailIt.next();
+                sBuilder.append(email);
+                sBuilder.append("\n");
+                sBuilder.append(uploadExceptionMap.get(email));
+                sBuilder.append("\n\n");
+            }
+            throw new RuntimeException(sBuilder.toString());
+        }
     }
     
     private void handleValidationException(Exchange exchange, String message) {

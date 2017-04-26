@@ -277,7 +277,7 @@
                 <otherwise>
                     <to uri="bean:ipaServiceBean?method=uploadToLdapServer"/>
                     <setBody><simple>${header.unprocessedStudentList}</simple></setBody>
-                    <to uri="bean:studentRegBean?method=updateIPAFlagOnStudents" />
+                    <to uri="bean:ipaServiceBean?method=updateIPAFlagOnStudents" />
                 </otherwise>
             </choice>
           </when>
