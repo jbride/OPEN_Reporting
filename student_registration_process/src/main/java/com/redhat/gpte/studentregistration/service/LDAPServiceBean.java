@@ -66,6 +66,8 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private static final String SREG_PERSIST_COMPANY = "sreg_persist_company";
     private static final String NULL_STRING = "null";
     public static final String SR_DENORMALIZED_STUDENTS_TO_PROCESS="sr_denormalized_students_to_process";
+    public static final String STUDENT_REG_PROCESSING_LOGIC_LOCKED = "studentRegProcessingLogicLocked";
+    public static final String GAINED_STUDENT_ACCRED_LOCK = "gainedStudentAccredLock";
     private String providerUrl = null;
     private String securityPrincipal = null;
     private String securityCredentials = null;
@@ -83,6 +85,9 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
     private Map<String,Integer> verifiedCompanies = new HashMap<String,Integer>();
 
     private boolean sregPersistCompany = true;
+
+    private boolean studentRegProcessingLogicLocked = false;
+    private Object studentRegProcessingLock = new Object();
 
     public LDAPServiceBean() {
         if(System.getProperty(SREG_PERSIST_COMPANY) != null) {
@@ -127,6 +132,29 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
                 testCtx.close();
             }
         }*/
+    }
+
+    public void isStudentRegProcessingLogicLocked(Exchange exchange) {
+        exchange.getIn().setHeader(STUDENT_REG_PROCESSING_LOGIC_LOCKED, studentRegProcessingLogicLocked);
+    }
+
+    public void acquireStudentRegProcessingLock(Exchange exchange) {
+        exchange.getIn().setHeader(GAINED_STUDENT_ACCRED_LOCK, false);
+        if(studentRegProcessingLogicLocked)
+            return;
+        else {
+            synchronized(studentRegProcessingLock) {
+                if(studentRegProcessingLogicLocked)
+                    return;
+
+                studentRegProcessingLogicLocked = true;
+                exchange.getIn().setHeader(GAINED_STUDENT_ACCRED_LOCK, true);
+            }
+        }
+    }
+
+    public void releaseStudentRegProcessingLock() {
+        studentRegProcessingLogicLocked = false;
     }
     
     

@@ -158,64 +158,6 @@
 <!-- ***********************************************************************************************************  -->
 
 
-
-
-
-<!-- *******************         Process Student Registrations           *****************************************   -->
-
-    <route id="receive-sumtotal-student-registrations">
-        <description>
-            1) Executes validation logic on inbound Student Registration data file generated from SumTotal
-            2) Kicks back data that does not pass validation logic and sends notification email of problem(s) to a list or recipients customized for this business service
-            3) Persists Student objects
-
-            Note regarding sumtotal data file:
-                It has duplicates because we are pulling the data from the registration of each ELAB course.  
-                So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
-        </description>
-        <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
-        <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
-        <setHeader headerName="ROUTE_SPECIFIC_SUBJECT"><simple>OPENTLC Daily Import Exceptions: ${date:now:MM-dd-yy} : {{jboss.host.name}}  : ${header.CamelFileName}</simple></setHeader>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>mawisner@redhat.com,open-program@redhat.com</constant></setHeader>
-        <unmarshal ref="studentRegBindy"/>
-        <doTry>
-                <!--potentially throws this exception:
-                    Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: DokeosCourseCompletion -->
-                <log message="# student registrations found in ${header.CamelFileName} : ${body.size()}"/>
-                <doCatch>
-                    <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
-                    <log message="only 1 student registration found in ${header.CamelFileName}"/>
-                    <to uri="bean:studentRegBean?method=clearException" />
-                </doCatch>
-        </doTry>
-        <to uri="direct:process-student-registrations-direct" />
-        <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
-    </route>
-
-
-    <route id="process-student-registrations-vm">
-        <from uri="vm:process-student-registrations-vm"/>
-        <to uri="direct:process-student-registrations-direct" />
-    </route>
-    <route id="process-student-registrations-direct">
-        <description>
-            1)  Accepts Collection of StudentRegistrationBindy
-        </description>
-        <from uri="direct:process-student-registrations-direct"/>
-
-        <!-- Sets header of Collection<DenormalizedStudents> for later downstream processing -->
-        <to uri="bean:ldapServiceBean?method=convertStudentRegBindyToCanonicalStudents" />
-
-        <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
-        <to uri="direct:persist-student-list"/>
-
-        <!-- Requires Collection<DenormalizedStudent> as body -->
-        <setBody><simple>${header.sr_denormalized_students_to_process}</simple></setBody>
-        <to uri="vm:sr_post-new-students-to-ipa-uri" />
-    </route>
-
-
-
     <route id="process-denormalized-student-vm">
         <from uri="vm:process-denormalized-student-vm"/>
         <to uri="direct:process-denormalized-student-direct" />
@@ -240,6 +182,68 @@
 
 
 
+<!-- *******************         Process Student Registrations           *****************************************   -->
+
+    <route id="receive-sumtotal-student-registrations">
+        <description>
+            1) Executes validation logic on inbound Student Registration data file generated from SumTotal
+            2) Kicks back data that does not pass validation logic and sends notification email of problem(s) to a list or recipients customized for this business service
+            3) Persists Student objects
+
+            Note regarding sumtotal data file:
+                It has duplicates because we are pulling the data from the registration of each ELAB course.  
+                So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
+        </description>
+        <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
+        <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
+        <setHeader headerName="ROUTE_SPECIFIC_SUBJECT"><simple>OPENTLC Daily Import Exceptions: ${date:now:MM-dd-yy} : {{jboss.host.name}}  : ${header.CamelFileName}</simple></setHeader>
+        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>mawisner@redhat.com,open-program@redhat.com</constant></setHeader>
+        <to uri="bean:ldapServiceBean?method=isStudentRegProcessingLogicLocked"/>
+        <choice>
+            <when>
+                <simple>${header.studentRegProcessingLogicLocked} != true</simple>
+                <unmarshal ref="studentRegBindy"/>
+                <doTry>
+                    <!--potentially throws this exception:
+                        Failed to invoke method: size on null due to: org.apache.camel.component.bean.MethodNotFoundException: Method with name: size not found on bean: DokeosCourseCompletion -->
+                    <log message="# student registrations found in ${header.CamelFileName} : ${body.size()}"/>
+                    <doCatch>
+                        <exception>org.apache.camel.language.bean.RuntimeBeanExpressionException</exception>
+                        <log message="only 1 student registration found in ${header.CamelFileName}"/>
+                        <to uri="bean:studentRegBean?method=clearException" />
+                    </doCatch>
+                </doTry>
+                <to uri="direct:process-student-registrations-direct" />
+                <log message="Completed Student Registration processing of file:  ${header.CamelFileName}"/>
+            </when>
+            <otherwise><log message="@@@@@@@@@@@@@@   STUDENT REGISTRATION PROCESSING LOGIC IS CURRENTLY LOCKED    @@@@@@@@@@@@@@" /></otherwise>
+        </choice>
+    </route>
+
+
+    <route id="process-student-registrations-vm">
+        <from uri="vm:process-student-registrations-vm"/>
+        <to uri="direct:process-student-registrations-direct" />
+    </route>
+    <route id="process-student-registrations-direct">
+        <description>
+            1)  Accepts Collection of StudentRegistrationBindy
+        </description>
+        <from uri="direct:process-student-registrations-direct"/>
+
+
+        <!-- Sets header of Collection<DenormalizedStudents> for later downstream processing -->
+        <to uri="bean:ldapServiceBean?method=convertStudentRegBindyToCanonicalStudents" />
+
+        <to uri="bean:ldapServiceBean?method=throwAnyCachedExceptions" />
+        <to uri="direct:persist-student-list"/>
+
+        <!-- Requires Collection<DenormalizedStudent> as body -->
+        <setBody><simple>${header.sr_denormalized_students_to_process}</simple></setBody>
+        <to uri="vm:sr_post-new-students-to-ipa-uri" />
+    </route>
+
+
     <route id="post-new-students-to-ipa-batch">
         <description>
             1. Periodically query database for Students whose information needs to be pushed to GPTE IPA
@@ -260,27 +264,35 @@
             4. Parse the response body pertaining to each student and, if no errors, update database for that student indicating that GPTE IPA now has record of that student information
         </description>
         <from uri="vm:sr_post-new-students-to-ipa-uri"/>
+        <to uri="bean:ldapServiceBean?method=acquireStudentRegProcessingLock"/>
         <choice>
-          <when>
-            <simple>${body.size} > 0 </simple>
-            <setHeader headerName="unprocessedStudentList" id="unprocessedStudentList-set-header" >
-                <simple>${body}</simple>
-            </setHeader>
-            <to uri="bean:ipaServiceBean?method=createLdapHttpUploadFile" />
-            <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd_HHmm}.csv" />
-            <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.csv" id="log_write_file"/>
-            <choice>
-                <when>
-                    <simple>{{ipa_ldap.testMode}}</simple>
-                    <log message="ipa_ldap.testMode set to true.  Will not upload to IPA LDAP"/>
-                </when>
-                <otherwise>
-                    <to uri="bean:ipaServiceBean?method=uploadToLdapServer"/>
-                    <setBody><simple>${header.unprocessedStudentList}</simple></setBody>
-                    <to uri="bean:ipaServiceBean?method=updateIPAFlagOnStudents" />
-                </otherwise>
-            </choice>
-          </when>
+            <when>
+                <simple>${header.gainedStudentAccredLock} == true</simple>
+                <choice>
+                    <when>
+                        <simple>${body.size} > 0 </simple>
+                        <setHeader headerName="unprocessedStudentList" id="unprocessedStudentList-set-header" >
+                            <simple>${body}</simple>
+                        </setHeader>
+                        <to uri="bean:ipaServiceBean?method=createLdapHttpUploadFile" />
+                        <to uri="file:/tmp/gpte/ipa_student_reg_uploads?fileName=${date:now:yyyyMMdd_HHmm}.csv" />
+                        <log message="*!*!*!*!   Just wrote IPA upload file to: /tmp/gpte/ipa_student_reg_uploads/${date:now:yyyyMMdd_HHmm}.csv" id="log_write_file"/>
+                        <choice>
+                            <when>
+                                <simple>{{ipa_ldap.testMode}}</simple>
+                                <log message="ipa_ldap.testMode set to true.  Will not upload to IPA LDAP"/>
+                            </when>
+                            <otherwise>
+                                <to uri="bean:ipaServiceBean?method=uploadToLdapServer"/>
+                                <setBody><simple>${header.unprocessedStudentList}</simple></setBody>
+                                <to uri="bean:ipaServiceBean?method=updateIPAFlagOnStudents" />
+                            </otherwise>
+                        </choice>
+                    </when>
+                </choice>
+                <to uri="bean:ipaServiceBean?method=releaseStudentRegProcessingLock"/>
+            </when>
+            <otherwise><log message="@@@@@@@@@@@@@@   FAILED TO GAIN EGISTRATION PROCESSING LOGIC LOCK    @@@@@@@@@@@@@@" /></otherwise>
         </choice>
     </route>
 
