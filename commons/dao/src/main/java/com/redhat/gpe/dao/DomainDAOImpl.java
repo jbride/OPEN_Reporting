@@ -323,7 +323,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
 
     public void addStudentCourse(StudentCourse cCompletion) {
-        StringBuilder sBuilder = new StringBuilder("insert into StudentCourses values (NULL,?,?,?,?,?,?,?,?,?)");
+        StringBuilder sBuilder = new StringBuilder("insert into StudentCourses values (NULL,?,?,?,?,?,?,?,?,?,?)");
         
         sbJdbcTemplate.update(sBuilder.toString(),
             cCompletion.getStudentid(),
@@ -334,7 +334,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             cCompletion.getAssessmentscore(),
             StudentCourse.UNPROCESSED,
             null,
-            cCompletion.getTotaraCourseCompletionId()
+            cCompletion.getTotaraCourseCompletionId(),
+            cCompletion.getTotaraCourseCompletionDate()
         );
     }
     
@@ -437,9 +438,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         return count == 0;
     }
 
-    public int getMostRecentTotaraCourseCompletionId() {
-        String sql = "select totaraCourseCompletionId from StudentCourses order by totaraCourseCompletionId asc limit 1";
-        return sbJdbcTemplate.queryForObject(sql, Integer.class);
+    public long getMostRecentTotaraCourseCompletionDate() {
+        String sql = "select totaraCourseCompletionDate from StudentCourses order by totaraCourseCompletionDate asc limit 1";
+        return sbJdbcTemplate.queryForObject(sql, Long.class);
     }
 /* ******************************************************************************* */
     

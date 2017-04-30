@@ -254,6 +254,21 @@ Various text files that provide more details of problems that may have occurred 
 
 === Totara Course Completions
 
+==== Execute SQL directly on Totara Shadow DB
+
+. ssh into GPTE dev, qa or prod environments
+. Switch users to `jboss` and change directories to: `/opt/OPEN_Reporting`
+. Determine password for totara shadow db
++
+-----
+$ cat properties/test.properties | grep totara_shadow_db_password
+-----
+. Execute:
++
+-----
+psql -h 23.253.23.27 -U totara_redhat_reporting -p 5432 -W totara_redhat_reporting
+-----
+
 ==== Manual processing
 . Manually pull and process Totara Course Completions (from their _shadow database_) given a range of totara course completion Ids:
 +

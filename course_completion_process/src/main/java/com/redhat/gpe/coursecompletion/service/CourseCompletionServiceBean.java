@@ -614,8 +614,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         }
     }
 
-    public int getMostRecentTotaraCourseCompletionId() {
-        return canonicalDAO.getMostRecentTotaraCourseCompletionId();
+    public long getMostRecentTotaraCourseCompletionDate() {
+        return canonicalDAO.getMostRecentTotaraCourseCompletionDate();
     }
    
     public int testTotaraJDBCConnection() {
@@ -623,20 +623,20 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     }
 
     public  List<TotaraCourseCompletion> getLatestTotaraCourseCompletions(Exchange exchange) {
-        int latestKnownCC = (Integer)exchange.getIn().getBody();
+        long latestKnownCCDate = (Long)exchange.getIn().getBody();
         int totaraCourseCompletionLimit = -1;
         String headerVal = (String)exchange.getIn().getHeader(TOTARA_COURSE_COMPLETION_LIMIT);
         if(headerVal != null)
             totaraCourseCompletionLimit = Integer.parseInt(headerVal);
 
-        List<TotaraCourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCC, totaraCourseCompletionLimit);
+        List<TotaraCourseCompletion> totaraCourseCompletions =  totaraShadowDAO.getLatestCourseCompletions(latestKnownCCDate, totaraCourseCompletionLimit);
         logger.info("getLatestTotaraCourseCompletions() # of totaraCourseCompletions = "+totaraCourseCompletions.size());
         return totaraCourseCompletions;
     }
 
     public List<TotaraCourseCompletion> getTotaraCourseCompletionsByRange(Exchange exchange) {
-        int lowId;
-        int highId;
+        long lowId;
+        long highId;
         Object lowIdObject = exchange.getIn().getHeader(TOTARA_LOW_CC_ID);
         if(lowIdObject == null)
             throw new RuntimeException("getTotaraCourseCompletionsByRange() please ensure that the following header is set: "+TOTARA_LOW_CC_ID );

@@ -8,7 +8,7 @@ public interface TotaraShadowDAO {
 
     int testTotaraJDBCConnection();
 
-    List<TotaraCourseCompletion> getLatestCourseCompletions(int lastCC, int totaraCCLimit);
-    List<TotaraCourseCompletion> getCourseCompletionsByRange(int lowCCId, int highCCId);
+    List<TotaraCourseCompletion> getLatestCourseCompletions(long lastCCDate, int totaraCCLimit);
+    List<TotaraCourseCompletion> getCourseCompletionsByRange(long lowCCDate, long highCCDate);
 
 }

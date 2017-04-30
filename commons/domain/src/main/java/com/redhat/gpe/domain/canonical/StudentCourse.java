@@ -25,7 +25,7 @@ public class StudentCourse implements Serializable {
     public static final String PROCESSED = "processed";
     public static final int UNPROCESSED = 0;
     public static final int PROCESSED_ALL = 1;
-    public static final String SELECT_CLAUSE = "sc.StudentCourseID, sc.StudentID, sc.CourseID, sc.LanguageID, sc.AssessmentDate, sc.AssessmentResult, sc.AssessmentScore, sc.Processed, sc.totaraCourseCompletionId";
+    public static final String SELECT_CLAUSE = "sc.StudentCourseID, sc.StudentID, sc.CourseID, sc.LanguageID, sc.AssessmentDate, sc.AssessmentResult, sc.AssessmentScore, sc.Processed, sc.totaraCourseCompletionId, sc.totaraCourseCompletionDate";
 
     private Integer    studentcourseid = 0;
 
@@ -37,6 +37,7 @@ public class StudentCourse implements Serializable {
     private byte       assessmentscore = 100;  //passing score is 70% or greater
     private short      processed = UNPROCESSED;
     private Integer    totaraCourseCompletionId;
+    private Timestamp  totaraCourseCompletionDate;
     
     public enum ResultTypes {
         Pass,Fail
@@ -62,6 +63,7 @@ public class StudentCourse implements Serializable {
         this.assessmentscore = value.assessmentscore;
         this.processed = value.processed;
         this.totaraCourseCompletionId = value.totaraCourseCompletionId;
+        this.totaraCourseCompletionDate = value.totaraCourseCompletionDate;
     }
 
     public StudentCourse(
@@ -73,7 +75,8 @@ public class StudentCourse implements Serializable {
         String     assessmentresult,
         byte assessmentscore,
         short      processed,
-        Integer    totaraCourseCompletionId
+        Integer    totaraCourseCompletionId,
+        Timestamp  totaraCourseCompletionDate
     ) {
         this.studentcourseid = studentcourseid;
         this.studentid = studentid;
@@ -84,6 +87,7 @@ public class StudentCourse implements Serializable {
         this.assessmentscore = assessmentscore;
         this.processed = processed;
         this.totaraCourseCompletionId = totaraCourseCompletionId;
+        this.totaraCourseCompletionDate = totaraCourseCompletionDate;
     }
 
     public Integer getStudentcourseid() {
@@ -149,6 +153,14 @@ public class StudentCourse implements Serializable {
         this.totaraCourseCompletionId = x;
     }
 
+    public Timestamp getTotaraCourseCompletionDate() {
+        return this.totaraCourseCompletionDate;
+    }
+
+    public void setTotaraCourseCompletionDate(Timestamp x) {
+        this.totaraCourseCompletionDate = x;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Studentcourses (");
@@ -162,6 +174,7 @@ public class StudentCourse implements Serializable {
         sb.append(", ").append(assessmentscore);
         sb.append(", ").append(processed);
         sb.append(", ").append(totaraCourseCompletionId);
+        sb.append(", ").append(totaraCourseCompletionDate);
 
         sb.append(")");
         return sb.toString();

@@ -119,8 +119,8 @@
     </rest>
 
     <!-- 
-        curl -v -X PUT -H "LOW_CC_ID: 110756" -H "HIGH_CC_ID: 110757" \
-                       localhost:8205/gpte-reporting/rest/course_completions/totara \
+        curl -v -X PUT -H "LOW_CC_ID: 1493371045" -H "HIGH_CC_ID: 1493518306" \
+                       localhost:8205/gpte-reporting/rest/course_completions/totara
     -->
     <rest id="process-totara-course-completions-by-range-vm" path="/course_completions/">
         <put uri="totara" produces="application/json" >

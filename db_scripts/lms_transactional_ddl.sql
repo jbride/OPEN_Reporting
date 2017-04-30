@@ -497,6 +497,7 @@ CREATE TABLE `StudentCourses` (
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `totaraCourseCompletionId` int(11) DEFAULT '0',
+  `totaraCourseCompletionDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   PRIMARY KEY (`StudentCourseID`),
   KEY `IDX_StudentCourses_Students` (`StudentID`),
   KEY `IDX_StudentCourses_Courses` (`CourseID`),

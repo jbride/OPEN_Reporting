@@ -9,8 +9,9 @@ public class TotaraCourseCompletion {
     private String courseShortName;
     private String studentFirstName;
     private String studentLastName;
+    private long completionDate;
 
-    public TotaraCourseCompletion(int totaraCCId, String email, String studentFirstName, String studentLastName, String totaraCourseId, String courseFullName, String courseShortName) {
+    public TotaraCourseCompletion(int totaraCCId, String email, String studentFirstName, String studentLastName, String totaraCourseId, String courseFullName, String courseShortName, long completionDate) {
         this.totaraCCId = totaraCCId;
         this.email = email;
         this.studentFirstName = studentFirstName;
@@ -18,6 +19,7 @@ public class TotaraCourseCompletion {
         this.totaraCourseId = totaraCourseId;
         this.courseFullName = courseFullName;
         this.courseShortName = courseShortName;
+        this.completionDate = completionDate;
     }
 
     public int getTotaraCCId() { return totaraCCId; }
@@ -46,6 +48,8 @@ public class TotaraCourseCompletion {
     public String getStudentFirstName() {
         return this.studentFirstName;
     }
+    public long getCompletionDate() { return completionDate; }
+    public void setCompletionDate(long x) { completionDate = x; }
 }
 
 
