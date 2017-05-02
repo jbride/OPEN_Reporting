@@ -27,9 +27,15 @@ The intended audience of this document architects, developers and administrators
 
 === Skills
 
+==== Operations Team Member
 . RHCSA or equivalent experience.
 . Experience with Ansible
 . Experience with Git.
+. Experience with administration of java projects using its defacto build tool:  Maven
+. Experience using Google Spreadsheets and its javascript extension functionality:  _Google App Script_.
+
+==== Development
+. All of the skills required of an operations team member
 . Experience with Java development and its defacto build tool: Maven.
 . Experience with JBoss EAP administration.
 . Experience developing services using JBoss Fuse.
