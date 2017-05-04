@@ -2,7 +2,7 @@
 # Purpose:  Determine all StudentAccreditations from a fresh lms_transactional database of existing student courses
 #
 # Dependencies:
-#  1)  accreditation-process JVM must be running on same machine and its rest-dsl endpoint available at:  http://$HOSTNAME:9090/gpte_accreditation/students/batch
+#  1)  accreditation-process JVM must be running on same machine and its rest-dsl endpoint available at:  http://$HOSTNAME:9090/gpte-accreditation/students/batch
 
 for var in $@
 do
@@ -66,7 +66,7 @@ function determineBatchAccreditations() {
                 -H "RESPOND_JSON: false" \
                 -H "LOW_STUDENT_ID: $low_student_id" \
                 -H "HIGH_STUDENT_ID: $high_student_id" \
-                http://$HOSTNAME:9090/gpte_accreditation/students/batch
+                http://$HOSTNAME:9090/gpte-accreditation/students/batch
 
         sleep $sleepAmount
         low_student_id=`expr $low_student_id + $incrementAmount`
