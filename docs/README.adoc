@@ -27,9 +27,15 @@ The intended audience of this document architects, developers and administrators
 
 === Skills
 
+==== Operations Team Member
 . RHCSA or equivalent experience.
 . Experience with Ansible
 . Experience with Git.
+. Experience with administration of java projects using its defacto build tool:  Maven
+. Experience using Google Spreadsheets and its javascript extension functionality:  _Google App Script_.
+
+==== Development
+. All of the skills required of an operations team member
 . Experience with Java development and its defacto build tool: Maven.
 . Experience with JBoss EAP administration.
 . Experience developing services using JBoss Fuse.
@@ -253,6 +259,29 @@ That information is not available from GPTE Reporting.
 Various text files that provide more details of problems that may have occurred during processing of Sumtotal batch course completion attachment files can be found on the dev machine at: `/tmp/gpte/courseCompletionIssues/` .
 
 === Totara Course Completions
+
+==== Periodically pull latest Totara Course Completions to GPTE Reporting
+
+GPTE Reporting provides the ability to periodically pull (on a configurable basis) the latest Totara course completions and persist to GPTE Reporting.
+
+By default, this polling is disabled.
+This feature can be enabled as follows:
+
+. As the `jboss` operating system user, edit the value of the following property in the properties file specific to your environment (ie:  dev, test, or prod):
++
+-----
+cc_poll_totara_course_completions_input_uri=direct:poll_totara_course_completions
+-----
+
+.. Change the value such that it uses the link:http://camel.apache.org/quartz2.html[quartz2 camel component] similar to the following:
++
+-----
+cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 23 1/1 * ? *
+----- 
+
+.. Save your changes to the properties file and exit.
+
+. Bounce the GPTE Reporting service:  `bg` .
 
 ==== Execute SQL directly on Totara Shadow DB
 
