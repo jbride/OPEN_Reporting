@@ -1,5 +1,8 @@
 package com.redhat.gpe.integration.test;
 
+import java.util.Date;
+import java.sql.Timestamp;
+
 import com.redhat.gpe.domain.canonical.*;
 import com.redhat.gpe.domain.helper.CourseCompletion;
 import com.redhat.gpe.domain.helper.DomainMockObjectHelper;
@@ -76,7 +79,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
     /* verification:   select * from StudentCourses where StudentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
        cleanup:        delete from StudentCourses where studentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
      */
-    @Ignore
+    //@Ignore
     @Test
     public void testPersistNewStudentCourse() throws InterruptedException {
         Endpoint endpoint = context.getEndpoint(PERSIST_STUDENT_COURSE_URI);
@@ -88,6 +91,8 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         Course courseObj = DomainMockObjectHelper.getMockCourse();
         Language langObj = DomainMockObjectHelper.getMockLanguage();
         StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
+
+        //sCourse.setTotaraCourseCompletionDate(new Timestamp(new Date().getTime()));
 
         CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
         in.setBody(scWrapper);

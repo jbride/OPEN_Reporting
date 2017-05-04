@@ -324,6 +324,15 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
     public void addStudentCourse(StudentCourse cCompletion) {
         StringBuilder sBuilder = new StringBuilder("insert into StudentCourses values (NULL,?,?,?,?,?,?,?,?,?,?)");
+
+        /* Mariadb wants to set current timestamp to totaraCourseCompletionDate field even if its value is null.
+           Therefore, when value is null, will hard-code to:  0000-00-00 00:00:00
+        */
+        Object totaraCourseCompletion = "0000-00-00 00:00:00";
+        if(cCompletion.getTotaraCourseCompletionDate() != null) {
+            totaraCourseCompletion = cCompletion.getTotaraCourseCompletionDate();
+        }
+
         
         sbJdbcTemplate.update(sBuilder.toString(),
             cCompletion.getStudentid(),
@@ -335,7 +344,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             StudentCourse.UNPROCESSED,
             null,
             cCompletion.getTotaraCourseCompletionId(),
-            cCompletion.getTotaraCourseCompletionDate()
+            totaraCourseCompletion
         );
     }
     

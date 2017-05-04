@@ -66,7 +66,7 @@ public class TotaraCourseCompletionsTest extends CamelSpringTestSupport {
        template.send(PROCESS_TOTARA_COURSE_COMPLETIONS_BY_RANGE_URI, exchange);
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testPollTotaraCourseCompletionsTest() throws InterruptedException {
        Endpoint endpoint = context.getEndpoint(POLL_NEW_TOTARA_COURSE_COMPLETIONS_URI);
