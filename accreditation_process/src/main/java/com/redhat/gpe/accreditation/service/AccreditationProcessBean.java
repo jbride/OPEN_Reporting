@@ -79,6 +79,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String SB_NAME = "name";
     private static final String SB_STATUS = "status";
     private static final String SB_START_DATE = "start_date";
+    private static final String SB_NEVER_CHECK_FOR_EXISTING_ACCRED = "sb_neverCheckForExistingAccred";
     
     private static Object accredProcessLock = new Object();
     private static boolean isLocked = false;
@@ -97,6 +98,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private String drlPath;
     
     private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
+
+    private boolean sb_neverCheckForExistingAccred = true;
 
     public AccreditationProcessBean() {
         tokenUrl = System.getProperty(TOKEN_URL);
@@ -136,6 +139,11 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             throw new RuntimeException("must set system property: "+EXPIRED_MONTHS);
         expiredMonths = Integer.parseInt(emString);
 
+        String checkString = System.getProperty(SB_NEVER_CHECK_FOR_EXISTING_ACCRED);
+        if(StringUtils.isEmpty(checkString))
+            throw new RuntimeException("must set system property: "+SB_NEVER_CHECK_FOR_EXISTING_ACCRED);
+        sb_neverCheckForExistingAccred = Boolean.parseBoolean(checkString);
+
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("init() \n    tokenUrl = "+tokenUrl);
         sBuilder.append("\n    personIdByEmailUrl = "+personIdByEmailUrl);
@@ -145,6 +153,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         sBuilder.append("\n    clientSecret = "+clientSecret);
         sBuilder.append("\n    grantType = "+grantType);
         sBuilder.append("\n    expiredMonths = "+expiredMonths);
+        sBuilder.append("\n    sb_neverCheckForExistingAccred = "+sb_neverCheckForExistingAccred);
         logger.info(sBuilder.toString()); 
     }
 
@@ -690,6 +699,12 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     public void checkSkillsBaseForExistingAccred(Exchange exchange) {
         Message in = exchange.getIn();
         Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
+
+        // Requirements regarding the need to check for existing SkillsBase qualifications are in flux.
+        if(sb_neverCheckForExistingAccred) {
+            denormalizedStudentAccred.setSkillsBaseQualExists(false);
+            return;
+        }
         
         Student studentObj = denormalizedStudentAccred.getStudent();
         AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
