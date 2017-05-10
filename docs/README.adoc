@@ -479,9 +479,9 @@ ta
 -----
 . Send one or more course completions to GPTE Reporting that lead to an existing accreditation.
 . Items of note for testing
-.. sb_sendMailToStudentEnabled must be enabled for the sync to occur
+.. sb_sendMailToStudentEnabled must be enabled for the sync to occur, accred_process-push-qualification-to-skillsbase-batch must be uncommented as well.
 .. Make sure that all StudentAccreditations have sa.Processed=1 other than the specific cases you want to test (sa.Processed=0) so that you do not send out unnessary emails
-.. Set sb_sendMailToStudentEnabled to false when you are done testing
+.. Set sb_sendMailToStudentEnabled to false when you are done testing, and comment accred_process-push-qualification-to-skillsbase-batch back out
 
 === SkillsBase Log Statements
 
