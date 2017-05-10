@@ -464,7 +464,7 @@ MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=1 where Email
 MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email="gpse.training+1@redhat.com";
 -----
 
-. flip SkillsBase integration swithch:
+. flip SkillsBase integration switch:
 .. Edit properties/{env}.properties :
 +
 -----
@@ -478,6 +478,10 @@ ba
 ta
 -----
 . Send one or more course completions to GPTE Reporting that lead to an existing accreditation.
+. Items of note for testing
+.. sb_sendMailToStudentEnabled must be enabled for the sync to occur
+.. Make sure that all StudentAccreditations have sa.Processed=1 other than the specific cases you want to test (sa.Processed=0) so that you do not send out unnessary emails
+.. Set sb_sendMailToStudentEnabled to false when you are done testing
 
 === SkillsBase Log Statements
 
