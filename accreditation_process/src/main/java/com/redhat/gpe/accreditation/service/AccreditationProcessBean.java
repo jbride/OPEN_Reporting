@@ -605,6 +605,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     public void getSkillsBaseToken(Exchange exchange) throws SkillsBaseCommunicationException{
         
         Message in = exchange.getIn();
+        String response = null;
         try {
                 
             HttpClient httpclient = new DefaultHttpClient();
@@ -625,19 +626,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpResponse httpResponse = httpclient.execute(post);
 
             // process response
-            String response = EntityUtils.toString(httpResponse.getEntity());
+            response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
             String token = jsonResponse.getString("access_token");
 
             in.setHeader(Constants.TOKEN, token);
         } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.debug(message, exc);
+            handleSkillsBaseResponseException(exc, response);
             throw (new SkillsBaseCommunicationException());
         }
     }
     
-    public void getSkillsBasePersonId(Exchange exchange) {
+    public void getSkillsBasePersonId(Exchange exchange) throws SkillsBaseCommunicationException {
 
         Message in = exchange.getIn();
         Accreditation studentAccredObj = in.getBody(Accreditation.class);
@@ -646,6 +646,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             throw new RuntimeException("getSkillsBasePersonId() Accreditation object passed to this function must have a student email");
 
         logger.info(theEmail+" : Getting personId from Skills Base web service.");
+        String response = null;
         
         try {
             HttpClient httpclient = new DefaultHttpClient();
@@ -666,7 +667,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpResponse httpResponse = httpclient.execute(post);
 
             // process response
-            String response = EntityUtils.toString(httpResponse.getEntity());
+            response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
 
             String status = jsonResponse.getString("status");
@@ -690,13 +691,12 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
                 }
             }
         } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
+            handleSkillsBaseResponseException(exc, response);
+            throw (new SkillsBaseCommunicationException());
         }
     }
 
-    public void checkSkillsBaseForExistingAccred(Exchange exchange) {
+    public void checkSkillsBaseForExistingAccred(Exchange exchange) throws SkillsBaseCommunicationException {
         Message in = exchange.getIn();
         Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
 
@@ -713,6 +713,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         String personId = studentObj.getSkillsbasePersonId();
 
         String accredName = accredObj.getAccreditationname();
+        String response = null;
 
         try {
             HttpClient httpclient = new DefaultHttpClient();
@@ -730,7 +731,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
             // process response
             long responseLength = httpResponse.getEntity().getContentLength();
-            String response = EntityUtils.toString(httpResponse.getEntity());
+            response = EntityUtils.toString(httpResponse.getEntity());
             StatusLine sLine = httpResponse.getStatusLine();
             logger.info(sEmail+" : skillsbase personId = "+personId+"\n\tstatusCode = "+sLine.getStatusCode()+"\n\tresponse content length = "+responseLength+"\n\tresponse reason phrase = "+sLine.getReasonPhrase()+"\n\tresponse: " + response);
 
@@ -751,14 +752,13 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             }
 
         } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
+            handleSkillsBaseResponseException(exc, response);
+            throw (new SkillsBaseCommunicationException());
         }
 
     }
     
-    public void postAccreditationToSkillsBase(Exchange exchange) {
+    public void postAccreditationToSkillsBase(Exchange exchange) throws SkillsBaseCommunicationException {
 
         Message in = exchange.getIn();
         Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
@@ -768,6 +768,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
 
         String accredName = accredObj.getAccreditationname();
+
+        String response = null;
         
         try {
             HttpClient httpclient = new DefaultHttpClient();
@@ -799,7 +801,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpResponse httpResponse = httpclient.execute(post);
 
             // process response
-            String response = EntityUtils.toString(httpResponse.getEntity());
+            response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
 
             String status = jsonResponse.getString("status");
@@ -809,13 +811,16 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             if (!"success".equalsIgnoreCase(status)) {
                 String message = "Error sending qualification. Student email: " + studentObj.getEmail() + ",  qualification: " + accredName;
                 logger.error(message);
-                throw new RuntimeException(message);
             }
         } catch (Exception exc) {
-            String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
+            handleSkillsBaseResponseException(exc, response);
+            throw (new SkillsBaseCommunicationException());
         }
+    }
+
+    private void handleSkillsBaseResponseException(Exception x, String skillsBaseResponse) {
+        logger.error("handleSkillsBaseResponseException() skillsBaseResponse = "+skillsBaseResponse);
+        x.printStackTrace();
     }
 
     private Date addMonthsToDate(Date originalDate, int monthsToAdd) {

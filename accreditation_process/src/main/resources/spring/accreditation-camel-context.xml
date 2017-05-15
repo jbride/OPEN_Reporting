@@ -452,6 +452,9 @@
             1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
             2) Responsible for updating SkillsBase web service with StudentAccreditation
             3) Emails Student to encourage them to create a SkillsBase account if student has not already done so
+
+            NOTE: If the SkillsBase API is responding with “HTTP/1.1 403 Unauthorized” and a message stating "API rate limit exceeded" then you may have exceeded the rate limit of 100 requests for the 15 minute interval.  
+                  In this case it will automatically correct itself at the next 15 minute block.
         </description>
         <from uri="direct:push-qual-to-skills-base"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
