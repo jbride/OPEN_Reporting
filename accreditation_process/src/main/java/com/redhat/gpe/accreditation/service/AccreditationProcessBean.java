@@ -602,7 +602,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 /*  *************               SkillsBase Integration              ******************  */
 
-    public void getSkillsBaseToken(Exchange exchange) {
+    public void getSkillsBaseToken(Exchange exchange) throws SkillsBaseCommunicationException{
         
         Message in = exchange.getIn();
         try {
@@ -632,8 +632,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             in.setHeader(Constants.TOKEN, token);
         } catch (Exception exc) {
             String message = "Failure making REST API CALL!";
-            logger.error(message, exc);
-            throw (new RuntimeException(message, exc));
+            logger.debug(message, exc);
+            throw (new SkillsBaseCommunicationException());
         }
     }
     

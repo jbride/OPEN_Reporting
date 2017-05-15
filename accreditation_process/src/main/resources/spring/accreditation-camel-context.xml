@@ -456,10 +456,11 @@
         <from uri="direct:push-qual-to-skills-base"/>
         <to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
         <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/>
-        <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
-        <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
-        <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
-        <choice>
+        <doTry>
+            <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
+            <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
+            <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
+            <choice>
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
                 <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="postAccreditationToSkillsBase"/>
@@ -487,7 +488,12 @@
                     <to uri="seda:user-not-found-in-skillsbase"/>
                 </filter>
             </otherwise>
-        </choice>
+            </choice>
+            <doCatch>
+                <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
+                <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+            </doCatch>
+        </doTry>
     </route>
 
     <route id="user-not-found-in-skillsbase">
