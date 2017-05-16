@@ -32,15 +32,20 @@ The intended audience of this document architects, developers and administrators
 . Experience with Ansible
 . Experience with Git.
 . Experience with administration of java projects using its defacto build tool:  Maven
+. Experience with JBoss EAP administration.
 . Experience using Google Spreadsheets and its javascript extension functionality:  _Google App Script_.
+. Exerpience with use and administration of a MariaDB RBDMS.
 
 ==== Development Team Member
 . All of the skills required of an operations team member
 . Experience with Java development and its defacto build tool: Maven.
-. Experience with JBoss EAP administration.
+. Experience developing _transactional_ applications using JDBC and the following patterns and archictures:
+.. Dependency Injection
+.. DAOs
+.. SOA
 . Experience developing services using JBoss Fuse.
 . Experience with the Drools and Dashbuilder components of JBoss BPMS.
-. Experience with database development and administration using MariaDB.
+. Experience with database development using MariaDB.
 
 == GPTE Reporting URLs
 
