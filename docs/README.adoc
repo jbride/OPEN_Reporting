@@ -27,7 +27,7 @@ The intended audience of this document architects, developers and administrators
 
 === Skills
 
-==== Operations Team Member
+==== Operations and QA Team Member
 . RHCSA or equivalent experience.
 . Experience with Ansible
 . Experience with Git.
