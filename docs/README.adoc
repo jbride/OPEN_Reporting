@@ -34,7 +34,7 @@ The intended audience of this document architects, developers and administrators
 . Experience with administration of java projects using its defacto build tool:  Maven
 . Experience with JBoss EAP administration.
 . Experience using Google Spreadsheets and its javascript extension functionality:  _Google App Script_.
-. Experience with use and administration of a MariaDB RBDMS.
+. Experience with use and administration of a MariaDB RDBMS.
 . Experience using Asciidoc (ie:  to update this document)
 
 ==== Development Team Member
