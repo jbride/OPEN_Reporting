@@ -39,10 +39,14 @@ The intended audience of this document architects, developers and administrators
 ==== Development Team Member
 . All of the skills required of an operations team member
 . Experience with Java development and its defacto build tool: Maven.
-. Experience developing _transactional_ applications using JDBC and the following patterns and archictures:
+. Experience developing _transactional_ applications using the following patterns and archictures:
 .. Dependency Injection
 .. DAOs
 .. SOA
+. Experience using the following Java based client libraries:
+.. HTTP (in particular, following OAUTH2 workflows)
+.. LDAP
+.. JDBC
 . Experience developing services using JBoss Fuse.
 . Experience with the Drools and Dashbuilder components of JBoss BPMS.
 . Experience with database development using MariaDB.
