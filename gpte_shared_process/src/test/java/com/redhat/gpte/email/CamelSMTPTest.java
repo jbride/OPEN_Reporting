@@ -19,7 +19,7 @@ import com.redhat.gpte.util.PropertiesSupport;
  * TO-DO: This test is written generically and as such should be refactored such that it is re-used across all GPTE integration projects as per:
  *     http://blog.anorakgirl.co.uk/2013/04/sharing-junit-tests-with-maven/
  */
-public class SMTPTest {
+public class CamelSMTPTest extends CamelSpringTestSupport {
     
     private static final String EMAIL_USERNAME = "gpte_email_username";
     private static final String EMAIL_PASSOWRD = "gpte_email_password";
@@ -35,6 +35,10 @@ public class SMTPTest {
     private int smtpPort = 0;
     private String testFilePath = "src/test/resources/";
 
+    public CamelSMTPTest() throws IOException {
+        PropertiesSupport.setupProps();
+    }
+    
     @Before
     public void init() throws IOException {
 
@@ -44,43 +48,19 @@ public class SMTPTest {
         smtpServer = System.getProperty(SMTP_SERVER);
         smtpPort = Integer.parseInt(System.getProperty(SMTP_PORT));
 
-        System.out.println("\n\ninit() "+ smtpServer+" : "+smtpPort+" : "+userId+" : "+password+" : "+recipientEmail+"\n\n");
+        System.out.println("init() "+ smtpServer+" : "+smtpPort+" : "+userId);
     }
 
+    @Override
+    protected AbstractApplicationContext createApplicationContext() {
+        return new ClassPathXmlApplicationContext("/spring/gpte-shared-camel-context.xml");
+    }
 
-    /* 
-     *  Example Usage:
-     *      mvn test -Dgpte_smtp_server=smtp.mail.yahoo.com -Dgpte_smtp_port=465 -Dgpte_email_username=rhtgptetest@yahoo.com -Dgpte_email_password=3_aY1wHZaU0qQp-1vZBNGZty -Dadmin_email=jbride@redhat.com
-    */
-    //@Ignore
+    @Ignore
     @Test
-    public void testSMTPServerConnectionAndSend() throws Exception {
-
-        String fileName = "sample-spreadsheets/Dokeos_CC_Mini.csv";
-        
-        // create simple email and send it out
-        MultiPartEmail email = new MultiPartEmail();
-        email.setHostName(smtpServer);
-        email.setSmtpPort(smtpPort);
-        email.setAuthenticator(new DefaultAuthenticator(userId, password));
-        email.setSSLOnConnect(true);
-        
-        email.setFrom(userId); // Defines value of "X-Google-Original-From" field in header
-        email.setSubject("TestMail");
-        email.setMsg("This is a test mail ... :-)");
-        email.addTo(recipientEmail);
-
-        // Create the attachment
-        EmailAttachment attachment = new EmailAttachment();
-        attachment.setPath(testFilePath + fileName);
-        attachment.setName(fileName);
-        attachment.setDisposition(EmailAttachment.ATTACHMENT);
-
-        // now attach it
-        email.attach(attachment);
-
-        // send it out
-        email.send();
+    public void testCamelSendEmail() throws InterruptedException {
+        template.setDefaultEndpointUri("vm:send-email");
+        template.sendBody(new Object());
     }
 
 }
