@@ -303,6 +303,14 @@ cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 
 
 .. Save your changes to the properties file and exit.
 
+. SSH into the local environment where you want your above cc_poll_totara_course_completions_input_uri change to be reflected
+
+. Once you are logged in, use the command "sudo -i -u jboss"
+
+. Navigate to the OPEN_Reporting directory (cd /opt/OPEN_Reporting)
+
+. Use the "git pull" command to sync the local environment with the master branch in Githib.  You will be asked for the jboss user password and it is "jboss"
+
 . Bounce the GPTE Reporting service:  `bg` .
 
 ==== Execute SQL directly on Totara Shadow DB
