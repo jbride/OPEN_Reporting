@@ -195,10 +195,10 @@
                 So if a person registers for an accreditation that has 3 ELABs in it, they will appear 3 times.
         </description>
         <from uri="{{sr_receive_sumtotal_student_reg_input-uri}}"/>
-        <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName}" id="log_student_reg_receive"/>
         <setHeader headerName="ROUTE_SPECIFIC_SUBJECT"><simple>OPENTLC Daily Import Exceptions: ${date:now:MM-dd-yy} : {{jboss.host.name}}  : ${header.CamelFileName}</simple></setHeader>
         <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>mawisner@redhat.com,open-program@redhat.com</constant></setHeader>
         <to uri="bean:ldapServiceBean?method=isStudentRegProcessingLogicLocked"/>
+        <log message="Received Student Registration file from: ${header.Return-Path}, subject ${header.subject} , ${header.CamelFileName} , studentRegProcessingLogicLocked = ${header.studentRegProcessingLogicLocked}" id="log_student_reg_receive"/>
         <choice>
             <when>
                 <simple>${header.studentRegProcessingLogicLocked} != true</simple>
@@ -265,6 +265,7 @@
         </description>
         <from uri="vm:sr_post-new-students-to-ipa-uri"/>
         <to uri="bean:ldapServiceBean?method=acquireStudentRegProcessingLock"/>
+        <log message="####### JUST ACQUIRED STUDENT REGISTRATION PROCESSING LOGIC LOCK ######" />
         <choice>
             <when>
                 <simple>${header.gainedStudentAccredLock} == true</simple>
@@ -285,14 +286,15 @@
                             <otherwise>
                                 <to uri="bean:ipaServiceBean?method=uploadToLdapServer"/>
                                 <setBody><simple>${header.unprocessedStudentList}</simple></setBody>
-                                <to uri="bean:ipaServiceBean?method=updateIPAFlagOnStudents" />
+                                <to uri="bean:ldapServiceBean?method=updateIPAFlagOnStudents" />
                             </otherwise>
                         </choice>
                     </when>
                 </choice>
-                <to uri="bean:ipaServiceBean?method=releaseStudentRegProcessingLock"/>
+                <to uri="bean:ldapServiceBean?method=releaseStudentRegProcessingLock"/>
+                <log message="####### JUST RELEASED STUDENT REGISTRATION PROCESSING LOGIC LOCK ######" />
             </when>
-            <otherwise><log message="@@@@@@@@@@@@@@   FAILED TO GAIN EGISTRATION PROCESSING LOGIC LOCK    @@@@@@@@@@@@@@" /></otherwise>
+            <otherwise><log message="#######   FAILED TO GAIN REGISTRATION PROCESSING LOGIC LOCK    ########## "/></otherwise>
         </choice>
     </route>
 
