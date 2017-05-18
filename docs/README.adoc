@@ -18,26 +18,31 @@ High level purpose and system design of the `GPTE Reporting` project can be foun
 === Audience
 The intended audience of this document architects, developers and administrators of the GPTE Reporting solution.
 
-== Pre-Reqs
+== Skills
 
-=== Technical
+=== Business User / Project Mgmt
+. Experience collaborating in a team using email and slack.
+. Experience using a browser to view web based reports.
+. Experience using Google Spreadsheets.
 
-. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization
-. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk
+=== Architect
+. All of the skills required of a business user
+. Experience designing _3-tier_, transactional applications
+. Experience desiging database schemas to support transactional and reporting requirements.
+. Experience documenting a software architecture
 
-=== Skills
-
-==== Operations and QA Team Member
+=== Operations and QA Team Member
+. All of the skills required of a business user
 . RHCSA or equivalent experience.
 . Experience with Ansible
 . Experience with Git.
 . Experience with administration of java projects using its defacto build tool:  Maven
 . Experience with JBoss EAP administration.
-. Experience using Google Spreadsheets and its javascript extension functionality:  _Google App Script_.
+. Experience using Google Spreadsheet's javascript extension functionality:  _Google App Script_.
 . Experience with use and administration of a MariaDB RDBMS.
 . Experience using Asciidoc (ie:  to update this document)
 
-==== Development Team Member
+=== Development Team Member
 . All of the skills required of an operations team member
 . Experience with Java development and its defacto build tool: Maven.
 . Experience developing _transactional_ applications using the following patterns and archictures:
@@ -51,6 +56,13 @@ The intended audience of this document architects, developers and administrators
 . Experience developing services using JBoss Fuse.
 . Experience with the Drools and Dashbuilder components of JBoss BPMS.
 . Experience with database development using MariaDB.
+
+== Pre-Reqs
+
+=== Technical
+
+. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization
+. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk
 
 == GPTE Reporting URLs
 
@@ -290,6 +302,14 @@ cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 
 ----- 
 
 .. Save your changes to the properties file and exit.
+
+. SSH into the local environment where you want your above cc_poll_totara_course_completions_input_uri change to be reflected
+
+. Once you are logged in, use the command "sudo -i -u jboss"
+
+. Navigate to the OPEN_Reporting directory (cd /opt/OPEN_Reporting)
+
+. Use the "git pull" command to sync the local environment with the master branch in Githib.  You will be asked for the jboss user password and it is "jboss"
 
 . Bounce the GPTE Reporting service:  `bg` .
 
