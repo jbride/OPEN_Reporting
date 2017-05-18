@@ -296,6 +296,19 @@
             </when>
             <otherwise><log message="#######   FAILED TO GAIN REGISTRATION PROCESSING LOGIC LOCK    ########## "/></otherwise>
         </choice>
+        <onException>
+            <exception>java.lang.Exception</exception>
+            <handled><constant>true</constant></handled>
+
+            <!-- Make sure that StudentRegProcessingLock is released if/when excpetion is thrown -->
+            <to uri="bean:ldapServiceBean?method=releaseStudentRegProcessingLock"/>
+            <log message="####### JUST RELEASED STUDENT REGISTRATION PROCESSING LOGIC LOCK ######" />
+
+            <log message="post-new-students-to-ipa:  Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+            <log message="post-new-students-to-ipa: ${exception.stacktrace}" loggingLevel="ERROR"/>
+            <setBody><simple>${exception.message}</simple></setBody>
+            <to uri="seda:send-email"/>
+        </onException>
     </route>
 
 <!--        ***************************************************************************************************         -->
