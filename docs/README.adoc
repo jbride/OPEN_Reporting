@@ -94,6 +94,15 @@ It is possible to update all GPTE Reporting environment (prod, qa & dev) via GPT
 
 A Jenkins pipeline has been created that triggers the ansible provisioning and updating functionaility of GPTE Reporting.
 
+NOTE:  MAKE SURE TARGET ENVIRONMENT DOES NOT HAVE ANY LOCAL CHANGES IN /opt/OPEN_Reporting .
+If there are existing, un-committed and un-pushed changes in the target environment, this Jenkins job will fail.
+
+You can check this by going to /opt/OPEN_Reporting and running "git status"  If the response is the below, you are free to trigger the Jenkins build job.
+"
+# On branch master
+nothing to commit, working directory clean
+"
+
 To update a GPTE Reporting environment, execute the following:
 
 . Point your browser to:  `https://forge.opentlc.com/jenkins`
