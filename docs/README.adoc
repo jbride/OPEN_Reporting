@@ -509,6 +509,9 @@ MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email
 -----
     sb_sendMailToStudentEnabled=true
     accred_process-push-qualification-to-skillsbase-batch=quartz2://accred_process-push-qualifications-to-skillsbase?cron=0 0/5 * 1/1 * ? *
+    
+. Comment out portions of the properties file that are not needed.  In this case, because we have a cronjob firing to run the process, comment out the below line.  This line is an an alternative optional property that if enabled, would infinitly wait for a client to "directly" invoke it.
+"accred_process-push-qualification-to-skillsbase-batch=direct:push-qual-to-skillsbase-uri"
 -----
 .. Bounce accreditation process and tail its log file:
 +
