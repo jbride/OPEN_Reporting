@@ -98,11 +98,14 @@ NOTE:  MAKE SURE TARGET ENVIRONMENT DOES NOT HAVE ANY LOCAL CHANGES IN /opt/OPEN
 If there are existing, un-committed and un-pushed changes in the target environment, this Jenkins job will fail.
 
 You can check this by going to /opt/OPEN_Reporting and running "git status"  If the response is the below, you are free to trigger the Jenkins build job.
-You can also check what the local properties are by the command "vi /opt/OPEN_Reporting/properties/qa.properties"
+
 "
 # On branch master
 nothing to commit, working directory clean
 "
+
+You can also check what the local properties are by the command "vi /opt/OPEN_Reporting/properties/qa.properties"
+
 
 To update a GPTE Reporting environment, execute the following:
 
