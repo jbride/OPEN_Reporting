@@ -699,6 +699,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         ccObj.setStudent(studentObj);
         ccObj.setLanguage(langObj);
         ccObj.setStudentCourse(sCourseObj);
+        ccObj.setCourse(courseObj);
         return ccObj;
     }
  
