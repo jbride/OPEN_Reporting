@@ -46,7 +46,7 @@ import java.util.HashSet;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
-    private static final String COURSE_REFRESH_COUNTER = "COURSE_REFRESH_COUNTER";    
+    private static final String COURSE_REFRESH_COUNTER = "COURSE_REFRESH_COUNTER";
     private static final String ENGLISH = "EN_US";
     private static final String SUMTOTAL_COMPLETED = "COMPLETED";
     private static final byte coursePassingValue = 70;
@@ -80,7 +80,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private boolean cc_append_student_issues_to_file = false;
     private File studentIssuesFile = null;
     private Map<String, Course> courseMapTempCache = new HashMap<String, Course>();  // <mappedCourseId, Course obj>
-    
+
     private static Object synchObj = new Object();
     private static final String underscoreFilter="_$";
     private static final String dashFilter="-$";
@@ -91,8 +91,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     @Autowired
     protected TotaraShadowDAO totaraShadowDAO;
-    
-   
+
+
     public CourseCompletionServiceBean() throws IOException {
 
 
@@ -122,13 +122,13 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             }
         }
 
-        // 3) read sumtotal rejection codes file and populate a Set 
+        // 3) read sumtotal rejection codes file and populate a Set
         InputStream iStream = null;
         try {
             iStream = this.getClass().getClassLoader().getResourceAsStream("/"+SUMTOTAL_REJECTION_CODES_FILE); // works in JEE server
             if(iStream == null) {
                 iStream = this.getClass().getClassLoader().getResourceAsStream(SUMTOTAL_REJECTION_CODES_FILE); // works during maven tests
-                if(iStream == null) 
+                if(iStream == null)
                     throw new RuntimeException("Unable to locate the following file: "+SUMTOTAL_REJECTION_CODES_FILE);
             }
 
@@ -143,9 +143,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 iStream.close();
         }
         logger.info("CourseCompletionServiceBean: # of sumtotal code rejections = "+sumtotalRejectCodeSet.size());
-        
+
     }
-    
+
     public void setLangFilter() {
         if(langFilter == null) {
             synchronized(synchObj) {
@@ -171,7 +171,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             }
         }
     }
-    
+
 
 /* ***********      Student    ************************ */
     public void insertNewStudentGivenSumtotalCourseCompletion(Exchange exchange) throws Exception {
@@ -193,9 +193,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
         insertNewStudent(exchange, sObj);
     }
-    
+
     public void insertNewStudentGivenDokeosCourseCompletion(Exchange exchange) throws Exception {
-        
+
         DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion) exchange.getIn().getBody();
         Student sObj = new Student();
         sObj.setEmail(dokeosCourseCompletion.getEmail());
@@ -204,9 +204,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sObj.setIpaStatus(1);
         insertNewStudent(exchange, sObj);
     }
-    
+
     public void insertNewStudentGivenTotaraCourseCompletion(Exchange exchange) throws Exception {
-        
+
         TotaraCourseCompletion tCourseCompletion = (TotaraCourseCompletion) exchange.getIn().getBody();
         Student sObj = new Student();
         sObj.setEmail(tCourseCompletion.getEmail());
@@ -215,17 +215,17 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sObj.setIpaStatus(1);
         insertNewStudent(exchange, sObj);
     }
-    
+
     private void insertNewStudent(Exchange exchange, Student studentIn) throws Exception {
         int companyId = 0;
         String studentEmail = studentIn.getEmail();
 
         // 0)  Exchange should return from this function with the same body it came in with
         Object origBody = exchange.getIn().getBody();
-        
+
         // 1)  Determine a companyId that the student is affiliated with
         if(studentEmail.indexOf(RED_HAT_SUFFIX) > 0) {
-            
+
             // 1.1) If RHT student, then identify (and cache) companyId for Red Hat
             if(this.rhtCompanyId == 0)
                 companyId = canonicalDAO.getCompanyID(Company.RED_HAT_COMPANY_NAME);
@@ -233,7 +233,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 companyId = this.rhtCompanyId;
         } else {
             // TO-DO:  https://github.com/redhat-gpe/OPEN_Reporting/issues/40
-            
+
             // 1.2)  If not RHT student, then query GPTE LDAP for student info (to include company name)
             CamelContext cContext = exchange.getContext();
             Endpoint endpoint = cContext.getEndpoint(DETERMINE_COMPANY_ID_AND_PERSIST_COMPANY);
@@ -252,12 +252,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 getCompanyExchange.getIn().setHeader(UPDATE_COMPANY, "FALSE");
                 producer.process(getCompanyExchange);
                 Student studentOut = (Student)getCompanyExchange.getIn().getBody();
-                
-                //1.3 setCompanyId (used downstream to persist student) from response from remote service 
+
+                //1.3 setCompanyId (used downstream to persist student) from response from remote service
                 companyId = studentOut.getCompanyid();
-                
+
                 if(companyId == 0){
-                  
+
                     // 1.4)  Not good.  Not able to identify a companyId for this student
                     /*
                     if(cc_append_student_issues_to_file ) {
@@ -280,28 +280,28 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 }
             }
         }
-        
+
         // 2)  persist student
         studentIn.setCompanyid(companyId);
         canonicalDAO.updateStudent(studentIn);
 
         // reset exchange with original body
         exchange.getIn().setBody(origBody);
-    } 
+    }
 /**
  * @throws IOException ******************************************************************/
-    
-    
-    
+
+
+
 
 /* **************       Student Courses        ********************** */
-   
+
     /*
      * Given a collection of SumtotalCourseCompletion objects, iterates and validates each one
-     */ 
+     */
     public void validateSumtotalCourseCompletions(Exchange exchange) throws IOException {
 
-        // 1)  make sure what is used in this function is a Collection<SumtotalCourseCompletion> 
+        // 1)  make sure what is used in this function is a Collection<SumtotalCourseCompletion>
         Object body = exchange.getIn().getBody();
         Collection<SumtotalCourseCompletion> sCourseCompletions = null;
         if(body instanceof SumtotalCourseCompletion) {
@@ -334,7 +334,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         if(cCompletionIssuesFile.exists())
             cCompletionIssuesFile.delete();
         cCompletionIssuesFile.createNewFile();
-        
+
         int i = 2;
         boolean invalidCourseExceptionThrown = false;
 
@@ -367,7 +367,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                     rejectCount++;
                     continue;
                 }
-            
+
                 try {
                     // 6) identify the canonical course specified in the sumtotal activity code
                     //    if not a known course, then catch exception and prevent further processing on this course completion
@@ -413,7 +413,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         aCode = aCode.replaceAll(this.underscoreFilter, "");
         aCode = aCode.replaceAll(this.dashFilter, "");
         stCC.setActivityCode(aCode);
-        
+
         Course course = null;
         if(courseMapTempCache.containsKey(stCC.getActivityCode())){
             course = courseMapTempCache.get(stCC.getActivityCode());
@@ -436,18 +436,18 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public Course getCourseByCourseName(@Body String courseName) {
         return canonicalDAO.getCourseByCourseName(courseName, null);
     }
-    
+
     public CourseCompletion convertSumtotalCourseCompletionToStudentCourse(Exchange exchange) throws IOException, InvalidCourseException {
 
         SumtotalCourseCompletion stCC = (SumtotalCourseCompletion)exchange.getIn().getBody();
-        
+
         // 1)  Identify student
         Student student = canonicalDAO.getStudentByEmail(stCC.getEmail()); // throws org.springframework.dao.EmptyResultDataAccessException
 
         // 2)  Identify canonical course name given a sumtotal "activity code"
         logger.info(stCC.getEmail()+" : converting from sumtotal course completion to canonical StudentCourse. ActivityCode = "+stCC.getActivityCode());
         Course course = getCourseFromSumtotalCompletion(stCC, null);
-        
+
         // 3)  Create StudentCourse object
         Language language = new Language();
         language.setLanguageid(ENGLISH);
@@ -456,7 +456,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sCourse.setCourseid(course.getCourseid());
         sCourse.setLanguageid(language.getLanguageid());
         sCourse.setAssessmentdate(new Timestamp(stCC.getAttemptEndDate().getTime()));
-        
+
         String dSuccess = stCC.getCompletionStatus();
         if(StringUtils.isNotEmpty(dSuccess)) {
             if(dSuccess.contains(SUMTOTAL_COMPLETED))
@@ -469,12 +469,12 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             dSuccess = StudentCourse.ResultTypes.Pass.name();
         }
         sCourse.setAssessmentresult(dSuccess);
-        
+
         // 4)  Transform into canonical CourseCompletion
         CourseCompletion dStudentCourse = new CourseCompletion(student, course, language, sCourse);
         return dStudentCourse;
     }
-    
+
     public void setSumtotalProcessingExceptionsToBody(Exchange exchange) throws java.io.IOException {
 
         String issueFileName = (String)exchange.getIn().getHeader(CAMEL_FILE_NAME);
@@ -495,20 +495,20 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         exchange.getIn().setBody(sBuilder.toString());
 
     }
-    
+
     public CourseCompletion convertDokeosCourseCompletionToStudentCourse(Exchange exchange) throws com.redhat.gpte.services.InvalidCourseException {
         DokeosCourseCompletion dokeosCourseCompletion = (DokeosCourseCompletion)exchange.getIn().getBody();
         if(StringUtils.isEmpty(dokeosCourseCompletion.getEmail()))
             throw new RuntimeException(ExceptionCodes.GPTE_CC1001+dokeosCourseCompletion.toString());
-        
+
         logger.info(dokeosCourseCompletion.getEmail()+" : converting from dokeos course completion to canonical StudentCourse");
 
         // If student not found, throws: org.springframework.dao.EmptyResultDataAccessException
         Student student = canonicalDAO.getStudentByEmail(dokeosCourseCompletion.getEmail());
-        
+
         // https://github.com/redhat-gpe/OPEN_Reporting/issues/37
         dokeosCourseCompletion.pruneQuizName();
-        
+
         Course course = null;
         try {
             course = canonicalDAO.getCourseByCourseName(dokeosCourseCompletion.getQuizName(), DokeosCourseCompletion.COURSE_COMPLETION_MAPPING_NAME);
@@ -526,39 +526,39 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         sCourse.setStudentid(student.getStudentid());
         sCourse.setCourseid(course.getCourseid());
         sCourse.setLanguageid(language.getLanguageid());
-        
-        
+
+
         try {
             sCourse.setAssessmentdate(convertDokeosAssessmentDateToCanonical(dokeosCourseCompletion.getAssessmentDate()));
         } catch(ParseException x) {
             throw new RuntimeException("Not able to parse the following dokeos date for: email = "+student.getEmail()+" : courseName = "+course.getCoursename()+" : date = "+dokeosCourseCompletion.getAssessmentDate());
         }
-        
+
         byte canonicalScore = convertDokeosAssessmentScoreToCanonical(dokeosCourseCompletion.getScore());
         sCourse.setAssessmentscore(canonicalScore);
-        
+
         String dSuccess = null;
         if(canonicalScore >= coursePassingValue)
             dSuccess = StudentCourse.ResultTypes.Pass.name();
         else
             dSuccess = StudentCourse.ResultTypes.Fail.name();
         sCourse.setAssessmentresult(dSuccess);
-        
+
         CourseCompletion dStudentCourse = new CourseCompletion(student, course, language, sCourse);
         return dStudentCourse;
     }
-    
+
     private Timestamp convertDokeosAssessmentDateToCanonical(String dateString) throws ParseException {
         Date dokeosDate = DokeosCourseCompletion.dokeosSDF.parse(dateString);
         return new Timestamp(dokeosDate.getTime());
     }
-    
+
     private byte convertDokeosAssessmentScoreToCanonical(String dScore) {
         String tempScore = dScore.substring(0, dScore.indexOf("%"));
         byte tempByte = Byte.valueOf(tempScore);
         return tempByte;
     }
-    
+
     public void addStudentCourseToDB(@Body CourseCompletion sCourseWrapper) {
         StudentCourse scObj = sCourseWrapper.getStudentCourse();
         if(canonicalDAO.getUniqueStudentCourseCount(scObj) < 1 ) {
@@ -567,7 +567,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             logger.warn("addStudentCourseDB() Student Course already exists with following attributes: "+scObj.getStudentid()+" : " + scObj.getCourseid() +" : "+ scObj.getAssessmentdate());
         }
     }
-    
+
     public boolean isNewStudentCourseForStudent(@Body StudentCourse sCourse) {
         boolean result = canonicalDAO.isNewStudentCourseForStudent(sCourse);
         return result;
@@ -606,7 +606,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 throw new RuntimeException(counter+" : processCourseRefreshSpreadsheetRecord() empty field: "+prunedMappedName+" : "+courseId+" : "+courseName);
 
             canonicalDAO.insertIntoCourseAndMappings(courseId, courseName, prunedMappedName);
- 
+
             //logger.info(counter+" processCourseRefreshSpreadsheetRecord() ssRecord = "+ssRecord);
         }catch(Exception x) {
             logger.error("processCourseRefreshSpreadsheetRecord() ssRecord = \""+ssRecord+"\"");
@@ -617,7 +617,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     public long getMostRecentTotaraCourseCompletionDate() {
         return canonicalDAO.getMostRecentTotaraCourseCompletionDate();
     }
-   
+
     public int testTotaraJDBCConnection() {
         return totaraShadowDAO.testTotaraJDBCConnection();
     }
@@ -669,24 +669,24 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     public CourseCompletion convertTotaraCourseCompletion(Exchange exchange) throws InvalidStudentException, InvalidCourseException {
         TotaraCourseCompletion tCC = (TotaraCourseCompletion)exchange.getIn().getBody();
-        
+
         Student studentObj = null;
         try {
-            studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail()); 
+            studentObj = canonicalDAO.getStudentByEmail(tCC.getEmail());
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
             throw new InvalidStudentException(tCC.getEmail());
         }
-        
+
         Course courseObj = null;
         try {
-            courseObj = canonicalDAO.getCourseByCourseName(tCC.getCourseFullName(), null);
+            courseObj = canonicalDAO.getCourseByCourseName(tCC.getCourseShortName(), null);
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {
-            throw new InvalidCourseException(tCC.getCourseFullName());
+            throw new InvalidCourseException(tCC.getCourseShortName());
         }
-        
+
         Language langObj = new Language();
         langObj.setLanguageid(Language.EN_US);
-        
+
         StudentCourse sCourseObj = new StudentCourse();
         sCourseObj.setAssessmentdate( new Timestamp( new Date().getTime()) );
         sCourseObj.setAssessmentresult(StudentCourse.ResultTypes.Pass.toString());
@@ -702,5 +702,5 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         ccObj.setCourse(courseObj);
         return ccObj;
     }
- 
+
 }
