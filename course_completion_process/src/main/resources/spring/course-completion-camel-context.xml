@@ -3,12 +3,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:camel="http://camel.apache.org/schema/spring"
        xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
            http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
            http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
-         "> 
+         ">
 
   <!-- Defines transactionalDS bean along with any other environment specific needs -->
   <import resource="classpath:spring/environment-specific-camel-context.xml" />
@@ -32,7 +32,7 @@
 
 
   <camelContext trace="false" id="course-completion" xmlns="http://camel.apache.org/schema/spring">
-      
+
     <dataFormats>
         <bindy type="Csv" classType="com.redhat.gpe.coursecompletion.dokeos.DokeosCourseCompletion" id="bindyDokeos" />
         <bindy type="Csv" classType="com.redhat.gpe.coursecompletion.sumtotal.SumtotalCourseCompletion" id="bindySumtotal"/>
@@ -151,9 +151,9 @@
     </route>
 
     <route id="poll-totara-course-completions">
-        <description> 
-            Purpose: 
-                - Periodically poll query Totara Shadow database for any new course completions.  
+        <description>
+            Purpose:
+                - Periodically poll query Totara Shadow database for any new course completions.
                 - Process each Totara course completion.
         </description>
         <from uri="{{cc_poll_totara_course_completions_input_uri}}" />
@@ -171,7 +171,7 @@
         <to uri="direct:process-totara-course-completions-by-range" />
     </route>
     <route id="process-totara-course-completions-by-range">
-        <description> 
+        <description>
             Purpose: Process Totara shadow database for course completions given a range of totara course completion IDs
         </description>
         <from uri="direct:process-totara-course-completions-by-range" />
@@ -184,7 +184,7 @@
     </route>
 
     <route id="process-single-totara-course-completion">
-        <description> 
+        <description>
             Purpose:  Process a single Totara Course Completion
             Inbound:  com.redhat.gpe.coursecompletion.domain.TotaraCourseCompletion
             Outbound: com.redhat.gpe.domain.helper.CourseCompletion
@@ -201,19 +201,19 @@
                     <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>
                     <doCatch>
                         <exception>com.redhat.gpte.services.InvalidCourseException</exception>
-                        <log message="${body.email} : Totara course not found: '${body.courseFullName}'" loggingLevel="ERROR" />
+                        <log message="${body.email} : Totara course not found: '${body.courseShortName}'" loggingLevel="ERROR" />
                     </doCatch>
                 </doTry>
             </doCatch>
             <doCatch>
                 <exception>com.redhat.gpte.services.InvalidCourseException</exception>
-                <log message="${body.email} : Totara course not found: '${body.courseFullName}'" loggingLevel="ERROR" />
+                <log message="${body.email} : Totara course not found: '${body.courseShortName}'" loggingLevel="ERROR" />
             </doCatch>
         </doTry>
     </route>
 
     <route id="add-student-course-to-db">
-        <description> 
+        <description>
             Expects the following payload:  CourseCompletion
             Responsible for insertion of new StudentCourse record into database
         </description>
@@ -252,7 +252,7 @@
         <from uri="vm:cc_process-new-courses-and-mappings-uri" />
 
         <!-- 1)  Blow away existing data in CourseMappings -->
-        <to uri="bean:cCompletionServiceBean?method=deleteAllFromCourseMappings" /> 
+        <to uri="bean:cCompletionServiceBean?method=deleteAllFromCourseMappings" />
         <log message="Following # of records deleted from CourseMappings tables: ${header.COURSE_MAPPING_ROWS_AFFECTED}" />
 
         <!-- 2)  Iterate through each row of spreadsheet -->
@@ -260,7 +260,7 @@
             <tokenize token="\n" />
 
             <!-- 3) insert / update into Courses and fully re-populate CourseMappings -->
-            <to uri="bean:cCompletionServiceBean?method=processCourseRefreshSpreadsheetRecord" /> 
+            <to uri="bean:cCompletionServiceBean?method=processCourseRefreshSpreadsheetRecord" />
 
             <choice><when><simple>${property.CamelSplitComplete} == true</simple>
                 <log message="Just refreshed Course and CourseMappings using the following # of records:  ${property.CamelSplitIndex}" />
