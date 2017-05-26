@@ -92,7 +92,10 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         Language langObj = DomainMockObjectHelper.getMockLanguage();
         StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());
 
-        //sCourse.setTotaraCourseCompletionDate(new Timestamp(new Date().getTime()));
+        long now = new Date().getTime();
+        System.out.println("testPersistNewStudentCourse now = "+now);
+        //sCourse.setTotaraCourseCompletionDate(new Timestamp(now));
+        sCourse.setTotaraCourseCompletionDate(new Timestamp(1492526633));
 
         CourseCompletion scWrapper = new CourseCompletion(studentObj, courseObj, langObj, sCourse);
         in.setBody(scWrapper);

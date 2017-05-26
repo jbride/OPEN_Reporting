@@ -47,7 +47,7 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
 
         if(totaraCCLimit > 0)
             totaraCCSQLBuilder.append(" limit "+totaraCCLimit);
-        logger.debug("getLatestCourseCompletions() sql = "+totaraCCSQLBuilder.toString());
+        logger.info("getLatestCourseCompletions() sql = "+totaraCCSQLBuilder.toString());
         return queryAndReturnCourseCompletions(totaraCCSQLBuilder.toString());
     }
 
@@ -64,13 +64,13 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
                 String courseFullName = rowSet.getString(6);
                 String courseShortName = rowSet.getString(7);
                 
-                /* Totara shadow database appears to return a long that is missing the last two trailing zeros. ie; 1484165145
+                /* Totara shadow database appears to return a long that is missing the last three trailing zeros. ie; 1484165145
                  * This value is different than:  1484165145000
                  */
                 long timeCompleted = rowSet.getLong(8);
                 timeCompleted = this.addTrailingZerosToATotaraLong(timeCompleted);
                 
-                logger.info("queryAndReturnCourseCompletions() "+totaraCCId+" :" +email+" : "+totaraCourseId+" : "+courseFullName+" : "+courseShortName+" : "+timeCompleted);
+                logger.debug("queryAndReturnCourseCompletions() "+totaraCCId+" :" +email+" : "+totaraCourseId+" : "+courseFullName+" : "+courseShortName+" : "+timeCompleted);
                 TotaraCourseCompletion tCC = new TotaraCourseCompletion(totaraCCId, email, firstName, lastName, totaraCourseId, courseFullName, courseShortName, timeCompleted);
                 sCourses.add(tCC);
             }
@@ -80,7 +80,7 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
     
     private long addTrailingZerosToATotaraLong(long tLong) {
     	String sString = Long.toString(tLong);
-    	return Long.parseLong(sString + "00");
+    	return Long.parseLong(sString + "000");
     }
 
 }

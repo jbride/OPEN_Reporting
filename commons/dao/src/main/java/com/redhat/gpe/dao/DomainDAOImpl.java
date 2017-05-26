@@ -448,7 +448,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     }
 
     public long getMostRecentTotaraCourseCompletionDate() {
-        String sql = "select totaraCourseCompletionDate from StudentCourses order by totaraCourseCompletionDate asc limit 1";
+        String sql = "select UNIX_TIMESTAMP(totaraCourseCompletionDate) from StudentCourses order by totaraCourseCompletionDate desc limit 1";
         return sbJdbcTemplate.queryForObject(sql, Long.class);
     }
 /* ******************************************************************************* */
