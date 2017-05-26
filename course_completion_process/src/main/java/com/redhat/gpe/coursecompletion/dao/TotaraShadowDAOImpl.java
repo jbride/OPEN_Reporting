@@ -64,7 +64,7 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
                 String courseFullName = rowSet.getString(6);
                 String courseShortName = rowSet.getString(7);
                 long timeCompleted = rowSet.getLong(8);
-                logger.info("queryAndReturnCourseCompletions() "+totaraCCId+" :" +email+" : "+totaraCourseId+" : "+courseFullName+" : "+courseShortName);
+                logger.info("queryAndReturnCourseCompletions() "+totaraCCId+" :" +email+" : "+totaraCourseId+" : "+courseFullName+" : "+courseShortName+" : "+timeCompleted);
                 TotaraCourseCompletion tCC = new TotaraCourseCompletion(totaraCCId, email, firstName, lastName, totaraCourseId, courseFullName, courseShortName, timeCompleted);
                 sCourses.add(tCC);
             }
