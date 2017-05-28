@@ -688,14 +688,15 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
         langObj.setLanguageid(Language.EN_US);
 
         StudentCourse sCourseObj = new StudentCourse();
-        sCourseObj.setAssessmentdate( new Timestamp( new Date().getTime()) );
+        Timestamp assessmentTStamp = new Timestamp(tCC.getCompletionDate());
+        sCourseObj.setAssessmentdate(assessmentTStamp);
         sCourseObj.setAssessmentresult(StudentCourse.ResultTypes.Pass.toString());
         sCourseObj.setAssessmentscore((byte) 100);
         sCourseObj.setCourseid(courseObj.getCourseid());
         sCourseObj.setLanguageid(langObj.getLanguageid());
         sCourseObj.setStudentid(studentObj.getStudentid());
         sCourseObj.setTotaraCourseCompletionId(tCC.getTotaraCCId());
-        sCourseObj.setTotaraCourseCompletionDate(new java.sql.Timestamp(tCC.getCompletionDate()));
+        sCourseObj.setTotaraCourseCompletionDate(assessmentTStamp);
 
         CourseCompletion ccObj = new CourseCompletion();
         ccObj.setStudent(studentObj);
