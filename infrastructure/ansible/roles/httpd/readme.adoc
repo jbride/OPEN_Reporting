@@ -111,10 +111,13 @@ expected results:  NSS: client certificate not found (nickname not specified)
 . test GPTE Reporting RESTful API using certs:
 +
 -----
-curl --cert $CERTS_HOME/prod_gpteclient.pem \
-     --key $CERTS_HOME/prod_gpteclient.key -v -k \
+curl --cacert $CERTS_HOME/gpteserver.crt \
+     --cert $CERTS_HOME/prod_gpteclient.pem \
+     --key $CERTS_HOME/prod_gpteclient.key -v \
      -X GET https://localhost/gpte-reporting/rest/sanityCheck/
 -----
++
+NOTE:  BUG: Unable to communicate securely with peer: requested domain name does not match the server's certificate.
 
 == Test (remote)
 

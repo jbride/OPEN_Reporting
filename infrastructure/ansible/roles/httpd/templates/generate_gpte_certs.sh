@@ -51,6 +51,11 @@ then
     exit 1;
 fi
 
+# The Common Name is typically composed of Host + Domain Name and will look like "www.yoursite.com" or "yoursite.com". 
+# SSL Server Certificates are specific to the Common Name that they have been issued to at the Host level. 
+# The Common Name must be the same as the Web address you will be accessing when connecting to a secure site. 
+# For example, a SSL Server Certificate for the domain "domain.com" will receive a warning if accessing a site named "www.domain.com" or "secure.domain.com", as "www.domain.com" and "secure.domain.com" are different from "domain.com". 
+# You would need to create a CSR for the correct Common Name. When the Certificate will be used on an Intranet (or internal network), the Common Name may be one word, and it can also be the name of the server.
 echo -en "\n create client cert signing request using client key (no need to specify a challenge password) \n" >> $log_file
 openssl req -nodes \
         -new -key $CERTS_HOME/{{gpte_env}}_gpteclient.key \
@@ -82,7 +87,7 @@ then
     exit 1;
 fi
 
-echo -en "\n Combines client.crt and client.key into a single PEM file for programs using openssl. \n" >> $log_file
+echo -en "\n Combines client.crt and client.key into a single PEM file for clients such as curl and programs using openssl. \n" >> $log_file
 openssl pkcs12 -in $CERTS_HOME/gpteclient.p12 -out $CERTS_HOME/{{gpte_env}}_gpteclient.pem -clcerts -nokeys -passin pass: >> $log_file
 if [ $? != 0 ];
 then
