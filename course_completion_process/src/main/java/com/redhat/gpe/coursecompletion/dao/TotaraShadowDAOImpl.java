@@ -29,7 +29,7 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
     }
 
     public List<TotaraCourseCompletion> getCourseCompletionsByRange(long lowCCDate, long highCCDate) {
-        String totaraCCSQL = "select cc.id, u.email, u.firstname, u.lastname, cc.course, c.fullname, c.shortname, cc.timecompleted from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status in (50, 75) and ci.data='GPTE' ";
+        String totaraCCSQL = "select cc.id, u.email, u.firstname, u.lastname, cc.course, c.fullname, c.shortname, cc.timecompleted from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status in (50, 75) and ci.data='GPTE' and cc.rpl is null ";
         StringBuilder totaraCCSQLBuilder = new StringBuilder(totaraCCSQL);
         totaraCCSQLBuilder.append(" and cc.timecompleted >= "+lowCCDate);
         totaraCCSQLBuilder.append(" and cc.timecompleted <= "+highCCDate);
@@ -40,7 +40,7 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
 
     public List<TotaraCourseCompletion> getLatestCourseCompletions(long lastCCDate, int totaraCCLimit) {
 
-        String totaraCCSQL = "select cc.id, u.email, u.firstname, u.lastname, cc.course, c.fullname, c.shortname, cc.timecompleted from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status in (50, 75) and ci.data='GPTE' and cc.timecompleted > ";
+        String totaraCCSQL = "select cc.id, u.email, u.firstname, u.lastname, cc.course, c.fullname, c.shortname, cc.timecompleted from mdl_course_info_data ci, mdl_course c, mdl_course_completions cc, mdl_user u where cc.course=ci.courseid and cc.course=c.id and u.id = cc.userid and status in (50, 75) and ci.data='GPTE' and cc.rpl is null and cc.timecompleted > ";
         StringBuilder totaraCCSQLBuilder = new StringBuilder(totaraCCSQL);
         totaraCCSQLBuilder.append(lastCCDate);
         totaraCCSQLBuilder.append(" order by cc.timecompleted desc");
