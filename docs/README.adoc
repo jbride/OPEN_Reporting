@@ -359,6 +359,23 @@ ERROR [process-single-totara-course-completion] ariahi@redhat.com : Totara cours
 +
 NOTES:  single quotes around course name are intentional and added by GPTE Reporting to highlight if/when there might be blank spaces before or after an unknown course name in Totara.
 
+==== Direct Access to the Totara DB and Via Web
+Direct Access:
+
+host: 23.253.23.27
+
+port: 5432
+
+username is totara_redhat_reporting
+
+password is 87IW1o1zWff94CUXm+5w
+
+database is totara_redhat_reporting
+
+phpPgAdmin:
+
+https://learning.redhat.com/exhibit-2/index.php
+
 == Accreditation Process
 
 The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel based, Java process.
