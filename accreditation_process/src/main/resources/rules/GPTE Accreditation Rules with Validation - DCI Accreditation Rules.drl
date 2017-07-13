@@ -62,7 +62,7 @@ rule "6_Red Hat Delivery Specialist - Automated SAP HANA System Replication with
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Automated SAP HANA System Replication with Pacemaker")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2016", "", $cc1))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2016", "1-Sep-2017", $cc1))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1);
 
@@ -395,7 +395,7 @@ rule "20_Red Hat Delivery Specialist - Red Hat Enterprise Linux for SAP HANA_wit
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Enterprise Linux for SAP Hana")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2015", "", $cc1))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2015", "1-Sep-2017", $cc1))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1);
 
@@ -881,7 +881,7 @@ rule "40_Red Hat Sales Engineer Specialist - Red Hat Enterprise Linux for IBM z 
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Systems Foundations")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2016", "", $cc1))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2016", "1-Sep-2017", $cc1))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1);
 
