@@ -199,6 +199,7 @@
                 <to uri="bean:cCompletionServiceBean?method=insertNewStudentGivenTotaraCourseCompletion" id="update-totara-student"/>
                 <doTry>
                     <to uri="bean:cCompletionServiceBean?method=convertTotaraCourseCompletion" id="totara-re-attempt-to-convert"/>
+                    <to uri="direct:add-student-course-to-db" id="cc_add-totara-student-course-to-db" />
                     <doCatch>
                         <exception>com.redhat.gpte.services.InvalidCourseException</exception>
                         <log message="${body.email} : Totara course not found: '${body.courseShortName}'" loggingLevel="ERROR" />
