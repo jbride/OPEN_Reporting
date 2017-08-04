@@ -26,24 +26,24 @@ The intended audience of this document architects, developers and administrators
 . Experience using Google Spreadsheets.
 
 === Architect
-. All of the skills required of a business user
-. Experience designing _3-tier_, transactional applications
+. All of the skills required of a business user.
+. Experience designing _3-tier_, transactional applications.
 . Experience desiging database schemas to support transactional and reporting requirements.
-. Experience documenting a software architecture
+. Experience documenting a software architecture.
 
 === Operations and QA Team Member
-. All of the skills required of a business user
+. All of the skills required of a business user.
 . RHCSA or equivalent experience.
-. Experience with Ansible
+. Experience with Ansible.
 . Experience with Git.
-. Experience with administration of java projects using its defacto build tool:  Maven
+. Experience with administration of java projects using its defacto build tool:  Maven.
 . Experience with JBoss EAP administration.
 . Experience using Google Spreadsheet's javascript extension functionality:  _Google App Script_.
 . Experience with use and administration of a MariaDB RDBMS.
-. Experience using Asciidoc (ie:  to update this document)
+. Experience using Asciidoc (ie: to update this document).
 
 === Development Team Member
-. All of the skills required of an operations team member
+. All of the skills required of an operations team member.
 . Experience with Java development and its defacto build tool: Maven.
 . Experience developing _transactional_ applications using the following patterns and archictures:
 .. Dependency Injection
@@ -61,8 +61,22 @@ The intended audience of this document architects, developers and administrators
 
 === Technical
 
-. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization
-. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk
+. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization.
+. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk.
+
+== GPTE Reporting VMs
+
+Each environment consists of a VM. Here is a list of the current VMs.
+
+. *prod* :   apps-iad01
+. *qa*   :   qa-fso00
+. *dev*  :   apps-iad00
+
+The following shell commands will allow you access to the VMs:
+
+. *prod* :   ssh <OPENTLC User ID>@apps-iad01.opentlc.com
+. *qa*   :   ssh <OPENTLC User ID>@qa-fso00.opentlc.com
+. *dev*  :   ssh <OPENTLC User ID>@apps-iad00.opentlc.com
 
 == GPTE Reporting URLs
 
@@ -81,6 +95,28 @@ URLs to each GPTE Reporting service are as follows:
 
 . *Dashbuilder* :  https://<fqdn>/dashbuilder
 
+== GPTE Reporting Email Addresses
+
+GPTE Reporting has an email address assigned to each environment. These email address inboxes are used to consume received data files.
+
+. *prod* :   gpeskillsdev@gmail.com
+. *qa*   :   rhtgpteqa@yahoo.com
+. *dev*  :   rhtgptetest@yahoo.com
+
+You can also login to these inboxes using the credentials found in each environments properties file. GPTE will reprocess emails that are marked unread, so marking an email unread will kick off the processing of the email's attached file.
+
+== GPTE Reporting Shell Alias Shortcuts
+
+Each environment contains shell aliases to tail logs, bounce services, and gain access to MySQL databases.
+
+. *ta* :   Tails the accreditation log
+. *ba* :   Bounces the accreditation services
+. *tg* :   Tails the JBoss EAP log (GPTE)
+. *bg* :   Bounces the JBoss EAP services
+. *td* :   Tails the DashBuilder log
+. *bd* :   Bounces the DashBuilder services
+. *mroot* :   Opens a MySQL mariadb connection to allow you to run queries on the GPTE Reporting databases.
+
 == RESTful APIs
 
 https://reporting.opentlc.com/gpte-reporting-swagger/
@@ -94,10 +130,10 @@ It is possible to update all GPTE Reporting environment (prod, qa & dev) via GPT
 
 A Jenkins pipeline has been created that triggers the ansible provisioning and updating functionaility of GPTE Reporting.
 
-NOTE:  MAKE SURE TARGET ENVIRONMENT DOES NOT HAVE ANY LOCAL CHANGES IN /opt/OPEN_Reporting .
+NOTE:  MAKE SURE TARGET ENVIRONMENT DOES NOT HAVE ANY LOCAL CHANGES IN /opt/OPEN_Reporting.
 If there are existing, un-committed and un-pushed changes in the target environment, this Jenkins job will fail.
 
-You can check this by going to /opt/OPEN_Reporting and running "git status"  If the response is the below, you are free to trigger the Jenkins build job.
+You can check this by going to /opt/OPEN_Reporting and running "git status".  If the response is the below, you are free to trigger the Jenkins build job.
 
 "
 # On branch master
@@ -121,7 +157,7 @@ image::images/click_update_gpte_reporting.png[]
 image::images/updated_build.png[]
 . Click: `Build`.
 . Click the _build #_ for the Jenkins build that is now in progress.
-. From the left panel, click: `Console Output` 
+. From the left panel, click: `Console Output`
 . Monitor the output of the update process
 
 == Production Database Disaster Recovery
@@ -140,7 +176,7 @@ image::images/prod_backup_job.png[]
 === Recovery
 If the production database at `reporting.opentlc.com` was to be lost, then it could be fully recovered as follows:
 
-. Re-provision `reporting.opentlc.com` from ansible
+. Re-provision `reporting.opentlc.com` from ansible.
 . Populate the `lms_transactional` and `lms_reporting` databases from the backups:
 .. ssh reporting.opentlc.com
 .. mkdir -p /tmp/mysqlbackup_target
@@ -148,10 +184,24 @@ If the production database at `reporting.opentlc.com` was to be lost, then it co
 .. unzip both files in /tmp/mysqlbackup_target
 .. Use the command line mysql utility to import into each corresponding database.
 
-NOTE: the `dashbuilder` database will also be needed.  The `dashbuilder` database can be dumped from `dev.opentlc.com`.
+NOTE: The `dashbuilder` database will also be needed.  The `dashbuilder` database can be dumped from `dev.opentlc.com`.
 
 
-== GPTE Reporting Database
+== GPTE Reporting Databases
+
+GPTE Reporting has three MySQL databases:
+
+. `lms_transactional`
+.. The OLTP (online transaction processing) database, commonly referred to as the "transactional database".
+.. Contains entities such as Students, Courses, StudentCourses, and StudentAccreditations.
+.. The Drools Accreditation Logic is run on lms_transactional to populate StudentAccreditations.
+. `lms_reporting`
+.. The OLAP (online analytical processing) database, commonly referred to as the "reporting database".
+.. This database can be thought of a view of `lms_transactional` as it is refreshed regularly using data from `lms_transactional`.
+.. `lms_reporting` is the back-end for Dashbuilder, the reporting tool used for online reporting.
+. `dashbuilder`
+.. This database contains the objects needed for the JBoss Dashbuilder web application. All data sources, queries, reports, etc. created witin Dashbuilder are stored here.
+.. `dashbuilder` contains data sources to lms_reporting and uses that data to populate the online reports.
 
 === Manual tasks to _lms_transactional_ database
 
@@ -190,15 +240,15 @@ echo 'select cm.PrunedCourseId, c.CourseId, c.CourseName from Courses c left joi
 NOTE: Not every courseId is going to have a corresponding mapping.
 For those courses without a mapping, the _PrunedCourseId_ field can either have a value of `NULL` or can be blank.
 
-. File -> Download As -> Tab-separated values (*.tsv, current sheet)
+. File -> Download As -> Tab-separated values (*.tsv, current sheet).
 . Using your Red Hat email account, create an email with the following:
-.. *To*:  rhtgptetest@yahoo.com
+.. *To*:  rhtgptetest@yahoo.com (for dev environment)
 .. *Subject*: Course Refresh
 .. *Attachment*: attach previously downloaded tsv.
-. Tail log of GPTE Reporting server of  development environment.
-.. ssh <opentlc userId>@dev.opentlc.com
+. Tail the log of the GPTE Reporting server of the environment.
+.. ssh <opentlc userId>@apps-iad00.opentlc.com
 .. Execute the following: tg
-. Send email
+. Send email.
 . Expect results similar to the following in the log file:
 +
 -----
@@ -227,7 +277,7 @@ This service executes within JBoss Fuse on EAP and its purpose is the following:
 
 . Consume data feeds sent to GPTE Reporting from external systems and users.
 +
-Examples include course completions from Dokeos and student registration data from Sumtotal.
+Examples include course completions from Totara and student registration data from Sumtotal.
 +
 This service consumes data files from a variety of endpoints such as email and local filesystem.
 . Light validation of the data file (ie: proper sender email account and correct file suffix).
@@ -240,13 +290,15 @@ This service consumes data files from a variety of endpoints such as email and l
 
 == Course Completion Process
 
-=== Dokeos Course Completions
+=== Dokeos Course Completions (Retired)
+Dokeos was retired in 2017.  The following could still be helpful in processing offline data files.
+
 Dokeos tends to send course completions to GPTE Reporting in near real-time.
 In particular, an email with a single course completion attachment file is sent as soon a student completes a course in rh.dokeos.com.
 
 An example of a dokeos course completion can be found link:https://github.com/redhat-gpe/OPEN_Reporting/blob/master/course_completion_process/src/test/resources/sample-spreadsheets/dokeos/app_dev_eap_new.csv[here].
 
-Upon consumption of the course completion email from dokeos, GPTE Reporting will :
+Upon consumption of the course completion email from dokeos, GPTE Reporting will:
 
 . Validate the course completion.  In particular, ensure that the course referenced in the course completion is a known GPTE canonical course name as specified in lms_transactional.Courses.
 . Persist the course completion (assuming the course completion validates).
@@ -262,16 +314,16 @@ Adding student course to db: 'Red Hat OpenStack Platform for Sales' '100'
 
 If an error occurs during either the validation or persistence of a course completion from rh.dokeos.com, an email will be sent out to GPTE Reporting system admins.
 
-=== Sumtotal Batch upload
+=== Sumtotal Batch Upload
 
 ==== Course Completion Processing Report
 The following provides instructions on how to review a summary of the processing of a batch of Sumtotal course competions in GPTE Reporting:
 
-. ssh into the dev environment of GPTE Reporting
-. Tail the JBoss EAP log file by executing:  `tg`
+. ssh into the appropriate environment of GPTE Reporting. (Dev is used in this example).
+. Tail the JBoss EAP log file by executing:  `tg`.
 
-. Email the batch file of Sumtotal course completions to the dev email address: 
-`rhtgptetest@yahoo.com`
+. Email the batch file of Sumtotal course completions to the appropriate email address:
+`rhtgptetest@yahoo.com` (for dev).
 . Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot_emails>> if nothing is observed.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
@@ -312,7 +364,7 @@ cc_poll_totara_course_completions_input_uri=direct:poll_totara_course_completion
 +
 -----
 cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 23 1/1 * ? *
------ 
+-----
 
 .. Save your changes to the properties file and exit.
 
@@ -328,18 +380,22 @@ cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 
 
 ==== Execute SQL directly on Totara Shadow DB
 
-. ssh into GPTE dev, qa or prod environments
-. Switch users to `jboss` and change directories to: `/opt/OPEN_Reporting`
-. Determine password for totara shadow db
+. ssh into GPTE dev, qa or prod environments.
+. Switch users to `jboss` and change directories to: `/opt/OPEN_Reporting`.
+. Determine the password for the Totara shadow db:
 +
 -----
 $ cat properties/test.properties | grep totara_shadow_db_password
 -----
-. Execute:
+. Execute the following and enter the password from the previous step at the prompt:
 +
 -----
 psql -h 23.253.23.27 -U totara_redhat_reporting -p 5432 -W totara_redhat_reporting
 -----
+. You will now be logged into the Totara shadow db and can run SELECT MySQL statements.
+
+NOTE:  Documentation of the Totara shadow database can be found here: https://autodocs.totaralms.com/schemaspy/totara-2.9/index.html
+
 
 ==== Manual processing
 . Manually pull and process Totara Course Completions (from their _shadow database_) given a range of totara course completion Ids:
@@ -357,65 +413,63 @@ $ curl -v -X PUT -H "LOW_CC_ID: 110756" -H "HIGH_CC_ID: 110757" \
 ERROR [process-single-totara-course-completion] ariahi@redhat.com : Totara course not found: 'How to Sell Red Hat OpenShift Container Platform'
 -----
 +
-NOTES:  single quotes around course name are intentional and added by GPTE Reporting to highlight if/when there might be blank spaces before or after an unknown course name in Totara.
+NOTE:  Single quotes around course name are intentional and added by GPTE Reporting to highlight if/when there might be blank spaces before or after an unknown course name in Totara.
 
 ==== Direct Access to the Totara DB and Via Web
-Direct Access:
+For direct access use the following:
 
 host: 23.253.23.27
 
 port: 5432
 
-username is totara_redhat_reporting
+username: totara_redhat_reporting
 
-password is 87IW1o1zWff94CUXm+5w
+password: 87IW1o1zWff94CUXm+5w
 
-database is totara_redhat_reporting
+database: totara_redhat_reporting
 
-phpPgAdmin:
-
-https://learning.redhat.com/exhibit-2/index.php
+phpPgAdmin: https://learning.redhat.com/exhibit-2/index.php
 
 == Accreditation Process
 
-The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel based, Java process.
+The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel-based, Java process.
 
-Its purpose is to :
+Its purpose is to:
 
 . Parse and validate GPTE accreditation rules (in tab-delimited spreadsheet format) into Drools Rule Language (DRL) format.
-. Determine accreditations based on student's course completions.
+. Determine accreditation based on student course completions.
 +
 In particular, the `accred-process` background job periodically determines new accreditations based on new course completions that have entered the system during that time period.
 
 
 ==== Start Accreditation Process
 
-Shell aliases have been provided to easily bounce all GPTE Reporting services.
+Shell aliases have been provided to easily bounce all GPTE Reporting services as defined earlier in this documentation.
 
-Take a look at the aliases found in:  `/etc/bashrc`.
+These can be found in:  `/etc/bashrc`.
 
 ==== Monitor Accreditation Process log
 
-Shell aliases have been provided to easily tail log files of all GPTE Reporting services.
+Shell aliases have been provided to easily tail log files of all GPTE Reporting services as defined earlier in this documentation.
 
-Take a look at the aliases found in:  `/etc/bashrc`.
+These can be found in:  `/etc/bashrc`.
 
 ==== Execute Rules Spreadsheet Validation and Parsing to DRL
 
-. Makes changes to any of the three following tabs of the {rulesspreadsheet}
+. Makes changes to any of the three following tabs of the {rulesspreadsheet}:
 .. `DCI Accreditation Rules`
 .. `MWS Accreditation Rules`
 .. `CI Accreditation Rules`
-. For those spreadsheets that have changed, download them to your local workstation
+. For those spreadsheets that have changed, download them to your local workstation.
 .. File -> Download As -> Tab-separated values (*.tsv, current sheet)
 . Using your Red Hat email account, create an email with the following:
-.. *To*:  rhtgptetest@yahoo.com
+.. *To*:  rhtgptetest@yahoo.com (for dev)
 .. *Subject*: <DCI | MWS | CI> Accreditation Rule Refresh
 .. *Attachment*: attach previously downloaded tsv.
-. Tail log of GPTE `Accreditation Service` of development environment.
-.. ssh <opentlc userId>@dev.opentlc.com
+. Tail the log of GPTE `Accreditation Service` of the environment.
+.. ssh <opentlc userId>@gptebuld.opentlc.com (for dev)
 .. Execute the following:  ta
-. Send email
+. Send the email.
 . Expect results similar to the following in the log file:
 +
 -----
@@ -425,13 +479,13 @@ INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  will 
 INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  DRL path= src/main/resources/rules   : file name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
 INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:   Completed DRL generation to: src/main/resources/rules GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
 -----
-. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`
-.. At the command line of the dev environment, execute:  ba
+. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`:
+.. At the command line of the environment, execute:  ba
 
 ==== Invoke accreditation logic REST service
 By default, the `accred-process` service runs as a background job that periodically determines accreditations.
 
-The `accred-process` service allows also allows for manual triggering of accreditation logic processing on one or more students.
+The `accred-process` service also allows for the manual triggering of accreditation logic processing for one or more students.
 
 ==== Full Accreditation Refresh
 This approach will delete all existing accreditations in the `StudentAccreditations` table.
@@ -439,17 +493,17 @@ This approach will delete all existing accreditations in the `StudentAccreditati
 It will then re-calculate all accreditations for all students based on their existing course completions.
 
 . SSH into GPTE Reporting operating as the `jboss` operating system user.
-. Change directories to OPEN_Reporting
+. Change directories to \opt\OPEN_Reporting.
 . Ensure that `accred-process` JVM is running.
 . Execute:
 +
 -----
-./bin/accreditation_batch_evaluation.sh -env=[prod | dev]
+./bin/accreditation_batch_evaluation.sh -env=[prod|dev|qa]
 -----
 
 ==== Focused Accreditation Refresh
 
-. Invoke accreditation logic on an existing student whose course completions should lead to an accreditation
+. Invoke accreditation logic on an existing student whose course completions should lead to an accreditation.
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
@@ -458,7 +512,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/10387
 -----
 
-. Invoke accreditation logic on a non existent student
+. Invoke accreditation logic on a non existent student.
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
@@ -467,7 +521,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/103899
 -----
 
-. Invoke accreditation logic on all students whose studentid > 10000 and < 11000
+. Invoke accreditation logic on all students whose studentid > = 10000 and < = 11000.
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
@@ -485,73 +539,73 @@ The following are steps and considerations for conducting QA of SkillsBase Integ
 
 . Authentication
 
-.. GPTE currently has two Skills Base instances:
+... GPTE currently has two Skills Base instances:
 +
 -----
 Test instance: https://app.skills-base.com/o/redhattest
 Production instance: https://app.skills-base.com/o/redhat
 -----
 
-.. Each Skills Base instance can have one unique key pair active at any time.
+... Each Skills Base instance can have one unique key pair active at any time.
 +
 The key pair is used to request OAuth2 access tokens via the Skills Base API that can then be used to make API requests.
 
-.. Note that a maximum of one access token per instance can be active at any one time.
+... Note that a maximum of one access token per instance can be active at any one time.
 +
 More information is available here: http://wiki.skills-base.net/index.php?title=API_introduction#Authentication
 
 . Check # of Red Hat associates whose accreds need to be pushed to SkillsBase
 +
 -----
-MariaDB [lms_transactional]> select count(sa.studentId) from StudentAccreditations sa, Students s where sa.Processed=0 and s.StudentId=sa.StudentID and s.email like "%redhat.com";
+MariaDB [lms_transactional]> select count(sa.studentId) from Students s join StudentAccreditations sa on s.StudentId = sa.StudentID where sa.Processed = 0 and s.email like "%@redhat.com";
 -----
 
 . SkillsBase data schema
 
-.. The `SkillsBase Integration Service` of GPTE Reporting maintains state (in the lms_transactional database) regarding if a student is known to have a SkillsBase account and if a particular accreditation has been pushed to skillsbase.
+... The `SkillsBase Integration Service` of GPTE Reporting maintains state (in the lms_transactional database) regarding if a student is known to have a SkillsBase account and if a particular accreditation has been pushed to skillsbase.
 +
 This database state is found in the following fields:
 
-... *Students.SkillsbaseStatus* :   boolean; 0 if student does not have a skillsbase account
-... *StudentAccreditations.Processed* : boolean; 0 if student accreditation has been pushed to SkillsBase 
+.. *Students.SkillsbaseStatus*:   boolean; 0 if student does not have a skillsbase account.
+.. *StudentAccreditations.Processed*: boolean; 0 if student accreditation has been pushed to SkillsBase.
 
-.. Prepare for end-to-end test using only student = gpse.training+1@redhat.com
+... Prepare for end-to-end test using only student = gpse.training+1@redhat.com
 +
 -----
-MariaDB [lms_transactional]>  update StudentAccreditations sa, Students s set sa.Processed=1 where s.StudentId=sa.StudentID and s.email like "%redhat.com";
-MariaDB [lms_transactional]>  update StudentAccreditations sa, Students s set sa.Processed=0 where s.StudentId=sa.StudentID and s.email="gpse.training+1@redhat.com";
-MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=1 where Email like "%redhat.com";
-MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email="gpse.training+1@redhat.com";
+MariaDB [lms_transactional]>  update StudentAccreditations sa join Students s on sa.studentid = s.studentid set sa.Processed = 1 where s.Email like "%@redhat.com";
+MariaDB [lms_transactional]>  update StudentAccreditations sa join Students s on sa.studentid = s.studentid set sa.Processed = 0 where s.Email = "gpse.training+1@redhat.com";
+MariaDB [lms_transactional]>  update Students set SkillsbaseStatus = 1 where Email like "%@redhat.com";
+MariaDB [lms_transactional]>  update Students set SkillsbaseStatus = 0 where Email = "gpse.training+1@redhat.com";
 -----
 
 . flip SkillsBase integration switch:
-.. Edit properties/{env}.properties :
+... Edit properties/{env}.properties :
 +
 -----
     sb_sendMailToStudentEnabled=true
     accred_process-push-qualification-to-skillsbase-batch=quartz2://accred_process-push-qualifications-to-skillsbase?cron=0 0/5 * 1/1 * ? *
-    
+
 Comment out portions of the properties file that are not needed.  In this case, because we have a cronjob firing to run the process,    comment out the below line.  This line is an an alternative optional property that if enabled, would infinitly wait for a client to "directly" invoke it.
 
 "accred_process-push-qualification-to-skillsbase-batch=direct:push-qual-to-skillsbase-uri"
 -----
-.. Bounce accreditation process and tail its log file:
+... Bounce accreditation process and tail its log file:
 +
 -----
 ba
 ta
 -----
-. Send one or more course completions to GPTE Reporting that lead to an existing accreditation.
-. Items of note for testing
-.. sb_sendMailToStudentEnabled must be enabled for the sync to occur, accred_process-push-qualification-to-skillsbase-batch must be uncommented as well.
-.. Make sure that all StudentAccreditations have sa.Processed=1 other than the specific cases you want to test (sa.Processed=0) so that you do not send out unnessary emails
-.. Set sb_sendMailToStudentEnabled to false when you are done testing, and comment accred_process-push-qualification-to-skillsbase-batch back out
+. Send one or more course completions to GPTE Reporting that lead to an accreditation.
+. Items of note for testing:
+... sb_sendMailToStudentEnabled must be enabled for the sync to occur, accred_process-push-qualification-to-skillsbase-batch must be uncommented as well.
+... Make sure that all StudentAccreditations have sa.Processed=1 other than the specific cases you want to test (sa.Processed=0) so that you do not send out unnecessary emails.
+... Set sb_sendMailToStudentEnabled to false when you are done testing, and comment accred_process-push-qualification-to-skillsbase-batch back out.
 
 === SkillsBase Log Statements
 
 The following can be expected in the log file of the GPTE Reporting _accreditation process_ (execute: `ta`):
 
-. *Qual does not already exist in SkillsBase*
+. *Qualification does not already exist in SkillsBase*:
 +
 -----
 INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId = 295
@@ -561,13 +615,13 @@ INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId =
     response: {"status":"success","data":[{"name":"Bachelor of Science in Material Science Engineering, Univ. of Michigan, Ann Arbor","person_id":295,"status":"completed","start_date":"Sep-03-1990","end_date":"Apr-30-1994"}]}
 INFO  push-qual-to-skills-base       - jbride@redhat.com : Red Hat Advanced Delivery Specialist - Cloud Management : Does not already exist in skillsbase.  Will now post to skillsbase
 INFO  AccreditationProcessBean       - jbride@redhat.com : Sending the following qualification to Skills Base web service : Red Hat Advanced Delivery Specialist - Cloud Management
-INFO  AccreditationProcessBean       - jbride@redhat.com : addQualification() 
+INFO  AccreditationProcessBean       - jbride@redhat.com : addQualification()
     endDate = 2019-04-13
     response: {"status":"success","message":null,"data":null} : status = success
 INFO  push-qual-to-skills-base       - jbride@redhat.com : Student qualification complete:  assessment=Red Hat Advanced Delivery Specialist - Cloud Management
 -----
 
-. *Qual already exists in SkillsBase*
+. *Qualification already exists in SkillsBase*:
 +
 -----
 INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId = 295
@@ -579,12 +633,12 @@ INFO  push-qual-to-skills-base       - jbride@redhat.com : Qualification already
 -----
 
 == Emails
-GPTE Reporting has services that for various business use cases both sends and consumes emails.
+GPTE Reporting has services that for various business use cases both send and consume emails.
 
 === Sending emails
 
 GPTE Reporting has the ability enable / disable the delivery of emails.
-This feature is may be useful in the `dev` and/or `qa` environment.
+This feature may be useful in the `dev` and/or `qa` environment.
 
 . Edit /opt/OPEN_Reporting/properties/<env>.properties.
 . Change value of the following property:
@@ -610,13 +664,13 @@ While tailing the log file of GPTE Reporting (ie:  `tg` ), if no indication of t
 . *Unknown attachment type*
 +
 GPTE Reporting's email inboxes receive spam.
-If the email attachment is of an unknown type, the email is not processed and no log is written.
+If the email attachment is of an unknown type, the email is not processed and nothing is written to the log.
 Make sure you are sending a known attachment type.
 If working with the GPTE Reporting dev environment, try sending a known working email attachment:  ie, resend a single test course completion.
 
 . *Camel Mail component connection is stale*
 .. The Camel _mail_ component is used to consume emails.
-More often than not, consumption of those emails occurs with out issue.  ie: The camel mail component has been running fine in production for months.
+More often than not, consumption of those emails occurs without issue.  For example, the camel mail component has been running fine in production for months.
 .. Occasionally, however, it might appear that the Camel _mail_ component may have gone stale.
 +
 To troubleshoot, start by logging into the email provider and: `mark your email as unsent`.
