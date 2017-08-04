@@ -26,24 +26,24 @@ The intended audience of this document architects, developers and administrators
 . Experience using Google Spreadsheets.
 
 === Architect
-. All of the skills required of a business user
-. Experience designing _3-tier_, transactional applications
+. All of the skills required of a business user.
+. Experience designing _3-tier_, transactional applications.
 . Experience desiging database schemas to support transactional and reporting requirements.
-. Experience documenting a software architecture
+. Experience documenting a software architecture.
 
 === Operations and QA Team Member
-. All of the skills required of a business user
+. All of the skills required of a business user.
 . RHCSA or equivalent experience.
-. Experience with Ansible
+. Experience with Ansible.
 . Experience with Git.
-. Experience with administration of java projects using its defacto build tool:  Maven
+. Experience with administration of java projects using its defacto build tool:  Maven.
 . Experience with JBoss EAP administration.
 . Experience using Google Spreadsheet's javascript extension functionality:  _Google App Script_.
 . Experience with use and administration of a MariaDB RDBMS.
-. Experience using Asciidoc (ie:  to update this document)
+. Experience using Asciidoc (ie: to update this document).
 
 === Development Team Member
-. All of the skills required of an operations team member
+. All of the skills required of an operations team member.
 . Experience with Java development and its defacto build tool: Maven.
 . Experience developing _transactional_ applications using the following patterns and archictures:
 .. Dependency Injection
@@ -61,8 +61,8 @@ The intended audience of this document architects, developers and administrators
 
 === Technical
 
-. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization
-. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk
+. Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization.
+. Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk.
 
 == GPTE Reporting URLs
 
@@ -94,10 +94,10 @@ It is possible to update all GPTE Reporting environment (prod, qa & dev) via GPT
 
 A Jenkins pipeline has been created that triggers the ansible provisioning and updating functionaility of GPTE Reporting.
 
-NOTE:  MAKE SURE TARGET ENVIRONMENT DOES NOT HAVE ANY LOCAL CHANGES IN /opt/OPEN_Reporting .
+NOTE:  MAKE SURE TARGET ENVIRONMENT DOES NOT HAVE ANY LOCAL CHANGES IN /opt/OPEN_Reporting.
 If there are existing, un-committed and un-pushed changes in the target environment, this Jenkins job will fail.
 
-You can check this by going to /opt/OPEN_Reporting and running "git status"  If the response is the below, you are free to trigger the Jenkins build job.
+You can check this by going to /opt/OPEN_Reporting and running "git status".  If the response is the below, you are free to trigger the Jenkins build job.
 
 "
 # On branch master
@@ -121,7 +121,7 @@ image::images/click_update_gpte_reporting.png[]
 image::images/updated_build.png[]
 . Click: `Build`.
 . Click the _build #_ for the Jenkins build that is now in progress.
-. From the left panel, click: `Console Output` 
+. From the left panel, click: `Console Output`
 . Monitor the output of the update process
 
 == Production Database Disaster Recovery
@@ -140,7 +140,7 @@ image::images/prod_backup_job.png[]
 === Recovery
 If the production database at `reporting.opentlc.com` was to be lost, then it could be fully recovered as follows:
 
-. Re-provision `reporting.opentlc.com` from ansible
+. Re-provision `reporting.opentlc.com` from ansible.
 . Populate the `lms_transactional` and `lms_reporting` databases from the backups:
 .. ssh reporting.opentlc.com
 .. mkdir -p /tmp/mysqlbackup_target
@@ -148,7 +148,7 @@ If the production database at `reporting.opentlc.com` was to be lost, then it co
 .. unzip both files in /tmp/mysqlbackup_target
 .. Use the command line mysql utility to import into each corresponding database.
 
-NOTE: the `dashbuilder` database will also be needed.  The `dashbuilder` database can be dumped from `dev.opentlc.com`.
+NOTE: The `dashbuilder` database will also be needed.  The `dashbuilder` database can be dumped from `dev.opentlc.com`.
 
 
 == GPTE Reporting Database
@@ -190,7 +190,7 @@ echo 'select cm.PrunedCourseId, c.CourseId, c.CourseName from Courses c left joi
 NOTE: Not every courseId is going to have a corresponding mapping.
 For those courses without a mapping, the _PrunedCourseId_ field can either have a value of `NULL` or can be blank.
 
-. File -> Download As -> Tab-separated values (*.tsv, current sheet)
+. File -> Download As -> Tab-separated values (*.tsv, current sheet).
 . Using your Red Hat email account, create an email with the following:
 .. *To*:  rhtgptetest@yahoo.com
 .. *Subject*: Course Refresh
@@ -198,7 +198,7 @@ For those courses without a mapping, the _PrunedCourseId_ field can either have 
 . Tail log of GPTE Reporting server of  development environment.
 .. ssh <opentlc userId>@dev.opentlc.com
 .. Execute the following: tg
-. Send email
+. Send email.
 . Expect results similar to the following in the log file:
 +
 -----
@@ -240,13 +240,15 @@ This service consumes data files from a variety of endpoints such as email and l
 
 == Course Completion Process
 
-=== Dokeos Course Completions
+=== Dokeos Course Completions (Retired)
+Dokeos was retired in 2017.  The following could still be helpful in processing offline data files.
+
 Dokeos tends to send course completions to GPTE Reporting in near real-time.
 In particular, an email with a single course completion attachment file is sent as soon a student completes a course in rh.dokeos.com.
 
 An example of a dokeos course completion can be found link:https://github.com/redhat-gpe/OPEN_Reporting/blob/master/course_completion_process/src/test/resources/sample-spreadsheets/dokeos/app_dev_eap_new.csv[here].
 
-Upon consumption of the course completion email from dokeos, GPTE Reporting will :
+Upon consumption of the course completion email from dokeos, GPTE Reporting will:
 
 . Validate the course completion.  In particular, ensure that the course referenced in the course completion is a known GPTE canonical course name as specified in lms_transactional.Courses.
 . Persist the course completion (assuming the course completion validates).
@@ -270,7 +272,7 @@ The following provides instructions on how to review a summary of the processing
 . ssh into the dev environment of GPTE Reporting
 . Tail the JBoss EAP log file by executing:  `tg`
 
-. Email the batch file of Sumtotal course completions to the dev email address: 
+. Email the batch file of Sumtotal course completions to the dev email address:
 `rhtgptetest@yahoo.com`
 . Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot_emails>> if nothing is observed.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
@@ -312,7 +314,7 @@ cc_poll_totara_course_completions_input_uri=direct:poll_totara_course_completion
 +
 -----
 cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 23 1/1 * ? *
------ 
+-----
 
 .. Save your changes to the properties file and exit.
 
@@ -513,7 +515,7 @@ MariaDB [lms_transactional]> select count(sa.studentId) from StudentAccreditatio
 This database state is found in the following fields:
 
 ... *Students.SkillsbaseStatus* :   boolean; 0 if student does not have a skillsbase account
-... *StudentAccreditations.Processed* : boolean; 0 if student accreditation has been pushed to SkillsBase 
+... *StudentAccreditations.Processed* : boolean; 0 if student accreditation has been pushed to SkillsBase
 
 .. Prepare for end-to-end test using only student = gpse.training+1@redhat.com
 +
@@ -530,7 +532,7 @@ MariaDB [lms_transactional]>  update Students set SkillsbaseStatus=0 where Email
 -----
     sb_sendMailToStudentEnabled=true
     accred_process-push-qualification-to-skillsbase-batch=quartz2://accred_process-push-qualifications-to-skillsbase?cron=0 0/5 * 1/1 * ? *
-    
+
 Comment out portions of the properties file that are not needed.  In this case, because we have a cronjob firing to run the process,    comment out the below line.  This line is an an alternative optional property that if enabled, would infinitly wait for a client to "directly" invoke it.
 
 "accred_process-push-qualification-to-skillsbase-batch=direct:push-qual-to-skillsbase-uri"
@@ -561,7 +563,7 @@ INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId =
     response: {"status":"success","data":[{"name":"Bachelor of Science in Material Science Engineering, Univ. of Michigan, Ann Arbor","person_id":295,"status":"completed","start_date":"Sep-03-1990","end_date":"Apr-30-1994"}]}
 INFO  push-qual-to-skills-base       - jbride@redhat.com : Red Hat Advanced Delivery Specialist - Cloud Management : Does not already exist in skillsbase.  Will now post to skillsbase
 INFO  AccreditationProcessBean       - jbride@redhat.com : Sending the following qualification to Skills Base web service : Red Hat Advanced Delivery Specialist - Cloud Management
-INFO  AccreditationProcessBean       - jbride@redhat.com : addQualification() 
+INFO  AccreditationProcessBean       - jbride@redhat.com : addQualification()
     endDate = 2019-04-13
     response: {"status":"success","message":null,"data":null} : status = success
 INFO  push-qual-to-skills-base       - jbride@redhat.com : Student qualification complete:  assessment=Red Hat Advanced Delivery Specialist - Cloud Management
