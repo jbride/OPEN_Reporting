@@ -64,6 +64,20 @@ The intended audience of this document architects, developers and administrators
 . Github account with, at a minimum, `viewer` credentials to the `github.com/redhat-gpe` organization.
 . Workstation (bare metal or VM) with 8GB RAM, 4 CPUs and 100GB disk.
 
+== GPTE Reporting VMs
+
+Each environment consists of a VM. Here is a list of the current VMs.
+
+. *prod* :   apps-iad01
+. *qa*   :   qa-fso00
+. *dev*  :   apps-iad00
+
+The following shell commands will allow you access to the VMs:
+
+. *prod* :   ssh <OPENTLC User ID>@apps-iad01.opentlc.com
+. *qa*   :   ssh <OPENTLC User ID>@qa-fso00.opentlc.com
+. *dev*  :   ssh <OPENTLC User ID>@apps-iad00.opentlc.com
+
 == GPTE Reporting URLs
 
 GPTE Reporting has three environments:  prod, qa and dev.
@@ -80,6 +94,27 @@ Each of these environments runs the same GPTE Reporting services.
 URLs to each GPTE Reporting service are as follows:
 
 . *Dashbuilder* :  https://<fqdn>/dashbuilder
+
+== GPTE Reporting Email Addresses
+
+GPTE Reporting has an email address assigned to each environment. These email address inboxes are used to consume received data files.
+
+. *prod* :   gpeskillsdev@gmail.com
+. *qa*   :   rhtgpteqa@yahoo.com
+. *dev*  :   rhtgptetest@yahoo.com
+
+You can also login to these inboxes using the credentials found in each environments properties file. GPTE will reprocess emails that are marked unread, so marking an email unread will kick off the processing of the email's attached file.
+
+== GPTE Reporting Shortcuts
+
+Each environment contains shortcuts to tail logs and bounce services.
+
+. *ta* :   Tails the accreditation log
+. *ba* :   Bounces the accreditation services
+. *tg* :   Tails the GPTE log
+. *bg* :   Bounces the GPTE services
+. *td* :   Tails the DashBuilder log
+. *bd* :   Bounces the DashBuilder services
 
 == RESTful APIs
 
@@ -151,7 +186,21 @@ If the production database at `reporting.opentlc.com` was to be lost, then it co
 NOTE: The `dashbuilder` database will also be needed.  The `dashbuilder` database can be dumped from `dev.opentlc.com`.
 
 
-== GPTE Reporting Database
+== GPTE Reporting Databases
+
+GPTE Reporting has three MySQL databases:
+
+. `lms_transactional`
+.. The OLTP (online transaction processing) database, commonly referred to as the "transactional database".
+.. Contains entities such as Students, Courses, StudentCourses, and StudentAccreditations.
+.. The Drools Accreditation Logic is run on lms_transactional to populate StudentAccreditations.
+. `lms_reporting`
+.. The OLAP (online analytical processing) database, commonly referred to as the "reporting database".
+.. This database can be thought of a view of `lms_transactional` as it is refreshed regularly using data from `lms_transactional`.
+.. `lms_reporting` is the back-end for Dashbuilder, the reporting tool used for online reporting.
+. `dashbuilder`
+.. This database contains the objects needed for the JBoss Dashbuilder web application. All data sources, queries, reports, etc. created witin Dashbuilder are stored here.
+.. `dashbuilder` contains data sources to lms_reporting, and uses data from lms_reporting to populate the online reports.
 
 === Manual tasks to _lms_transactional_ database
 
@@ -192,11 +241,11 @@ For those courses without a mapping, the _PrunedCourseId_ field can either have 
 
 . File -> Download As -> Tab-separated values (*.tsv, current sheet).
 . Using your Red Hat email account, create an email with the following:
-.. *To*:  rhtgptetest@yahoo.com
+.. *To*:  rhtgptetest@yahoo.com (for dev environment)
 .. *Subject*: Course Refresh
 .. *Attachment*: attach previously downloaded tsv.
-. Tail log of GPTE Reporting server of  development environment.
-.. ssh <opentlc userId>@dev.opentlc.com
+. Tail the log of the GPTE Reporting server of the environment.
+.. ssh <opentlc userId>@apps-iad00.opentlc.com
 .. Execute the following: tg
 . Send email.
 . Expect results similar to the following in the log file:
@@ -264,13 +313,13 @@ Adding student course to db: 'Red Hat OpenStack Platform for Sales' '100'
 
 If an error occurs during either the validation or persistence of a course completion from rh.dokeos.com, an email will be sent out to GPTE Reporting system admins.
 
-=== Sumtotal Batch upload
+=== Sumtotal Batch Upload
 
 ==== Course Completion Processing Report
 The following provides instructions on how to review a summary of the processing of a batch of Sumtotal course competions in GPTE Reporting:
 
-. ssh into the dev environment of GPTE Reporting
-. Tail the JBoss EAP log file by executing:  `tg`
+. ssh into the dev environment of GPTE Reporting.
+. Tail the JBoss EAP log file by executing:  `tg`.
 
 . Email the batch file of Sumtotal course completions to the dev email address:
 `rhtgptetest@yahoo.com`
