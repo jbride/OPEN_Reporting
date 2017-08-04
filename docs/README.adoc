@@ -105,16 +105,17 @@ GPTE Reporting has an email address assigned to each environment. These email ad
 
 You can also login to these inboxes using the credentials found in each environments properties file. GPTE will reprocess emails that are marked unread, so marking an email unread will kick off the processing of the email's attached file.
 
-== GPTE Reporting Shortcuts
+== GPTE Reporting Shell Alias Shortcuts
 
-Each environment contains shortcuts to tail logs and bounce services.
+Each environment contains shell aliases to tail logs, bounce services, and gain access to MySQL databases.
 
 . *ta* :   Tails the accreditation log
 . *ba* :   Bounces the accreditation services
-. *tg* :   Tails the GPTE log
-. *bg* :   Bounces the GPTE services
+. *tg* :   Tails the JBoss EAP log (GPTE)
+. *bg* :   Bounces the JBoss EAP services
 . *td* :   Tails the DashBuilder log
 . *bd* :   Bounces the DashBuilder services
+. *mroot* :   Opens a MySQL mariadb connection to allow you to run queries on the GPTE Reporting databases.
 
 == RESTful APIs
 
@@ -200,7 +201,7 @@ GPTE Reporting has three MySQL databases:
 .. `lms_reporting` is the back-end for Dashbuilder, the reporting tool used for online reporting.
 . `dashbuilder`
 .. This database contains the objects needed for the JBoss Dashbuilder web application. All data sources, queries, reports, etc. created witin Dashbuilder are stored here.
-.. `dashbuilder` contains data sources to lms_reporting, and uses data from lms_reporting to populate the online reports.
+.. `dashbuilder` contains data sources to lms_reporting and uses that data to populate the online reports.
 
 === Manual tasks to _lms_transactional_ database
 
@@ -276,7 +277,7 @@ This service executes within JBoss Fuse on EAP and its purpose is the following:
 
 . Consume data feeds sent to GPTE Reporting from external systems and users.
 +
-Examples include course completions from Dokeos and student registration data from Sumtotal.
+Examples include course completions from Totara and student registration data from Sumtotal.
 +
 This service consumes data files from a variety of endpoints such as email and local filesystem.
 . Light validation of the data file (ie: proper sender email account and correct file suffix).
@@ -318,11 +319,11 @@ If an error occurs during either the validation or persistence of a course compl
 ==== Course Completion Processing Report
 The following provides instructions on how to review a summary of the processing of a batch of Sumtotal course competions in GPTE Reporting:
 
-. ssh into the dev environment of GPTE Reporting.
+. ssh into the appropriate environment of GPTE Reporting. (Dev is used in this example).
 . Tail the JBoss EAP log file by executing:  `tg`.
 
-. Email the batch file of Sumtotal course completions to the dev email address:
-`rhtgptetest@yahoo.com`
+. Email the batch file of Sumtotal course completions to the appropriate email address:
+`rhtgptetest@yahoo.com` (for dev).
 . Wait for anywhere between 5 - 45 seconds.  See <<troubleshoot_emails>> if nothing is observed.
 . Observe the beginning of the log file for a _SumtotalCourseCompletions report_.
 It will appear similar to the following:
@@ -379,18 +380,22 @@ cc_poll_totara_course_completions_input_uri=quartz2://cc_poll_totara?cron= 0 30 
 
 ==== Execute SQL directly on Totara Shadow DB
 
-. ssh into GPTE dev, qa or prod environments
-. Switch users to `jboss` and change directories to: `/opt/OPEN_Reporting`
-. Determine password for totara shadow db
+. ssh into GPTE dev, qa or prod environments.
+. Switch users to `jboss` and change directories to: `/opt/OPEN_Reporting`.
+. Determine the password for the Totara shadow db:
 +
 -----
 $ cat properties/test.properties | grep totara_shadow_db_password
 -----
-. Execute:
+. Execute the following and enter the password from the previous step at the prompt:
 +
 -----
 psql -h 23.253.23.27 -U totara_redhat_reporting -p 5432 -W totara_redhat_reporting
 -----
+. You will now be logged into the Totara shadow db and can run SELECT MySQL statements.
+
+NOTE:  Documentation of the Totara shadow database can be found here: https://autodocs.totaralms.com/schemaspy/totara-2.9/index.html
+
 
 ==== Manual processing
 . Manually pull and process Totara Course Completions (from their _shadow database_) given a range of totara course completion Ids:
@@ -408,65 +413,63 @@ $ curl -v -X PUT -H "LOW_CC_ID: 110756" -H "HIGH_CC_ID: 110757" \
 ERROR [process-single-totara-course-completion] ariahi@redhat.com : Totara course not found: 'How to Sell Red Hat OpenShift Container Platform'
 -----
 +
-NOTES:  single quotes around course name are intentional and added by GPTE Reporting to highlight if/when there might be blank spaces before or after an unknown course name in Totara.
+NOTE:  Single quotes around course name are intentional and added by GPTE Reporting to highlight if/when there might be blank spaces before or after an unknown course name in Totara.
 
 ==== Direct Access to the Totara DB and Via Web
-Direct Access:
+For direct access use the following:
 
 host: 23.253.23.27
 
 port: 5432
 
-username is totara_redhat_reporting
+username: totara_redhat_reporting
 
-password is 87IW1o1zWff94CUXm+5w
+password: 87IW1o1zWff94CUXm+5w
 
-database is totara_redhat_reporting
+database: totara_redhat_reporting
 
-phpPgAdmin:
-
-https://learning.redhat.com/exhibit-2/index.php
+phpPgAdmin: https://learning.redhat.com/exhibit-2/index.php
 
 == Accreditation Process
 
-The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel based, Java process.
+The GPTE Reporting service is a stand-alone (it does not run in JBoss EAP), Camel-based, Java process.
 
-Its purpose is to :
+Its purpose is to:
 
 . Parse and validate GPTE accreditation rules (in tab-delimited spreadsheet format) into Drools Rule Language (DRL) format.
-. Determine accreditations based on student's course completions.
+. Determine accreditation based on student course completions.
 +
 In particular, the `accred-process` background job periodically determines new accreditations based on new course completions that have entered the system during that time period.
 
 
 ==== Start Accreditation Process
 
-Shell aliases have been provided to easily bounce all GPTE Reporting services.
+Shell aliases have been provided to easily bounce all GPTE Reporting services as defined earlier in this documentation.
 
-Take a look at the aliases found in:  `/etc/bashrc`.
+These can be found in:  `/etc/bashrc`.
 
 ==== Monitor Accreditation Process log
 
-Shell aliases have been provided to easily tail log files of all GPTE Reporting services.
+Shell aliases have been provided to easily tail log files of all GPTE Reporting services as defined earlier in this documentation.
 
-Take a look at the aliases found in:  `/etc/bashrc`.
+These can be found in:  `/etc/bashrc`.
 
 ==== Execute Rules Spreadsheet Validation and Parsing to DRL
 
-. Makes changes to any of the three following tabs of the {rulesspreadsheet}
+. Makes changes to any of the three following tabs of the {rulesspreadsheet}:
 .. `DCI Accreditation Rules`
 .. `MWS Accreditation Rules`
 .. `CI Accreditation Rules`
-. For those spreadsheets that have changed, download them to your local workstation
+. For those spreadsheets that have changed, download them to your local workstation.
 .. File -> Download As -> Tab-separated values (*.tsv, current sheet)
 . Using your Red Hat email account, create an email with the following:
-.. *To*:  rhtgptetest@yahoo.com
+.. *To*:  rhtgptetest@yahoo.com (for dev)
 .. *Subject*: <DCI | MWS | CI> Accreditation Rule Refresh
 .. *Attachment*: attach previously downloaded tsv.
-. Tail log of GPTE `Accreditation Service` of development environment.
-.. ssh <opentlc userId>@dev.opentlc.com
+. Tail the log of GPTE `Accreditation Service` of the environment.
+.. ssh <opentlc userId>@gptebuld.opentlc.com (for dev)
 .. Execute the following:  ta
-. Send email
+. Send the email.
 . Expect results similar to the following in the log file:
 +
 -----
@@ -476,13 +479,13 @@ INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  will 
 INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:  DRL path= src/main/resources/rules   : file name= GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
 INFO  ate-drl-from-rules-spreadsheet - create-drl-from-rules-spreadsheet:   Completed DRL generation to: src/main/resources/rules GPTE Accreditation Rules with Validation - DCI Accreditation Rules.drl
 -----
-. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`
-.. At the command line of the dev environment, execute:  ba
+. After all rule spreadsheets have been emailed and processed, bounce the GPTE `Accreditation Service`:
+.. At the command line of the environment, execute:  ba
 
 ==== Invoke accreditation logic REST service
 By default, the `accred-process` service runs as a background job that periodically determines accreditations.
 
-The `accred-process` service allows also allows for manual triggering of accreditation logic processing on one or more students.
+The `accred-process` service also allows for the manual triggering of accreditation logic processing for one or more students.
 
 ==== Full Accreditation Refresh
 This approach will delete all existing accreditations in the `StudentAccreditations` table.
@@ -490,17 +493,17 @@ This approach will delete all existing accreditations in the `StudentAccreditati
 It will then re-calculate all accreditations for all students based on their existing course completions.
 
 . SSH into GPTE Reporting operating as the `jboss` operating system user.
-. Change directories to OPEN_Reporting
+. Change directories to \opt\OPEN_Reporting.
 . Ensure that `accred-process` JVM is running.
 . Execute:
 +
 -----
-./bin/accreditation_batch_evaluation.sh -env=[prod | dev]
+./bin/accreditation_batch_evaluation.sh -env=[prod|dev|qa]
 -----
 
 ==== Focused Accreditation Refresh
 
-. Invoke accreditation logic on an existing student whose course completions should lead to an accreditation
+. Invoke accreditation logic on an existing student whose course completions should lead to an accreditation.
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
@@ -509,7 +512,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/10387
 -----
 
-. Invoke accreditation logic on a non existent student
+. Invoke accreditation logic on a non existent student.
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
@@ -518,7 +521,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/103899
 -----
 
-. Invoke accreditation logic on all students whose studentid > 10000 and < 11000
+. Invoke accreditation logic on all students whose studentid > = 10000 and < = 11000.
 +
 -----
 curl -v -X PUT  -H "ACCEPT: application/json" \
