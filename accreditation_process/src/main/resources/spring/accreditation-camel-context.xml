@@ -466,7 +466,7 @@
             <choice>
             <when>
                 <simple>${body.student.skillsbasePersonId} != null</simple>
-                <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="postAccreditationToSkillsBase"/>
+                <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
                 <choice>
                     <when>
                         <simple>${body.skillsBaseQualExists} == false</simple>
@@ -474,9 +474,9 @@
                         <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
                         <when>
                             <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
+                            <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
                             <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
                         </when>
-                        <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
                         <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
                     </when>
                     <otherwise>
