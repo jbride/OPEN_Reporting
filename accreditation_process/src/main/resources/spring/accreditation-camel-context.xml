@@ -104,6 +104,14 @@
             <to uri="direct:determine-accred-for-student" />
         </put>
     </rest>
+    <rest path="/gpte-accreditation/skillsbase/students/">
+        <put uri="{STUDENT_ID}" produces="application/json" >
+            <route>
+                <setBody><simple>${headers.STUDENT_ID}</simple></setBody>
+                <to uri="direct:push-qual-to-skills-base-single-student" />
+            </route>
+        </put>
+    </rest>
 
     <route id="dumpKieBase">
         <from uri="timer://start?repeatCount=1" />
@@ -446,6 +454,32 @@
         </split>
         <log message="####################      done" loggingLevel="INFO"/>
     </route>
+
+    <route id="push-qualifications-to-skills-base-single-student">
+        <description>
+            1)  Periodically checks for student accreditations that have not been processed
+            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SkillsBase with that student accreditation information
+            3)  To-Do: aggregate results and send report
+        </description>
+        <from uri="direct:push-qual-to-skills-base-single-student"/>
+        <log message="${body} ####################    push-qualifications-to-skills-base-single-student" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentAccreditationByStudentId"/>
+        <split>
+            <simple>${body}</simple>
+            <filter>
+                <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
+                <choice> 
+                    <when>
+                        <simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
+                        <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
+                        <to uri="direct:push-qual-to-skills-base" />
+                    </when>
+                </choice> 
+            </filter>
+        </split>
+        <log message="####################      done" loggingLevel="INFO"/>
+    </route>
+
 
     <route id="push-qual-to-skills-base">
         <description>

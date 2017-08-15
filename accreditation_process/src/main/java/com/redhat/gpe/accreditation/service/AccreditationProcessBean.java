@@ -205,6 +205,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
         return sAccreds;
     }
+
+    public List<Accreditation> selectStudentAccreditationByStudentId(@Body Integer studentId) {
+        List<Accreditation> sAccreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId, 0);
+        if(sAccreds == null || sAccreds.isEmpty()) {
+            logger.info("selectStudentAccreditationByStudentId() no StudentAccreditation objects found with status = "+StudentAccreditation.UNPROCESSED);
+        }
+        else {
+            logger.info("selectStudentAccreditationByStudentId() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
+        }
+        return sAccreds;
+    }
+    
     
     public void setAccreditationIdOnAccreditationObj(@Body Accreditation accredObj){
         if(accredObj.getAccreditationId() != null && accredObj.getAccreditationId() != 0)

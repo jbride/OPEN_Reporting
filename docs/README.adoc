@@ -632,6 +632,13 @@ INFO  AccreditationProcessBean       - jbride@redhat.com : skillsbase personId =
 INFO  push-qual-to-skills-base       - jbride@redhat.com : Qualification already exists in SkillsBase: Red Hat Advanced Delivery Specialist - Cloud Management.  Will not post to Skills Base
 -----
 
+=== Manual Push to SkillsBase
+
+-----
+$ curl -v -X PUT \
+          localhost:9090/gpte-accreditation/skillsbase/students/59218
+-----
+
 == Emails
 GPTE Reporting has services that for various business use cases both send and consume emails.
 

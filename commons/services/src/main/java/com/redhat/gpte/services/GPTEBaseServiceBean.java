@@ -147,7 +147,7 @@ public class GPTEBaseServiceBean {
             GPTEBaseCondition mostRecent = sCourses.get(0);
            
             // https://github.com/redhat-gpe/OPEN_Reporting/issues/170
-            List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId);
+            List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId, 0); // select unprocessed StudentAccreditations
             sCourses.addAll(accreds);
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
 
