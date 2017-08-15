@@ -86,6 +86,7 @@ public class BaseRowMapper {
         sAccredObj.setAccreditationdate(rs.getTimestamp(StudentAccreditation.ACCRED_DATE));
         sAccredObj.setAccreditationtype(rs.getString(StudentAccreditation.ACCRED_TYPE));
         sAccredObj.setCourseid(rs.getString(StudentAccreditation.COURSE_ID));
+        sAccredObj.setRuleFired(rs.getString(StudentAccreditation.RULE_FIRED));
         sAccredObj.setProcessed(rs.getShort(StudentAccreditation.PROCESSED));
         return sAccredObj;
     }

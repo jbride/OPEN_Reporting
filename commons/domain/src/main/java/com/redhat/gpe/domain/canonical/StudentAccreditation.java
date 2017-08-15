@@ -19,6 +19,7 @@ public class StudentAccreditation implements Serializable {
     public static final String ACCRED_DATE = "accreditationdate";
     public static final String ACCRED_TYPE = "accreditationtype";
     public static final String COURSE_ID = "courseid";
+    public static final String RULE_FIRED = "ruleFired";
     public static final String PROCESSED = "processed";
     public static final short UNPROCESSED = 0;
     public static final short PROCESSED_SKILLS_BASE_ONLY = 1;
