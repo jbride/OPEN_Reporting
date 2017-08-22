@@ -487,12 +487,12 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
         sBuilder.append("AND sa.CourseID = c.CourseID ");
         sBuilder.append("AND sa.Processed = 0 ");
-        sBuilder.append("ORDER BY sa.accreditationdate desc ");
-        if(StringUtils.isNotEmpty(studentEmailSuffix)) {
+                if(StringUtils.isNotEmpty(studentEmailSuffix)) {
             sBuilder.append("AND s.email like \"%");
             sBuilder.append(studentEmailSuffix);
             sBuilder.append("\"");
         }
+        sBuilder.append(" ORDER BY sa.accreditationdate desc ");
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
         return sAccreds;
     }
