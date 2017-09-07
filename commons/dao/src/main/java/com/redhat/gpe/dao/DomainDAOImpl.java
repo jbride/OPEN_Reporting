@@ -530,6 +530,10 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?,null) ");
         sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");
                 
+        Integer accredId = sAccredObj.getAccreditationid();
+        if(accredId != null && accredId > 0 && sAccredObj.getProcessed() == 0) {
+            logger.warn(accredId +" : ***** flipping processed flag to zero!");
+        }
         int updateCount = sbJdbcTemplate.update(sBuilder.toString(),
                 sAccredObj.getStudentid(), 
                 sAccredObj.getAccreditationid(), 
