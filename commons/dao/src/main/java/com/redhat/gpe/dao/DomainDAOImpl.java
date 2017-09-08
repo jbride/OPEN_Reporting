@@ -528,7 +528,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         logger.debug("addStudentAccreditation() sAccredObj = "+sAccredObj);
         
         StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?,null) ");
-sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=case when AccreditationDate = values(AccreditationDate) then Processed else 0 end, RuleFired=values(RuleFired)");        
+sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=case when AccreditationDate <> values(AccreditationDate) then 0 else Processed end, RuleFired=values(RuleFired)");        
                 
         Integer accredId = sAccredObj.getAccreditationid();
         if(accredId != null && accredId > 0 && sAccredObj.getProcessed() == 0) {
