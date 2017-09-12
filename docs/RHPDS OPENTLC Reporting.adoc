@@ -14,8 +14,6 @@ This data resides in a PGSQL database server.  The creation of a RESTful client 
 
 A reporting database and a new Dashbuilder workspace/page should be created to report this information.
 
-TEST
-
 == Data Sources
 
 === Overview
