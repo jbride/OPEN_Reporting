@@ -5,101 +5,53 @@
 :rulesspreadsheet: link:https://docs.google.com/spreadsheets/d/1C4jbSADmHJvLL3PBBBSEB54L8G_I6NN5rblWIGymAXg/edit#gid=1640119171[GPTE Accreditation Rules Spreadsheet with validation]
 :designdoc: link:https://docs.google.com/document/d/1rFioqj5uhLtdoUEfHHBEwh4_-bW7vqEc5N0R24tN9FU/edit#[GPTE Reporting design document]
 
-= GPTE Student Registration API
+= RHPDS/OPENTLC Reporting
 
 == Overview
-The Red Hat GPTE team has a need to provide reports regarding course completions and accreditations achieved by both Red Hat associates as well as Red Hat partners.
-A copy of the student and company details related to those students who participate in Red Hat GPTE's enablement offerings should be co-located with the course completion and accreditation data.
+The Red Hat GPTE team has a need to provide reports regarding RHPDS/OPENTLC utilization by both Red Hat associates as well as Red Hat partners.
 
-The _system of record_ of student and company information is Red Hat's Saleforce account.
+This data resides in a PGSQL database server.  The creation of a RESTful client that periodically pulls from Ravello and persists to a reporting database would be ideal.
 
-This document provides details needed for a Salesforce client to supply student and company details to GPTE Reporting.
+A reporting database and a new Dashbuilder workspace/page should be created to report this information.
 
+TEST
 
-== REST API
+== Data Sources
 
 === Overview
-GPTE Reporting exposes a RESTful interface to manage student and company information.
+GPTE Reporting will use the following databases as data sources for this effort.
 
 === Resources
 
-===== _processStudent_
+===== _OPENTLC DB_
 
-. *purpose* : create or update student record (keyed by email) in GPTE Reporting database.
-. *Network protocol* : _https_  (See the <<security>> section for more details).
-. *HTTP Method* :  _PUT_
-. *Content-Type* : _application/json_
-. *Payload Example* :
-+
------
-{
-    "email":"jbride@redhat.com",
-    "firstname":"Jeff",
-    "lastname":"Bride",
-    "region":"global",
-    "subregion":"GPTE_NOT_USED",
-    "country":"US",
-    "companyName":"Red Hat",
-    "roles":"consultant",
-    "salesforcecontactid":"testcontactId",
-    "salesforceusername":"test_username",
-    "salesforcemanagerid":"test_managerid",
-    "salesforceaccountname":"test_accountname",
-    "salesforcejobfunctions":"test_consultant"
-}
------
+host=www00.opentlc.com
 
-. *URI* : _user-registration-process/rs/company/{salesForceStudentId}_
-. *Response Codes* :
-.. 400 - Invalid JSON payload
-.. 404 - Resource not found
-.. 503 - Internal GPTE Reporting system(s) not available
-. *Notes*
+dbname=openusage
 
-===== _processCompany_
+user=reportuser
 
-. *Purpose* : Create or update company record (keyed by companyName) in GPTE Reporting database
-. *Network protocol* : _https_  (See the <<security>> section for more details).
-. *HTTP Method* :  _PUT_
-. *Content-Type* : _application/json_
-. *Payload Example* :
-+
------
-{
-    "companyname":"GPTE TEST COMPANY",
-    "partnertype":"test_partnertype",
-    "partnertier":"test_partnertier"
-}
------
+password=fargnots!
 
-. *URI* : _user-registration-process/rs/company/{salesForceCompanyId}_
-. *Response Codes* :
-.. 400 - Invalid JSON payload
-.. 404 - Resource not found
-.. 503 - Internal GPTE Reporting system(s) not available
-. *Notes*
+sslmode=require
 
 
-=== FQDNs
-. *Development Environment:*  _dev.opentlc.com_
-. *Production Environment:* _reporting.opentlc.com_
+===== _RHPDS_
 
-[[security]]
-=== Security
-Both the _processStudent_ as well as the _processCompany_ REST APIs are secured using the _https_ with _Client Authentication_ protocol.
+host=www00.opentlc.com
 
-The server certificate is self-signed.
-The client certificate is generated from the server key and the server certificate .
+dbname=rhpdsusage
 
-Please send a request for the GPTE Reporting client certificate to the following address:  _opentlc-infra-admins@redhat.com_
+user=reportuser
 
-=== Example
+password=fargnots!
 
-== AMQP API
-future
+sslmode=require
 
-== Internal Implementation Details
+== Database Schema
+The following is the current schema of the database.
 
+timestamp, 'userName', 'catalogItem', 'partner', 'blueprint', 'className', 'fullName', 'email', 'geo'
 
 
 ifdef::showscript[]
