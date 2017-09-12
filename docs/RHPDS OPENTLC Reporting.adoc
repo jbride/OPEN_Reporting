@@ -47,7 +47,7 @@ password=fargnots!
 sslmode=require
 
 == Database Schema
-The following is the current schema of the database.
+The following is the current schema of the source database.
 
 timestamp, 'userName', 'catalogItem', 'partner', 'blueprint', 'className', 'fullName', 'email', 'geo'
 
