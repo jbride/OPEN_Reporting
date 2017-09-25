@@ -117,10 +117,20 @@ mail_relay_port: 19587
 totara_shadow_db_module_name: org.postgresql
 totara_shadow_db_driver_jar_dir: /usr/share/java
 totara_shadow_db_driver_jar: postgresql-jdbc.jar
-totara_shadow_host_ip: 23.253.23.27 
+totara_shadow_host_ip: 23.253.23.27
 totara_shadow_host_port: 5432
 totara_shadow_db_name: totara_redhat_reporting
 totara_shadow_db_username: totara_redhat_reporting
 totara_shadow_db_password: 87IW1o1zWff94CUXm+5w
+
+# lab_and_demo db settings
+lab_and_demo_db_module_name: org.postgresql
+lab_and_demo_db_driver_jar_dir: /usr/share/java
+lab_and_demo_db_driver_jar: postgresql-jdbc.jar
+lab_and_demo_host_ip: www00.opentlc.com
+lab_and_demo_host_port: 5432
+lab_and_demo_db_name: openusage
+lab_and_demo_db_username: reportuser
+lab_and_demo_db_password: fargnots!
 
 path_to_swagger_ui: /opt/swagger-ui/
