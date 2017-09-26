@@ -199,12 +199,45 @@
                         <track-statements>true</track-statements>
                     </statement>
                 </datasource>
+
+                <!-- labs & demos reporting datasource -->
+                <datasource jndi-name="java:jboss/datasources/labsDemoReportingDS" pool-name="labsDemoReportingDS" enabled="true" use-java-context="true">
+                    <connection-url>jdbc:postgresql://${labs_demos_reporting_host_ip}:${labs_demos_reporting_host_port}/${labs_demos_reporting_db_name}?autoReconnect=true&amp;sslmode=require&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory</connection-url>
+                    <driver>pgsql</driver>
+                    <pool>
+			<min-pool-size>10</min-pool-size>
+        		<max-pool-size>100</max-pool-size>
+        		<prefill>true</prefill>
+		    </pool>
+		    <security>
+                        <user-name>${labs_demos_reporting_db_userId}</user-name>
+                        <password>${labs_demos_reporting_db_passwd}</password>
+                    </security>
+                    <validation>
+                        <check-valid-connection-sql>select 1</check-valid-connection-sql>
+                        <background-validation>true</background-validation>
+                        <background-validation-millis>60000</background-validation-millis>
+                    </validation>
+                    <timeout>
+                        <idle-timeout-minutes>30</idle-timeout-minutes>
+                    </timeout>
+                    <statement>
+			<prepared-statement-cache-size>32</prepared-statement-cache-size>
+        		<share-prepared-statements/>
+                        <track-statements>true</track-statements>
+                    </statement>
+                </datasource>
+
+
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
                     <driver name="mysql" module="com.mysql">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="pgsql" module="org.postgresql">
+                        <xa-datasource-class>org.postgresql.xa.PGXADataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>

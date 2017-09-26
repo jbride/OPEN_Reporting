@@ -55,6 +55,11 @@
       JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_db_name={{lms_reporting_db_name}}"
       JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_userId={{lms_reporting_userId}}"
       JAVA_OPTS="$JAVA_OPTS -Dlms_reporting_passwd={{lms_reporting_passwd}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlabs_demos_reporting_host_ip={{labs_demos_reporting_host_ip}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlabs_demos_reporting_host_port={{labs_demos_reporting_host_port}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlabs_demos_reporting_db_name={{labs_demos_reporting_db_name}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlabs_demos_reporting_db_userId={{labs_demos_reporting_db_userId}}"
+      JAVA_OPTS="$JAVA_OPTS -Dlabs_demos_reporting_db_passwd={{labs_demos_reporting_db_passwd}}"
 
 - name: Copy CLI scripts to target
   template: 
