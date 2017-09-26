@@ -1,6 +1,6 @@
 # Create JBoss EAP module based on jdbc driver library installed from RHN
 module add --name={{lms_reporting_module_name}} --resources={{lms_reporting_driver_jar_dir}}/{{lms_reporting_driver_jar}} --dependencies=javax.api,javax.transaction.api
-module add --name={{lab_and_demo_db_module_name}} --resources={{lab_and_demo_db_driver_jar_dir}}/{{lab_and_demo_db_driver_jar}} --dependencies=javax.api,javax.transaction.api
+module add --name={{demo_db_module_name}} --resources={{demo_db_driver_jar_dir}}/{{demo_db_driver_jar}} --dependencies=javax.api,javax.transaction.api
 
 batch
 

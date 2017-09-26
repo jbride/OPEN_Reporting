@@ -124,13 +124,13 @@ totara_shadow_db_username: totara_redhat_reporting
 totara_shadow_db_password: 87IW1o1zWff94CUXm+5w
 
 # lab_and_demo db settings
-lab_and_demo_db_module_name: org.postgresql
-lab_and_demo_db_driver_jar_dir: /usr/share/java
-lab_and_demo_db_driver_jar: postgresql-jdbc.jar
-lab_and_demo_host_ip: www00.opentlc.com
-lab_and_demo_host_port: 5432
-lab_and_demo_db_name: openusage
-lab_and_demo_db_username: reportuser
-lab_and_demo_db_password: fargnots!
+demo_db_module_name: org.postgresql
+demo_db_driver_jar_dir: /usr/share/java
+demo_db_driver_jar: postgresql-jdbc.jar
+demo_host_ip: www00.opentlc.com
+demo_host_port: 5432
+demo_db_name: openusage
+demo_db_username: reportuser
+demo_db_password: fargnots!
 
 path_to_swagger_ui: /opt/swagger-ui/
