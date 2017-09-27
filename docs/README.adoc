@@ -685,6 +685,8 @@ The camel mail provider should detect the presence of this email.
 
 .. If you still don't observe any indication of the email being processed, bounce GPTE Reporting (ie:   `bg`).
 
+== GPTE Cost Reporting
+https://docs.google.com/document/d/1J9suQNSvHPLpGhoiXJDn3Qu90RrbX_Gpxq9gTw8hnE0/edit#heading=h.5jbd4bzcvhoc
 
 ifdef::showscript[]
 

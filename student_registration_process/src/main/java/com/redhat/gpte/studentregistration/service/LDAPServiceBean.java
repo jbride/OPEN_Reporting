@@ -542,16 +542,16 @@ public class LDAPServiceBean extends GPTEBaseServiceBean {
        
         // 2) Iterate through list and filter out potential duplicates by email address
         for(StudentRegistrationBindy sBindy : sBindyList){
-        	String email = sBindy.getEmail();
+            String email = sBindy.getEmail();
             if(noDupsStudentMap.containsKey(email) || exceptions.containsKey(sBindy.getEmail())) {
                 dupsCounter++;
             }else {
-            	
-            	//Prune any entries that are known to have recently been successfully pushed to IPA
-            	if(this.verifiedLADPRegisteredUsers.contains(email) ) {
-            		logger.info(email+" : convertStudentRegBindy() Already verified to have been successfully pushed to IPA LDAP.  Will not process again");
-            		continue;
-            	}
+                
+                //Prune any entries that are known to have recently been successfully pushed to IPA
+                if(this.verifiedLADPRegisteredUsers.contains(email) ) {
+                    logger.info(email+" : convertStudentRegBindy() Already verified to have been successfully pushed to IPA LDAP.  Will not process again");
+                    continue;
+                }
                 
                 try {
                     // 3) Grab student and company data as parsed by bindy

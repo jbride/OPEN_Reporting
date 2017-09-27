@@ -42,6 +42,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Set;
+
+import javax.annotation.PostConstruct;
+
 import java.util.HashSet;
 
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
@@ -65,6 +68,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     private static final String COURSE_ROWS_AFFECTED = "COURSE_ROWS_AFFECTED";
     private static final String COURSE_MAPPING_ROWS_AFFECTED = "COURSE_MAPPING_ROWS_AFFECTED";
+    private static final String UNKNOWN_COUNTRY_ID = "UN";
 
     private static final String COMMA = ",";
     private static final String TAB = "\\t";
@@ -74,12 +78,17 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     private static final String TOTARA_LOW_CC_ID="LOW_CC_ID";
     private static final String TOTARA_HIGH_CC_ID="HIGH_CC_ID";
+    
+    private static final String UNKOWN_COUNTRY_CODE_ERROR = "CC_5000";
 
     private Logger logger = Logger.getLogger(getClass());
     private boolean cc_append_course_issues_to_file = true;
     private boolean cc_append_student_issues_to_file = false;
     private File studentIssuesFile = null;
     private Map<String, Course> courseMapTempCache = new HashMap<String, Course>();  // <mappedCourseId, Course obj>
+    
+    private Set<String> countryCodes;
+    private Map<String, String> countryMap;
 
     private static Object synchObj = new Object();
     private static final String underscoreFilter="_$";
@@ -143,7 +152,15 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 iStream.close();
         }
         logger.info("CourseCompletionServiceBean: # of sumtotal code rejections = "+sumtotalRejectCodeSet.size());
+    
 
+    }
+    
+    @PostConstruct
+    public void init() {
+        Map<String, String> countryMap = canonicalDAO.getCountries();
+        countryCodes = (Set<String>) countryMap.values();
+        
     }
 
     public void setLangFilter() {
@@ -280,8 +297,24 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 }
             }
         }
+        
+        // 2) Ensure valid country on student
+        String studentCountryCode = studentIn.getCountry();
+        if(StringUtils.isEmpty(studentCountryCode)) {
+            
+            logger.warn(UNKOWN_COUNTRY_CODE_ERROR+" : "+studentIn.getEmail()+" : missing country code.  Will set country as: " + UNKNOWN_COUNTRY_ID );
+            studentIn.setCountry(UNKNOWN_COUNTRY_ID);
+            
+        }else if(!countryCodes.contains(studentCountryCode)){
+            String mappedCountryCode = countryMap.get(studentCountryCode);
+            if(mappedCountryCode == null) {
+                logger.warn(UNKOWN_COUNTRY_CODE_ERROR+" : "+studentIn.getEmail()+" : unknown country code: "+studentCountryCode+" .  Will set country as: " + UNKNOWN_COUNTRY_ID );
+                studentIn.setCountry(UNKNOWN_COUNTRY_ID);
+            }
+            
+        }
 
-        // 2)  persist student
+        // 3)  persist student
         studentIn.setCompanyid(companyId);
         canonicalDAO.updateStudent(studentIn);
 

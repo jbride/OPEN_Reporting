@@ -11,13 +11,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcCall;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.DataSource;
@@ -41,6 +44,22 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     @Autowired
     public void setDataSource(DataSource transactionalDS) {
         simpleJdbcCall = new SimpleJdbcCall(transactionalDS);
+       
+    }
+    
+    /* ****************        Countries           ********************* */
+    public Map<String, String> getCountries() {
+        StringBuilder sBuilder = new StringBuilder("select countryid, countryname as countryvalue from Countries union select countryid, countryvalue from CountryMappings");
+        Map<String, String> cMap = new HashMap<String, String>();
+        
+        SqlRowSet sRowSet = sbJdbcTemplate.queryForRowSet(sBuilder.toString());
+        while(sRowSet.next()) {
+            String cCode = sRowSet.getString(1);
+            String cName = sRowSet.getString(2);
+            cMap.put(cName, cCode);
+        }
+        
+        return cMap;
     }
     
     /* *********************        Company                ***************************** */
@@ -220,6 +239,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         String sql = "update Students set "+field+"=? where email=?";
         return sbJdbcTemplate.update(sql, statusCode, email.toLowerCase());
     }
+    
 /* ******************************************************************************* */
 
     
@@ -565,6 +585,10 @@ sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationD
         logger.info("triggerStoredProcedure simpleJdbcCall = "+this.simpleJdbcCall+" : storedProcCall = "+storedProcCall);
         sbJdbcTemplate.update(storedProcCall);
     }
+
+
+
+
 
 
     

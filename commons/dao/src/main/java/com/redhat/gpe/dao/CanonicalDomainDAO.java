@@ -1,6 +1,7 @@
 package com.redhat.gpe.dao;
 
 import java.util.List;
+import java.util.Map;
 
 import com.redhat.gpe.domain.canonical.Company;
 import com.redhat.gpe.domain.canonical.Course;
@@ -14,6 +15,9 @@ import com.redhat.gpe.domain.helper.DenormalizedStudent;
 import com.redhat.gpe.domain.helper.GPTEBaseCondition;
 
 public interface CanonicalDomainDAO {
+    
+    /* *******   Country   *********/
+    public Map<String, String> getCountries();
     
     /* *******   Company   *********/
     public int updateCompany(Company companyObj);
@@ -30,6 +34,7 @@ public interface CanonicalDomainDAO {
     public void updateStudentStatusForEmailedAlready(String email);
     public void updateStudentStatusForOk(String email);
     public int updateStudentStatus(String email, int statusCode, String field);
+    
     
     
     /********  Course  ********/

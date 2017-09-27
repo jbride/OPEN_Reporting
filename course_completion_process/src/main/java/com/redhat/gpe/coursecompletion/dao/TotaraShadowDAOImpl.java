@@ -79,8 +79,8 @@ public class TotaraShadowDAOImpl implements TotaraShadowDAO {
     }
     
     private long addTrailingZerosToATotaraLong(long tLong) {
-    	String sString = Long.toString(tLong);
-    	return Long.parseLong(sString + "000");
+        String sString = Long.toString(tLong);
+        return Long.parseLong(sString + "000");
     }
 
 }
