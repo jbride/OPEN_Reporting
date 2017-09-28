@@ -290,6 +290,20 @@ This service consumes data files from a variety of endpoints such as email and l
 
 == Course Completion Process
 
+=== Insertion of new Students
+With some course completion data files (ie: such as from Sumtotal) there is typically sufficient information in the datafile to insert a new Student record if that student is unknown to GPTE Reporting.
+
+If a country code is passed in the course completion datafile, then that country code is validated.
+Validation behavior as follows:
+
+. Valid country code:  log statement written at the debug level for the following class: com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean
+. Missing country code:
+.. Student record persisted using the following country code:  UN  (aka:  UNKNONW)
+.. log statement written at the warn level for the following class: com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean
+. Invalid country code:
+.. Student record persisted using the following country code:  UN  (aka:  UNKNONW)
+.. log statement written at the warn level for the following class: com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean
+
 === Dokeos Course Completions (Retired)
 Dokeos was retired in 2017.  The following could still be helpful in processing offline data files.
 

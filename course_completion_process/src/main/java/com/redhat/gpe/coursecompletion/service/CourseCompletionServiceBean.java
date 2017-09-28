@@ -46,8 +46,6 @@ import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 
-import java.util.HashSet;
-
 public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     private static final String COURSE_REFRESH_COUNTER = "COURSE_REFRESH_COUNTER";
@@ -160,8 +158,9 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     @PostConstruct
     public void init() {
         Map<String, String> countryMap = canonicalDAO.getCountries();
-        Collection<String> collection = (Set<String>) countryMap.values();
+        Collection<String> collection = countryMap.values();
         countryCodes = new HashSet<String>(collection);
+        logger.info("init() # of countrys and mappings = "+countryMap.size());
     }
 
     public void setLangFilter() {
@@ -313,6 +312,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 studentIn.setCountry(UNKNOWN_COUNTRY_ID);
             }
             
+        } else {
+            logger.debug(studentIn.getEmail()+" : valid country code: "+studentCountryCode);
         }
 
         // 3)  persist student
