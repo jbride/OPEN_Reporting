@@ -89,6 +89,7 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     private Set<String> countryCodes;
     private Map<String, String> countryMap;
 
+    private static Object countryLock = new Object();
     private static Object synchObj = new Object();
     private static final String underscoreFilter="_$";
     private static final String dashFilter="-$";
@@ -155,12 +156,18 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
 
     }
     
+    // Not sure why this is not working
     @PostConstruct
     public void init() {
-        Map<String, String> countryMap = canonicalDAO.getCountries();
-        Collection<String> collection = countryMap.values();
-        countryCodes = new HashSet<String>(collection);
-        logger.info("init() # of countrys and mappings = "+countryMap.size());
+        synchronized(countryLock) {
+            if(countryMap != null)
+                return;
+
+            countryMap = canonicalDAO.getCountries();
+            Collection<String> collection = countryMap.values();
+            countryCodes = new HashSet<String>(collection);
+            logger.info("init() # of countrys and mappings = "+countryMap.size());
+        }
     }
 
     public void setLangFilter() {
@@ -297,7 +304,11 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
                 }
             }
         }
-        
+       
+        // PostConstruct seems to be broken so will ensure country stuff is instantiated here 
+        if(countryMap == null)
+           init();
+
         // 2) Ensure valid country on student
         String studentCountryCode = studentIn.getCountry();
         if(StringUtils.isEmpty(studentCountryCode)) {
@@ -310,10 +321,13 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
             if(mappedCountryCode == null) {
                 logger.warn(UNKOWN_COUNTRY_CODE_ERROR+" : "+studentIn.getEmail()+" : unknown country code: "+studentCountryCode+" .  Will set country as: " + UNKNOWN_COUNTRY_ID );
                 studentIn.setCountry(UNKNOWN_COUNTRY_ID);
+            }else {
+                logger.warn(UNKOWN_COUNTRY_CODE_ERROR+" : "+studentIn.getEmail()+" : mapped country : "+studentCountryCode+" .  Will set country as: " + mappedCountryCode );
+                studentIn.setCountry(mappedCountryCode);
             }
             
         } else {
-            logger.debug(studentIn.getEmail()+" : valid country code: "+studentCountryCode);
+            logger.info(studentIn.getEmail()+" : valid country code: "+studentCountryCode);
         }
 
         // 3)  persist student

@@ -297,12 +297,30 @@ If a country code is passed in the course completion datafile, then that country
 Validation behavior as follows:
 
 . Valid country code:  log statement written at the debug level for the following class: com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean
+
 . Missing country code:
 .. Student record persisted using the following country code:  UN  (aka:  UNKNONW)
-.. log statement written at the warn level for the following class: com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean
+.. log statement similar to the following written at the warn level:
++
+-----
+10:30:34,294 WARN  [com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean] CC_5000 : cristinai@accelerasolutions.com : unknown country code:   .  Will set country as: UN
+-----
+
 . Invalid country code:
 .. Student record persisted using the following country code:  UN  (aka:  UNKNONW)
-.. log statement written at the warn level for the following class: com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean
+.. log statement similar to the following written at the warn level:
++
+-----
+WARN  [com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean] CC_5000 : cristinah@accelerasolutions.com : unknown country code: United State .  Will set country as: UN
+-----
+
+. mapped country code:
+.. Student record persisted using the mapped country code from CountryMappings table.
+.. log statement similar to the following written at the warn level:
++
+-----
+WARN  [com.redhat.gpe.coursecompletion.service.CourseCompletionServiceBean] CC_5000 : cristinaj@accelerasolutions.com : mapped country : Tanzania *, United Republic of .  Will set country as: TZ
+-----
 
 === Dokeos Course Completions (Retired)
 Dokeos was retired in 2017.  The following could still be helpful in processing offline data files.
