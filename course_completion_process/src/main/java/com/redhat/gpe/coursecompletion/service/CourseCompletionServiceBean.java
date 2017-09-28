@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.HashSet;
 
 import javax.annotation.PostConstruct;
 
@@ -159,8 +160,8 @@ public class CourseCompletionServiceBean extends GPTEBaseServiceBean {
     @PostConstruct
     public void init() {
         Map<String, String> countryMap = canonicalDAO.getCountries();
-        countryCodes = (Set<String>) countryMap.values();
-        
+        Collection<String> collection = (Set<String>) countryMap.values();
+        countryCodes = new HashSet<String>(collection);
     }
 
     public void setLangFilter() {
