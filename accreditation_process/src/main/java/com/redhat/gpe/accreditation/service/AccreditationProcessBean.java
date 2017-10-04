@@ -80,6 +80,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String SB_STATUS = "status";
     private static final String SB_START_DATE = "start_date";
     private static final String SB_NEVER_CHECK_FOR_EXISTING_ACCRED = "sb_neverCheckForExistingAccred";
+    private static final String ACCESS_TOKEN = "access_token";
+    private static final String EXPIRES_IN = "expires_in";
+    private static final SimpleDateFormat sdfObj = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     
     private static Object accredProcessLock = new Object();
     private static boolean isLocked = false;
@@ -640,12 +643,31 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             // process response
             response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
-            String token = jsonResponse.getString("access_token");
+            String token = jsonResponse.getString(ACCESS_TOKEN);
+            String expiresInString = jsonResponse.getString(EXPIRES_IN);
+            int expiresInSeconds = Integer.parseInt(expiresInString);
+            Calendar tokenExpDate = Calendar.getInstance();
+            tokenExpDate.add(Calendar.SECOND, expiresInSeconds);
 
             in.setHeader(Constants.TOKEN, token);
+            in.setHeader(Constants.TOKEN_EXPIRED, tokenExpDate);
+            StringBuilder sBuilder = new StringBuilder("getSkillsBaseToken() just retrieved the following skillsbase token:\n\t");
+            sBuilder.append("token = "+token+"\n\t");
+            sBuilder.append("expires at = "+sdfObj.format(tokenExpDate.getTime()));
+            logger.info(sBuilder.toString());
         } catch (Exception exc) {
             handleSkillsBaseResponseException(exc, response);
             throw (new SkillsBaseCommunicationException());
+        }
+    }
+    
+    private void checkAccessToken(Exchange exchange) throws SkillsBaseCommunicationException {
+        Message in = exchange.getIn();
+        Calendar tokenExpDate = (Calendar) in.getHeader(Constants.TOKEN_EXPIRED);
+        Calendar tenSecondsFromNow = Calendar.getInstance();
+        tenSecondsFromNow.add(Calendar.SECOND, 10);
+        if(tokenExpDate == null || tokenExpDate.after(tenSecondsFromNow) ) {
+            this.getSkillsBaseToken(exchange);
         }
     }
     
@@ -666,6 +688,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpPost post = new HttpPost(personIdByEmailUrl);
 
             // set up header
+            checkAccessToken(exchange);
             post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
             
             // set up name value pairs
@@ -737,6 +760,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpGet get = new HttpGet(getStudentQualUrl);
 
             // set up header
+            checkAccessToken(exchange);
             get.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
 
             HttpResponse httpResponse = httpclient.execute(get);
@@ -791,6 +815,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             logger.info(studentObj.getEmail() +" : Sending the following qualification to Skills Base web service : " + accredName);
 
             // set up header
+            checkAccessToken(exchange);
             post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
             
             // set up name value pairs
