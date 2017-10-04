@@ -670,7 +670,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         tenSecondsFromNow.add(Calendar.SECOND, 10);
 
         Calendar tokenExpDate = (Calendar)sbTokenArray[1];
-        if(tokenExpDate == null || tokenExpDate.after(tenSecondsFromNow) ) {
+        if(tokenExpDate == null || tokenExpDate.before(tenSecondsFromNow) ) {
             this.getSkillsBaseToken();
         }
     }
