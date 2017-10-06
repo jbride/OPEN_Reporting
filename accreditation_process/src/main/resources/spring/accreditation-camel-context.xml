@@ -491,8 +491,8 @@
                   In this case it will automatically correct itself at the next 15 minute block.
         </description>
         <from uri="direct:push-qual-to-skills-base"/>
-        <to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
-        <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/>
+        <!-- to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
+        <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/ -->
         <doTry>
             <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
             <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
