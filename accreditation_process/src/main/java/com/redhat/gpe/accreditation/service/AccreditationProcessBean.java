@@ -49,11 +49,10 @@ import java.util.HashSet;
 
 public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
-    private static final String TOKEN_URL = "sb_tokenURL";
-    private static final String PERSON_EMAIL = "sb_personIdByEmailURL";
-    private static final String Q_URL = "sb_addQualificationUrl";
     private static final String GRANT_TYPE = "sb_grantType";
-    private static final String GET_Q_URL = "sb_getQualificationUrl";
+    private static final String SB_TOKEN_URL = "sb_tokenUrl";
+    private static final String SB_PERSON_URL = "sb_personUrl";
+    private static final String SB_Q_URL = "sb_qualificationUrl";
     private static final String EXPIRED_MONTHS = "sb_qualificationEndDateDurationInMonths";
 
     private static final String CLIENT_ID = "sb_skillsbase_clientId";
@@ -75,11 +74,16 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String EVAL = "eval(";
     private static final String NEW_LINE = "\n";
     private static final String CONSEQUENCE_FUNCTION = "determineMostRecentCourseCompletion";
+    private static final String SB_DATA = "data";
+    private static final String SB_NULL = "null";
     private static final String SB_END_DATE = "end_date";
     private static final String SB_NAME = "name";
     private static final String SB_STATUS = "status";
     private static final String SB_START_DATE = "start_date";
     private static final String SB_NEVER_CHECK_FOR_EXISTING_ACCRED = "sb_neverCheckForExistingAccred";
+    private static final String ACCESS_TOKEN = "access_token";
+    private static final String EXPIRES_IN = "expires_in";
+    private static final SimpleDateFormat sdfObj = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
     
     private static Object accredProcessLock = new Object();
     private static boolean isLocked = false;
@@ -87,10 +91,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private Logger logger = Logger.getLogger(getClass());
     
     private String tokenUrl;
-    private String personIdByEmailUrl;
-    private String addQualificationUrl;
-    private String getQualificationUrl;
+    private String sbPersonUrl;
+    private String sbQualificationUrl;
     private int expiredMonths = 24;
+
+    /* Cache Skills Base Token
+     *   Purpose:
+     *      Allow for Skills Base API rate limit increase which is applied for an individual access token across the entire Skills Base API
+     *   Contents of cache:
+     *      sbTokenArray[0] = String token
+     *      sbTokenArray[1] = Calendar object indicating token expiration
+    */
+    private Object[] sbTokenArray = new Object[2];
 
     private String grantType;
     private String clientId;
@@ -102,21 +114,17 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private boolean sb_neverCheckForExistingAccred = true;
 
     public AccreditationProcessBean() {
-        tokenUrl = System.getProperty(TOKEN_URL);
+        tokenUrl = System.getProperty(SB_TOKEN_URL);
         if(StringUtils.isEmpty(tokenUrl))
-            throw new RuntimeException("must set system property: "+TOKEN_URL);
+            throw new RuntimeException("must set system property: "+SB_TOKEN_URL);
 
-        personIdByEmailUrl = System.getProperty(PERSON_EMAIL);
-        if(StringUtils.isEmpty(personIdByEmailUrl))
-            throw new RuntimeException("must set system property: "+PERSON_EMAIL);
+        sbPersonUrl = System.getProperty(SB_PERSON_URL);
+        if(StringUtils.isEmpty(sbPersonUrl))
+            throw new RuntimeException("must set system property: "+SB_PERSON_URL);
 
-        addQualificationUrl = System.getProperty(Q_URL);
-        if(StringUtils.isEmpty(addQualificationUrl))
-            throw new RuntimeException("must set system property: "+Q_URL);
-
-        getQualificationUrl = System.getProperty(GET_Q_URL);
-        if(StringUtils.isEmpty(getQualificationUrl))
-            throw new RuntimeException("must set system property: "+GET_Q_URL);
+        sbQualificationUrl = System.getProperty(SB_Q_URL);
+        if(StringUtils.isEmpty(sbQualificationUrl))
+            throw new RuntimeException("must set system property: "+SB_Q_URL);
 
         clientId = System.getProperty(CLIENT_ID);
         if(StringUtils.isEmpty(clientId))
@@ -146,9 +154,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("init() \n    tokenUrl = "+tokenUrl);
-        sBuilder.append("\n    personIdByEmailUrl = "+personIdByEmailUrl);
-        sBuilder.append("\n    addQualificationUrl = "+addQualificationUrl);
-        sBuilder.append("\n    getQualificationUrl = "+getQualificationUrl);
+        sBuilder.append("\n    sbPersonUrl = "+sbPersonUrl);
+        sBuilder.append("\n    sbQualificationUrl = "+sbQualificationUrl);
         sBuilder.append("\n    clientId = "+clientId);
         sBuilder.append("\n    clientSecret = "+clientSecret);
         sBuilder.append("\n    grantType = "+grantType);
@@ -614,9 +621,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 /*  *************               SkillsBase Integration              ******************  */
 
-    public void getSkillsBaseToken(Exchange exchange) throws SkillsBaseCommunicationException{
+    private void getSkillsBaseToken() throws SkillsBaseCommunicationException{
         
-        Message in = exchange.getIn();
         String response = null;
         try {
                 
@@ -640,12 +646,31 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             // process response
             response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
-            String token = jsonResponse.getString("access_token");
+            String token = jsonResponse.getString(ACCESS_TOKEN);
+            String expiresInString = jsonResponse.getString(EXPIRES_IN);
+            int expiresInSeconds = Integer.parseInt(expiresInString);
+            Calendar tokenExpDate = Calendar.getInstance();
+            tokenExpDate.add(Calendar.SECOND, expiresInSeconds);
 
-            in.setHeader(Constants.TOKEN, token);
+            sbTokenArray[0] = token;
+            sbTokenArray[1] = tokenExpDate;
+            StringBuilder sBuilder = new StringBuilder("getSkillsBaseToken() just retrieved the following skillsbase token:\n\t");
+            sBuilder.append("token = "+token+"\n\t");
+            sBuilder.append("expires at = "+sdfObj.format(tokenExpDate.getTime()));
+            logger.info(sBuilder.toString());
         } catch (Exception exc) {
             handleSkillsBaseResponseException(exc, response);
             throw (new SkillsBaseCommunicationException());
+        }
+    }
+    
+    private void checkAccessToken() throws SkillsBaseCommunicationException {
+        Calendar tenSecondsFromNow = Calendar.getInstance();
+        tenSecondsFromNow.add(Calendar.SECOND, 10);
+
+        Calendar tokenExpDate = (Calendar)sbTokenArray[1];
+        if(tokenExpDate == null || tokenExpDate.before(tenSecondsFromNow) ) {
+            this.getSkillsBaseToken();
         }
     }
     
@@ -663,10 +688,11 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         try {
             HttpClient httpclient = new DefaultHttpClient();
             httpclient = WebClientDevWrapper.wrapClient(httpclient);
-            HttpPost post = new HttpPost(personIdByEmailUrl);
+            HttpPost post = new HttpPost(sbPersonUrl+"search");
 
             // set up header
-            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            checkAccessToken();
+            post.setHeader("Authorization", "Bearer " + sbTokenArray[0]);
             
             // set up name value pairs
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
@@ -682,26 +708,29 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
 
-            String status = jsonResponse.getString("status");
+            String status = jsonResponse.getString(SB_STATUS);
             
-            logger.info(theEmail+" : response: " + response+" : status = "+status);
+            logger.info(theEmail+" : getSkillsPersonId() SkillsBase response: " + response+" : status = "+status);
 
             // parse person id
             String personId = null;
             if (SUCCESS.equalsIgnoreCase(status)) {
-                JSONObject jsonData = jsonResponse.getJSONObject("data");
-                personId = jsonData.getString("id");
-
-                studentAccredObj.getStudent().setSkillsbasePersonId(personId);
-            } else if (ERROR.equalsIgnoreCase(status)) {
-                String message = jsonResponse.getString("message");
-
-                if (message.contains("No person found")) {
-                    studentAccredObj.getStudent().setSkillsbasePersonId(null);
-                } else {
-                    throw new RuntimeException(message);
+                JSONArray jArray = jsonResponse.optJSONArray(SB_DATA);
+                if(jArray != null && jArray.length() > 0) {
+                    JSONObject jsonData = jsonResponse.optJSONArray(SB_DATA).getJSONObject(0);
+                    personId = jsonData.getString("id");
+                    studentAccredObj.getStudent().setSkillsbasePersonId(personId);
+                    return;
                 }
             }
+            String message = jsonResponse.getString("message");
+
+            if (message.contains(SB_NULL)) {
+                studentAccredObj.getStudent().setSkillsbasePersonId(null);
+            } else {
+                throw new RuntimeException(message);
+            }
+            
         } catch (Exception exc) {
             handleSkillsBaseResponseException(exc, response);
             throw (new SkillsBaseCommunicationException());
@@ -731,13 +760,14 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpClient httpclient = new DefaultHttpClient();
             httpclient = WebClientDevWrapper.wrapClient(httpclient);
 
-            String getStudentQualUrl = getQualificationUrl+personId;
+            String getStudentQualUrl = sbQualificationUrl+"personId/"+personId;
             //logger.info(sEmail+" : checkSkillsBaseForExistingAccred() getStudentQualUrl = "+getStudentQualUrl);
 
             HttpGet get = new HttpGet(getStudentQualUrl);
 
             // set up header
-            get.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            checkAccessToken();
+            get.setHeader("Authorization", "Bearer " + sbTokenArray[0]);
 
             HttpResponse httpResponse = httpclient.execute(get);
 
@@ -748,7 +778,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             logger.info(sEmail+" : skillsbase personId = "+personId+"\n\tstatusCode = "+sLine.getStatusCode()+"\n\tresponse content length = "+responseLength+"\n\tresponse reason phrase = "+sLine.getReasonPhrase()+"\n\tresponse: " + response);
 
             JSONObject jsonResponse = new JSONObject(response);
-            JSONArray jArray = jsonResponse.optJSONArray("data");
+            JSONArray jArray = jsonResponse.optJSONArray(SB_DATA);
             if(jArray.length() < 1) {
                 logger.warn(sEmail+" checkSkillsBaseForExistingAccred() no qualifications found");
             } else {
@@ -787,17 +817,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             HttpClient httpclient = new DefaultHttpClient();
             httpclient = WebClientDevWrapper.wrapClient(httpclient);
 
-            HttpPost post = new HttpPost(addQualificationUrl);
+            HttpPost post = new HttpPost(sbQualificationUrl);
             logger.info(studentObj.getEmail() +" : Sending the following qualification to Skills Base web service : " + accredName);
 
             // set up header
-            post.setHeader("Authorization", "Bearer " + in.getHeader(Constants.TOKEN));
+            checkAccessToken();
+            post.setHeader("Authorization", "Bearer " + sbTokenArray[0]);
             
             // set up name value pairs
             List<NameValuePair> nvps = new ArrayList<NameValuePair>();
             nvps.add(new BasicNameValuePair("name", accredName));
             nvps.add(new BasicNameValuePair("person_id", studentObj.getSkillsbasePersonId()));
-            nvps.add(new BasicNameValuePair("status", Constants.COMPLETED));
+            nvps.add(new BasicNameValuePair(SB_STATUS, Constants.COMPLETED));
             
             String startDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
             nvps.add(new BasicNameValuePair("start_date", startDateStr));
@@ -816,7 +847,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             response = EntityUtils.toString(httpResponse.getEntity());
             JSONObject jsonResponse = new JSONObject(response);
 
-            String status = jsonResponse.getString("status");
+            String status = jsonResponse.getString(SB_STATUS);
 
             logger.info(studentObj.getEmail() +" : addQualification() \n\tendDate = "+endDateStr+"\n\tresponse: " + response+" : status = "+status);
 

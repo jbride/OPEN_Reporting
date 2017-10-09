@@ -88,7 +88,7 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     @DataField(pos=9, required=true)
     private String userNumber;
 
-    @DataField(pos=10, required=true, length=2)
+    @DataField(pos=10, required=false, length=2)
     private String country;
     
     public SumtotalCourseCompletion() {
@@ -276,8 +276,11 @@ public class SumtotalCourseCompletion implements java.io.Serializable{
     }
 
     public void validate() throws Exception {
+
+        /* commented out because of: 267
         if(country.length() != 2)
             throw new Exception(email+" : country must be of length = 2 : "+country+"\n");
+        */
     }
     
 }
