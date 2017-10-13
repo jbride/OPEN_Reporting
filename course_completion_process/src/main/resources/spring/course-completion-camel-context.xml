@@ -46,7 +46,7 @@
         </description>
         <from uri="{{cc_receive_sumtotal_input_uri}}" />
         <log message="Received Sumttotal email. from: ${header.Return-Path}, subject ${header.subject}, ${header.CamelFileName}" id="log_sumtotal_receive"/>
-        <setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>smangan@redhat.com,jdoser@redhat.com,nihall@redhat.com,lana@redhat.com,wgodfrey@redhat.com,nickhall22+n4estd21nouwk42oey6z@boards.trello.com</constant></setHeader>
+<setHeader headerName="ROUTE_SPECIFIC_EMAILS"><constant>smangan@redhat.com,jdoser@redhat.com,nihall@redhat.com,clafranc@redhat.com,wgodfrey@redhat.com,nickhall22+n4estd21nouwk42oey6z@boards.trello.com</constant></setHeader>
             <unmarshal ref="bindySumtotal"/>
             <doTry>
                 <!--potentially throws this exception:
