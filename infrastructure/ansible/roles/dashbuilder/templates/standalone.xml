@@ -31,6 +31,10 @@
     <system-properties>
         <!-- JA Bride:  over-ride dashbuilder security with custom implementation -->
         <property name="com.redhat.gp.reporting.cdi.space.delimited.veto.classes" value="org.jboss.dashboard.ui.controller.requestChain.HttpSSOProcessor org.jboss.dashboard.command.DashboardCommandFactory org.jboss.dashboard.users.UserStatus"/>
+
+        <!-- JA Bride: https://github.com/kiegroup/dashboard-builder/commit/82034d720c9da328be82e9511cb18b206f358982#diff-dcd8a73331aba627440c247763086b99R18 -->
+        <property name="org.jboss.dashboard.dataset.DataSetSettings.maxDataSetSizeInBytes" value="209715200" />
+        <property name="org.jboss.dashboard.dataset.DataSetSettings.maxMemoryUsedInDataLoad" value="419430400" />
     </system-properties>
 
 
