@@ -1,17 +1,20 @@
 ---
 
+# Usage:  ansible-playbook utilization_sync.yml
+
 
 - name: Create upload folder at  {{ database_update_script_dir }}
   file: path={{ database_update_script_dir }} state=directory
   run_once: true
 
-- name: Dump remote utilization databases
-  postgresql_db:
-    login_host: "{{ utilization_db_host }}"
-    login_password: "{{ utilization_db_password }}"
-    login_user: "{{ utilization_db_username  }}"
-    name: "{{ item }}"
-    state: dump
-    target: "{{ database_update_script_dir }}/{{ item }}Db.sql.gz"
-  with_items: "{{utilization_dbs}}"
+- name: Copy utilization script
+  template:
+    src: utilization_sync.sh
+    dest: "{{ database_update_script_dir }}"
+    mode: 0755
+    owner: "{{user}}"
+    group: "{{user}}"
 
+- name: Dump remote utilization databases (via psql utility)
+  shell: "sh {{ database_update_script_dir }}/utilization_sync.sh {{item}}"
+  with_items: "{{utilization_dbs}}"
