@@ -134,3 +134,14 @@ labs_demos_reporting_db_userId: reportuser
 labs_demos_reporting_db_passwd: fargnots!
 
 path_to_swagger_ui: /opt/swagger-ui/
+
+# OPEN/RHPDS Financial and Usage Data
+open_rhpds_usage_db_module_name: org.postgresql
+open_rhpds_usage_db_driver_jar_dir: /usr/share/java
+open_rhpds_usage_driver_jar: postgresql-jdbc.jar
+open_rhpds_usage_host_ip: www00.opentlc.com
+open_rhpds_usage_host_port: 5432
+open_rhpds_usage_username: reportuser
+open_rhpds_usage_password: fargnots!
+open_usage_db_name: openusage
+rhpds_usage_db_name: rhpdsusage
