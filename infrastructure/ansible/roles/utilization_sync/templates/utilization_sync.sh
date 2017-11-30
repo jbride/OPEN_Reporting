@@ -10,3 +10,6 @@ psql -h {{ utilization_db_host }} -U {{ utilization_db_username  }} -w $1 -c "\c
 echo -en "load utilization data: $1\n"
 mysql -u root {{lms_reporting_db_name}} -e "truncate table lms_reporting.$1;"
 mysql -u root {{lms_reporting_db_name}} -e "load data local infile '{{database_update_script_dir}}/$1-db.csv' into table lms_reporting.$1 fields terminated by ',' lines terminated by '\n';"
+
+echo -en "run procedure to update dashbuilder"
+mysql -u root {{lms_reporting_db_name}} -e "call refresh_labs_demos;"
