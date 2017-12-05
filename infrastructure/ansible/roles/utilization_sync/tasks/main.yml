@@ -15,6 +15,6 @@
     owner: "{{user}}"
     group: "{{user}}"
 
-- name: Dump remote utilization databases (via psql utility)
-  shell: "sh {{ database_update_script_dir }}/utilization_sync.sh {{item}}"
+- name: "Dump remote utilization databases (via psql utility); log at  {{database_update_script_dir}}/utilization_sync.log"
+  shell: "sh {{ database_update_script_dir }}/utilization_sync.sh {{item}} {{database_update_script_dir}}/utilization_sync.log"
   with_items: "{{utilization_dbs}}"
