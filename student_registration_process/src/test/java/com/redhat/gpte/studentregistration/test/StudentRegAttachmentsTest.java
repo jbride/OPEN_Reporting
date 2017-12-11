@@ -33,7 +33,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
     
     private static final Logger logger = LoggerFactory.getLogger(StudentRegAttachmentsTest.class);
     public static final String RECEIVE_VALIDATE_INPUT_URI = "direct:receive-sumtotal-student-reg-input";
-    public static final String INBOX_PATH = "target/test-classes/sample-spreadsheets/";
+    public static final String INBOX_PATH = "target/test-classes/sample-spreadsheets/student-registration";
     public static final String ADMIN_EMAIL = "admin_email";
     public static final String RETURN_PATH = "Return-Path";
     public static final String CAMEL_FILE_NAME = "CamelFileName";
@@ -64,7 +64,7 @@ public class StudentRegAttachmentsTest extends CamelSpringTestSupport {
         return new ClassPathXmlApplicationContext("/spring/student-registration-camel-context.xml");
     }
     
-    @Ignore
+    //@Ignore
     @Test
     public void test00StudentRegistration() throws IOException {
         File inbox_file = new File(INBOX_PATH, GOOD_STUDENT_REG_FILE);
