@@ -80,6 +80,7 @@ databases_to_provision_from_prod:
 databases_to_update_from_prod:
   - "{{ lms_trans_db_name }}"
   - "{{ lms_reporting_db_name }}"
+  - "{{ dashbuilder_db_name }}"
 
 # The following property is used when updating production or qa database from dev
 databases_to_update_from_dev:
