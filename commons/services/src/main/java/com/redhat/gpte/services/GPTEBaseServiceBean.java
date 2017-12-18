@@ -92,6 +92,7 @@ public class GPTEBaseServiceBean {
 
             student.setStudentid(dbStudent.getStudentid());
             student.setCountry(dbStudent.getCountry());
+            student.setSkillsbaseStatus(dbStudent.getSkillsbaseStatus());
         } catch(org.springframework.dao.EmptyResultDataAccessException x) {}
         canonicalDAO.updateStudent(student);
     }
