@@ -68,15 +68,21 @@ The intended audience of this document architects, developers and administrators
 
 Each environment consists of a VM. Here is a list of the current VMs.
 
-. *prod* :   apps-iad01
-. *qa*   :   qa-fso00
-. *dev*  :   apps-iad00
+. *prod* :   apps-iad01.opentl.com / reporting.opentlc.com
+. *qa*   :   qa-fso00   / qa.opentlc.com
+. *dev*  :   apps-iad00 / qa.opentlc.com
 
 The following shell commands will allow you access to the VMs:
 
 . *prod* :   ssh <OPENTLC User ID>@apps-iad01.opentlc.com
 . *qa*   :   ssh <OPENTLC User ID>@qa-fso00.opentlc.com
 . *dev*  :   ssh <OPENTLC User ID>@apps-iad00.opentlc.com
+
+=== SSH access
+To gain access to the GPTE Reporting machines, the following is necessary:
+
+. UPload your public  ssh key to https://account.opentlc.com/update
+. Send a request to the following email to have your opentlc account add to the role `opentlc-appadmin-users` : opentlc-infra-admins@redhat.com
 
 == GPTE Reporting URLs
 
