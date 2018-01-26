@@ -78,7 +78,7 @@ public class Student implements Serializable {
 
     /* NOTE:  A better name for this field (in the context of how it is actually being used) would be:  hasThisStudentBeenEmailedBeforeToCreateSkillsBaseAccount
      * In particular, this field is used to identify a student that meets the following criteria:
-     *  1) student has an accrediation (aka:  qualification) that needs to get pushed to SkillsBase with the following criteria:
+     *  1) student has an accrediation (aka:  qualification) that needs to get pushed to SkillsBase
      *  2) student does not currently have a skillsbase account
      *  3) student has already been emailed once before by GPTE Reporting requesting that the student create a skills base account
      *
