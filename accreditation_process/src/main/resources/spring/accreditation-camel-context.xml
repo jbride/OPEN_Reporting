@@ -467,7 +467,7 @@
         <split>
             <simple>${body}</simple>
             <filter>
-                <method ref="accreditationProcessBean" method="isRedHatStudentFromStudentAccreditation"></method>
+                <method ref="accreditationProcessBean" method="shouldStudentAccreditationBePushedToSkillsBase"></method>
                 <choice> 
                     <when>
                         <simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>

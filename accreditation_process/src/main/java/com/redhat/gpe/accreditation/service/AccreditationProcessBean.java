@@ -245,11 +245,11 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
     }
     
-    public boolean isRedHatStudentFromStudentAccreditation(@Body Accreditation saObj) {
-        if(saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) > 0) {
+    public boolean shouldStudentAccreditationBePushedToSkillsBase(@Body Accreditation saObj) {
+        if((saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) > 0) || (saObj.getStudent().getSkillsbasePartner() == Student.IS_SKILLSBASE_PARTNER) ) {
             return true;
         }else {
-            logger.debug(saObj.getStudent().getEmail()+" : Not a Red Hat associate.  Will not update SkillsBase");
+            logger.debug(saObj.getStudent().getEmail()+" : Neither a Red Hat associate nor eligible partner.  Will not update SkillsBase");
             return false;
         }
     }
