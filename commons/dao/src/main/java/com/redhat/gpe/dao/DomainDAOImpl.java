@@ -146,7 +146,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
         try {
             if(studentObj.getStudentid() == 0) {
-                StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
+                StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
                 sbJdbcTemplate.update(sBuilder.toString(), 
                         studentObj.getEmail().toLowerCase(), 
                         studentObj.getFirstname(),
@@ -168,7 +168,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                         studentObj.getSalesforceusername(),
                         studentObj.getSalesforcemanagerid(),
                         studentObj.getSalesforceaccountname(),
-                        studentObj.getSalesforcejobfunctions()
+                        studentObj.getSalesforcejobfunctions(),
+                        studentObj.getSkillsbasePartner()
                         );
                 logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
             } else {
@@ -179,7 +180,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 sBuilder.append(Student.SKILLSBASE_STATUS+EQUAL+Student.IPA_STATUS+EQUAL);
                 sBuilder.append(Student.ACTIVATION_DATE+EQUAL+Student.DEACTIVATION_DATE+EQUAL);
                 sBuilder.append(Student.SALESFORCEUSERNAME+EQUAL+Student.SALESFORCEMANAGERID+EQUAL);
-                sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+"=? ");
+                sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+EQUAL+Student.SKILLSBASEPARTNER+"=? ");
                 sBuilder.append("where studentID="+studentObj.getStudentid());
                 sbJdbcTemplate.update(sBuilder.toString(),new Object[]{
                     studentObj.getEmail(),
@@ -201,7 +202,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getSalesforceusername(),
                     studentObj.getSalesforcemanagerid(),
                     studentObj.getSalesforceaccountname(),
-                    studentObj.getSalesforcejobfunctions()
+                    studentObj.getSalesforcejobfunctions(),
+                    studentObj.getSkillsbasePartner(),
                 });
                 logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
             }

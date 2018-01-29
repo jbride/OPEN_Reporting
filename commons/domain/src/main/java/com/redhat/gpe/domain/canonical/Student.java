@@ -39,16 +39,19 @@ public class Student implements Serializable {
     public static final String SALESFORCEMANAGERID = "SalesForceManagerID";
     public static final String SALESFORCEACCOUNTNAME = "SalesForceAccountName";
     public static final String SALESFORCEJOBFUNCTIONS = "SalesForceJobFunctions";
+    public static final String SKILLSBASEPARTNER = "SkillsbasePartner";
     public static final String COMMA = ",";
     public static final String NEW_LINE = "\n";
 
-    public static final String SELECT_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate";
+    public static final String SELECT_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate,s.SkillsbasePartner";
 
     public static final int SKILLSBASE_PERSON_UNVERIFIED = 0;
     public static final int SKILLSBASE_PERSON_NOTIFIED_NO_ACCOUNT=1;
     public static final int SKILLSBASE_PERSON_OK = 2;
-    public static final int IPA_UNSYNCHED = 0;
+    public static final int IS_SKILLSBASE_PARTNER = 1;
+    public static final int IS_NOT_SKILLSBASE_PARTNER = 0;
     public static final int IPA_SYNCHED = 1;
+    public static final int IPA_UNSYNCHED = 0;
 
     public static final String RED_HAT_EMAIL_SUFFIX="redhat.com";
 
@@ -98,6 +101,9 @@ public class Student implements Serializable {
     private String salesforcemanagerid;
     private String salesforceaccountname;
     private String salesforcejobfunctions;  // channel roles
+    
+    private int skillsbasePartner = IS_NOT_SKILLSBASE_PARTNER;
+    
 
     /* Patrick, 20 January 2016
      * the Title attribute in LDAP is being used for Role because it was available. It does not mean its their title
@@ -302,6 +308,14 @@ public class Student implements Serializable {
         this.salesforcejobfunctions = salesforcejobfunctions;
     }
 
+    public int getSkillsbasePartner() {
+        return skillsbasePartner;
+    }
+
+    public void setSkillsbasePartner(int skillsbasePartner) {
+        this.skillsbasePartner = skillsbasePartner;
+    }
+
     @Override
     public String toString() {
         return "Student [studentid=" + studentid + ", email=" + email
@@ -315,7 +329,8 @@ public class Student implements Serializable {
                 + skillsbaseStatus + ", skillsbasePersonId="
                 + skillsbasePersonId + ", ipaStatus=" + ipaStatus
                 + ", activationDate=" + activationDate + ", deActivationDate="
-                + deActivationDate + "]";
+                + deActivationDate+ ", skillsbasePartner="
+                + skillsbasePartner +"]";
     }
 
     public String toCsv() {
