@@ -37,6 +37,7 @@ public class BaseRowMapper {
         student.setIpaStatus(rs.getShort(Student.IPA_STATUS));
         student.setActivationDate(rs.getTimestamp(Student.ACTIVATION_DATE));
         student.setDeActivationDate(rs.getTimestamp(Student.DEACTIVATION_DATE));
+        student.setSkillsbasePartner(rs.getInt(Student.SKILLSBASEPARTNER));
         return student;
     }
     
