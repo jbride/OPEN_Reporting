@@ -509,7 +509,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
         sBuilder.append("AND sa.CourseID = c.CourseID ");
         sBuilder.append("AND sa.Processed = 0 ");
-                if(StringUtils.isNotEmpty(studentEmailSuffix)) {
+        if(StringUtils.isNotEmpty(studentEmailSuffix)) {
             sBuilder.append("AND s.email like \"%");
             sBuilder.append(studentEmailSuffix);
             sBuilder.append("\"");
