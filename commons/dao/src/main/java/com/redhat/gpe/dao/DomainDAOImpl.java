@@ -509,11 +509,13 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
         sBuilder.append("AND sa.CourseID = c.CourseID ");
         sBuilder.append("AND sa.Processed = 0 ");
+        sBuilder.append("AND ( s.skillsbasepartner = 1 ");
         if(StringUtils.isNotEmpty(studentEmailSuffix)) {
-            sBuilder.append("AND s.email like \"%");
+            sBuilder.append("OR s.email like \"%");
             sBuilder.append(studentEmailSuffix);
             sBuilder.append("\"");
         }
+        sBuilder.append(" )");
         sBuilder.append(" ORDER BY sa.accreditationdate desc ");
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
         return sAccreds;
@@ -550,7 +552,12 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         logger.debug("addStudentAccreditation() sAccredObj = "+sAccredObj);
         
         StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?,null) ");
-sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=IF(AccreditationDate <> VALUES(AccreditationDate), 0, Processed), RuleFired=values(RuleFired)");        
+
+        // JA Bride:  not sure why this business logic was here implemented in SQL.
+        // If this business logic is needed, it should be implemented higher up the stack:  ie;  in the camel routes.
+        // sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=IF(AccreditationDate <> VALUES(AccreditationDate), 0, Processed), RuleFired=values(RuleFired)");
+
+        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");        
                 
         Integer accredId = sAccredObj.getAccreditationid();
         if(accredId != null && accredId > 0 && sAccredObj.getProcessed() == 0) {
