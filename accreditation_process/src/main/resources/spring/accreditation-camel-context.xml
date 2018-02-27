@@ -226,6 +226,7 @@
                 <simple>${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
                 <filter>
                     <simple>${body.size} > 0</simple>
+                    <to uri="bean:accreditationProcessBean?method=filterDuplicateAccreds" />
                     <split id="loop-for-each-accreditation">
                         <simple>${body}</simple>
                         <to uri="bean:accreditationProcessBean?method=setAccreditationIdOnAccreditationObj" />

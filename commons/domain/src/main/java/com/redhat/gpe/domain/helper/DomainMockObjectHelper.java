@@ -19,7 +19,7 @@ public class DomainMockObjectHelper {
     //static int partnerStudentId = 10145;                   // Abhishek Singh
     //static String partnerEmail = "abhishek139@tcs.com";
     
-    public static int partnerStudentId = 10161;
+    public static int partnerStudentId = 73173;
     public static String partnerEmail = "abhishek5.chatterjee5@cognizant.com";
     
     static String rhtEmail = "jbride@redhat.com";

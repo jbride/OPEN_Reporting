@@ -555,14 +555,17 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
         // JA Bride:  not sure why this business logic was here implemented in SQL.
         // If this business logic is needed, it should be implemented higher up the stack:  ie;  in the camel routes.
-        // sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=IF(AccreditationDate <> VALUES(AccreditationDate), 0, Processed), RuleFired=values(RuleFired)");
+        /*
+        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=IF(AccreditationDate <> VALUES(AccreditationDate), 0, Processed), RuleFired=values(RuleFired)");
 
-        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");        
-                
         Integer accredId = sAccredObj.getAccreditationid();
         if(accredId != null && accredId > 0 && sAccredObj.getProcessed() == 0) {
             logger.warn(accredId +" : ***** flipping processed flag to zero!");
         }
+        */
+        
+        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");        
+
         int updateCount = sbJdbcTemplate.update(sBuilder.toString(),
                 sAccredObj.getStudentid(), 
                 sAccredObj.getAccreditationid(), 
@@ -574,6 +577,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 );
         logger.debug("addStudentAccreditation() added the following # of records = "+updateCount);
     }
+
 /* ******************************************************************************* */
     
     

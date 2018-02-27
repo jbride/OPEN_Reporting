@@ -15,6 +15,7 @@ import com.redhat.gpte.services.GPTEBaseServiceBean;
 import org.apache.camel.Body;
 import org.apache.camel.Exchange;
 import org.apache.camel.Message;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
@@ -222,6 +223,55 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             logger.info("selectStudentAccreditationByStudentId() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
         }
         return sAccreds;
+    }
+
+    public List<Accreditation> filterDuplicateAccreds(Exchange exchange) {
+        List<Accreditation> rulesDeterminedAccreds = (List<Accreditation>)exchange.getIn().getBody();
+        List<Accreditation> existingAccreds = (List<Accreditation>)exchange.getIn().getHeader(ORIGINAL_STUDENT_ACCREDS_HEADER);
+        List<Accreditation> filteredAccreds = null;
+        if(existingAccreds == null || (existingAccreds.size() < 1) ) {
+            filteredAccreds = existingAccreds;
+        } else {
+            filteredAccreds = new ArrayList<Accreditation>();
+            
+            //1) Change existingAccreds List into a Map keyed by Course
+            Map<String, Accreditation> existingAccredMap = new HashMap<String, Accreditation>();
+            for(Accreditation eAccred : existingAccreds) {
+                existingAccredMap.put(eAccred.getCourseId(), eAccred);
+            }
+            String email = null;
+            
+            //2) iterate through new Accreds and determine whether its a duplicate or not
+            for(Accreditation rdAccred : rulesDeterminedAccreds) {
+                if(email == null) 
+                    email = rdAccred.getStudent().getEmail();
+                
+                String courseId = rdAccred.getCourseId();
+                Accreditation oldMatchAccred = existingAccredMap.get(courseId);
+                if(oldMatchAccred == null)
+                    filteredAccreds.add(rdAccred);
+                else {
+                    Date oldAccredDate = oldMatchAccred.getCompletionDate();
+                    Calendar oldAccredCal = Calendar.getInstance();
+                    oldAccredCal.setTime(oldAccredDate);
+                    
+                    Date newAccredDate = rdAccred.getCompletionDate();
+                    Calendar newAccredCal = Calendar.getInstance();
+                    newAccredCal.setTime(newAccredDate);
+                    
+                    if(DateUtils.isSameDay(oldAccredCal, oldAccredCal)) {
+                        logger.debug(email+" : "+ courseId+" : Same day for old and new accreds.  Will filter out");
+                    }else {
+                        logger.info(email +" : "+ courseId+" : More than one day between old and new accreds.  Will not filter out");
+                        filteredAccreds.add(rdAccred);
+                    }
+                }
+            }
+            StringBuilder sBuilder = new StringBuilder().append(email+" : \n\t# pre-filtered sAccreds = "+rulesDeterminedAccreds.size());
+            sBuilder.append("\n\t# post-filtered accreds = "+filteredAccreds.size());
+            logger.info(sBuilder.toString());
+        }
+        return filteredAccreds; 
     }
     
     

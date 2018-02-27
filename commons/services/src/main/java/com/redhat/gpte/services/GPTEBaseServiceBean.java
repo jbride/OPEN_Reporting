@@ -27,6 +27,7 @@ public class GPTEBaseServiceBean {
     private static final String NUMBER_OF_LINES_TO_SKIP = "NUMBER_OF_LINES_TO_SKIP";
     protected static final String STUDENT_COURSES_HEADER = "STUDENT_COURSES";
     protected static final String RULES_FIRED_HEADER = "RULES_FIRED";
+    protected static final String ORIGINAL_STUDENT_ACCREDS_HEADER="ORIGINAL_STUDENT_ACCREDS";
     public static final String LOW_STUDENT_ID = "LOW_STUDENT_ID";
     public static final String HIGH_STUDENT_ID = "HIGH_STUDENT_ID";
     public static final String ACCENTURE="accenture";
@@ -152,6 +153,9 @@ public class GPTEBaseServiceBean {
             List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId, 0); // select unprocessed StudentAccreditations
             sCourses.addAll(accreds);
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
+
+            // https://github.com/redhat-gpe/OPEN_Reporting/issues/283
+            exchange.getIn().setHeader(ORIGINAL_STUDENT_ACCREDS_HEADER, accreds);
 
             //sCourses.get(0).setMostRecentCourseCompletion(true);
             StringBuilder sBuilder = new StringBuilder(studentId+" : Will execute rules on "+sCourses.size()+" CourseCompletion(s).");

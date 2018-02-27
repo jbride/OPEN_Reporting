@@ -53,13 +53,13 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
     public void init() {}
 
 
-    @Ignore
+    //@Ignore
     @Test
     public void testDetermineAccreditationForStudent() throws InterruptedException {
 
         // admin@slamsys.io ; studentId = 10301
         // agomez@criticalperu.com ; student = 10387
-        int studentId = 10387;
+        int studentId = 73173;
         
         //int studentId = 10386; // course completions but no accreditations
         //int studentId = 20387; // bogus student

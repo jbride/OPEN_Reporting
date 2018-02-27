@@ -7,7 +7,7 @@
 alter table Students Add Column ActivationDate DATETIME DEFAULT CURRENT_TIMESTAMP after IpaStatus;
 alter table Students Add Column DeActivationDate DATETIME after ActivationDate
 
-# update StudentCourses set Processed=0 where StudentId=10000
+# update StudentCourses set Processed=0 where StudentId=73173;
 
 # select StudentID from StudentCourses WHERE Processed=0 GROUP BY StudentID
 
