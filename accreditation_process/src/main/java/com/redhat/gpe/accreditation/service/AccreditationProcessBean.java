@@ -226,13 +226,24 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
 
     public List<Accreditation> filterDuplicateAccreds(Exchange exchange) {
-        List<Accreditation> rulesDeterminedAccreds = (List<Accreditation>)exchange.getIn().getBody();
+
+        // List of student accreditations that may have already existed prior to accreditation rules having been executed for this student
         List<Accreditation> existingAccreds = (List<Accreditation>)exchange.getIn().getHeader(ORIGINAL_STUDENT_ACCREDS_HEADER);
-        List<Accreditation> filteredAccreds = null;
+
+        // List of student accreditations that were newly determined by accreditation rules in this transaction
+        List<Accreditation> newAccreds = (List<Accreditation>)exchange.getIn().getBody();
+
+        // List of new accreditations that will not be filtered out.
+        // This list is returned at the conclusion of this function
+        List<Accreditation> unfilteredAccreds = null;
+
         if(existingAccreds == null || (existingAccreds.size() < 1) ) {
-            filteredAccreds = existingAccreds;
+
+            // No previous accreds, will exit this function and return entire list of newly geenerated accreds
+            unfilteredAccreds = existingAccreds;
+
         } else {
-            filteredAccreds = new ArrayList<Accreditation>();
+            unfilteredAccreds = new ArrayList<Accreditation>();
             
             //1) Change existingAccreds List into a Map keyed by Course
             Map<String, Accreditation> existingAccredMap = new HashMap<String, Accreditation>();
@@ -241,37 +252,44 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             }
             String email = null;
             
-            //2) iterate through new Accreds and determine whether its a duplicate or not
-            for(Accreditation rdAccred : rulesDeterminedAccreds) {
+            //2) iterate through new student accreds and determine whether any of them are duplicates of student accreds that are already known to GPTE Reporting
+            for(Accreditation newAccred : newAccreds) {
                 if(email == null) 
-                    email = rdAccred.getStudent().getEmail();
+                    email = newAccred.getStudent().getEmail();
                 
-                String courseId = rdAccred.getCourseId();
+                String courseId = newAccred.getCourseId();
                 Accreditation oldMatchAccred = existingAccredMap.get(courseId);
                 if(oldMatchAccred == null)
-                    filteredAccreds.add(rdAccred);
+
+                    // This is a new accred that does not have an existing match.
+                    // Add to the list that is returned at conclusion of function
+                    unfilteredAccreds.add(newAccred);
+
                 else {
+
+                    //3) Determine dates for both existing and new student accreds for date comparison in the next step
                     Date oldAccredDate = oldMatchAccred.getCompletionDate();
                     Calendar oldAccredCal = Calendar.getInstance();
                     oldAccredCal.setTime(oldAccredDate);
                     
-                    Date newAccredDate = rdAccred.getCompletionDate();
+                    Date newAccredDate = newAccred.getCompletionDate();
                     Calendar newAccredCal = Calendar.getInstance();
                     newAccredCal.setTime(newAccredDate);
-                    
+                   
+                    //4) Date comparison 
                     if(DateUtils.isSameDay(oldAccredCal, oldAccredCal)) {
                         logger.debug(email+" : "+ courseId+" : Same day for old and new accreds.  Will filter out");
                     }else {
-                        logger.info(email +" : "+ courseId+" : More than one day between old and new accreds.  Will not filter out");
-                        filteredAccreds.add(rdAccred);
+                        logger.info(email +" : "+ courseId+" : More than one day difference between old and new accreds.  Will not filter out");
+                        unfilteredAccreds.add(newAccred);
                     }
                 }
             }
-            StringBuilder sBuilder = new StringBuilder().append(email+" : \n\t# pre-filtered sAccreds = "+rulesDeterminedAccreds.size());
-            sBuilder.append("\n\t# post-filtered accreds = "+filteredAccreds.size());
+            StringBuilder sBuilder = new StringBuilder().append(email+" : \n\t# pre-filtered sAccreds = "+newAccreds.size());
+            sBuilder.append("\n\t# post-filtered accreds = "+unfilteredAccreds.size());
             logger.info(sBuilder.toString());
         }
-        return filteredAccreds; 
+        return unfilteredAccreds; 
     }
     
     
