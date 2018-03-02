@@ -216,14 +216,14 @@
             <otherwise><setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader></otherwise>
         </choice>
         <!-- to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/ -->
-        <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="DEBUG"/>
+        <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/> <!-- sets header:  STUDENT_COURSES -->
         <filter>
             <simple>${body.size} > 0</simple>
             <to uri="direct:execute-accreditation_rules-uri" id="execute-accreditation-rules-on-student-courses" />
             <setHeader headerName="RULES_FIRED"><simple>${body}</simple></setHeader> <!-- needed if providing JSON response -->
             <filter>
-                <simple>${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
+                <simple>${header.IDENTIFY_FIRED_RULED_ONLY} == null || ${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
                 <filter>
                     <simple>${body.size} > 0</simple>
                     <to uri="bean:accreditationProcessBean?method=filterDuplicateAccreds" />

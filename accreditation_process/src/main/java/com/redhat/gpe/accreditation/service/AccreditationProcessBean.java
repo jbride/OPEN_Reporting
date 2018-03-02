@@ -240,7 +240,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         if(existingAccreds == null || (existingAccreds.size() < 1) ) {
 
             // No previous accreds, will exit this function and return entire list of newly geenerated accreds
-            unfilteredAccreds = existingAccreds;
+            unfilteredAccreds = newAccreds;
 
         } else {
             unfilteredAccreds = new ArrayList<Accreditation>();
