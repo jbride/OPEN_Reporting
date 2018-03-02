@@ -570,6 +570,15 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/batch
 -----
 
+== SalesForce Integration
+
+=== General Approach
+Restful Integration
+
+=== Catalog Sync
+
+=== Sample Python Code
+
 == SkillsBase Integration
 
 === QA
