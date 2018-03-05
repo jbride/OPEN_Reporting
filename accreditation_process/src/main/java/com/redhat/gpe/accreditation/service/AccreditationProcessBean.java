@@ -82,6 +82,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String SB_STATUS = "status";
     private static final String SB_START_DATE = "start_date";
     private static final String SB_NEVER_CHECK_FOR_EXISTING_ACCRED = "sb_neverCheckForExistingAccred";
+    private static final String SB_STUDENT_REGISTERED="SB_STUDENT_REGISTERED";
+    private static final String SB_STUDENT_NOT_REGISTERED="SB_STUDENT_NOT_REGISTERED";
+    private static final String SB_PUSH_RESULTS_HEADER="SB_PUSH_RESULTS_HEADER";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String EXPIRES_IN = "expires_in";
     private static final SimpleDateFormat sdfObj = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
@@ -277,8 +280,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
                     newAccredCal.setTime(newAccredDate);
                    
                     //4) Date comparison 
-                    if(DateUtils.isSameDay(oldAccredCal, oldAccredCal)) {
-                        logger.debug(email+" : "+ courseId+" : Same day for old and new accreds.  Will filter out");
+                    if(DateUtils.isSameDay(oldAccredCal, newAccredCal)) {
+                        logger.info(email+" : "+ courseId+" : Same day for old and new accreds.  Will filter out");
                     }else {
                         logger.info(email +" : "+ courseId+" : More than one day difference between old and new accreds.  Will not filter out");
                         unfilteredAccreds.add(newAccred);
@@ -320,6 +323,21 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             logger.debug(saObj.getStudent().getEmail()+" : Neither a Red Hat associate nor eligible partner.  Will not update SkillsBase");
             return false;
         }
+    }
+   
+    // When using a ‘.split()’, all subsequent messages will have the same headers from the original message  
+    public void resetSkillsBasePushResultsCache(Exchange exchange) {
+        Map<String, String> skBasePushResults = (Map<String, String>)exchange.getIn().getBody();
+        if(skBasePushResults == null) {
+            logger.info("resetSkillsBasePushResultsCache() creating new map");
+            skBasePushResults = new HashMap<String, String>();
+        } else {
+            logger.info("resetSkillsBasePushResultsCache() re-setting existing map");
+            skBasePushResults.clear();
+        }
+
+        exchange.getIn().setHeader(SB_PUSH_RESULTS_HEADER, skBasePushResults);
+        
     }
     
     public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
