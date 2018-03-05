@@ -706,11 +706,23 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         exchange.getIn().setHeader(SB_PUSH_RESULTS_CACHE, skBasePushResults);
     }
 
+    public void determineStudentInSkillsBaseCache(Exchange exchange) {
+        Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
+        if(skBasePushResults != null) {
+            Accreditation studentAccredObj = exchange.getIn().getBody(Accreditation.class);
+            Student sObj = studentAccredObj.getStudent();
+            Object entry = skBasePushResults.get(sObj.getStudentid());
+            if(entry != null) {
+                exchange.getIn().setHeader(SB_STUDENT_NOT_REGISTERED, SB_STUDENT_NOT_REGISTERED);
+            }
+        }
+    }
+
     public void setStudentNotFoundOnSkillsBaseResultCache(Exchange exchange) {
         Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
-        Accreditation studentAccredObj = exchange.getIn().getBody(Accreditation.class);
-        Student sObj = studentAccredObj.getStudent();
         if(skBasePushResults != null) {
+            Accreditation studentAccredObj = exchange.getIn().getBody(Accreditation.class);
+            Student sObj = studentAccredObj.getStudent();
             logger.info(sObj.getEmail()+" : setStudentNotFoundOnSkillsBaseResultCache() Will not attempt to push any new quals to skillsbase for this student");
             skBasePushResults.put(sObj.getStudentid(), SB_STUDENT_NOT_REGISTERED);
         }

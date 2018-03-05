@@ -493,9 +493,10 @@
                   In this case it will automatically correct itself at the next 15 minute block.
         </description>
         <from uri="direct:push-qual-to-skills-base"/>
+        <to uri="bean:accreditationProcessBean?method=determineStudentInSkillsBaseCache" id="get-person-id"/>
         <choice>
             <when>
-                <simple>( ${header.SB_PUSH_RESULTS_CACHE} == null) || ( ${header.SB_PUSH_RESULTS_CACHE[ ${body.student.studentId ] == null )</simple>
+                <simple>${header.SB_STUDENT_NOT_REGISTERED} == null</simple>
                 <doTry>
                     <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
                     <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
