@@ -694,16 +694,26 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
     // When using a ‘.split()’, all subsequent messages will have the same headers from the original message  
     public void resetSkillsBasePushResultsCache(Exchange exchange) {
-        Map<String, String> skBasePushResults = (Map<String, String>)exchange.getIn().getBody();
+        Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
         if(skBasePushResults == null) {
             logger.info("resetSkillsBasePushResultsCache() creating new map");
-            skBasePushResults = new HashMap<String, String>();
+            skBasePushResults = new HashMap<Integer, String>();
         } else {
             logger.info("resetSkillsBasePushResultsCache() re-setting existing map");
             skBasePushResults.clear();
         }
 
         exchange.getIn().setHeader(SB_PUSH_RESULTS_CACHE, skBasePushResults);
+    }
+
+    public void setStudentNotFoundOnSkillsBaseResultCache(Exchange exchange) {
+        Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
+        Accreditation studentAccredObj = exchange.getIn().getBody(Accreditation.class);
+        Student sObj = studentAccredObj.getStudent();
+        if(skBasePushResults != null) {
+            logger.info(sObj.getEmail()+" : setStudentNotFoundOnSkillsBaseResultCache() Will not attempt to push any new quals to skillsbase for this student");
+            skBasePushResults.put(sObj.getStudentid(), SB_STUDENT_NOT_REGISTERED);
+        }
     }
 
     private void getSkillsBaseToken() throws SkillsBaseCommunicationException{

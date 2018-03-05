@@ -495,44 +495,45 @@
         <from uri="direct:push-qual-to-skills-base"/>
         <choice>
             <when>
-                <simple>( ${header.SB_PUSH_RESULTS_CACHE} == null)</simple>
+                <simple>( ${header.SB_PUSH_RESULTS_CACHE} == null) || ( ${header.SB_PUSH_RESULTS_CACHE[ ${body.student.studentId ] == null )</simple>
                 <doTry>
                     <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
                     <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
                     <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
                     <choice>
-                    <when>
-                        <simple>${body.student.skillsbasePersonId} != null</simple>
-                        <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
-                        <choice>
-                            <when>
-                                <simple>${body.skillsBaseQualExists} == false</simple>
-                                <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
-                                <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                        <when>
+                            <simple>${body.student.skillsbasePersonId} != null</simple>
+                            <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
+                            <choice>
                                 <when>
-                                    <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
-                                    <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
-                                    <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                                    <simple>${body.skillsBaseQualExists} == false</simple>
+                                    <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
+                                    <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                                    <when>
+                                        <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
+                                        <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
+                                        <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                                    </when>
+                                    <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
                                 </when>
-                                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
-                            </when>
-                            <otherwise>
-                                <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
-                            </otherwise>
-                        </choice>
-                    </when>
-                    <otherwise>
-                        <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
-                        <filter>
-                            <constant>{{sb_sendMailToStudentEnabled}}</constant>
-                            <to uri="seda:user-not-found-in-skillsbase"/>
-                        </filter>
-                    </otherwise>
+                                <otherwise>
+                                    <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
+                                </otherwise>
+                            </choice>
+                        </when>
+                        <otherwise>
+                            <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                            <to uri="bean:accreditationProcessBean?method=setStudentNotFoundOnSkillsBaseResultCache" />
+                            <filter>
+                                <constant>{{sb_sendMailToStudentEnabled}}</constant>
+                                <to uri="seda:user-not-found-in-skillsbase"/>
+                            </filter>
+                        </otherwise>
                     </choice>
-                    <doCatch>
-                        <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
-                        <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
-                    </doCatch>
+                  <doCatch>
+                      <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
+                      <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                  </doCatch>
                 </doTry>
             </when>
             <otherwise>
