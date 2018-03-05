@@ -84,7 +84,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String SB_NEVER_CHECK_FOR_EXISTING_ACCRED = "sb_neverCheckForExistingAccred";
     private static final String SB_STUDENT_REGISTERED="SB_STUDENT_REGISTERED";
     private static final String SB_STUDENT_NOT_REGISTERED="SB_STUDENT_NOT_REGISTERED";
-    private static final String SB_PUSH_RESULTS_HEADER="SB_PUSH_RESULTS_HEADER";
+    private static final String SB_PUSH_RESULTS_CACHE="SB_PUSH_RESULTS_CACHE";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String EXPIRES_IN = "expires_in";
     private static final SimpleDateFormat sdfObj = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
@@ -325,21 +325,6 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
     }
    
-    // When using a ‘.split()’, all subsequent messages will have the same headers from the original message  
-    public void resetSkillsBasePushResultsCache(Exchange exchange) {
-        Map<String, String> skBasePushResults = (Map<String, String>)exchange.getIn().getBody();
-        if(skBasePushResults == null) {
-            logger.info("resetSkillsBasePushResultsCache() creating new map");
-            skBasePushResults = new HashMap<String, String>();
-        } else {
-            logger.info("resetSkillsBasePushResultsCache() re-setting existing map");
-            skBasePushResults.clear();
-        }
-
-        exchange.getIn().setHeader(SB_PUSH_RESULTS_HEADER, skBasePushResults);
-        
-    }
-    
     public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
         accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
     }
@@ -706,6 +691,20 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 
 /*  *************               SkillsBase Integration              ******************  */
+
+    // When using a ‘.split()’, all subsequent messages will have the same headers from the original message  
+    public void resetSkillsBasePushResultsCache(Exchange exchange) {
+        Map<String, String> skBasePushResults = (Map<String, String>)exchange.getIn().getBody();
+        if(skBasePushResults == null) {
+            logger.info("resetSkillsBasePushResultsCache() creating new map");
+            skBasePushResults = new HashMap<String, String>();
+        } else {
+            logger.info("resetSkillsBasePushResultsCache() re-setting existing map");
+            skBasePushResults.clear();
+        }
+
+        exchange.getIn().setHeader(SB_PUSH_RESULTS_CACHE, skBasePushResults);
+    }
 
     private void getSkillsBaseToken() throws SkillsBaseCommunicationException{
         

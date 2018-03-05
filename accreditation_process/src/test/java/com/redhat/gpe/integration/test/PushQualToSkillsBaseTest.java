@@ -81,7 +81,7 @@ public class PushQualToSkillsBaseTest extends CamelSpringTestSupport {
         template.send(pushQualsToSkillsBaseBatchURI, exchange);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void testPushQualToSkillsBaseGivenKnownRHTStudent() throws InterruptedException {
 

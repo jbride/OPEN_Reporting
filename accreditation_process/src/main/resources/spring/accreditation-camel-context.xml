@@ -440,6 +440,7 @@
         <from uri="{{accred_process-push-qualification-to-skillsbase-batch}}"/>
         <log message="####################      Starting .... push-qualifications-to-skillsbase-batch" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
+        <to uri="bean:accreditationProcessBean?method=resetSkillsBasePushResultsCache" />
         <split id="loop-for-each-student">
             <simple>${body}</simple>
             <filter>
@@ -492,46 +493,52 @@
                   In this case it will automatically correct itself at the next 15 minute block.
         </description>
         <from uri="direct:push-qual-to-skills-base"/>
-        <!-- to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
-        <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/ -->
-        <doTry>
-            <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
-            <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
-            <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
-            <choice>
+        <choice>
             <when>
-                <simple>${body.student.skillsbasePersonId} != null</simple>
-                <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
-                <choice>
+                <simple>( ${header.SB_PUSH_RESULTS_CACHE} == null)</simple>
+                <doTry>
+                    <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
+                    <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
+                    <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
+                    <choice>
                     <when>
-                        <simple>${body.skillsBaseQualExists} == false</simple>
-                        <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
-                        <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
-                        <when>
-                            <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
-                            <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
-                            <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
-                        </when>
-                        <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+                        <simple>${body.student.skillsbasePersonId} != null</simple>
+                        <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
+                        <choice>
+                            <when>
+                                <simple>${body.skillsBaseQualExists} == false</simple>
+                                <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
+                                <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                                <when>
+                                    <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
+                                    <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
+                                    <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                                </when>
+                                <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+                            </when>
+                            <otherwise>
+                                <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
+                            </otherwise>
+                        </choice>
                     </when>
                     <otherwise>
-                        <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
+                        <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                        <filter>
+                            <constant>{{sb_sendMailToStudentEnabled}}</constant>
+                            <to uri="seda:user-not-found-in-skillsbase"/>
+                        </filter>
                     </otherwise>
-                </choice>
+                    </choice>
+                    <doCatch>
+                        <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
+                        <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                    </doCatch>
+                </doTry>
             </when>
             <otherwise>
-                <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
-                <filter>
-                    <constant>{{sb_sendMailToStudentEnabled}}</constant>
-                    <to uri="seda:user-not-found-in-skillsbase"/>
-                </filter>
+                <log message="${body.student.email} : Already attempted to post a qual to skillsbase for this student.  Will not re-attempt with qual: ${body.accreditation.accreditationname}" loggingLevel="WARN"/>
             </otherwise>
-            </choice>
-            <doCatch>
-                <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
-                <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
-            </doCatch>
-        </doTry>
+        </choice>
     </route>
 
     <route id="user-not-found-in-skillsbase">
