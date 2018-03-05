@@ -217,7 +217,7 @@
         </choice>
         <!-- to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/ -->
         <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="INFO"/>
-        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/> <!-- sets header:  STUDENT_COURSES -->
+        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesAndAccredsByStudent"/> <!-- sets header:  STUDENT_COURSES -->
         <filter>
             <simple>${body.size} > 0</simple>
             <to uri="direct:execute-accreditation_rules-uri" id="execute-accreditation-rules-on-student-courses" />

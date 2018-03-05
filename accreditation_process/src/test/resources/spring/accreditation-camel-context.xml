@@ -1,1 +1,616 @@
-../../../main/resources/spring/accreditation-camel-context.xml
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+       xmlns:kie="http://drools.org/schema/kie-spring"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+           http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+           http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+           http://drools.org/schema/kie-spring http://drools.org/schema/kie-spring.xsd
+         "> 
+
+  <!-- Defines transactionalDS bean along with any other environment specific needs -->
+  <!-- import resource="classpath:spring/environment-specific-camel-context.xml" / -->
+
+   <!-- Allows Spring to leverage java system properties -->
+  <context:property-placeholder />
+
+  <!-- In JBoss EAP, use existing transactionalDS datasource available via JNDI/IronJacamar.
+              In test harness, define the transactionalDS datasource directly here in XML DSL.
+       Note the use of Spring style variable substition variables.
+  -->
+  <bean id="transactionalDS" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close" >
+    <property name="driverClassName" value="${lms_transactional_driverClassName}" />
+    <property name="url" value="${lms_transactional_url}" />
+    <property name="username" value="${lms_transactional_username}" />
+    <property name="password" value="${lms_transactional_password}" />
+    <property name="initialSize" value="${lms_transactional_initialSize}" />
+    <property name="maxActive" value="${lms_transactional_maxActive}" />
+    <property name="maxWait" value="${lms_transactional_maxWait}" />
+    <property name="validationQuery" value="${lms_transactional_validationQuery}" />
+  </bean>
+
+
+  <!-- Spring configuration based on annotations: required for Spring Autowiring -->
+  <context:annotation-config />
+
+  <bean id="kiePostProcessor" class="org.kie.spring.KModuleBeanFactoryPostProcessor"/>
+  <bean id="droolsHelper" class="com.redhat.gpte.util.DroolsCommandHelper"/>
+
+  <bean id="sbJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="transactionalDS" />
+  </bean>
+
+  <bean id="canonicalDAO" class="com.redhat.gpe.dao.DomainDAOImpl" />
+
+  <bean id="accreditationProcessBean"       class="com.redhat.gpe.accreditation.service.AccreditationProcessBean" />
+  <bean id="emailServiceBean"               class="com.redhat.gpte.services.EmailServiceBean" />
+
+  <kie:kmodule id="accreditation">
+      <kie:kbase name="rules" packages="rules">
+          <kie:ksession name="gpteAccreditationSession" type="stateful">
+              <!--kie:consoleLogger/ -->
+              <kie:batch>
+                    <kie:set-global identifier="accreditationList">
+                        <bean class="java.util.ArrayList"/>
+                    </kie:set-global>
+              </kie:batch>
+          </kie:ksession>
+      </kie:kbase>
+  </kie:kmodule>
+
+  <bean id="reportOnCoursesAggregatorStrategy" class="com.redhat.gpe.accreditation.service.ReportOnCoursesResultsAggregator" />
+
+  <camelContext trace="false" id="accreditation-process" xmlns="http://camel.apache.org/schema/spring">
+    <dataFormats>
+        <bindy type="Csv" classType="com.redhat.gpe.accreditation.util.SpreadsheetRule" id="bindyRules"/>
+    </dataFormats>
+    
+    <onException>
+        <exception>com.sun.mail.util.MailConnectException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
+    <onException>
+        <exception>com.sun.mail.smtp.SMTPSendFailedException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
+    <onException>
+        <exception>javax.mail.MessagingException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>
+    <onException>
+        <exception>java.lang.IllegalArgumentException</exception>
+        <log message="Exception encountered : ${exception.message}" loggingLevel="ERROR"/>
+    </onException>  
+    <onException>
+        <exception>java.lang.NullPointerException</exception>
+
+        <handled><constant>true</constant></handled>
+
+        <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
+        <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+    </onException>
+
+
+    <restConfiguration component="jetty" host="0.0.0.0" port="9090" bindingMode="off" />
+    <rest path="/gpte-accreditation/students/">
+        <put uri="batch" produces="application/json" >
+            <to uri="direct:determine-accreds-for-range"/>
+        </put>
+        <put uri="{STUDENT_ID}" produces="application/json" >
+            <to uri="direct:determine-accred-for-student" />
+        </put>
+    </rest>
+    <rest path="/gpte-accreditation/skillsbase/students/">
+        <put uri="{STUDENT_ID}" produces="application/json" >
+            <route>
+                <setBody><simple>${headers.STUDENT_ID}</simple></setBody>
+                <to uri="direct:push-qual-to-skills-base-single-student" />
+            </route>
+        </put>
+    </rest>
+
+    <route id="dumpKieBase">
+        <from uri="timer://start?repeatCount=1" />
+        <bean method="dumpKieBase" ref="droolsHelper"/>
+    </route>
+
+
+    <!--    *************************************************************************************************   -->
+    <!--    *************                        ACCREDITATION LOGIC                            *************   -->
+    <route id="determine-accreditations-for-all">
+        <description> 
+            1) Periodically checks for *ALL* StudentCourses that have yet to be evaluated by the rules engine
+            2) Gets List of StudentCourse objects from database for *ALL* students with unevaluated student courses
+            3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
+            4) Persists student accreditations to database
+            5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
+        </description> 
+        <from uri="{{accred_determine-accreditations-for-all-uri}}"/>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@      Starting .... determine-accreditations for all" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=isAccredLogicLocked"/>
+        <choice>
+            <when>
+                <simple>${body} != true</simple>
+                <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
+                <to uri="direct:determine-accreditations-iterate-studentIds" id="determine-accreditations-iterate-studentIds1" />
+            </when>
+            <otherwise><log message="@@@@@@@@@@@@@@   ACCREDITATION PROCESSING LOGIC IS CURRENTLY LOCKED    @@@@@@@@@@@@@@" /></otherwise>
+        </choice>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreditations" />
+    </route>
+
+    <route id="determine-accreditations-for-range">
+        <description> 
+            1) Given a range of studentIds, checks for StudentCourses that have yet to be evaluated by the rules engine
+               Expects the following headers :
+                   LOW_STUDENT_ID   : int
+                   HIGH_STUDENT_ID  : int
+            2) Gets List of StudentCourse objects from database for students (within the range of studentIds) with unevaluated student courses
+            3) Triggers rule engine to determine potential accreditations for each student given List of StudentCourse objects
+            4) Persists student accreditations to database
+            5) Given a StudentID, updates all associated StudentCourse objects such that: processed=StudentCourse.PROCESSED
+
+            NOTE:  It's possible that mulitple clients could be invoking this route at the same time.
+                   This route is synchronized to ensure that at any given time, only on thread executes through this route.
+
+        </description> 
+        <from uri="direct:determine-accreds-for-range"/>
+        <log message="@@@@@@@@@@@@@@@       Starting determine-accreditations range: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=isAccredLogicLocked"/>
+        <choice>
+            <when>
+                <simple>${body} != true</simple>
+                <to uri="bean:accreditationProcessBean?method=selectStudentIdsWithUnProcessedStudentCourses"/>
+                <to uri="direct:determine-accreditations-iterate-studentIds" id="determine-accreditations-iterate-studentIds2" />
+                <otherwise><log message="@@@@@@@@@@@@@@   ACCREDITATION PROCESSING LOGIC IS CURRENTLY LOCKED    @@@@@@@@@@@@@@" /></otherwise>
+            </when>
+        </choice>
+        <log message="@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@     Done:    determine-accreds-for-range:  ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" />
+    </route>
+
+    <route id="determine-accreditations-iterate-studentIds">
+        <description> 
+            - Iterates through list of studentIds
+            - For each studentId, invokes route to identify accreditations
+            - Only allows one client to invoke this route at a time.  If not able to obtain accredLogicLock, then immediately kicked out.
+        </description> 
+        <from uri="direct:determine-accreditations-iterate-studentIds"/>
+        <log message="determine-accreditations-iterate-studentIds: ${header.LOW_STUDENT_ID} ${header.HIGH_STUDENT_ID}" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=acquireAccredLogicLock"/>
+        <choice>
+            <when>
+                <simple>${header.gainedAccredLock} == true</simple>
+                <split id="loop-for-each-student_with-unprocessed-student-courses">
+                    <simple>${body}</simple>
+                    <to uri="direct:determine-accred-for-student" id="determine-accred-for-student" />
+                </split>
+                <to uri="bean:accreditationProcessBean?method=releaseAccredLogicLock"/>
+            </when>
+        </choice>
+        <log message="Done:    determine-accreditations-iterate-studentIds" />
+    </route>
+
+    <route id="determine-accreditations-for-student">
+        <description> 
+            1) Given: Integer studentId , retrieves all StudentCourse objects for that student
+            2) If List of StudentCourse objects is > 0, then executes accreditation logic
+            3) If accreditation logic returns a non-empty List of Accreditation objects, then this route executes the following:
+              3.a) persists the Accreditation object
+              3.b) sets the processed flag on all StudentCourse objects associated with that student
+            4) if header contains RESPOND_JSON == true, then returns json of results
+            5) optional headers:
+                a) IDENTIFY_FIRED_RULES_ONLY    :   true/false  :   if set to true, will only fire the rules without persisting any resultant accreditations
+                b) RESPOND_JSON                 :   true/false  :   if set to true, provides a json response of course completions for this student and rules fired
+        </description> 
+        <from uri="direct:determine-accred-for-student"/>
+        <choice>
+            <!-- Ensure that value of STUDENT_ID is set both in header and body.
+                 Header is later in this route -->
+            <when><simple>${header.STUDENT_ID} != null</simple>
+                <setBody><simple>${header.STUDENT_ID}</simple></setBody>
+            </when>
+            <otherwise><setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader></otherwise>
+        </choice>
+        <!-- to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/ -->
+        <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesAndAccredsByStudent"/> <!-- sets header:  STUDENT_COURSES -->
+        <filter>
+            <simple>${body.size} > 0</simple>
+            <to uri="direct:execute-accreditation_rules-uri" id="execute-accreditation-rules-on-student-courses" />
+            <setHeader headerName="RULES_FIRED"><simple>${body}</simple></setHeader> <!-- needed if providing JSON response -->
+            <filter>
+                <simple>${header.IDENTIFY_FIRED_RULED_ONLY} == null || ${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
+                <filter>
+                    <simple>${body.size} > 0</simple>
+                    <to uri="bean:accreditationProcessBean?method=filterDuplicateAccreds" />
+                    <split id="loop-for-each-accreditation">
+                        <simple>${body}</simple>
+                        <to uri="bean:accreditationProcessBean?method=setAccreditationIdOnAccreditationObj" />
+                        <to uri="direct:persist-student-accreditations" id="persist-student-accreds" />
+                    </split>
+                </filter>
+                <setBody><simple>${header.STUDENT_ID}</simple></setBody>
+                <to uri="direct:set-processed-on-student-course-by-student" id="call-set-processed-on-student-course-by-student" />
+            </filter>
+        </filter>
+        <filter>
+            <simple>${header.RESPOND_JSON} == true</simple>
+            <to uri="bean:accreditationProcessBean?method=setStudentAccreditationsJSONResponse" />
+            <to uri="bean:accreditationProcessBean?method=clearHeaders" />
+        </filter>
+    </route>
+
+    <route id="set-accredId-on-accredObj" >
+        <from uri="direct:set-accredId-on-accredObj"/>
+        <to uri="bean:accreditationProcessBean?method=setAccreditationIdOnAccreditationObj" />
+    </route>
+
+    <route id="execute-accreditation-rules" >
+        <description>
+            Pupose:
+                Execution of accreditation rules given a list of CourseCompletion objects for a particular student
+            NOTE: valid 'action' values for the ksession are:
+              1) 'execute'          takes a 'Command' object (default)
+              2) 'insertBody'       inserts the Exchange.in.body, and executes rules
+              3) 'insertMessage'    inserts the Exchange.in (type org.apache.camel.Message), and executes rules
+              4) 'insertExchange'   inserts the Exchange (type org.apache.camel.Exchange), and executes rules
+        </description>
+        <from uri="direct:execute-accreditation_rules-uri"/>
+        <bean method="insertAndFireAll" ref="droolsHelper"/>
+        <to uri="kie:gpteAccreditationSession?action=execute" />
+        <bean method="flushKieSession" ref="droolsHelper"/>
+    </route>
+
+    <route id="set-processed-on-student-course-by-student" >
+        <description> 
+            Expects the following payload:  Integer studentId
+            Responsible for updating processed field on StudentCourse objects associated with a student 
+        </description>
+        <from uri="direct:set-processed-on-student-course-by-student"/>
+        <to uri="bean:accreditationProcessBean?method=setProcessedOnStudentCourseByStudent" id="set-processed-on-student-courses"/>
+    </route>
+
+    <route id="persist-accreditation">
+        <description>
+            Expects the following payload:  List of StudentAccreditation objects
+            Responsible for insertion or updating of new StudentAccreditation record into database
+        </description>
+        <from uri="direct:persist-student-accreditations"/>
+        <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="add-student-accreditation-to-db" />
+    </route>
+
+    <route id="check-expired-accreditations">
+        <description>
+            Changes the value of StudentAccreditations.AccreditationType to Expired on all records whose AccreditationDate > 2 years from date this route is executed
+        </description>
+        <from uri="{{accred_check_expired_accreds_uri}}"/>
+        <log message="#########     Check Expirsed Accreds:  Start" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=changeStatusOnExpiredStudentAccreditations" id="changeStatusOnExpiredStudentAccreds" />
+        <log message="#########     Check Expirsed Accreds:  Finish: # of accreds expired = ${body}" loggingLevel="INFO"/>
+    </route>
+
+    <!--    *************************************************************************************************   -->
+
+
+    <!--    *************************************************************************************************   -->
+    <!--    *************       RULES SPREADSHEET VALIDATION AND TRANSFORMATION TO DRL         *************   -->
+
+    <route id="receive-new-accreditation-spreadsheet">
+        <description>
+            1)  Executes validation logic on tsv rules accreditation spreadsheet
+            2)  Kicks back data files that do not pass validation logic and sends notification email of problem
+            3)  Generates DRL from spreadsheet
+        </description>
+        <from uri="{{accred_receive_tsv_rules_spreadsheet_uri}}" />
+        <log message="Received rules spreadsheet.  name= ${header.CamelFileName} : from= ${header.Return-Path}, subject= ${header.subject}" id="log_rules_spreadsheet_receive"/>
+        <split id="for-each-spreadsheet-attachment">
+            <simple>${body}</simple>
+            <to uri="direct:validate-rules-spreadsheet" />
+            <to uri="bean:accreditationProcessBean?method=changeSuffixOfRuleFileName"/>
+            <to uri="direct:create-drl-from-rules-spreadsheet" />
+            <setBody><constant>Rules Accreditation Process:  Rule spreadsheet received and validated</constant></setBody>
+            <to uri="seda:send-email"/>
+        </split>
+    </route>
+
+    <route id="validate-rules-spreadsheet">
+        <description>
+            1) Accepts a single spreadsheet of rules (as one large String)
+            2) Removes appropriate headers, unmarshalls the String to List of SpreadsheetRule objects and executes validation logic
+            3) If validation logic fails for any row in the spreadsheet, an exception is set on the Exchange
+            4) If validation logic passes, Outbound message body consists of List of SpreadsheetRule objects
+        </description>
+        <from uri="direct:validate-rules-spreadsheet"/>
+        <setHeader headerName="NUMBER_OF_LINES_TO_SKIP"><constant>3</constant></setHeader>
+        <to uri="bean:accreditationProcessBean?method=removeHeaderLinesFromSpreadsheet"/>
+        <unmarshal ref="bindyRules"/>
+        <to uri="bean:accreditationProcessBean?method=validateSpreadsheetRules"/>
+    </route>
+
+    <route id="create-drl-from-rules-spreadsheet">
+        <description>
+            1)  Accepts pre-validated List of SpreadsheetRule objects
+            2)  Iterates through List of SpreadsheetRule objects and create a corresponding DRL rule
+            3)  All DRL rules are appended to the same DRL file
+            4)  Once done iterating through List of SpreadsheetRule objects, writes DRL file to value of accred_drl_rules_path system property
+        </description>
+        <from uri="direct:create-drl-from-rules-spreadsheet"/>
+        <log message="create-drl-from-rules-spreadsheet:  will create the following # of rules: ${body.size} ." />
+        <log message="create-drl-from-rules-spreadsheet:  DRL path= {{accred_drl_rules_path}}   : file name= ${header.CamelFileName}" />
+        <to uri="seda:write-drl-header" />
+        <delay><constant>1000</constant></delay>
+        <split id="split-by-rules">
+            <simple>${body}</simple>
+            <to uri="bean:accreditationProcessBean?method=setHeadersForGeneratingDRL"/>
+            <choice>
+                <when><simple>${header.course2} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-1courses.vm"/>
+                </when>
+                <when><simple>${header.course3} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-2courses.vm"/>
+                </when>
+                <when><simple>${header.course4} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-3courses.vm"/>
+                </when>
+                <when><simple>${header.course5} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-4courses.vm"/>
+                </when>
+                <when><simple>${header.course6} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-5courses.vm"/>
+                </when>
+                <when><simple>${header.course7} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-6courses.vm"/>
+                </when>
+                <when><simple>${header.course8} == null</simple>
+                    <to uri="velocity:rulesTemplates/rule-template-7courses.vm"/>
+                </when>
+                <otherwise><to uri="velocity:rulesTemplates/rule-template-8courses.vm"/></otherwise>
+            </choice>
+            <choice>
+                <when><simple>${header.accredCondition} != null</simple>
+                    <to uri="bean:accreditationProcessBean?method=weaveAccredConditionIntoRule"/>
+                </when>
+            </choice>
+            <to uri="file:{{accred_drl_rules_path}}?fileName=${header.CamelFileName}&amp;fileExist=Append"/>
+        </split>
+        <log message="create-drl-from-rules-spreadsheet:   Completed DRL generation to: {{accred_drl_rules_path}} ${header.CamelFileName}" />
+    </route>
+
+    <route id="write-drl-header">
+        <description>
+            Body of out message is over-written by velocity component.
+            Calling route still needs it original message body. 
+            Subsequently, using SEDA component so that this route operates on its own thread.
+        </description>
+        <from uri="seda:write-drl-header" />
+        <to uri="velocity:rulesTemplates/base-rule-template.vm"/>
+        <to uri="file:{{accred_drl_rules_path}}?fileName=${header.CamelFileName}&amp;fileExist=Override"/>
+    </route>
+    <!--    *************************************************************************************************   -->
+
+
+
+
+    <!--    *************************************************************************************************   -->
+    <!--    *************                     Canonical Courses Report                          *************   -->
+
+    <route id="report-on-courses">
+        <description>
+            Provide a report of accreditation logic rules associated with Canonical Courses.
+            Should highlight orphan courses (those courses where no accreditation rule references the course) 
+        </description>
+        <from uri="{{accred_report_on_courses_uri}}" />
+        <setHeader headerName="NUMBER_OF_LINES_TO_SKIP"><constant>3</constant></setHeader>
+        <to uri="bean:accreditationProcessBean?method=removeHeaderLinesFromSpreadsheet"/>
+        <unmarshal ref="bindyRules"/>
+        <log message="SpreadsheetRule:  ${header.CamelFileName}" loggingLevel="INFO"/>
+        <to uri="direct:report-on-courses-aggregate"/>
+    </route>
+
+    <route id="report-on-courses-aggregate">
+        <from uri="direct:report-on-courses-aggregate"/>
+        <aggregate strategyRef="reportOnCoursesAggregatorStrategy" completionTimeout="3000" >
+            <correlationExpression>
+                <simple>true</simple>
+            </correlationExpression>
+            <log message="Report On Courses Aggregate:  Done" loggingLevel="INFO"/>
+            <to uri="bean:accreditationProcessBean?method=reportOnCanonicalCourses"/>
+            <to uri="seda:send-email"/>
+        </aggregate>
+    </route>
+
+    <!--    *************************************************************************************************   -->
+
+
+
+
+    <!--    *************************************************************************************************   -->
+    <!--    *************                       SkillsBase                                      *************   -->
+
+    <route id="push-qualifications-to-skills-base-batch">
+        <description>
+            1)  Periodically checks for student accreditations that have not been processed
+            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SkillsBase with that student accreditation information
+            3)  To-Do: aggregate results and send report
+        </description>
+        <from uri="{{accred_process-push-qualification-to-skillsbase-batch}}"/>
+        <log message="####################      Starting .... push-qualifications-to-skillsbase-batch" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
+        <split id="loop-for-each-student">
+            <simple>${body}</simple>
+            <filter>
+                <method ref="accreditationProcessBean" method="shouldStudentAccreditationBePushedToSkillsBase"></method>
+                <choice> 
+                    <when>
+                        <simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
+                        <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
+                        <to uri="direct:push-qual-to-skills-base" id="invoke-push-qual-to-skills-base" />
+                    </when>
+                </choice> 
+            </filter>
+        </split>
+        <log message="####################      done" loggingLevel="INFO"/>
+    </route>
+
+    <route id="push-qualifications-to-skills-base-single-student">
+        <description>
+            1)  Periodically checks for student accreditations that have not been processed
+            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SkillsBase with that student accreditation information
+            3)  To-Do: aggregate results and send report
+        </description>
+        <from uri="direct:push-qual-to-skills-base-single-student"/>
+        <log message="${body} ####################    push-qualifications-to-skills-base-single-student" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentAccreditationByStudentId"/>
+        <split>
+            <simple>${body}</simple>
+            <filter>
+                <method ref="accreditationProcessBean" method="shouldStudentAccreditationBePushedToSkillsBase"></method>
+                <choice> 
+                    <when>
+                        <simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
+                        <log message="${body.student.email} : Will update SkillsBase; Accreditation = ${body.accreditation.accreditationname}"/>
+                        <to uri="direct:push-qual-to-skills-base" />
+                    </when>
+                </choice> 
+            </filter>
+        </split>
+        <log message="####################      done" loggingLevel="INFO"/>
+    </route>
+
+
+    <route id="push-qual-to-skills-base">
+        <description>
+            1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
+            2) Responsible for updating SkillsBase web service with StudentAccreditation
+            3) Emails Student to encourage them to create a SkillsBase account if student has not already done so
+
+            NOTE: If the SkillsBase API is responding with “HTTP/1.1 403 Unauthorized” and a message stating "API rate limit exceeded" then you may have exceeded the rate limit of 100 requests for the 15 minute interval.  
+                  In this case it will automatically correct itself at the next 15 minute block.
+        </description>
+        <from uri="direct:push-qual-to-skills-base"/>
+        <!-- to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
+        <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/ -->
+        <doTry>
+            <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
+            <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
+            <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
+            <choice>
+            <when>
+                <simple>${body.student.skillsbasePersonId} != null</simple>
+                <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
+                <choice>
+                    <when>
+                        <simple>${body.skillsBaseQualExists} == false</simple>
+                        <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
+                        <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                        <when>
+                            <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
+                            <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
+                            <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                        </when>
+                        <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+                    </when>
+                    <otherwise>
+                        <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
+                    </otherwise>
+                </choice>
+            </when>
+            <otherwise>
+                <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                <filter>
+                    <constant>{{sb_sendMailToStudentEnabled}}</constant>
+                    <to uri="seda:user-not-found-in-skillsbase"/>
+                </filter>
+            </otherwise>
+            </choice>
+            <doCatch>
+                <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
+                <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+            </doCatch>
+        </doTry>
+    </route>
+
+    <route id="user-not-found-in-skillsbase">
+        <from uri="seda:user-not-found-in-skillsbase"/>
+        <setHeader headerName="accreditationName">
+            <simple>${body.name}</simple>
+        </setHeader>
+        <setBody><simple>${body.student}</simple></setBody>
+        <choice id="have-we-emailed-before">
+            <when>
+                <method ref="accreditationProcessBean" method="hasThisUserBeenEmailedBefore"></method>
+                <log message="${body.email} : Not emailing the student. We've already emailed them before." loggingLevel="INFO"/>
+            </when>
+            <otherwise>
+                <log message="${body.email} : Need to email student to sign into skillsbase." loggingLevel="INFO"/>
+                <setHeader headerName="firstName">
+                    <simple>${body.firstname}</simple>
+                </setHeader>
+                <setHeader headerName="Subject">
+                    <constant>ACTION REQUIRED: Please log into Skills Base!</constant>
+                </setHeader>
+                <setHeader headerName="From">
+                    <constant>GPTE Accreditation Processing &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
+                </setHeader>
+                <setHeader headerName="to">
+                    <simple>${body.email}</simple>
+                </setHeader>
+
+                <!-- update database before use of velocity component (becaue velocity changes payload to a string -->
+                <to uri="bean:accreditationProcessBean?method=updateUserStatusForEmailedAlready"/>
+
+                <to uri="velocity:emailTemplates/email-student-create-sb-account.vm"/>
+                <to uri="smtp://{{gpte_smtp_server}}:{{gpte_smtp_port}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_skillsbase_notification_to_student"/>
+                <log message="${header.to} : Sent email to: ${header.to}"/>
+            </otherwise>
+        </choice>
+    </route>
+    <!--    *************************************************************************************************   -->
+
+
+    <route id="send-email">
+        <from uri="seda:send-email"/>
+        <to uri="bean:emailServiceBean?method=setHeaderToWithProperEmails"/>
+        <to uri="bean:emailServiceBean?method=clearAttachments"/>
+        <setHeader headerName="From">
+            <constant>GPTE Accreditation Processing &lt;{{user.name}}.noreply@{{jboss.host.name}}.com&gt;</constant>
+        </setHeader>
+        <choice id="if-exception-exists">
+            <when>
+                <simple>${exception.message} != null</simple>
+                <setHeader headerName="Subject">
+                    <constant>GPTE Accreditation Processing ({{jboss.host.name}}): Problem processing data</constant>
+                </setHeader>
+
+                <!-- Appears that exception.message is not passed to velocity template -->
+                <setBody><simple>${exception.message}</simple></setBody>
+
+                <to uri="velocity:emailTemplates/problem-reply-email.vm"/>
+            </when>
+            <otherwise>
+                <setHeader headerName="Subject">
+                    <constant>GPTE Accreditation Processing ({{jboss.host.name}}): Success</constant>
+                </setHeader>
+                <to uri="velocity:emailTemplates/auto-reply-email.vm"/>
+            </otherwise>
+        </choice>
+        <filter>
+            <constant>{{gpte_enable_all_emails}}</constant>
+            <to uri="smtp://{{gpte_smtp_server}}?username={{gpte_email_username}}&amp;password={{gpte_email_password}}" id="send_email"/>
+            <log message="Sent reply email to: ${header.to}"/>
+        </filter>
+        <onException>
+            <exception>com.sun.mail.util.MailConnectException</exception>
+            <handled><constant>true</constant></handled>
+            <log message="Exception encountered: ${exception.message}" loggingLevel="ERROR"/>
+            <log message="${exception.stacktrace}" loggingLevel="ERROR"/>
+        </onException>
+    </route>
+
+
+  </camelContext>
+</beans>

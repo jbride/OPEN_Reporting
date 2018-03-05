@@ -424,7 +424,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("AND sc.StudentID="+studentId);
         sBuilder.append(" AND sc.AssessmentResult=\""+StudentCourse.ResultTypes.Pass+"\" ");
         sBuilder.append("ORDER By sc.AssessmentDate DESC");
-        logger.debug("selectStudentCoursesByStudent() query = " + sBuilder.toString());
+        logger.debug("selectStudentCoursesAndAccredsByStudent() query = " + sBuilder.toString());
         List<CourseCompletion> sCourses = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentCourseRowMapper());
         
         // https://github.com/redhat-gpe/OPEN_Reporting/issues/48
@@ -520,7 +520,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
         return sAccreds;
     }
-    
+   
     public List<Accreditation> selectStudentAccreditationByStudentId(int studentId, int processed) {
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("SELECT "+Student.SELECT_CLAUSE+","+AccreditationDefinition.SELECT_CLAUSE+","+StudentAccreditation.SELECT_CLAUSE+","+Course.SELECT_CLAUSE+" "); 
@@ -528,8 +528,10 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         sBuilder.append("WHERE sa.StudentID = s.StudentID ");
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
         sBuilder.append("AND sa.CourseID = c.CourseID ");
-        sBuilder.append("AND sa.Processed = ");
-        sBuilder.append(processed);
+        if(processed >= 0) {
+            sBuilder.append("AND sa.Processed = ");
+            sBuilder.append(processed);
+        }
         sBuilder.append(" AND s.StudentID="+studentId);
         
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
