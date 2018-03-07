@@ -600,7 +600,7 @@
             1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
             2) Responsible for updating SalesForce with StudentAccreditation
         </description>
-        <from uri="direct:push-qual-to-skills-base"/>
+        <from uri="direct:push-accred-to-sfdc"/>
         <log message="${body.student.email} : Pushing the following accred to SFDC: ${body.accreditation.accreditationname}" loggingLevel="WARN"/>
     </route>
     <!--    *************************************************************************************************************   -->
