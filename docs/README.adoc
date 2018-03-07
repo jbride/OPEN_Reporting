@@ -572,6 +572,8 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 
 == SalesForce Integration
 
+https://docs.google.com/document/d/1vk_oKIzdrhiuTNCbjLgM7IoLohjw8Z2Z3d1FWPDUNsM/edit
+
 === General Approach
 Restful Integration
 
