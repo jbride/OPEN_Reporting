@@ -82,6 +82,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private static final String SB_STATUS = "status";
     private static final String SB_START_DATE = "start_date";
     private static final String SB_NEVER_CHECK_FOR_EXISTING_ACCRED = "sb_neverCheckForExistingAccred";
+    private static final String SB_STUDENT_REGISTERED="SB_STUDENT_REGISTERED";
+    private static final String SB_STUDENT_NOT_REGISTERED="SB_STUDENT_NOT_REGISTERED";
+    private static final String SB_PUSH_RESULTS_CACHE="SB_PUSH_RESULTS_CACHE";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String EXPIRES_IN = "expires_in";
     private static final SimpleDateFormat sdfObj = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
@@ -240,7 +243,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         if(existingAccreds == null || (existingAccreds.size() < 1) ) {
 
             // No previous accreds, will exit this function and return entire list of newly geenerated accreds
-            unfilteredAccreds = existingAccreds;
+            unfilteredAccreds = newAccreds;
 
         } else {
             unfilteredAccreds = new ArrayList<Accreditation>();
@@ -277,8 +280,8 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
                     newAccredCal.setTime(newAccredDate);
                    
                     //4) Date comparison 
-                    if(DateUtils.isSameDay(oldAccredCal, oldAccredCal)) {
-                        logger.debug(email+" : "+ courseId+" : Same day for old and new accreds.  Will filter out");
+                    if(DateUtils.isSameDay(oldAccredCal, newAccredCal)) {
+                        logger.info(email+" : "+ courseId+" : Same day for old and new accreds.  Will filter out");
                     }else {
                         logger.info(email +" : "+ courseId+" : More than one day difference between old and new accreds.  Will not filter out");
                         unfilteredAccreds.add(newAccred);
@@ -321,7 +324,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             return false;
         }
     }
-    
+   
     public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
         accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
     }
@@ -688,6 +691,42 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 
 /*  *************               SkillsBase Integration              ******************  */
+
+    // When using a ‘.split()’, all subsequent messages will have the same headers from the original message  
+    public void resetSkillsBasePushResultsCache(Exchange exchange) {
+        Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
+        if(skBasePushResults == null) {
+            logger.info("resetSkillsBasePushResultsCache() creating new map");
+            skBasePushResults = new HashMap<Integer, String>();
+        } else {
+            logger.info("resetSkillsBasePushResultsCache() re-setting existing map");
+            skBasePushResults.clear();
+        }
+
+        exchange.getIn().setHeader(SB_PUSH_RESULTS_CACHE, skBasePushResults);
+    }
+
+    public void determineStudentInSkillsBaseCache(Exchange exchange) {
+        Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
+        if(skBasePushResults != null) {
+            Accreditation studentAccredObj = exchange.getIn().getBody(Accreditation.class);
+            Student sObj = studentAccredObj.getStudent();
+            Object entry = skBasePushResults.get(sObj.getStudentid());
+            if(entry != null) {
+                exchange.getIn().setHeader(SB_STUDENT_NOT_REGISTERED, SB_STUDENT_NOT_REGISTERED);
+            }
+        }
+    }
+
+    public void setStudentNotFoundOnSkillsBaseResultCache(Exchange exchange) {
+        Map<Integer, String> skBasePushResults = (Map<Integer, String>)exchange.getIn().getHeader(SB_PUSH_RESULTS_CACHE);
+        if(skBasePushResults != null) {
+            Accreditation studentAccredObj = exchange.getIn().getBody(Accreditation.class);
+            Student sObj = studentAccredObj.getStudent();
+            logger.info(sObj.getEmail()+" : setStudentNotFoundOnSkillsBaseResultCache() Will not attempt to push any new quals to skillsbase for this student");
+            skBasePushResults.put(sObj.getStudentid(), SB_STUDENT_NOT_REGISTERED);
+        }
+    }
 
     private void getSkillsBaseToken() throws SkillsBaseCommunicationException{
         

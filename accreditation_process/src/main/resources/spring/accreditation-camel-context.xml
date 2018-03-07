@@ -216,14 +216,14 @@
             <otherwise><setHeader headerName="STUDENT_ID"><simple>${body}</simple></setHeader></otherwise>
         </choice>
         <!-- to uri="bean:accreditationProcessBean?method=dumpHeadersAndBody"/ -->
-        <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="DEBUG"/>
-        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesByStudent"/> <!-- sets header:  STUDENT_COURSES -->
+        <log message="${header.STUDENT_ID} : determine-accred-for-student: IDENTIFY_FIRED_RULES_ONLY=${header.IDENTIFY_FIRED_RULES_ONLY} : RESPOND_JSON=${header.RESPOND_JSON}" loggingLevel="INFO"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentCoursesAndAccredsByStudent"/> <!-- sets header:  STUDENT_COURSES -->
         <filter>
             <simple>${body.size} > 0</simple>
             <to uri="direct:execute-accreditation_rules-uri" id="execute-accreditation-rules-on-student-courses" />
             <setHeader headerName="RULES_FIRED"><simple>${body}</simple></setHeader> <!-- needed if providing JSON response -->
             <filter>
-                <simple>${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
+                <simple>${header.IDENTIFY_FIRED_RULED_ONLY} == null || ${header.IDENTIFY_FIRED_RULES_ONLY} != true</simple>
                 <filter>
                     <simple>${body.size} > 0</simple>
                     <to uri="bean:accreditationProcessBean?method=filterDuplicateAccreds" />
@@ -440,6 +440,7 @@
         <from uri="{{accred_process-push-qualification-to-skillsbase-batch}}"/>
         <log message="####################      Starting .... push-qualifications-to-skillsbase-batch" loggingLevel="INFO"/>
         <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
+        <to uri="bean:accreditationProcessBean?method=resetSkillsBasePushResultsCache" />
         <split id="loop-for-each-student">
             <simple>${body}</simple>
             <filter>
@@ -492,46 +493,54 @@
                   In this case it will automatically correct itself at the next 15 minute block.
         </description>
         <from uri="direct:push-qual-to-skills-base"/>
-        <!-- to uri="bean:accreditationProcessBean?method=getSkillsBaseToken" id="get-token"/>
-        <log message="${body.student.email} Retrieved token from SkillsBase; Token: ${header.TOKEN}" loggingLevel="INFO"/ -->
-        <doTry>
-            <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
-            <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
-            <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
-            <choice>
+        <to uri="bean:accreditationProcessBean?method=determineStudentInSkillsBaseCache" id="get-person-id"/>
+        <choice>
             <when>
-                <simple>${body.student.skillsbasePersonId} != null</simple>
-                <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
-                <choice>
-                    <when>
-                        <simple>${body.skillsBaseQualExists} == false</simple>
-                        <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
-                        <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                <simple>${header.SB_STUDENT_NOT_REGISTERED} == null</simple>
+                <doTry>
+                    <to uri="bean:accreditationProcessBean?method=getSkillsBasePersonId" id="get-person-id"/>
+                    <log message="${body.student.email} : Person Id: ${body.student.skillsbasePersonId}" loggingLevel="INFO"/>
+                    <delay><constant>{{sb_delay_millis_between_skillsbase_requests}}</constant></delay>
+                    <choice>
                         <when>
-                            <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
-                            <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
-                            <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                            <simple>${body.student.skillsbasePersonId} != null</simple>
+                            <to uri="bean:accreditationProcessBean?method=checkSkillsBaseForExistingAccred" id="checkSkillsBaseForExistingAccred"/>
+                            <choice>
+                                <when>
+                                    <simple>${body.skillsBaseQualExists} == false</simple>
+                                    <log message="${body.student.email} : ${body.accreditation.accreditationname} : Does not already exist in skillsbase.  Will now post to skillsbase" loggingLevel="INFO"/>
+                                    <to uri="bean:accreditationProcessBean?method=postAccreditationToSkillsBase" id="postAccreditationToSkillsBase"/>
+                                    <when>
+                                        <simple>{{sb_persistSkillsBaseStatusChangeToDB}} == true</simple>
+                                        <to uri="bean:accreditationProcessBean?method=setProcessedOnAccreditation" id="setProcessedOnAccreditation"/>
+                                        <to uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB" id="update-accred-in-database" />
+                                    </when>
+                                    <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
+                                </when>
+                                <otherwise>
+                                    <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
+                                </otherwise>
+                            </choice>
                         </when>
-                        <log message="${body.student.email} : Student qualification complete:  assessment=${body.accreditation.accreditationname}\n" loggingLevel="INFO"/>
-                    </when>
-                    <otherwise>
-                        <log message="${body.student.email} : Qualification already exists in SkillsBase: ${body.accreditation.accreditationname}.  Will not post to Skills Base" loggingLevel="INFO"/>
-                    </otherwise>
-                </choice>
+                        <otherwise>
+                            <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                            <to uri="bean:accreditationProcessBean?method=setStudentNotFoundOnSkillsBaseResultCache" />
+                            <filter>
+                                <constant>{{sb_sendMailToStudentEnabled}}</constant>
+                                <to uri="seda:user-not-found-in-skillsbase"/>
+                            </filter>
+                        </otherwise>
+                    </choice>
+                  <doCatch>
+                      <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
+                      <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
+                  </doCatch>
+                </doTry>
             </when>
             <otherwise>
-                <log message="${body.student.email} : Email address is not found in Skills Base. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
-                <filter>
-                    <constant>{{sb_sendMailToStudentEnabled}}</constant>
-                    <to uri="seda:user-not-found-in-skillsbase"/>
-                </filter>
+                <log message="${body.student.email} : Already attempted to post a qual to skillsbase for this student.  Will not re-attempt with qual: ${body.accreditation.accreditationname}" loggingLevel="WARN"/>
             </otherwise>
-            </choice>
-            <doCatch>
-                <exception>com.redhat.gpe.accreditation.service.SkillsBaseCommunicationException</exception>
-                <log message="${body.student.email} : Can. Will notify = {{sb_sendMailToStudentEnabled}}" loggingLevel="INFO"/>
-            </doCatch>
-        </doTry>
+        </choice>
     </route>
 
     <route id="user-not-found-in-skillsbase">
@@ -570,6 +579,34 @@
         </choice>
     </route>
     <!--    *************************************************************************************************   -->
+
+
+
+
+    <!--    ********************************      Accred Upload to SalesForce         **********************************   -->
+    <route id="push-accred-to-sfdc-batch">
+        <description>
+            1)  Periodically checks for student accreditations that have not been pushed to SFDC
+            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SFDC with that student accreditation information
+        </description>
+        <from uri="{{accred_process-push-accreds-to-sfdc-batch}}"/>
+        <log message="^^^^^^^^^^      Starting .... push-accreds-to-sfdc-batch" loggingLevel="INFO"/>
+        <log message="^^^^^^^^^^      done" loggingLevel="INFO"/>
+    </route>
+
+
+    <route id="push-accred-to-sfdc">
+        <description>
+            1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
+            2) Responsible for updating SalesForce with StudentAccreditation
+        </description>
+        <from uri="direct:push-accred-to-sfdc"/>
+        <log message="${body.student.email} : Pushing the following accred to SFDC: ${body.accreditation.accreditationname}" loggingLevel="WARN"/>
+    </route>
+    <!--    *************************************************************************************************************   -->
+
+
+
 
 
     <route id="send-email">

@@ -132,7 +132,7 @@ public class GPTEBaseServiceBean {
         canonicalDAO.triggerStoredProcedure(storedProcName);
     }
     
-    public List<GPTEBaseCondition> selectStudentCoursesByStudent(Exchange exchange) {
+    public List<GPTEBaseCondition> selectStudentCoursesAndAccredsByStudent(Exchange exchange) {
         Object studentIdObj = exchange.getIn().getBody();
         Integer studentId = 0;
         if(studentIdObj instanceof String)
@@ -140,17 +140,19 @@ public class GPTEBaseServiceBean {
         else
             studentId = (Integer)studentIdObj;
         if(studentId == null || studentId == 0)
-            throw new RuntimeException("selectStudentCoursesByStudent() must pass a studentId");
+            throw new RuntimeException("selectStudentCoursesAndAccredsByStudent() must pass a studentId");
 
         List<GPTEBaseCondition> sCourses = canonicalDAO.selectPassedStudentCoursesByStudent(studentId);
         if(sCourses == null || sCourses.isEmpty()) {
-            logger.warn("selectStudentCoursesByStudent() no student courses found for studentId = "+studentId);
+            logger.warn("selectStudentCoursesAndAccredsByStudent() no student courses found for studentId = "+studentId);
         }else {
 
             GPTEBaseCondition mostRecent = sCourses.get(0);
            
             // https://github.com/redhat-gpe/OPEN_Reporting/issues/170
-            List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId, 0); // select unprocessed StudentAccreditations
+            // https://github.com/redhat-gpe/OPEN_Reporting/issues/283
+            //    - All studentAccreds for a student should be pulled
+            List<Accreditation> accreds = canonicalDAO.selectStudentAccreditationByStudentId(studentId, -1);
             sCourses.addAll(accreds);
             exchange.getIn().setHeader(STUDENT_COURSES_HEADER, sCourses);
 
