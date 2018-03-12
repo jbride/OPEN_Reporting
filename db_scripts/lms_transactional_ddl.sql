@@ -262,6 +262,7 @@ CREATE TABLE `StudentAccreditations` (
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
   `RuleFired` varchar(200) DEFAULT NULL,
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `SalesForceUploaded` int(11) DEFAULT '0',
   PRIMARY KEY (`StudentID`,`AccreditationID`),
   KEY `IDX_StudentAccreditations_Students` (`StudentID`),
   KEY `IDX_StudentAccreditations_AccreditationDefinitions` (`AccreditationID`),
@@ -444,4 +445,4 @@ CREATE TABLE `SumtotalCountries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-12 16:07:18
+-- Dump completed on 2018-03-12 17:31:55
