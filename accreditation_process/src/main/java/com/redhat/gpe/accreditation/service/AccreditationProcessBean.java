@@ -206,13 +206,13 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 /*  ************    Student Accreditation CRUD Operations     *************************** */
     
-    public List<Accreditation> selectUnprocessedStudentAccreditations() {
-        List<Accreditation> sAccreds = canonicalDAO.selectUnprocessedStudentAccreditationsByProcessStatus(StudentAccreditation.UNPROCESSED, Student.RED_HAT_EMAIL_SUFFIX);
+    public List<Accreditation> selectStudentAccreditationsNotUploadedToSkillsBase() {
+        List<Accreditation> sAccreds = canonicalDAO.selectStudentAccreditations(StudentAccreditation.NOT_UPLOADED, -1, Student.RED_HAT_EMAIL_SUFFIX);
         if(sAccreds == null || sAccreds.isEmpty()) {
-            logger.info("selectUnprocessedStudentAccreditations() no StudentAccreditation objects found with status = "+StudentAccreditation.UNPROCESSED);
+            logger.info("selectStudentAccreditationsNotUploadedToSkillsBase() no StudentAccreditation objects found with status = "+StudentAccreditation.NOT_UPLOADED);
         }
         else {
-            logger.info("selectUnprocessedStudentAccreditations() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
+            logger.info("selectStudentAccreditationsNotUploadedToSkillsBase() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
         }
         return sAccreds;
     }

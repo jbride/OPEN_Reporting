@@ -50,7 +50,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
        exchange.setPattern(ExchangePattern.InOnly);
        Message in = exchange.getIn();
 
-       Student studentObj = DomainMockObjectHelper.getMockStudent();
+       Student studentObj = DomainMockObjectHelper.getMockRHTStudent();
        Language langObj = DomainMockObjectHelper.getMockLanguage();
        
        // BPMS Implementation Course
@@ -79,7 +79,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
     /* verification:   select * from StudentCourses where StudentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
        cleanup:        delete from StudentCourses where studentId = 10145 and CourseID = "MWS-SE-BPA-ASM-BRMS";
      */
-    @Ignore
+    //@Ignore
     @Test
     public void testPersistNewStudentCourse() throws InterruptedException {
         Endpoint endpoint = context.getEndpoint(PERSIST_STUDENT_COURSE_URI);
@@ -87,7 +87,7 @@ public class StudentCoursesTest extends CamelSpringTestSupport {
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
 
-        Student studentObj = DomainMockObjectHelper.getMockStudent();
+        Student studentObj = DomainMockObjectHelper.getMockRHTStudent();
         Course courseObj = DomainMockObjectHelper.getMockCourse();
         Language langObj = DomainMockObjectHelper.getMockLanguage();
         StudentCourse sCourse = DomainMockObjectHelper.getMockStudentCourse(studentObj.getStudentid(), courseObj.getCourseid());

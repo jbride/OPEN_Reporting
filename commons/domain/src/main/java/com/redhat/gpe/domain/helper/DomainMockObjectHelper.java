@@ -23,6 +23,8 @@ public class DomainMockObjectHelper {
     public static String partnerEmail = "abhishek5.chatterjee5@cognizant.com";
     
     static String rhtEmail = "jbride@redhat.com";
+    static int rhtStudentId = 75106;
+    
     static int accredId = 19;   // Red Hat Delivery Specialist - Business Process Automation
     static String accredName = "Red Hat Delivery Specialist – Business Process Automation";
     static String courseId = "MWS-SE-BPA-ASM-BRMS";
@@ -61,6 +63,7 @@ public class DomainMockObjectHelper {
 
     public static Student getMockRHTStudent() {
         Student studentObj = new Student();
+        studentObj.setStudentid(rhtStudentId);
         studentObj.setEmail(rhtEmail);
         return studentObj;
     }
@@ -119,7 +122,7 @@ public class DomainMockObjectHelper {
     
     public static StudentAccreditation getMockStudentAccreditation(){
         StudentAccreditation sAccredObj = new StudentAccreditation();
-        sAccredObj.setStudentid(partnerStudentId);
+        sAccredObj.setStudentid(rhtStudentId);
         sAccredObj.setAccreditationid(accredId);
         sAccredObj.setAccreditationdate(new Timestamp(new Date().getTime()));
         sAccredObj.setCourseid(courseId);

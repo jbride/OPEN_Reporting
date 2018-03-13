@@ -25,7 +25,9 @@ public class StudentAccreditation implements Serializable {
     public static final short PROCESSED_SKILLS_BASE_ONLY = 1;
     public static final short PROCESSED_SALESFORCE_ONLY = 2;
     public static final short PROCESSED_ALL = 10;
-    public static final String SELECT_CLAUSE = "sa.AccreditationID,sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed,sa.RuleFired";
+    public static final short NOT_UPLOADED = 0;
+    public static final String SALESFORCE_UPLOADED = "salesforceuploaded";
+    public static final String SELECT_CLAUSE = "sa.AccreditationID,sa.AccreditationDate,sa.AccreditationType,sa.CourseID,sa.Processed,sa.RuleFired,sa.SalesForceUploaded";
 
     private Integer   studentid;
     private Integer   accreditationid;
@@ -41,6 +43,8 @@ public class StudentAccreditation implements Serializable {
     private short     processed = UNPROCESSED;
     
     private String ruleFired;
+    
+    private short salesforceuploaded = NOT_UPLOADED;
     
     public java.util.Date determineExperitionDate() {
         Calendar cal = Calendar.getInstance();
@@ -136,6 +140,14 @@ public class StudentAccreditation implements Serializable {
         this.ruleFired = ruleFired;
     }
 
+    public short getSalesforceuploaded() {
+        return salesforceuploaded;
+    }
+
+    public void setSalesforceuploaded(short salesforceuploaded) {
+        this.salesforceuploaded = salesforceuploaded;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Studentaccreditations (");
@@ -147,7 +159,7 @@ public class StudentAccreditation implements Serializable {
         sb.append(", ").append(courseid);
         sb.append(", ").append(processed);
         sb.append(", ").append(ruleFired);
-
+        sb.append(", ").append(salesforceuploaded);
         sb.append(")");
         return sb.toString();
     }

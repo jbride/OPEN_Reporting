@@ -121,7 +121,7 @@
 
     <!--    *************************************************************************************************   -->
     <!--    *************                        ACCREDITATION LOGIC                            *************   -->
-    <route id="determine-accreditations-for-all">
+    <route id="determine-student-accreditations-for-all">
         <description> 
             1) Periodically checks for *ALL* StudentCourses that have yet to be evaluated by the rules engine
             2) Gets List of StudentCourse objects from database for *ALL* students with unevaluated student courses
@@ -439,7 +439,7 @@
         </description>
         <from uri="{{accred_process-push-qualification-to-skillsbase-batch}}"/>
         <log message="####################      Starting .... push-qualifications-to-skillsbase-batch" loggingLevel="INFO"/>
-        <to uri="bean:accreditationProcessBean?method=selectUnprocessedStudentAccreditations"/>
+        <to uri="bean:accreditationProcessBean?method=selectStudentAccreditationsNotUploadedToSkillsBase"/>
         <to uri="bean:accreditationProcessBean?method=resetSkillsBasePushResultsCache" />
         <split id="loop-for-each-student">
             <simple>${body}</simple>

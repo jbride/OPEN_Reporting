@@ -501,14 +501,25 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
 /* *******************    StudentAccreditation    ************************************************ */
     
-    public List<Accreditation> selectUnprocessedStudentAccreditationsByProcessStatus(int processedStatus, String studentEmailSuffix) {
+    public List<Accreditation> selectStudentAccreditations(int skillsBaseUploaded, int salesForceUploaded, String studentEmailSuffix) {
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("SELECT "+Student.SELECT_CLAUSE+","+AccreditationDefinition.SELECT_CLAUSE+","+StudentAccreditation.SELECT_CLAUSE+","+Course.SELECT_CLAUSE+" "); 
         sBuilder.append("FROM Students s, AccreditationDefinitions a, StudentAccreditations sa, Courses c ");
         sBuilder.append("WHERE sa.StudentID = s.StudentID ");
         sBuilder.append("AND sa.AccreditationID = a.AccreditationID ");
         sBuilder.append("AND sa.CourseID = c.CourseID ");
-        sBuilder.append("AND sa.Processed = 0 ");
+        
+        if(skillsBaseUploaded >= 0) {            
+            sBuilder.append("AND sa.Processed = ");
+            sBuilder.append(skillsBaseUploaded);
+            sBuilder.append(" ");
+        }
+        if(salesForceUploaded >= 0) {            
+            sBuilder.append("AND sa.SalesForceUploaded = ");
+            sBuilder.append(salesForceUploaded);
+            sBuilder.append(" ");
+        }
+       
         sBuilder.append("AND ( s.skillsbasepartner = 1 ");
         if(StringUtils.isNotEmpty(studentEmailSuffix)) {
             sBuilder.append("OR s.email like \"%");
@@ -516,7 +527,9 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append("\"");
         }
         sBuilder.append(" )");
+        
         sBuilder.append(" ORDER BY sa.accreditationdate desc ");
+        logger.debug("selectStudentAccreditations() query = "+sBuilder.toString());
         List<Accreditation> sAccreds = sbJdbcTemplate.query(sBuilder.toString(), new DenormalizedStudentAccreditationRowMapper());
         return sAccreds;
     }
@@ -553,7 +566,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
         logger.debug("addStudentAccreditation() sAccredObj = "+sAccredObj);
         
-        StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?,null) ");
+        StringBuilder sBuilder = new StringBuilder("insert into StudentAccreditations values (?,?,?,?,?,?,?,?,null) ");
 
         // JA Bride:  not sure why this business logic was here implemented in SQL.
         // If this business logic is needed, it should be implemented higher up the stack:  ie;  in the camel routes.
@@ -566,7 +579,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
         }
         */
         
-        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired)");        
+        sBuilder.append("on duplicate key update AccreditationDate=values(AccreditationDate), AccreditationType=values(AccreditationType), CourseID=values(CourseID), Processed=values(Processed), RuleFired=values(RuleFired), SalesForceUploaded=values(SalesForceUploaded)");        
 
         int updateCount = sbJdbcTemplate.update(sBuilder.toString(),
                 sAccredObj.getStudentid(), 
@@ -575,7 +588,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 sAccredObj.getAccreditationtype(),
                 sAccredObj.getCourseid(),
                 sAccredObj.getProcessed(),
-                sAccredObj.getRuleFired()
+                sAccredObj.getRuleFired(),
+                sAccredObj.getSalesforceuploaded()
                 );
         logger.debug("addStudentAccreditation() added the following # of records = "+updateCount);
     }

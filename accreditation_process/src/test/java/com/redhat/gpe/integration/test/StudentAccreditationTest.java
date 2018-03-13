@@ -32,7 +32,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
 
     private static final String DETERMINE_ACCREDITATION_FOR_STUDENT_URI = "direct:determine-accred-for-student";
     private static final String DETERMINE_ACCREDITATION_FOR_RANGE_URI = "direct:determine-accreds-for-range";
-    private static final String PERSIST_NEW_ACCREDITATION_URI = "direct:persist-new-accreditation";
+    private static final String PERSIST_NEW_ACCREDITATION_URI = "direct:persist-student-accreditations";
     private static final String PROCESS_NEW_STUDENT_ACCREDS_URI = "accred_process-push-qualification-to-skillsbase-batch";
     private static final String SET_ACCRED_ID_ON_ACCRED_OBJ_URI = "direct:set-accredId-on-accredObj";
     private static final String IDENTIFY_FIRED_RULES_ONLY_HEADER = "IDENTIFY_FIRED_RULES_ONLY";
@@ -103,7 +103,7 @@ public class StudentAccreditationTest extends CamelSpringTestSupport {
         Message in = exchange.getIn();
         
         AccreditationDefinition accred = DomainMockObjectHelper.getMockAccreditation();
-        Student studentObj = DomainMockObjectHelper.getMockStudent();
+        Student studentObj = DomainMockObjectHelper.getMockRHTStudent();
         Course courseObj = DomainMockObjectHelper.getMockCourse();
         StudentAccreditation sAccredObj = DomainMockObjectHelper.getMockStudentAccreditation();
         
