@@ -169,7 +169,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                         studentObj.getSalesforcemanagerid(),
                         studentObj.getSalesforceaccountname(),
                         studentObj.getSalesforcejobfunctions(),
-                        studentObj.getSkillsbasePartner()
+                        studentObj.getSkillsbasePartner(),
+                        studentObj.getSalesforcefederationid()
                         );
                 logger.debug(studentObj.getEmail()+" :updateStudent() just inserted");
             } else {
@@ -180,7 +181,8 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 sBuilder.append(Student.SKILLSBASE_STATUS+EQUAL+Student.IPA_STATUS+EQUAL);
                 sBuilder.append(Student.ACTIVATION_DATE+EQUAL+Student.DEACTIVATION_DATE+EQUAL);
                 sBuilder.append(Student.SALESFORCEUSERNAME+EQUAL+Student.SALESFORCEMANAGERID+EQUAL);
-                sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+EQUAL+Student.SKILLSBASEPARTNER+"=? ");
+                sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+EQUAL+Student.SKILLSBASEPARTNER+EQUAL);
+                sBuilder.append(Student.SALESFORCEFEDERATIONID+"=?");
                 sBuilder.append("where studentID="+studentObj.getStudentid());
                 sbJdbcTemplate.update(sBuilder.toString(),new Object[]{
                     studentObj.getEmail(),
@@ -204,6 +206,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                     studentObj.getSalesforceaccountname(),
                     studentObj.getSalesforcejobfunctions(),
                     studentObj.getSkillsbasePartner(),
+                    studentObj.getSalesforcefederationid()
                 });
                 logger.debug(studentObj.getEmail()+" :updateStudent() just updated");
             }

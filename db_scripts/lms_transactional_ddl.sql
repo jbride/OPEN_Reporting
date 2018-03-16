@@ -266,6 +266,7 @@ CREATE TABLE `Students` (
   `SalesForceAccountName` varchar(255) DEFAULT NULL,
   `SalesForceJobFunctions` varchar(80) DEFAULT NULL,
   `SkillsbasePartner` int(11) DEFAULT 0,
+  `SalesForceFederationID` tinyint(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (`StudentID`),
   UNIQUE KEY `Email` (`Email`),
   KEY `IDX_Email` (`Email`),
@@ -297,4 +298,4 @@ CREATE TABLE `Students` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-13 13:45:34
+-- Dump completed on 2018-03-16  8:51:17

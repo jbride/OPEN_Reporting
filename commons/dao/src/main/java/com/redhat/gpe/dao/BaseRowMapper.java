@@ -38,6 +38,7 @@ public class BaseRowMapper {
         student.setActivationDate(rs.getTimestamp(Student.ACTIVATION_DATE));
         student.setDeActivationDate(rs.getTimestamp(Student.DEACTIVATION_DATE));
         student.setSkillsbasePartner(rs.getInt(Student.SKILLSBASEPARTNER));
+        student.setSalesforcefederationid(rs.getString(Student.SALESFORCEFEDERATIONID));
         return student;
     }
     

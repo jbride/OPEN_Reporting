@@ -40,10 +40,11 @@ public class Student implements Serializable {
     public static final String SALESFORCEACCOUNTNAME = "SalesForceAccountName";
     public static final String SALESFORCEJOBFUNCTIONS = "SalesForceJobFunctions";
     public static final String SKILLSBASEPARTNER = "SkillsbasePartner";
+    public static final String SALESFORCEFEDERATIONID = "SalesForceFederationID";
     public static final String COMMA = ",";
     public static final String NEW_LINE = "\n";
 
-    public static final String SELECT_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate,s.SkillsbasePartner";
+    public static final String SELECT_CLAUSE = "s.StudentID,s.Email,s.FirstName,s.LastName,s.CompanyID,s.Region,s.SubRegion,s.Country,s.Roles,s.SalesForceContactID,s.SalesForceActive,s.SumTotalID,s.SumTotalActive,s.SkillsbaseStatus,s.IpaStatus,s.ActivationDate,s.DeActivationDate,s.SkillsbasePartner,s.SalesForceFederationID";
 
     public static final int SKILLSBASE_PERSON_UNVERIFIED = 0;
     public static final int SKILLSBASE_PERSON_NOTIFIED_NO_ACCOUNT=1;
@@ -103,6 +104,8 @@ public class Student implements Serializable {
     private String salesforcejobfunctions;  // channel roles
     
     private int skillsbasePartner = IS_NOT_SKILLSBASE_PARTNER;
+    
+    private String salesforcefederationid;
     
 
     /* Patrick, 20 January 2016
@@ -314,6 +317,14 @@ public class Student implements Serializable {
 
     public void setSkillsbasePartner(int skillsbasePartner) {
         this.skillsbasePartner = skillsbasePartner;
+    }
+
+    public String getSalesforcefederationid() {
+        return salesforcefederationid;
+    }
+
+    public void setSalesforcefederationid(String salesforcefederationid) {
+        this.salesforcefederationid = salesforcefederationid;
     }
 
     @Override
