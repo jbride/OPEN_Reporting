@@ -54,7 +54,7 @@ CREATE TABLE `Companies` (
   UNIQUE KEY `IDX_CompanyName` (`CompanyName`),
   KEY `IDX_PartnerType` (`PartnerType`),
   KEY `IDX_PartnerTier` (`PartnerTier`)
-) ENGINE=InnoDB AUTO_INCREMENT=31459 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=31439 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -174,15 +174,15 @@ CREATE TABLE `QvExport` (
   `Country Code` char(2) DEFAULT NULL,
   `Email` varchar(100) NOT NULL,
   `Code` varchar(50) NOT NULL DEFAULT '',
-  `Start Date` datetime,
-  `End Date` datetime,
+  `Start Date` datetime DEFAULT NULL,
+  `End Date` datetime DEFAULT NULL,
   `RedHat` varchar(3) CHARACTER SET utf8 DEFAULT NULL,
   `Is Certification` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `In Progress` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `Role` varchar(20) DEFAULT NULL,
   `Skills Track` varchar(42) DEFAULT NULL,
   `Specialization` varchar(32) DEFAULT NULL,
-  `AccreditationName` varchar(150),
+  `AccreditationName` varchar(150) DEFAULT NULL,
   `Geo` varchar(16) DEFAULT NULL,
   `Channel Mix` varchar(6) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `Split Business Unit` varchar(4) CHARACTER SET utf8 NOT NULL DEFAULT '',
@@ -223,7 +223,43 @@ CREATE TABLE `SalesForce` (
   `KeepFlag` int(11) DEFAULT '0',
   PRIMARY KEY (`AutoID`),
   KEY `idx_email` (`Email`)
-) ENGINE=InnoDB AUTO_INCREMENT=57981 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Table structure for table `SalesForcePartners`
+--
+
+DROP TABLE IF EXISTS `SalesForcePartners`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `SalesForcePartners` (
+  `FederationID` varchar(200) DEFAULT NULL,
+  `ID` varchar(200) DEFAULT NULL,
+  `ContactID` varchar(200) DEFAULT NULL,
+  `AccountID` varchar(200) DEFAULT NULL,
+  `AccountName` varchar(200) DEFAULT NULL,
+  `Active` char(1) DEFAULT NULL,
+  `LastName` varchar(200) DEFAULT NULL,
+  `FirstName` varchar(200) DEFAULT NULL,
+  `Email` varchar(200) DEFAULT NULL,
+  `SumTotalID` varchar(200) DEFAULT NULL,
+  `CompanyName` varchar(200) DEFAULT NULL,
+  `Language` varchar(200) DEFAULT NULL,
+  `UserName` varchar(200) DEFAULT NULL,
+  `Alias` varchar(200) DEFAULT NULL,
+  `LastLogin` varchar(200) DEFAULT NULL,
+  `Region` varchar(200) DEFAULT NULL,
+  `Subregion` varchar(200) DEFAULT NULL,
+  `Country` varchar(200) DEFAULT NULL,
+  `PartnerTier` varchar(200) DEFAULT NULL,
+  `PartnerType` varchar(200) DEFAULT NULL,
+  `Role` varchar(200) DEFAULT NULL,
+  `AutoID` int(11) NOT NULL AUTO_INCREMENT,
+  `KeepFlag` int(11) DEFAULT '0',
+  PRIMARY KEY (`AutoID`),
+  KEY `idx_email` (`Email`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -303,7 +339,7 @@ CREATE TABLE `StudentCourses` (
   CONSTRAINT `FK_StudentCourses_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Languages` FOREIGN KEY (`LanguageID`) REFERENCES `Languages` (`LanguageID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=275234 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=273636 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -356,6 +392,7 @@ CREATE TABLE `Students` (
   `SalesForceAccountName` varchar(255) DEFAULT NULL,
   `SalesForceJobFunctions` varchar(80) DEFAULT NULL,
   `SkillsbasePartner` int(11) DEFAULT '0',
+  `SalesForceFederationID` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`StudentID`),
   UNIQUE KEY `Email` (`Email`),
   KEY `IDX_Email` (`Email`),
@@ -375,40 +412,7 @@ CREATE TABLE `Students` (
   KEY `IDX_ActivationDate` (`ActivationDate`),
   KEY `IDX_DeActivationDate` (`DeActivationDate`),
   CONSTRAINT `FK_Students_Companies` FOREIGN KEY (`CompanyID`) REFERENCES `Companies` (`CompanyID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=77379 DEFAULT CHARSET=latin1;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Students_20170301`
---
-
-DROP TABLE IF EXISTS `Students_20170301`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Students_20170301` (
-  `StudentID` int(11) NOT NULL DEFAULT '0',
-  `Email` varchar(100) NOT NULL,
-  `FirstName` varchar(50) DEFAULT NULL,
-  `LastName` varchar(50) DEFAULT NULL,
-  `CompanyID` int(11) NOT NULL,
-  `Region` varchar(8) DEFAULT NULL,
-  `SubRegion` varchar(20) DEFAULT NULL,
-  `Country` char(2) DEFAULT NULL,
-  `Roles` varchar(40) DEFAULT NULL,
-  `SalesForceContactID` varchar(18) DEFAULT NULL,
-  `SalesForceActive` char(3) DEFAULT NULL,
-  `SumTotalID` varchar(18) DEFAULT NULL,
-  `SumTotalActive` char(3) DEFAULT NULL,
-  `SkillsbaseStatus` tinyint(1) NOT NULL DEFAULT '0',
-  `IpaStatus` tinyint(1) NOT NULL DEFAULT '0',
-  `ActivationDate` datetime DEFAULT NULL,
-  `DeActivationDate` datetime DEFAULT NULL,
-  `CreateDate` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
-  `SalesForceUserName` varchar(80) DEFAULT NULL,
-  `SalesForceManagerID` varchar(18) DEFAULT NULL,
-  `SalesForceAccountName` varchar(255) DEFAULT NULL,
-  `SalesForceJobFunctions` varchar(80) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=76901 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -477,4 +481,4 @@ CREATE TABLE `SumtotalCountries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-04-02 10:31:57
+-- Dump completed on 2018-04-02 10:36:31
