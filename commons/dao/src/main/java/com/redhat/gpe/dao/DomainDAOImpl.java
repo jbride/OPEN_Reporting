@@ -183,7 +183,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
                 sBuilder.append(Student.SALESFORCEUSERNAME+EQUAL+Student.SALESFORCEMANAGERID+EQUAL);
                 sBuilder.append(Student.SALESFORCEACCOUNTNAME+EQUAL+Student.SALESFORCEJOBFUNCTIONS+EQUAL+Student.SKILLSBASEPARTNER+EQUAL);
                 sBuilder.append(Student.SALESFORCEFEDERATIONID+"=?");
-                sBuilder.append("where studentID="+studentObj.getStudentid());
+                sBuilder.append(" where studentID="+studentObj.getStudentid());
                 sbJdbcTemplate.update(sBuilder.toString(),new Object[]{
                     studentObj.getEmail(),
                     studentObj.getFirstname(),
