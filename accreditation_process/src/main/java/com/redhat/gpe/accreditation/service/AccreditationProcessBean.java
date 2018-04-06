@@ -25,11 +25,13 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
@@ -38,6 +40,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1043,6 +1046,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         }
     }
     
+    /**
+     * Method for generating and setting SalesForce token
+     */
     public void setSfToken() {
 		HttpClient httpclient = HttpClients.createDefault();
 
@@ -1065,7 +1071,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 
 		// verify response is HTTP OK
 		final int statusCode = response.getStatusLine().getStatusCode();
-		logger.info("authStatusCode" + statusCode);
+		logger.info("---- authStatusCode=" + statusCode);
 
 		String resp = null;
 		try {
@@ -1073,7 +1079,6 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 		} catch (IOException ioException) {
 			// Handle system IO exception
 		}
-		logger.info("authResponse=" + resp);
 		JSONObject jsonObject = null;
 		String authTokenOrSessionId = null;
 		try {
@@ -1087,6 +1092,9 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 		sfToken = authTokenOrSessionId;
 	}
 
+    /**
+     * Method for posting Student Accreditation record to SalesForce
+     */
 	public void postAccreditationToSfdc(Exchange exchange) throws SkillsBaseCommunicationException {
 		Message in = exchange.getIn();
 		Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
@@ -1094,70 +1102,72 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 		Student studentObj = denormalizedStudentAccred.getStudent();
 		AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
 		StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
-
-		String accredName = accredObj.getAccreditationname();
-		String response = null;
-		try {
-
-			HttpClient httpclient = HttpClients.createDefault();
-			HttpGet httpGet = new HttpGet(sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
-					+ accredObj.getAccreditationid());
-			httpGet.setHeader("Content-Type", "application/json");
-			setSfToken();
-			httpGet.setHeader("Authorization", "Bearer " + sfToken);
-			HttpResponse getResponse = httpclient.execute(httpGet);
-			final int getStatusCode = getResponse.getStatusLine().getStatusCode();
-			if (HttpStatus.SC_NOT_FOUND == getStatusCode) {
-				// set up name value pairs
-				List<NameValuePair> partnerTraining = new ArrayList<NameValuePair>();
-				partnerTraining.add(new BasicNameValuePair("Catalog_ID__c", accredObj.getAccreditationid().toString()));
-				partnerTraining.add(new BasicNameValuePair("Federation_ID__c", studentObj.getSalesforcefederationid()));
-
-				String accredDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
-				partnerTraining.add(new BasicNameValuePair("Date_Achieved__c", accredDateStr));
-
-				Date accredEndDate = addMonthsToDate(sAccredObj.getAccreditationdate(), expiredMonths);
-				String expirationDateStr = dateFormatter.format(accredEndDate);
-				partnerTraining.add(new BasicNameValuePair("Expiration_Date__c", expirationDateStr));
-
-				Boolean isActive = null != sAccredObj.getAccreditationtype()
-						&& ACTIVE.equalsIgnoreCase(sAccredObj.getAccreditationtype());
-				partnerTraining.add(new BasicNameValuePair("is_Active__c", isActive.toString()));
-
-				HttpPatch httpPatch = new HttpPatch(
-						sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
+		if (null != accredObj.getAccreditationid() && StringUtils.isNoneBlank(studentObj.getSalesforcefederationid())
+				&& null != sAccredObj.getAccreditationdate()) {
+			String accredName = accredObj.getAccreditationname();
+			String response = null;
+			try {
+				HttpClient httpclient = HttpClients.createDefault();
+				HttpGet httpGet = new HttpGet(
+						sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/Catalog_ID__c/"
 								+ accredObj.getAccreditationid());
-				httpPatch.setHeader("Content-Type", "application/json");
-				httpPatch.setEntity(new UrlEncodedFormEntity(partnerTraining));
+				httpGet.setHeader("Content-Type", "application/json");
 				setSfToken();
-				httpPatch.setHeader("Authorization", "Bearer " + sfToken);
-				// send POST message
-				HttpResponse httpResponse = httpclient.execute(httpPatch);
+				httpGet.setHeader("Authorization", "Bearer " + sfToken);
+				HttpResponse getResponse = httpclient.execute(httpGet);
+				final int getStatusCode = getResponse.getStatusLine().getStatusCode();
+				if (HttpStatus.SC_NOT_FOUND == getStatusCode) {
+					// set up SalesForce request
+					String accredDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+					Date accredEndDate = addMonthsToDate(sAccredObj.getAccreditationdate(), expiredMonths);
+					String expirationDateStr = dateFormatter.format(accredEndDate);
 
-				final int statusCode = httpResponse.getStatusLine().getStatusCode();
-				// process response
-				response = EntityUtils.toString(httpResponse.getEntity());
-				logger.info("Salesforce patchResponse=" + response);
-				if (statusCode != HttpStatus.SC_CREATED) {
-					String message = "Error pushing qualification to salesforce. Student email: "
-							+ studentObj.getEmail() + ",  qualification: " + accredName 
-							+ ", External_ID__c="+accredObj.getAccreditationid() 
-							+ ", Accreditationid="+accredObj.getAccreditationid();
-					logger.error(message);
+					boolean isActive = null != sAccredObj.getAccreditationtype()
+							&& ACTIVE.equalsIgnoreCase(sAccredObj.getAccreditationtype());
+
+					StringEntity request = new StringEntity(
+							"{\"Federation_ID__c\":\"" + studentObj.getSalesforcefederationid() + "\", "
+									+ "\"Date_Achieved__c\":\"" + accredDateStr + "\", " + "\"Expiration_Date__c\":\""
+									+ expirationDateStr + "\", " + "\"is_Active__c\":\"" + isActive + "\"}");
+
+					HttpPatch httpPatch = new HttpPatch(
+							sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
+									+ accredObj.getAccreditationid());
+					httpPatch.setHeader("Content-Type", "application/json");
+					logger.info("---- Salesforce patchResquest=" + request.toString());
+					httpPatch.setEntity(request);
+					httpPatch.setHeader("Authorization", "Bearer " + sfToken);
+					// send POST message
+					HttpResponse httpResponse = httpclient.execute(httpPatch);
+
+					final int statusCode = httpResponse.getStatusLine().getStatusCode();
+					// process response
+					response = EntityUtils.toString(httpResponse.getEntity());
+					logger.info("---- Salesforce patchResponse=" + response);
+					if (statusCode != HttpStatus.SC_CREATED) {
+						String message = "Error pushing qualification to salesforce. Student email: "
+								+ studentObj.getEmail() + ",  qualification: " + accredName + ", External_ID__c="
+								+ accredObj.getAccreditationid() + ", Accreditationid="
+								+ accredObj.getAccreditationid();
+						logger.error(message);
+					}
+					httpPatch.releaseConnection();
+				} else {
+					logger.info("===== Record exists in salesforce. External_ID__c=" + accredObj.getAccreditationid()
+							+ ", Student email: " + studentObj.getEmail() + ", qualification: " + accredName);
+
 				}
-				httpPatch.releaseConnection();
-			} else {
-				logger.info("Record exists in salesforce. External_ID__c=" + accredObj.getAccreditationid()
-						+ ", Student email: " + studentObj.getEmail() + ", qualification: " + accredName);
-
+				httpGet.releaseConnection();
+			} catch (Exception exc) {
+				handleSkillsBaseResponseException(exc, response);
+				throw (new SkillsBaseCommunicationException());
 			}
-			httpGet.releaseConnection();
-		} catch (Exception exc) {
-			handleSkillsBaseResponseException(exc, response);
-			throw (new SkillsBaseCommunicationException());
+		} else {
+			logger.info("===== Incomplete Student Accredatitions Data. Data not pushed to SFDC. Accreditationid="
+					+ accredObj.getAccreditationid());
 		}
 	}
-	
+
 	public void setPushedAccreditationToSfdc(@Body Accreditation accredObj ) {
         accredObj.getStudentAccred().setSalesforceuploaded(StudentAccreditation.PROCESSED_SALESFORCE_ONLY);;
     }
@@ -1166,6 +1176,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         logger.error("handleSkillsBaseResponseException() skillsBaseResponse = "+skillsBaseResponse);
         x.printStackTrace();
     }
+
 
     private Date addMonthsToDate(Date originalDate, int monthsToAdd) {
         Calendar calObj = Calendar.getInstance();

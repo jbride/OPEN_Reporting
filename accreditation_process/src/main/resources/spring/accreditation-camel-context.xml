@@ -586,23 +586,44 @@
     <!--    ********************************      Accred Upload to SalesForce         **********************************   -->
     <route id="push-accred-to-sfdc-batch">
         <description>
-            1)  Periodically checks for student accreditations that have not been pushed to SFDC
-            2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SFDC with that student accreditation information
+		1)  Periodically checks for student accreditations that have not been pushed to SFDC
+		2)  If StudentAccreditation is gained by a Red Hat associate, attempts to sync SFDC with that student accreditation information
         </description>
-        <from uri="{{accred_process-push-accreds-to-sfdc-batch}}"/>
-        <log message="^^^^^^^^^^      Starting .... push-accreds-to-sfdc-batch" loggingLevel="INFO"/>
-        <log message="^^^^^^^^^^      done" loggingLevel="INFO"/>
-    </route>
+		<from id="_from24" uri="{{accred_process-push-accreds-to-sfdc-batch}}"/>
+		<log id="_log36" loggingLevel="INFO" message="^^^^^^^^^^      Starting .... push-accreds-to-sfdc-batch"/>
+		<to id="_to51" uri="bean:accreditationProcessBean?method=selectStudentAccreditationsNotUploadedToSfdc"/>
+		<split id="loop-for-each-student-accred">
+			<simple>${body}</simple>
+			<filter id="_filter8">
+				<method
+					method="shouldStudentAccreditationBePushedToSfdc" ref="accreditationProcessBean"/>
+				<choice id="_choice16">
+					<when id="_when24">
+						<simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
+          				<log id="_log34" message="${body.student.email} : Will update Salesforce Accreditation = ${body.accreditation.accreditationname}"/>
+          				<to id="invoke-push-accred-to-sfdc" uri="direct:push-accred-to-sfdc"/>
+         			</when>
+           		</choice>
+      		</filter>
+ 		</split>
+		<log id="_log35" loggingLevel="INFO" message="^^^^^^^^^^      done"/>
+	</route>
 
 
-    <route id="push-accred-to-sfdc">
-        <description>
+ 	<route id="push-accred-to-sfdc">
+		<description>
             1) Expects the following payload:  com.redhat.gpe.domain.helper.Accreditation
             2) Responsible for updating SalesForce with StudentAccreditation
         </description>
-        <from uri="direct:push-accred-to-sfdc"/>
-        <log message="${body.student.email} : Pushing the following accred to SFDC: ${body.accreditation.accreditationname}" loggingLevel="WARN"/>
-    </route>
+		<from id="_from22" uri="direct:push-accred-to-sfdc"/>
+		<to id="postAccreditationToSfdc" uri="bean:accreditationProcessBean?method=postAccreditationToSfdc"/>
+		<when>
+			<simple>{{sb_persistSfdcStatusChangeToDB}} == true</simple>
+			<to id="setPushedAccreditationToSfdc" uri="bean:accreditationProcessBean?method=setPushedAccreditationToSfdc"/>
+			<to id="update-accred-to-database-after-sfdc" uri="bean:accreditationProcessBean?method=addStudentAccreditationToDB"/>
+		</when>
+		<log id="_log37" loggingLevel="WARN" message="${body.student.email} : Pushing the following accred to Salesforce. accreditationid=${body.accreditation.accreditationid} accreditationname=${body.accreditation.accreditationname}"/>
+   	</route>
     <!--    *************************************************************************************************************   -->
 
 

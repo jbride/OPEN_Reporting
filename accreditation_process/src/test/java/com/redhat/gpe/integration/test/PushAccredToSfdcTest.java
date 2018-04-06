@@ -62,26 +62,27 @@ public class PushAccredToSfdcTest extends CamelSpringTestSupport {
     public void testPushAccredToSfdcGivenKnownStudent() throws InterruptedException {
 
         Course course2 = new Course();
-        course2.setCourseid("DCI-TECH-PLT-EXAM-SAT6.1FST");
-        course2.setCoursename("Red Hat Satellite 6 Foundations");
+        course2.setCourseid("DCI-S-PLT-SAL-SAT");
+        course2.setCoursename("RHN Satellite Sales");
 
         Student student = new Student();
         student.setStudentid(10251);
+        student.setSalesforcefederationid("45");
         student.setEmail("adam.lister@e-business.com");
 
         Accreditation accreditation = new Accreditation();
         accreditation.setCourse(course2);
 
         AccreditationDefinition accreditationDefinition = new AccreditationDefinition();
-        accreditationDefinition.setAccreditationid(34);
-        accreditationDefinition.setAccreditationname("Red Hat Sales Engineer Specialist - Platform_with_4_courses");
+        accreditationDefinition.setAccreditationid(45);
+        accreditationDefinition.setAccreditationname("Red Hat Sales Specialist - Platform_with_2_courses");
 
         accreditation.setAccreditation(accreditationDefinition);
 
         StudentAccreditation studentAccreditation = new StudentAccreditation();
         studentAccreditation.setStudentid(10251);
         studentAccreditation.setAccreditationtype(StudentAccreditation.Types.Active.name());
-        studentAccreditation.setAccreditationid(34);
+        studentAccreditation.setAccreditationid(23);
         studentAccreditation.setAccreditationdate(new Timestamp(new Date().getTime()));
 
         accreditation.setStudentAccred(studentAccreditation);
