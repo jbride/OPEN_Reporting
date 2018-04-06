@@ -1111,7 +1111,7 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 			try {
 				HttpClient httpclient = HttpClients.createDefault();
 				HttpGet httpGet = new HttpGet(
-						sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/Catalog_ID__c/"
+						sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
 								+ accredObj.getAccreditationid());
 				httpGet.setHeader("Content-Type", "application/json");
 				setSfToken();

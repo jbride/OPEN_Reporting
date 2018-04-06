@@ -47,7 +47,7 @@ public class PushAccredToSfdcTest extends CamelSpringTestSupport {
 
     //@Ignore
     @Test
-    public void testForUnpushedSFDCAccred() throws InterruptedException {
+    public void testQueryForUnpushedAccred() throws InterruptedException {
         template.setDefaultEndpointUri(pushAccredToSfdcBatchURI);
         Endpoint endpoint = context.getEndpoint(pushAccredToSfdcBatchURI);
         Exchange exchange = endpoint.createExchange();
@@ -82,7 +82,7 @@ public class PushAccredToSfdcTest extends CamelSpringTestSupport {
         StudentAccreditation studentAccreditation = new StudentAccreditation();
         studentAccreditation.setStudentid(10251);
         studentAccreditation.setAccreditationtype(StudentAccreditation.Types.Active.name());
-        studentAccreditation.setAccreditationid(23);
+        studentAccreditation.setAccreditationid(45);
         studentAccreditation.setAccreditationdate(new Timestamp(new Date().getTime()));
 
         accreditation.setStudentAccred(studentAccreditation);
