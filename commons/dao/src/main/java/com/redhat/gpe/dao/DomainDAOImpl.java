@@ -529,7 +529,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append("\" ");
         }
         if(skillsBaseUploaded >= 0) {   
-        		sBuilder.append("AND ( s.skillsbasepartner = 1 ");
+                sBuilder.append("AND ( s.skillsbasepartner = 1 ");
         }
         if(StringUtils.isNotEmpty(studentEmailSuffix)) {
             sBuilder.append("OR s.email like \"%");
@@ -537,7 +537,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append("\"");
         }  
         if(skillsBaseUploaded >= 0) {   
-        		sBuilder.append(" )");
+                sBuilder.append(" )");
         }
         
         sBuilder.append(" ORDER BY sa.accreditationdate desc ");

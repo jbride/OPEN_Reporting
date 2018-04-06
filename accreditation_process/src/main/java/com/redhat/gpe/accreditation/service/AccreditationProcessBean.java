@@ -129,19 +129,19 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     
     //Variables for salesforce integration
     private static final String SF_USR = "sf_usr";
-	private static final String SF_PWD = "sf_pwd";
-	private static final String SF_LOGINURL = "sf_loginurl";
-	private static final String SF_GRANTSERVICE = "sf_grantservice";
-	private static final String SF_CLIENTID = "sf_clientid";
-	private static final String SF_CLIENTSECRET = "sf_clientsecret";
-	private String sfUsr;
-	private String sfPwd;
-	private String sfLoginUrl;
-	private String sfGrantService;
-	private String sfClientId;
-	private String sfClientSecret;
-	private String sfToken;
-	private static final String ACTIVE = "Active";
+    private static final String SF_PWD = "sf_pwd";
+    private static final String SF_LOGINURL = "sf_loginurl";
+    private static final String SF_GRANTSERVICE = "sf_grantservice";
+    private static final String SF_CLIENTID = "sf_clientid";
+    private static final String SF_CLIENTSECRET = "sf_clientsecret";
+    private String sfUsr;
+    private String sfPwd;
+    private String sfLoginUrl;
+    private String sfGrantService;
+    private String sfClientId;
+    private String sfClientSecret;
+    private String sfToken;
+    private static final String ACTIVE = "Active";
     
     public AccreditationProcessBean() {
         tokenUrl = System.getProperty(SB_TOKEN_URL);
@@ -194,34 +194,34 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         logger.info(sBuilder.toString()); 
 
         sfLoginUrl = System.getProperty(SF_LOGINURL);
-		if (StringUtils.isEmpty(sfLoginUrl))
-			throw new RuntimeException("must set system property: " + SF_LOGINURL);
+        if (StringUtils.isEmpty(sfLoginUrl))
+            throw new RuntimeException("must set system property: " + SF_LOGINURL);
 
-		sfUsr = System.getProperty(SF_USR);
-		if (StringUtils.isEmpty(sfUsr))
-			throw new RuntimeException("must set system property: " + SF_USR);
+        sfUsr = System.getProperty(SF_USR);
+        if (StringUtils.isEmpty(sfUsr))
+            throw new RuntimeException("must set system property: " + SF_USR);
 
-		sfPwd = System.getProperty(SF_PWD);
-		if (StringUtils.isEmpty(sfPwd))
-			throw new RuntimeException("must set system property: " + SF_PWD);
+        sfPwd = System.getProperty(SF_PWD);
+        if (StringUtils.isEmpty(sfPwd))
+            throw new RuntimeException("must set system property: " + SF_PWD);
 
-		sfClientId = System.getProperty(SF_CLIENTID);
-		if (StringUtils.isEmpty(sfClientId))
-			throw new RuntimeException("must set system property: " + SF_CLIENTID);
+        sfClientId = System.getProperty(SF_CLIENTID);
+        if (StringUtils.isEmpty(sfClientId))
+            throw new RuntimeException("must set system property: " + SF_CLIENTID);
 
-		sfClientSecret = System.getProperty(SF_CLIENTSECRET);
-		if (StringUtils.isEmpty(sfClientSecret))
-			throw new RuntimeException("must set system property: " + SF_CLIENTSECRET);
+        sfClientSecret = System.getProperty(SF_CLIENTSECRET);
+        if (StringUtils.isEmpty(sfClientSecret))
+            throw new RuntimeException("must set system property: " + SF_CLIENTSECRET);
 
-		sfGrantService = System.getProperty(SF_GRANTSERVICE);
-		if (StringUtils.isEmpty(sfGrantService))
-			throw new RuntimeException("must set system property: " + SF_GRANTSERVICE);
+        sfGrantService = System.getProperty(SF_GRANTSERVICE);
+        if (StringUtils.isEmpty(sfGrantService))
+            throw new RuntimeException("must set system property: " + SF_GRANTSERVICE);
 
-		StringBuilder sSFBuilder = new StringBuilder();
-		sSFBuilder.append("init() \n    sfLoginUrl = " + sfLoginUrl);
-		sSFBuilder.append("\n    sfClientId = " + sfClientId);
-		sSFBuilder.append("\n    sfClientSecret = " + sfClientSecret);
-		logger.info(sSFBuilder.toString());
+        StringBuilder sSFBuilder = new StringBuilder();
+        sSFBuilder.append("init() \n    sfLoginUrl = " + sfLoginUrl);
+        sSFBuilder.append("\n    sfClientId = " + sfClientId);
+        sSFBuilder.append("\n    sfClientSecret = " + sfClientSecret);
+        logger.info(sSFBuilder.toString());
     }
 
 
@@ -394,18 +394,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
     
     // Method to check student partner is salesforce
-	public boolean shouldStudentAccreditationBePushedToSfdc(@Body Accreditation saObj) {
-		if ((saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) < 0)
-				&& null != saObj.getAccreditation().getAccreditationid()
-				&& StringUtils.isNoneBlank(saObj.getStudent().getSalesforcefederationid())
-				&& null != saObj.getStudentAccred().getAccreditationdate()) {
-			return true;
-		} else {
-			logger.info("===== Incomplete Data. Will not update Sfdc. Accreditationid="
-					+ saObj.getAccreditation().getAccreditationid() + "StudentEmail=" + saObj.getStudent().getEmail());
-			return false;
-		}
-	}
+    public boolean shouldStudentAccreditationBePushedToSfdc(@Body Accreditation saObj) {
+        if ((saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) < 0)
+                && null != saObj.getAccreditation().getAccreditationid()
+                && StringUtils.isNoneBlank(saObj.getStudent().getSalesforcefederationid())
+                && null != saObj.getStudentAccred().getAccreditationdate()) {
+            return true;
+        } else {
+            logger.info("===== Incomplete Data. Will not update Sfdc. Accreditationid="
+                    + saObj.getAccreditation().getAccreditationid() + "StudentEmail=" + saObj.getStudent().getEmail());
+            return false;
+        }
+    }
    
     public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
         accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
@@ -1054,119 +1054,119 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
      * Method for generating and setting SalesForce token
      */
     public void setSfToken() {
-		HttpClient httpclient = HttpClients.createDefault();
+        HttpClient httpclient = HttpClients.createDefault();
 
-		// Assemble the login request URL
-		String loginURL = sfLoginUrl + sfGrantService + "&client_id=" + sfClientId + "&client_secret=" + sfClientSecret
-				+ "&username=" + sfUsr + "&password=" + sfPwd;
+        // Assemble the login request URL
+        String loginURL = sfLoginUrl + sfGrantService + "&client_id=" + sfClientId + "&client_secret=" + sfClientSecret
+                + "&username=" + sfUsr + "&password=" + sfPwd;
 
-		// Login requests must be POSTs
-		HttpPost httpPost = new HttpPost(loginURL);
-		HttpResponse response = null;
+        // Login requests must be POSTs
+        HttpPost httpPost = new HttpPost(loginURL);
+        HttpResponse response = null;
 
-		try {
-			// Execute the login POST request
-			response = httpclient.execute(httpPost);
-		} catch (ClientProtocolException cpException) {
-			// Handle protocol exception
-		} catch (IOException ioException) {
-			// Handle system IO exception
-		}
+        try {
+            // Execute the login POST request
+            response = httpclient.execute(httpPost);
+        } catch (ClientProtocolException cpException) {
+            // Handle protocol exception
+        } catch (IOException ioException) {
+            // Handle system IO exception
+        }
 
-		// verify response is HTTP OK
-		final int statusCode = response.getStatusLine().getStatusCode();
-		logger.info("---- authStatusCode=" + statusCode);
+        // verify response is HTTP OK
+        final int statusCode = response.getStatusLine().getStatusCode();
+        logger.info("---- authStatusCode=" + statusCode);
 
-		String resp = null;
-		try {
-			resp = EntityUtils.toString(response.getEntity());
-		} catch (IOException ioException) {
-			// Handle system IO exception
-		}
-		JSONObject jsonObject = null;
-		String authTokenOrSessionId = null;
-		try {
-			jsonObject = (JSONObject) new JSONTokener(resp).nextValue();
-			authTokenOrSessionId = jsonObject.getString("access_token");
-		} catch (JSONException jsonException) {
-			// Handle JSON exception
-		}
-		// release connection
-		httpPost.releaseConnection();
-		sfToken = authTokenOrSessionId;
-	}
+        String resp = null;
+        try {
+            resp = EntityUtils.toString(response.getEntity());
+        } catch (IOException ioException) {
+            // Handle system IO exception
+        }
+        JSONObject jsonObject = null;
+        String authTokenOrSessionId = null;
+        try {
+            jsonObject = (JSONObject) new JSONTokener(resp).nextValue();
+            authTokenOrSessionId = jsonObject.getString("access_token");
+        } catch (JSONException jsonException) {
+            // Handle JSON exception
+        }
+        // release connection
+        httpPost.releaseConnection();
+        sfToken = authTokenOrSessionId;
+    }
 
     /**
      * Method for posting Student Accreditation record to SalesForce
      */
-	public void postAccreditationToSfdc(Exchange exchange) throws SkillsBaseCommunicationException {
-		Message in = exchange.getIn();
-		Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
+    public void postAccreditationToSfdc(Exchange exchange) throws SkillsBaseCommunicationException {
+        Message in = exchange.getIn();
+        Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
 
-		Student studentObj = denormalizedStudentAccred.getStudent();
-		AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
-		StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
-			String accredName = accredObj.getAccreditationname();
-			String response = null;
-			try {
-				HttpClient httpclient = HttpClients.createDefault();
-				HttpGet httpGet = new HttpGet(
-						sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
-								+ accredObj.getAccreditationid());
-				httpGet.setHeader("Content-Type", "application/json");
-				setSfToken();
-				httpGet.setHeader("Authorization", "Bearer " + sfToken);
-				HttpResponse getResponse = httpclient.execute(httpGet);
-				final int getStatusCode = getResponse.getStatusLine().getStatusCode();
-				if (HttpStatus.SC_NOT_FOUND == getStatusCode) {
-					// set up SalesForce request
-					String accredDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
-					Date accredEndDate = addMonthsToDate(sAccredObj.getAccreditationdate(), expiredMonths);
-					String expirationDateStr = dateFormatter.format(accredEndDate);
+        Student studentObj = denormalizedStudentAccred.getStudent();
+        AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
+        StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
+            String accredName = accredObj.getAccreditationname();
+            String response = null;
+            try {
+                HttpClient httpclient = HttpClients.createDefault();
+                HttpGet httpGet = new HttpGet(
+                        sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
+                                + accredObj.getAccreditationid());
+                httpGet.setHeader("Content-Type", "application/json");
+                setSfToken();
+                httpGet.setHeader("Authorization", "Bearer " + sfToken);
+                HttpResponse getResponse = httpclient.execute(httpGet);
+                final int getStatusCode = getResponse.getStatusLine().getStatusCode();
+                if (HttpStatus.SC_NOT_FOUND == getStatusCode) {
+                    // set up SalesForce request
+                    String accredDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+                    Date accredEndDate = addMonthsToDate(sAccredObj.getAccreditationdate(), expiredMonths);
+                    String expirationDateStr = dateFormatter.format(accredEndDate);
 
-					boolean isActive = null != sAccredObj.getAccreditationtype()
-							&& ACTIVE.equalsIgnoreCase(sAccredObj.getAccreditationtype());
+                    boolean isActive = null != sAccredObj.getAccreditationtype()
+                            && ACTIVE.equalsIgnoreCase(sAccredObj.getAccreditationtype());
 
-					StringEntity request = new StringEntity(
-							"{\"Federation_ID__c\":\"" + studentObj.getSalesforcefederationid() + "\", "
-									+ "\"Date_Achieved__c\":\"" + accredDateStr + "\", " + "\"Expiration_Date__c\":\""
-									+ expirationDateStr + "\", " + "\"is_Active__c\":\"" + isActive + "\"}");
+                    StringEntity request = new StringEntity(
+                            "{\"Federation_ID__c\":\"" + studentObj.getSalesforcefederationid() + "\", "
+                                    + "\"Date_Achieved__c\":\"" + accredDateStr + "\", " + "\"Expiration_Date__c\":\""
+                                    + expirationDateStr + "\", " + "\"is_Active__c\":\"" + isActive + "\"}");
 
-					HttpPatch httpPatch = new HttpPatch(
-							sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
-									+ accredObj.getAccreditationid());
-					httpPatch.setHeader("Content-Type", "application/json");
-					logger.info("---- Salesforce patchResquest=" + request.toString());
-					httpPatch.setEntity(request);
-					httpPatch.setHeader("Authorization", "Bearer " + sfToken);
-					// send POST message
-					HttpResponse httpResponse = httpclient.execute(httpPatch);
+                    HttpPatch httpPatch = new HttpPatch(
+                            sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
+                                    + accredObj.getAccreditationid());
+                    httpPatch.setHeader("Content-Type", "application/json");
+                    logger.info("---- Salesforce patchResquest=" + request.toString());
+                    httpPatch.setEntity(request);
+                    httpPatch.setHeader("Authorization", "Bearer " + sfToken);
+                    // send POST message
+                    HttpResponse httpResponse = httpclient.execute(httpPatch);
 
-					final int statusCode = httpResponse.getStatusLine().getStatusCode();
-					// process response
-					response = EntityUtils.toString(httpResponse.getEntity());
-					logger.info("---- Salesforce patchResponse=" + response);
-					if (statusCode != HttpStatus.SC_CREATED) {
-						String message = "Error pushing qualification to salesforce. Student email: "
-								+ studentObj.getEmail() + ",  qualification: " + accredName + ", External_ID__c="
-								+ accredObj.getAccreditationid() + ", Accreditationid="
-								+ accredObj.getAccreditationid();
-						logger.error(message);
-					}
-					httpPatch.releaseConnection();
-				} else {
-					logger.info("===== Record exists in salesforce. External_ID__c=" + accredObj.getAccreditationid()
-							+ ", Student email: " + studentObj.getEmail() + ", qualification: " + accredName);
+                    final int statusCode = httpResponse.getStatusLine().getStatusCode();
+                    // process response
+                    response = EntityUtils.toString(httpResponse.getEntity());
+                    logger.info("---- Salesforce patchResponse=" + response);
+                    if (statusCode != HttpStatus.SC_CREATED) {
+                        String message = "Error pushing qualification to salesforce. Student email: "
+                                + studentObj.getEmail() + ",  qualification: " + accredName + ", External_ID__c="
+                                + accredObj.getAccreditationid() + ", Accreditationid="
+                                + accredObj.getAccreditationid();
+                        logger.error(message);
+                    }
+                    httpPatch.releaseConnection();
+                } else {
+                    logger.info("===== Record exists in salesforce. External_ID__c=" + accredObj.getAccreditationid()
+                            + ", Student email: " + studentObj.getEmail() + ", qualification: " + accredName);
 
-				}
-				httpGet.releaseConnection();
-			} catch (Exception exc) {
-				handleSkillsBaseResponseException(exc, response);
-				throw (new SkillsBaseCommunicationException());
-			}
-	}
+                }
+                httpGet.releaseConnection();
+            } catch (Exception exc) {
+                handleSkillsBaseResponseException(exc, response);
+                throw (new SkillsBaseCommunicationException());
+            }
+    }
 
-	public void setPushedAccreditationToSfdc(@Body Accreditation accredObj ) {
+    public void setPushedAccreditationToSfdc(@Body Accreditation accredObj ) {
         accredObj.getStudentAccred().setSalesforceuploaded(StudentAccreditation.PROCESSED_SALESFORCE_ONLY);;
     }
 
