@@ -60,7 +60,7 @@ public interface CanonicalDomainDAO {
     
     /* *******  Accreditations  ********/
     public int getAccreditationIdGivenName(String accredName);
-    public List<Accreditation> selectStudentAccreditations(int skillsBaseUploaded, int salesForceUploaded, String studentEmailSuffix);
+    public List<Accreditation> selectStudentAccreditations(int skillsBaseUploaded, int salesForceUploaded, String studentEmailSuffix, String notWithEmailSuffix);
     public List<Accreditation> selectStudentAccreditationByStudentId(int studentId, int processed);
     public int changeStatusOnExpiredStudentAccreditations();
     public void addStudentAccreditation(StudentAccreditation sAccredObj);

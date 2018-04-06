@@ -18,19 +18,26 @@ import org.apache.camel.Message;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.json.JSONArray;
+import org.json.JSONException;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -116,7 +123,23 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     private DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
 
     private boolean sb_neverCheckForExistingAccred = true;
-
+    
+    //Variables for salesforce integration
+    private static final String SF_USR = "sf_usr";
+	private static final String SF_PWD = "sf_pwd";
+	private static final String SF_LOGINURL = "sf_loginurl";
+	private static final String SF_GRANTSERVICE = "sf_grantservice";
+	private static final String SF_CLIENTID = "sf_clientid";
+	private static final String SF_CLIENTSECRET = "sf_clientsecret";
+	private String sfUsr;
+	private String sfPwd;
+	private String sfLoginUrl;
+	private String sfGrantService;
+	private String sfClientId;
+	private String sfClientSecret;
+	private String sfToken;
+	private static final String ACTIVE = "Active";
+    
     public AccreditationProcessBean() {
         tokenUrl = System.getProperty(SB_TOKEN_URL);
         if(StringUtils.isEmpty(tokenUrl))
@@ -166,6 +189,36 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
         sBuilder.append("\n    expiredMonths = "+expiredMonths);
         sBuilder.append("\n    sb_neverCheckForExistingAccred = "+sb_neverCheckForExistingAccred);
         logger.info(sBuilder.toString()); 
+
+        sfLoginUrl = System.getProperty(SF_LOGINURL);
+		if (StringUtils.isEmpty(sfLoginUrl))
+			throw new RuntimeException("must set system property: " + SF_LOGINURL);
+
+		sfUsr = System.getProperty(SF_USR);
+		if (StringUtils.isEmpty(sfUsr))
+			throw new RuntimeException("must set system property: " + SF_USR);
+
+		sfPwd = System.getProperty(SF_PWD);
+		if (StringUtils.isEmpty(sfPwd))
+			throw new RuntimeException("must set system property: " + SF_PWD);
+
+		sfClientId = System.getProperty(SF_CLIENTID);
+		if (StringUtils.isEmpty(sfClientId))
+			throw new RuntimeException("must set system property: " + SF_CLIENTID);
+
+		sfClientSecret = System.getProperty(SF_CLIENTSECRET);
+		if (StringUtils.isEmpty(sfClientSecret))
+			throw new RuntimeException("must set system property: " + SF_CLIENTSECRET);
+
+		sfGrantService = System.getProperty(SF_GRANTSERVICE);
+		if (StringUtils.isEmpty(sfGrantService))
+			throw new RuntimeException("must set system property: " + SF_GRANTSERVICE);
+
+		StringBuilder sSFBuilder = new StringBuilder();
+		sSFBuilder.append("init() \n    sfLoginUrl = " + sfLoginUrl);
+		sSFBuilder.append("\n    sfClientId = " + sfClientId);
+		sSFBuilder.append("\n    sfClientSecret = " + sfClientSecret);
+		logger.info(sSFBuilder.toString());
     }
 
 
@@ -207,12 +260,24 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 /*  ************    Student Accreditation CRUD Operations     *************************** */
     
     public List<Accreditation> selectStudentAccreditationsNotUploadedToSkillsBase() {
-        List<Accreditation> sAccreds = canonicalDAO.selectStudentAccreditations(StudentAccreditation.NOT_UPLOADED, -1, Student.RED_HAT_EMAIL_SUFFIX);
+        List<Accreditation> sAccreds = canonicalDAO.selectStudentAccreditations(StudentAccreditation.NOT_UPLOADED, -1, Student.RED_HAT_EMAIL_SUFFIX, null);
         if(sAccreds == null || sAccreds.isEmpty()) {
             logger.info("selectStudentAccreditationsNotUploadedToSkillsBase() no StudentAccreditation objects found with status = "+StudentAccreditation.NOT_UPLOADED);
         }
         else {
             logger.info("selectStudentAccreditationsNotUploadedToSkillsBase() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
+        }
+        return sAccreds;
+    }
+    
+    // Method for selecting student list to push accreditation into salesforce
+    public List<Accreditation> selectStudentAccreditationsNotUploadedToSfdc() {
+        List<Accreditation> sAccreds = canonicalDAO.selectStudentAccreditations(-1, StudentAccreditation.NOT_UPLOADED, null, Student.RED_HAT_EMAIL_SUFFIX);
+        if(sAccreds == null || sAccreds.isEmpty()) {
+            logger.info("selectStudentAccreditationsNotUploadedToSfdc() no StudentAccreditation objects found with status = "+StudentAccreditation.NOT_UPLOADED);
+        }
+        else {
+            logger.info("selectStudentAccreditationsNotUploadedToSfdc() Will evaluate following # of StudentAccreditation objects: "+sAccreds.size());
         }
         return sAccreds;
     }
@@ -321,6 +386,16 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             return true;
         }else {
             logger.debug(saObj.getStudent().getEmail()+" : Neither a Red Hat associate nor eligible partner.  Will not update SkillsBase");
+            return false;
+        }
+    }
+    
+    // Method to check student partner is salesforce
+    public boolean shouldStudentAccreditationBePushedToSfdc(@Body Accreditation saObj) {
+        if((saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) < 0) || (Student.SALES_FORCE_ACTIVE.equals(saObj.getStudent().getSalesforceactive()))) {
+            return true;
+        }else {
+            logger.debug(saObj.getStudent().getEmail()+" : A Red Hat associate nor eligible partner.  Will not update Sfdc");
             return false;
         }
     }
@@ -966,6 +1041,125 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
             handleSkillsBaseResponseException(exc, response);
             throw (new SkillsBaseCommunicationException());
         }
+    }
+    
+    public void setSfToken() {
+		HttpClient httpclient = HttpClients.createDefault();
+
+		// Assemble the login request URL
+		String loginURL = sfLoginUrl + sfGrantService + "&client_id=" + sfClientId + "&client_secret=" + sfClientSecret
+				+ "&username=" + sfUsr + "&password=" + sfPwd;
+
+		// Login requests must be POSTs
+		HttpPost httpPost = new HttpPost(loginURL);
+		HttpResponse response = null;
+
+		try {
+			// Execute the login POST request
+			response = httpclient.execute(httpPost);
+		} catch (ClientProtocolException cpException) {
+			// Handle protocol exception
+		} catch (IOException ioException) {
+			// Handle system IO exception
+		}
+
+		// verify response is HTTP OK
+		final int statusCode = response.getStatusLine().getStatusCode();
+		logger.info("authStatusCode" + statusCode);
+
+		String resp = null;
+		try {
+			resp = EntityUtils.toString(response.getEntity());
+		} catch (IOException ioException) {
+			// Handle system IO exception
+		}
+		logger.info("authResponse=" + resp);
+		JSONObject jsonObject = null;
+		String authTokenOrSessionId = null;
+		try {
+			jsonObject = (JSONObject) new JSONTokener(resp).nextValue();
+			authTokenOrSessionId = jsonObject.getString("access_token");
+		} catch (JSONException jsonException) {
+			// Handle JSON exception
+		}
+		// release connection
+		httpPost.releaseConnection();
+		sfToken = authTokenOrSessionId;
+	}
+
+	public void postAccreditationToSfdc(Exchange exchange) throws SkillsBaseCommunicationException {
+		Message in = exchange.getIn();
+		Accreditation denormalizedStudentAccred = in.getBody(Accreditation.class);
+
+		Student studentObj = denormalizedStudentAccred.getStudent();
+		AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
+		StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
+
+		String accredName = accredObj.getAccreditationname();
+		String response = null;
+		try {
+
+			HttpClient httpclient = HttpClients.createDefault();
+			HttpGet httpGet = new HttpGet(sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
+					+ accredObj.getAccreditationid());
+			httpGet.setHeader("Content-Type", "application/json");
+			setSfToken();
+			httpGet.setHeader("Authorization", "Bearer " + sfToken);
+			HttpResponse getResponse = httpclient.execute(httpGet);
+			final int getStatusCode = getResponse.getStatusLine().getStatusCode();
+			if (HttpStatus.SC_NOT_FOUND == getStatusCode) {
+				// set up name value pairs
+				List<NameValuePair> partnerTraining = new ArrayList<NameValuePair>();
+				partnerTraining.add(new BasicNameValuePair("Catalog_ID__c", accredObj.getAccreditationid().toString()));
+				partnerTraining.add(new BasicNameValuePair("Federation_ID__c", studentObj.getSalesforcefederationid()));
+
+				String accredDateStr = dateFormatter.format(sAccredObj.getAccreditationdate());
+				partnerTraining.add(new BasicNameValuePair("Date_Achieved__c", accredDateStr));
+
+				Date accredEndDate = addMonthsToDate(sAccredObj.getAccreditationdate(), expiredMonths);
+				String expirationDateStr = dateFormatter.format(accredEndDate);
+				partnerTraining.add(new BasicNameValuePair("Expiration_Date__c", expirationDateStr));
+
+				Boolean isActive = null != sAccredObj.getAccreditationtype()
+						&& ACTIVE.equalsIgnoreCase(sAccredObj.getAccreditationtype());
+				partnerTraining.add(new BasicNameValuePair("is_Active__c", isActive.toString()));
+
+				HttpPatch httpPatch = new HttpPatch(
+						sfLoginUrl + "/services/data/v42.0/sobjects/LMS_Training__c/External_ID__c/"
+								+ accredObj.getAccreditationid());
+				httpPatch.setHeader("Content-Type", "application/json");
+				httpPatch.setEntity(new UrlEncodedFormEntity(partnerTraining));
+				setSfToken();
+				httpPatch.setHeader("Authorization", "Bearer " + sfToken);
+				// send POST message
+				HttpResponse httpResponse = httpclient.execute(httpPatch);
+
+				final int statusCode = httpResponse.getStatusLine().getStatusCode();
+				// process response
+				response = EntityUtils.toString(httpResponse.getEntity());
+				logger.info("Salesforce patchResponse=" + response);
+				if (statusCode != HttpStatus.SC_CREATED) {
+					String message = "Error pushing qualification to salesforce. Student email: "
+							+ studentObj.getEmail() + ",  qualification: " + accredName 
+							+ ", External_ID__c="+accredObj.getAccreditationid() 
+							+ ", Accreditationid="+accredObj.getAccreditationid();
+					logger.error(message);
+				}
+				httpPatch.releaseConnection();
+			} else {
+				logger.info("Record exists in salesforce. External_ID__c=" + accredObj.getAccreditationid()
+						+ ", Student email: " + studentObj.getEmail() + ", qualification: " + accredName);
+
+			}
+			httpGet.releaseConnection();
+		} catch (Exception exc) {
+			handleSkillsBaseResponseException(exc, response);
+			throw (new SkillsBaseCommunicationException());
+		}
+	}
+	
+	public void setPushedAccreditationToSfdc(@Body Accreditation accredObj ) {
+        accredObj.getStudentAccred().setSalesforceuploaded(StudentAccreditation.PROCESSED_SALESFORCE_ONLY);;
     }
 
     private void handleSkillsBaseResponseException(Exception x, String skillsBaseResponse) {

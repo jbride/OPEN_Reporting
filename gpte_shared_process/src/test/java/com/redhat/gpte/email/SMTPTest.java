@@ -52,7 +52,7 @@ public class SMTPTest {
      *      mvn test -Dgpte_smtp_server=smtp.mail.yahoo.com -Dgpte_smtp_port=465 -Dgpte_email_username=rhtgptetest@yahoo.com -Dgpte_email_password=3_aY1wHZaU0qQp-1vZBNGZty -DreplyTo_email=rhtgptetest@yahoo.com -Drecipient_email=rhtgptetest@yahoo.com
      *      mvn test -Dgpte_smtp_server=smtp.mail.yahoo.com -Dgpte_smtp_port=465 -Dgpte_email_username=rhtgptetest@yahoo.com -Dgpte_email_password=3_aY1wHZaU0qQp-1vZBNGZty -DreplyTo_email=no-reply@cloudapps.5b3d.3scale.opentlc.com -Drecipient_email=rhtgptetest@yahoo.com
     */
-    //@Ignore
+    @Ignore
     @Test
     public void testSMTPServerConnectionAndSend() throws Exception {
 

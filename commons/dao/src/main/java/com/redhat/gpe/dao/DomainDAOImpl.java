@@ -504,7 +504,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
     
 /* *******************    StudentAccreditation    ************************************************ */
     
-    public List<Accreditation> selectStudentAccreditations(int skillsBaseUploaded, int salesForceUploaded, String studentEmailSuffix) {
+    public List<Accreditation> selectStudentAccreditations(int skillsBaseUploaded, int salesForceUploaded, String studentEmailSuffix, String notWithEmailSuffix) {
         StringBuilder sBuilder = new StringBuilder();
         sBuilder.append("SELECT "+Student.SELECT_CLAUSE+","+AccreditationDefinition.SELECT_CLAUSE+","+StudentAccreditation.SELECT_CLAUSE+","+Course.SELECT_CLAUSE+" "); 
         sBuilder.append("FROM Students s, AccreditationDefinitions a, StudentAccreditations sa, Courses c ");
@@ -522,14 +522,23 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
             sBuilder.append(salesForceUploaded);
             sBuilder.append(" ");
         }
-       
-        sBuilder.append("AND ( s.skillsbasepartner = 1 ");
+        
+        if(StringUtils.isNotEmpty(notWithEmailSuffix)) {
+            sBuilder.append("AND s.email not like \"%");
+            sBuilder.append(studentEmailSuffix);
+            sBuilder.append("\" ");
+        }
+        if(skillsBaseUploaded >= 0) {   
+        		sBuilder.append("AND ( s.skillsbasepartner = 1 ");
+        }
         if(StringUtils.isNotEmpty(studentEmailSuffix)) {
             sBuilder.append("OR s.email like \"%");
             sBuilder.append(studentEmailSuffix);
             sBuilder.append("\"");
+        }  
+        if(skillsBaseUploaded >= 0) {   
+        		sBuilder.append(" )");
         }
-        sBuilder.append(" )");
         
         sBuilder.append(" ORDER BY sa.accreditationdate desc ");
         logger.debug("selectStudentAccreditations() query = "+sBuilder.toString());
