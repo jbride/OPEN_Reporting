@@ -394,14 +394,18 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
     }
     
     // Method to check student partner is salesforce
-    public boolean shouldStudentAccreditationBePushedToSfdc(@Body Accreditation saObj) {
-        if((saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) < 0) || (Student.SALES_FORCE_ACTIVE.equals(saObj.getStudent().getSalesforceactive()))) {
-            return true;
-        }else {
-            logger.debug(saObj.getStudent().getEmail()+" : A Red Hat associate nor eligible partner.  Will not update Sfdc");
-            return false;
-        }
-    }
+	public boolean shouldStudentAccreditationBePushedToSfdc(@Body Accreditation saObj) {
+		if ((saObj.getStudent().getEmail().indexOf(RED_HAT_SUFFIX) < 0)
+				&& null != saObj.getAccreditation().getAccreditationid()
+				&& StringUtils.isNoneBlank(saObj.getStudent().getSalesforcefederationid())
+				&& null != saObj.getStudentAccred().getAccreditationdate()) {
+			return true;
+		} else {
+			logger.info("===== Incomplete Data. Will not update Sfdc. Accreditationid="
+					+ saObj.getAccreditation().getAccreditationid() + "StudentEmail=" + saObj.getStudent().getEmail());
+			return false;
+		}
+	}
    
     public void setProcessedOnAccreditation(@Body Accreditation accredObj ) {
         accredObj.getStudentAccred().setProcessed(StudentAccreditation.PROCESSED_SKILLS_BASE_ONLY);
@@ -1102,8 +1106,6 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 		Student studentObj = denormalizedStudentAccred.getStudent();
 		AccreditationDefinition accredObj = denormalizedStudentAccred.getAccreditation();
 		StudentAccreditation sAccredObj = denormalizedStudentAccred.getStudentAccred();
-		if (null != accredObj.getAccreditationid() && StringUtils.isNoneBlank(studentObj.getSalesforcefederationid())
-				&& null != sAccredObj.getAccreditationdate()) {
 			String accredName = accredObj.getAccreditationname();
 			String response = null;
 			try {
@@ -1162,10 +1164,6 @@ public class AccreditationProcessBean extends GPTEBaseServiceBean {
 				handleSkillsBaseResponseException(exc, response);
 				throw (new SkillsBaseCommunicationException());
 			}
-		} else {
-			logger.info("===== Incomplete Student Accredatitions Data. Data not pushed to SFDC. Accreditationid="
-					+ accredObj.getAccreditationid());
-		}
 	}
 
 	public void setPushedAccreditationToSfdc(@Body Accreditation accredObj ) {
