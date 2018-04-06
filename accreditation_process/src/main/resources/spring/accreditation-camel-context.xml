@@ -599,7 +599,7 @@
 					method="shouldStudentAccreditationBePushedToSfdc" ref="accreditationProcessBean"/>
 				<choice id="_choice16">
 					<when id="_when24">
-						<simple>${header.DETERMINE_UNPROCESSED_ACCREDS_ONLY} != true</simple>
+						<simple>${header.DETERMINE_UNSFDCPUSH_ACCREDS_ONLY} != true</simple>
           				<log id="_log34" message="${body.student.email} : Will update Salesforce Accreditation = ${body.accreditation.accreditationname}"/>
           				<to id="invoke-push-accred-to-sfdc" uri="direct:push-accred-to-sfdc"/>
          			</when>

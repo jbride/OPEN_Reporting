@@ -47,13 +47,13 @@ public class PushAccredToSfdcTest extends CamelSpringTestSupport {
 
     //@Ignore
     @Test
-    public void testQueryForUnpushedAccred() throws InterruptedException {
+    public void testForUnpushedSFDCAccred() throws InterruptedException {
         template.setDefaultEndpointUri(pushAccredToSfdcBatchURI);
         Endpoint endpoint = context.getEndpoint(pushAccredToSfdcBatchURI);
         Exchange exchange = endpoint.createExchange();
         exchange.setPattern(ExchangePattern.InOnly);
         Message in = exchange.getIn();
-        in.setHeader("DETERMINE_UNPROCESSED_ACCREDS_ONLY", true);
+        in.setHeader("DETERMINE_UNSFDCPUSH_ACCREDS_ONLY", true);
         template.send(pushAccredToSfdcBatchURI, exchange);
     }
 
