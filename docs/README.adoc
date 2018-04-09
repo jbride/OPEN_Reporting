@@ -68,9 +68,9 @@ The intended audience of this document architects, developers and administrators
 
 Each environment consists of a VM. Here is a list of the current VMs.
 
-. *prod* :   apps-iad01.opentl.com / reporting.opentlc.com
-. *qa*   :   qa-fso00   / qa.opentlc.com
-. *dev*  :   apps-iad00 / qa.opentlc.com
+. *prod* :   reporting.opentlc.com
+. *qa*   :   qa.opentlc.com
+. *dev*  :   dev.opentlc.com
 
 The following shell commands will allow you access to the VMs:
 
