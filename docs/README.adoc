@@ -151,7 +151,7 @@ You can also check what the local properties are by the command "vi /opt/OPEN_Re
 
 To update a GPTE Reporting environment, execute the following:
 
-. Point your browser to:  `https://forge.opentlc.com/jenkins`
+. Point your browser to:  `https://jenkins.opentlc.com/jenkins`
 . Authenticate using your _OPENTLC_ userId and password.
 . Navigate to `GPTE Reporting -> update_gpte_reporting`
 +
@@ -177,7 +177,7 @@ image::images/updated_build.png[]
 . The backup occurs via a Jenkins job
 +
 image::images/prod_backup_job.png[]
-. A zip of both databases can be found at the following: `forge.opentlc.com:/tmp/mysqlbackup_target/`
+. A zip of both databases can be found at the following: `jenkins.opentlc.com:/tmp/mysqlbackup_target/`
 
 === Recovery
 If the production database at `reporting.opentlc.com` was to be lost, then it could be fully recovered as follows:
@@ -186,7 +186,7 @@ If the production database at `reporting.opentlc.com` was to be lost, then it co
 . Populate the `lms_transactional` and `lms_reporting` databases from the backups:
 .. ssh reporting.opentlc.com
 .. mkdir -p /tmp/mysqlbackup_target
-.. scp forge.opentlc.com:/tmp/mysqlbackup_target/* /tmp/mysqlbackup_target
+.. scp jenkins.opentlc.com:/tmp/mysqlbackup_target/* /tmp/mysqlbackup_target
 .. unzip both files in /tmp/mysqlbackup_target
 .. Use the command line mysql utility to import into each corresponding database.
 
