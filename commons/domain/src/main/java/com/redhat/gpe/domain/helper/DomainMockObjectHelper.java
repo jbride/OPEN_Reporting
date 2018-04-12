@@ -63,7 +63,7 @@ public class DomainMockObjectHelper {
 
     public static Student getMockRHTStudent() {
         Student studentObj = new Student();
-        studentObj.setStudentid(rhtStudentId);
+        //studentObj.setStudentid(rhtStudentId);
         studentObj.setEmail(rhtEmail);
         return studentObj;
     }

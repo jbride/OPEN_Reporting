@@ -34,7 +34,7 @@ public class StudentTest extends CamelSpringTestSupport {
     public void init() {
     }
     
-    //@Ignore
+    @Ignore
     @Test
     public void testPersistPartnerStudent() throws InterruptedException {
         Student studentObj = DomainMockObjectHelper.getMockStudent();
