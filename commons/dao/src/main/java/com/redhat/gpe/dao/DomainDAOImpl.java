@@ -146,7 +146,7 @@ public class DomainDAOImpl implements CanonicalDomainDAO {
 
         try {
             if(studentObj.getStudentid() == 0) {
-                StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
+                StringBuilder sBuilder = new StringBuilder("insert into Students values (null,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) ");
                 sbJdbcTemplate.update(sBuilder.toString(), 
                         studentObj.getEmail().toLowerCase(), 
                         studentObj.getFirstname(),
