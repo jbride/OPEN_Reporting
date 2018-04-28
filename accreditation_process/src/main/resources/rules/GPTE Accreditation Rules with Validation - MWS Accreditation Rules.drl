@@ -1444,7 +1444,7 @@ when
     $cc1:CourseCompletion(name == "Application Modernization Foundations")
     $cc2:CourseCompletion(this != $cc1, name == "Microservices Development with WildFly Swarm")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Microservices Development with Vert.x")
-    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Microservices Development with Spring Boot")
+    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Advanced Microservices Development")
     $cc5:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, name == "Advanced Microservices Development")
     eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2018", "", $cc1, $cc2, $cc3, $cc4, $cc5 ))
 then
@@ -1497,7 +1497,7 @@ when
     $student:Student()
     $cc1:CourseCompletion(name == "3scale Foundations")
     $cc2:CourseCompletion(this != $cc1, name == "3scale Implementation")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2017", "18-May-2018", $cc1, $cc2))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2017", "27-April-2018", $cc1, $cc2))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2);
 
@@ -1584,16 +1584,15 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "71_Red Hat Delivery Specialist - Cloud-Native Development_with_4_courses"
+rule "71_Red Hat Delivery Specialist - Cloud-Native Development_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Application Modernization Foundations")
     $cc2:CourseCompletion(this != $cc1, name == "Microservices Development with WildFly Swarm")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Microservices Development with Vert.x")
-    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Microservices Development with Spring Boot")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2018", "", $cc1, $cc2, $cc3, $cc4 ))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Mar-2018", "", $cc1, $cc2, $cc3))
 then
-    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4 );
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3);
 
     Accreditation accreditation = new Accreditation();
     accreditation.setName("Red Hat Delivery Specialist - Cloud-Native Development");
