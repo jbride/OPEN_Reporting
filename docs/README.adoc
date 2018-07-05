@@ -570,6 +570,13 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/batch
 -----
 
+==== Interpreting the Accreditation Rules
+In order to earn or renew an accreditation the following must all be true:
+
+. A student must complete all courses for the rule before the rule's end date.
+. A student must complete at least one course for the rule between the rule's start date and end date.
+. The accreditation date is most recent assessment date of all completions in the rule that occur prior to the rule's end date.
+
 == SalesForce Integration
 
 https://docs.google.com/document/d/1vk_oKIzdrhiuTNCbjLgM7IoLohjw8Z2Z3d1FWPDUNsM/edit
