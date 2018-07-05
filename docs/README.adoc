@@ -479,7 +479,7 @@ Its purpose is to:
 +
 In particular, the `accred-process` background job periodically determines new accreditations based on new course completions that have entered the system during that time period.
 
-Interpreting the Accreditation Rules
+*Interpreting the Accreditation Rules*
 
 In order to earn or renew an accreditation the following must all be true:
 
@@ -576,13 +576,6 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 -H "HIGH_STUDENT_ID: 11000" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/batch
 -----
-
-==== Interpreting the Accreditation Rules
-In order to earn or renew an accreditation the following must all be true:
-
-. A student must complete all courses for the rule before the rule's end date.
-. A student must complete at least one course for the rule between the rule's start date and end date.
-. The accreditation date is most recent assessment date of all completions in the rule that occur prior to the rule's end date.
 
 == SalesForce Integration
 
