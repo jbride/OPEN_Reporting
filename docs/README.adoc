@@ -482,6 +482,7 @@ In particular, the `accred-process` background job periodically determines new a
 Interpreting the Accreditation Rules
 
 In order to earn or renew an accreditation the following must all be true:
+
 . A student must complete all courses for the rule before the rule's end date.
 . A student must complete at least one course for the rule between the rule's start date and end date.
 . The accreditation date is most recent assessment date of all completions in the rule that occur prior to the rule's end date.
