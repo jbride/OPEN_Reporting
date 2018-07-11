@@ -633,7 +633,7 @@ when
     $cc2:CourseCompletion(this != $cc1, name == "RHN Satellite Sales")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Red Hat Enterprise Linux 7 Implementation")
     $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Red Hat Satellite 6 Foundations")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Aug-2015", "", $cc1, $cc2, $cc3, $cc4 ))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Aug-2015", "22-Jun-2018", $cc1, $cc2, $cc3, $cc4 ))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4 );
 
@@ -696,7 +696,32 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "32_Red Hat Sales Engineer Specialist - Platform_with_4_courses"
+rule "32_Red Hat Delivery Specialist - Platform_with_4_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(name == "Red Hat Enterprise Linux 7 Implementation")
+    $cc2:CourseCompletion(this != $cc1, name == "Red Hat Satellite 6 Foundations")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Red Hat Satellite 6 Implementation")
+    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Red Hat Satellite 6 Delta")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jun-2018", "", $cc1, $cc2, $cc3, $cc4 ))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4 );
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setName("Red Hat Delivery Specialist - Platform");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getName());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "33_Red Hat Sales Engineer Specialist - Platform_with_4_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Platform 2.0 for Sales")
@@ -721,7 +746,33 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "33_Red Hat Delivery Specialist - Virtualization_with_2_courses"
+rule "34_Red Hat Sales Engineer Specialist - Platform_with_5_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(name == "Platform 2.0 for Sales")
+    $cc2:CourseCompletion(this != $cc1, name == "Satellite Overview")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Red Hat Enterprise Linux 7 Implementation")
+    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Red Hat Satellite 6 Foundations")
+    $cc5:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, name == "Red Hat Satellite 6 Delta")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jun-2018", "", $cc1, $cc2, $cc3, $cc4, $cc5 ))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4, $cc5 );
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setName("Red Hat Sales Engineer Specialist - Platform");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getName());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "35_Red Hat Delivery Specialist - Virtualization_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Enterprise Virtualization FASTRAX")
@@ -744,7 +795,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "34_Red Hat Sales Engineer Specialist - Storage_with_1_course"
+rule "36_Red Hat Sales Engineer Specialist - Storage_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for PreSales")
@@ -766,7 +817,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "35_Red Hat Sales Engineer Specialist - Virtualization_with_2_courses"
+rule "37_Red Hat Sales Engineer Specialist - Virtualization_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Virtualization Sales")
@@ -789,7 +840,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "36_Red Hat Delivery Specialist - Automated SAP HANA System Replication with Pacemaker on Red Hat Enterprise Linux_with_1_course"
+rule "38_Red Hat Delivery Specialist - Automated SAP HANA System Replication with Pacemaker on Red Hat Enterprise Linux_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Automated SAP HANA System Replication with Pacemaker")
@@ -811,7 +862,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "37_Red Hat Sales Engineer Specialist - Red Hat Enterprise Linux for IBM z Systems_with_1_course"
+rule "39_Red Hat Sales Engineer Specialist - Red Hat Enterprise Linux for IBM z Systems_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Systems Foundations")
@@ -833,7 +884,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "38_Red Hat Delivery Specialist - Red Hat Enterprise Linux for SAP HANA_with_1_course"
+rule "40_Red Hat Delivery Specialist - Red Hat Enterprise Linux for SAP HANA_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Enterprise Linux for SAP HANA")
@@ -855,7 +906,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "39_Red Hat Sales Specialist - How to sell Red Hat Insights_with_1_course"
+rule "41_Red Hat Sales Specialist - How to sell Red Hat Insights_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Insights Sales")
@@ -877,7 +928,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "40_Red Hat Sales Specialist - How to sell Red Hat Learning Subscription_with_1_course"
+rule "42_Red Hat Sales Specialist - How to sell Red Hat Learning Subscription_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Learning Subscription Sales")
@@ -899,7 +950,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "41_Red Hat Delivery Specialist - Red Hat Enterprise Linux 7 Troubleshooting_with_1_course"
+rule "43_Red Hat Delivery Specialist - Red Hat Enterprise Linux 7 Troubleshooting_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Enterprise Linux 7 Troubleshooting")
@@ -921,7 +972,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "42_Red Hat Sales Engineer Specialist - Platform Migration_with_1_course"
+rule "44_Red Hat Sales Engineer Specialist - Platform Migration_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Platform Migration for Sales")
@@ -943,7 +994,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "43_Red Hat Sales Engineer Specialist - Storage_with_2_courses"
+rule "45_Red Hat Sales Engineer Specialist - Storage_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for PreSales")
@@ -966,7 +1017,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "44_Red Hat Sales Engineer Specialist - Storage_with_2_courses"
+rule "46_Red Hat Sales Engineer Specialist - Storage_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
@@ -989,7 +1040,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "45_Red Hat Sales Engineer Specialist - Red Hat Ceph Storage_with_2_courses"
+rule "47_Red Hat Sales Engineer Specialist - Red Hat Ceph Storage_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Ceph Sales")
@@ -1012,7 +1063,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "46_Red Hat Sales Specialist - Platform_with_1_course"
+rule "48_Red Hat Sales Specialist - Platform_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Sales Specialist - Platform")
@@ -1034,7 +1085,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "47_Red Hat Sales Engineer Specialist - Red Hat Gluster Storage_with_2_courses"
+rule "49_Red Hat Sales Engineer Specialist - Red Hat Gluster Storage_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Gluster Sales")
@@ -1057,7 +1108,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "48_Red Hat Sales Engineer Specialist - Storage_with_2_courses"
+rule "50_Red Hat Sales Engineer Specialist - Storage_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
@@ -1080,7 +1131,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "49_Red Hat Sales Engineer Specialist - Storage_with_3_courses"
+rule "51_Red Hat Sales Engineer Specialist - Storage_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
@@ -1104,7 +1155,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "50_Red Hat Sales Engineer Specialist - Storage_with_3_courses"
+rule "52_Red Hat Sales Engineer Specialist - Storage_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
@@ -1128,7 +1179,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "51_Red Hat Sales Engineer Specialist - Virtualization_with_2_courses"
+rule "53_Red Hat Sales Engineer Specialist - Virtualization_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Virtualization Sales")
@@ -1151,7 +1202,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "52_Red Hat Sales Specialist - Platform_with_4_courses"
+rule "54_Red Hat Sales Specialist - Platform_with_4_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Sales Specialist - Platform")
@@ -1176,12 +1227,12 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "53_Red Hat Sales Specialist - Platform_with_2_courses"
+rule "55_Red Hat Sales Specialist - Platform_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Platform 2.0 for Sales")
     $cc2:CourseCompletion(this != $cc1, name == "RHN Satellite Sales")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jul-2014", "", $cc1, $cc2))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Jul-2014", "22-Jun-2018", $cc1, $cc2))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2);
 
@@ -1199,7 +1250,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "54_Red Hat Sales Specialist - Platform_with_2_courses"
+rule "56_Red Hat Sales Specialist - Platform_with_2_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Platform 2.0 for Sales")
@@ -1222,7 +1273,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "55_Red Hat Sales Specialist - Platform Migration_with_1_course"
+rule "57_Red Hat Sales Specialist - Platform Migration_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Platform Migration for Sales")
@@ -1244,7 +1295,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "56_Red Hat Sales Specialist - Storage_with_1_course"
+rule "58_Red Hat Sales Specialist - Storage_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Storage Solution for Salesperson")
@@ -1266,7 +1317,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "57_Red Hat Sales Specialist - Red Hat Ceph Storage_with_1_course"
+rule "59_Red Hat Sales Specialist - Red Hat Ceph Storage_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Ceph Sales")
@@ -1288,7 +1339,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "58_Red Hat Sales Specialist - Red Hat Gluster Storage_with_1_course"
+rule "60_Red Hat Sales Specialist - Red Hat Gluster Storage_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Gluster Sales")
@@ -1310,7 +1361,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "59_Red Hat Sales Specialist - Virtualization_with_1_course"
+rule "61_Red Hat Sales Specialist - Virtualization_with_1_course"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Red Hat Virtualization Sales")
@@ -1332,7 +1383,7 @@ then
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
 
-rule "60_Red Hat Sales Engineer Specialist - Red Hat Ceph Storage_with_3_courses"
+rule "62_Red Hat Sales Engineer Specialist - Red Hat Ceph Storage_with_3_courses"
 when
     $student:Student()
     $cc1:CourseCompletion(name == "Ceph Sales")
@@ -1344,6 +1395,30 @@ then
 
     Accreditation accreditation = new Accreditation();
     accreditation.setName("Red Hat Sales Engineer Specialist - Red Hat Ceph Storage");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getName());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
+
+rule "63_Red Hat Delivery Specialist - Red Hat Ceph Storage_with_3_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(name == "Red Hat Ceph Storage 2 Foundations")
+    $cc2:CourseCompletion(this != $cc1, name == "Red Hat Ceph Storage 2 Implementation")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Ceph 3 Delta")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Apr-2018", "", $cc1, $cc2, $cc3))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3);
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setName("Red Hat Delivery Specialist - Red Hat Ceph Storage");
     accreditation.setStudentId($student.getStudentid());
     accreditation.setEmail($student.getEmail());
     accreditation.setCourseId(latestCC.getCourseId());
