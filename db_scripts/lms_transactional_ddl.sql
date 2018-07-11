@@ -155,6 +155,22 @@ CREATE TABLE `Conversations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
+-- Table structure for table `Countries`
+--
+
+DROP TABLE IF EXISTS `Countries`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `Countries` (
+  `CountryID` varchar(2) NOT NULL,
+  `CountryName` varchar(100) DEFAULT NULL,
+  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`CountryID`),
+  UNIQUE KEY `IDX_CountryName` (`CountryName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
 -- Table structure for table `CountryMappings`
 --
 
@@ -307,7 +323,7 @@ CREATE TABLE `SalesForce` (
   `KeepFlag` int(11) DEFAULT '0',
   PRIMARY KEY (`AutoID`),
   KEY `idx_email` (`Email`)
-) ENGINE=InnoDB AUTO_INCREMENT=153713 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -532,4 +548,4 @@ CREATE TABLE `SumtotalCountries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-07-11 11:58:11
+-- Dump completed on 2018-07-11 12:05:25
