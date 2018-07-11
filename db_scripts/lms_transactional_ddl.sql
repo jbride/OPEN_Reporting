@@ -70,7 +70,7 @@ CREATE TABLE `AccreditationDefinitions` (
   `AccreditationExportID` varchar(30) DEFAULT NULL,
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`AccreditationID`)
-) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `Companies` (
   KEY `IDX_PartnerType` (`PartnerType`),
   KEY `IDX_PartnerTier` (`PartnerTier`),
   KEY `IDX_SfdcID` (`SfdcId`)
-) ENGINE=InnoDB AUTO_INCREMENT=31781 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=31781 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -548,4 +548,4 @@ CREATE TABLE `SumtotalCountries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-07-11 12:05:25
+-- Dump completed on 2018-07-11 12:14:28
