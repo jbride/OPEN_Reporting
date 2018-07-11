@@ -35,25 +35,6 @@ CREATE TABLE `AccreditationConversations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Table structure for table `AccreditationCourses`
---
-
-DROP TABLE IF EXISTS `AccreditationCourses`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `AccreditationCourses` (
-  `accreditationid` int(11) DEFAULT NULL,
-  `accreditationname` varchar(500) DEFAULT NULL,
-  `coursename` varchar(200) DEFAULT NULL,
-  `rulenumber` int(11) NOT NULL DEFAULT '0',
-  `startdate` datetime DEFAULT NULL,
-  `enddate` datetime DEFAULT NULL,
-  `numberofcourses` int(11) DEFAULT NULL,
-  `droolsname` varchar(400) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
 -- Table structure for table `AccreditationDefinitions`
 --
 
@@ -70,49 +51,7 @@ CREATE TABLE `AccreditationDefinitions` (
   `AccreditationExportID` varchar(30) DEFAULT NULL,
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`AccreditationID`)
-) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `AccreditationRules`
---
-
-DROP TABLE IF EXISTS `AccreditationRules`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `AccreditationRules` (
-  `AccreditationID` int(11) DEFAULT NULL,
-  `AccreditationName` varchar(500) DEFAULT NULL,
-  `StartDate` datetime DEFAULT NULL,
-  `EndDate` datetime DEFAULT NULL,
-  `AccreditationCondition1` varchar(200) DEFAULT NULL,
-  `CourseCompletion1` varchar(200) DEFAULT NULL,
-  `CourseCompletion2` varchar(200) DEFAULT NULL,
-  `CourseCompletion3` varchar(200) DEFAULT NULL,
-  `CourseCompletion4` varchar(200) DEFAULT NULL,
-  `CourseCompletion5` varchar(200) DEFAULT NULL,
-  `CourseCompletion6` varchar(200) DEFAULT NULL,
-  `CourseCompletion7` varchar(200) DEFAULT NULL,
-  `CourseCompletion8` varchar(200) DEFAULT NULL,
-  `RuleNumber` int(11) NOT NULL AUTO_INCREMENT,
-  `NumberOfCourses` int(11) DEFAULT NULL,
-  `droolsname` varchar(400) DEFAULT NULL,
-  PRIMARY KEY (`RuleNumber`),
-  KEY `IDX_AccreditationID` (`AccreditationID`),
-  KEY `IDX_AccreditationName` (`AccreditationName`(255)),
-  KEY `IDX_StartDate` (`StartDate`),
-  KEY `IDX_EndDate` (`EndDate`),
-  KEY `IDX_CourseCompletion1` (`CourseCompletion1`),
-  KEY `IDX_CourseCompletion2` (`CourseCompletion2`),
-  KEY `IDX_CourseCompletion3` (`CourseCompletion3`),
-  KEY `IDX_CourseCompletion4` (`CourseCompletion4`),
-  KEY `IDX_CourseCompletion5` (`CourseCompletion5`),
-  KEY `IDX_CourseCompletion6` (`CourseCompletion6`),
-  KEY `IDX_CourseCompletion7` (`CourseCompletion7`),
-  KEY `IDX_CourseCompletion8` (`CourseCompletion8`),
-  KEY `IDX_RuleNumber` (`RuleNumber`),
-  KEY `IDX_NumberOfCourses` (`NumberOfCourses`)
-) ENGINE=InnoDB AUTO_INCREMENT=219 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +74,7 @@ CREATE TABLE `Companies` (
   KEY `IDX_PartnerType` (`PartnerType`),
   KEY `IDX_PartnerTier` (`PartnerTier`),
   KEY `IDX_SfdcID` (`SfdcId`)
-) ENGINE=InnoDB AUTO_INCREMENT=31781 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=31781 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -167,7 +106,7 @@ CREATE TABLE `Countries` (
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`CountryID`),
   UNIQUE KEY `IDX_CountryName` (`CountryName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -184,7 +123,7 @@ CREATE TABLE `CountryMappings` (
   PRIMARY KEY (`CountryID`,`CountryValue`),
   UNIQUE KEY `IDX_CountryValue` (`CountryValue`),
   CONSTRAINT `FK_CountryMappings_Countries` FOREIGN KEY (`CountryID`) REFERENCES `Countries` (`CountryID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -199,7 +138,7 @@ CREATE TABLE `CourseIdMappings` (
   `NewCourseId` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`OldCourseId`),
   KEY `IDX_NewCourseId` (`NewCourseId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -216,7 +155,7 @@ CREATE TABLE `CourseMappings` (
   KEY `IDX_NewCourseCode` (`PrunedCourseID`),
   KEY `FK_CourseMappings_Courses` (`CourseID`),
   CONSTRAINT `FK_CourseMappings_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -233,7 +172,7 @@ CREATE TABLE `Courses` (
   PRIMARY KEY (`CourseID`),
   UNIQUE KEY `CourseName` (`CourseName`),
   KEY `IDX_CourseName` (`CourseName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -260,32 +199,32 @@ DROP TABLE IF EXISTS `QvExport`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `QvExport` (
-  `Month` varchar(8) DEFAULT NULL,
+  `Month` varchar(8) CHARACTER SET utf8 DEFAULT NULL,
   `Year` int(4) DEFAULT NULL,
-  `FY` varchar(5) DEFAULT NULL,
+  `FY` varchar(5) CHARACTER SET utf8 DEFAULT NULL,
   `Full Name` varchar(102) DEFAULT NULL,
-  `companyname` varchar(100) DEFAULT NULL,
+  `companyname` varchar(100),
   `User Primary Job` varchar(40) DEFAULT NULL,
   `User Primary Organization` varchar(50) DEFAULT NULL,
   `User Primary Domain` varchar(8) DEFAULT NULL,
   `Country Code` char(2) DEFAULT NULL,
   `Email` varchar(100) NOT NULL,
   `Code` varchar(50) NOT NULL DEFAULT '',
-  `Start Date` datetime DEFAULT NULL,
-  `End Date` datetime DEFAULT NULL,
-  `RedHat` varchar(3) DEFAULT NULL,
-  `Is Certification` varchar(3) NOT NULL DEFAULT '',
-  `In Progress` varchar(3) NOT NULL DEFAULT '',
+  `Start Date` datetime,
+  `End Date` datetime,
+  `RedHat` varchar(3) CHARACTER SET utf8 DEFAULT NULL,
+  `Is Certification` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `In Progress` varchar(3) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `Role` varchar(20) DEFAULT NULL,
   `Skills Track` varchar(42) DEFAULT NULL,
   `Specialization` varchar(32) DEFAULT NULL,
-  `AccreditationName` varchar(150) DEFAULT NULL,
+  `AccreditationName` varchar(150),
   `Geo` varchar(16) DEFAULT NULL,
-  `Channel Mix` varchar(6) NOT NULL DEFAULT '',
-  `Split Business Unit` varchar(4) NOT NULL DEFAULT '',
+  `Channel Mix` varchar(6) CHARACTER SET utf8 NOT NULL DEFAULT '',
+  `Split Business Unit` varchar(4) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `tier` varchar(50) DEFAULT NULL,
   `alliancecode` varchar(15) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -323,7 +262,7 @@ CREATE TABLE `SalesForce` (
   `KeepFlag` int(11) DEFAULT '0',
   PRIMARY KEY (`AutoID`),
   KEY `idx_email` (`Email`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=316106 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -343,7 +282,7 @@ CREATE TABLE `SkillsbasePartners` (
   `Location` varchar(200) DEFAULT NULL,
   `Blank` varchar(200) DEFAULT NULL,
   `InstructionsEmailed` varchar(200) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -373,7 +312,7 @@ CREATE TABLE `StudentAccreditations` (
   CONSTRAINT `FK_StudentAccreditations_AccreditationDefinitions` FOREIGN KEY (`AccreditationID`) REFERENCES `AccreditationDefinitions` (`AccreditationID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentAccreditations_StudentCourses` FOREIGN KEY (`StudentID`, `CourseID`) REFERENCES `StudentCourses` (`StudentID`, `CourseID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentAccreditations_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -387,9 +326,9 @@ CREATE TABLE `StudentCourses` (
   `StudentCourseID` int(11) NOT NULL AUTO_INCREMENT,
   `StudentID` int(11) NOT NULL,
   `CourseID` varchar(50) NOT NULL,
-  `LanguageID` varchar(5) NOT NULL DEFAULT '',
+  `LanguageID` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `AssessmentDate` datetime NOT NULL,
-  `AssessmentResult` varchar(5) NOT NULL DEFAULT '',
+  `AssessmentResult` varchar(5) CHARACTER SET utf8 NOT NULL DEFAULT '',
   `AssessmentScore` tinyint(4) NOT NULL DEFAULT '100',
   `Processed` tinyint(1) NOT NULL DEFAULT '0',
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -405,7 +344,7 @@ CREATE TABLE `StudentCourses` (
   CONSTRAINT `FK_StudentCourses_Courses` FOREIGN KEY (`CourseID`) REFERENCES `Courses` (`CourseID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Languages` FOREIGN KEY (`LanguageID`) REFERENCES `Languages` (`LanguageID`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_StudentCourses_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=293507 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=295140 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -424,7 +363,7 @@ CREATE TABLE `StudentMappings` (
   KEY `IDX_NewEmail` (`NewEmail`),
   KEY `IDX_StudentID` (`StudentID`),
   CONSTRAINT `FK_StudentMappings_Students` FOREIGN KEY (`StudentID`) REFERENCES `Students` (`StudentID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -477,9 +416,8 @@ CREATE TABLE `Students` (
   KEY `IDX_IpaStatus` (`IpaStatus`),
   KEY `IDX_ActivationDate` (`ActivationDate`),
   KEY `IDX_DeActivationDate` (`DeActivationDate`),
-  CONSTRAINT `IDX_CompanyID` FOREIGN KEY (`CompanyID`) REFERENCES `Companies` (`CompanyID`),
   CONSTRAINT `FK_Students_Companies` FOREIGN KEY (`CompanyID`) REFERENCES `Companies` (`CompanyID`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=80932 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=81373 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -501,7 +439,7 @@ CREATE TABLE `Summary` (
   `FY16` bigint(21) NOT NULL DEFAULT '0',
   `FY17` bigint(21) NOT NULL DEFAULT '0',
   `total` bigint(21) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -523,7 +461,7 @@ CREATE TABLE `SummaryRedHat` (
   `FY16` bigint(21) NOT NULL DEFAULT '0',
   `FY17` bigint(21) NOT NULL DEFAULT '0',
   `total` bigint(21) NOT NULL DEFAULT '0'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -536,7 +474,7 @@ DROP TABLE IF EXISTS `SumtotalCountries`;
 CREATE TABLE `SumtotalCountries` (
   `email` varchar(200) DEFAULT NULL,
   `Country` varchar(100) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -548,4 +486,4 @@ CREATE TABLE `SumtotalCountries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-07-11 12:14:28
+-- Dump completed on 2018-07-11 12:25:43
