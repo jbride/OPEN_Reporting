@@ -29,8 +29,8 @@ CREATE TABLE `AccreditationConversations` (
   PRIMARY KEY (`AccreditationID`,`ConversationID`),
   KEY `IDX_AccreditationConversations_AccreditationID` (`AccreditationID`),
   KEY `IDX_AccreditationConversations_ConversationID` (`ConversationID`),
-  CONSTRAINT `FK_AccreditationConversations_Accreditations` FOREIGN KEY (`AccreditationID`) REFERENCES `AccreditationDefinitions` (`AccreditationID`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_AccreditationConversations_Conversations` FOREIGN KEY (`ConversationID`) REFERENCES `Conversations` (`ConversationID`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `FK_AccreditationConversations_Conversations` FOREIGN KEY (`ConversationID`) REFERENCES `Conversations` (`ConversationID`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_AccreditationConversations_Accreditations` FOREIGN KEY (`AccreditationID`) REFERENCES `AccreditationDefinitions` (`AccreditationID`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -70,7 +70,7 @@ CREATE TABLE `AccreditationDefinitions` (
   `AccreditationExportID` varchar(30) DEFAULT NULL,
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`AccreditationID`)
-) ENGINE=InnoDB AUTO_INCREMENT=128 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=129 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -135,7 +135,7 @@ CREATE TABLE `Companies` (
   KEY `IDX_PartnerType` (`PartnerType`),
   KEY `IDX_PartnerTier` (`PartnerTier`),
   KEY `IDX_SfdcID` (`SfdcId`)
-) ENGINE=InnoDB AUTO_INCREMENT=31744 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=31781 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -151,23 +151,7 @@ CREATE TABLE `Conversations` (
   `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`ConversationID`),
   KEY `IDX_Conversations_ConversationName` (`ConversationName`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Table structure for table `Countries`
---
-
-DROP TABLE IF EXISTS `Countries`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `Countries` (
-  `CountryID` varchar(2) NOT NULL,
-  `CountryName` varchar(100) DEFAULT NULL,
-  `CreateDate` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`CountryID`),
-  UNIQUE KEY `IDX_CountryName` (`CountryName`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -264,22 +248,22 @@ CREATE TABLE `QvExport` (
   `Year` int(4) DEFAULT NULL,
   `FY` varchar(5) DEFAULT NULL,
   `Full Name` varchar(102) DEFAULT NULL,
-  `companyname` varchar(100),
+  `companyname` varchar(100) DEFAULT NULL,
   `User Primary Job` varchar(40) DEFAULT NULL,
   `User Primary Organization` varchar(50) DEFAULT NULL,
   `User Primary Domain` varchar(8) DEFAULT NULL,
   `Country Code` char(2) DEFAULT NULL,
   `Email` varchar(100) NOT NULL,
   `Code` varchar(50) NOT NULL DEFAULT '',
-  `Start Date` datetime,
-  `End Date` datetime,
+  `Start Date` datetime DEFAULT NULL,
+  `End Date` datetime DEFAULT NULL,
   `RedHat` varchar(3) DEFAULT NULL,
   `Is Certification` varchar(3) NOT NULL DEFAULT '',
   `In Progress` varchar(3) NOT NULL DEFAULT '',
   `Role` varchar(20) DEFAULT NULL,
   `Skills Track` varchar(42) DEFAULT NULL,
   `Specialization` varchar(32) DEFAULT NULL,
-  `AccreditationName` varchar(150),
+  `AccreditationName` varchar(150) DEFAULT NULL,
   `Geo` varchar(16) DEFAULT NULL,
   `Channel Mix` varchar(6) NOT NULL DEFAULT '',
   `Split Business Unit` varchar(4) NOT NULL DEFAULT '',
@@ -548,4 +532,4 @@ CREATE TABLE `SumtotalCountries` (
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-07-11 10:21:19
+-- Dump completed on 2018-07-11 11:58:11
