@@ -1541,3 +1541,31 @@ then
     accreditationList.add(accreditation);
     System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
 end
+
+rule "68_Red Hat Delivery Specialist - Advanced Cloud Infrastructure_with_7_courses"
+when
+    $student:Student()
+    $cc1:CourseCompletion(name == "OpenStack 13 Foundations")
+    $cc2:CourseCompletion(this != $cc1, name == "OpenStack 13 Concepts and Architecture")
+    $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "OpenStack 13 Director")
+    $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Ceph Integration with OpenStack 13 Director")
+    $cc5:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, name == "OpenStack Advanced Networking")
+    $cc6:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, this != $cc5, name == "OpenStack Advanced Storage")
+    $cc7:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, this != $cc4, this != $cc5, this != $cc6, name == "Advanced OpenStack Director")
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Oct-2018", "", $cc1, $cc2, $cc3, $cc4, $cc5, $cc6, $cc7 ))
+then
+    CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4, $cc5, $cc6, $cc7 );
+
+    Accreditation accreditation = new Accreditation();
+    accreditation.setName("Red Hat Delivery Specialist - Advanced Cloud Infrastructure");
+    accreditation.setStudentId($student.getStudentid());
+    accreditation.setEmail($student.getEmail());
+    accreditation.setCourseId(latestCC.getCourseId());
+    accreditation.setCourseName(latestCC.getName());
+    accreditation.setCompletionDate(latestCC.getCompletionDate());
+    accreditation.setAccreditationType("Active");
+    accreditation.setRuleFired(drools.getRule().getName());
+
+    accreditationList.add(accreditation);
+    System.out.println("   [ "+ $student.getEmail()+" : Fired: " + drools.getRule().getName() + " ]");
+end
