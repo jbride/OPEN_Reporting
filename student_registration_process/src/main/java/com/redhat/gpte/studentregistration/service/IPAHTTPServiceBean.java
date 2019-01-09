@@ -238,7 +238,6 @@ public class IPAHTTPServiceBean extends GPTEBaseServiceBean {
                     HttpResponse<String> result = Unirest.post(ldapHTTPUrl)                
                             .basicAuth(ldapHTTPUserName, ldapHTTPPassword)
                             .header("accept", "text/plain")
-                            .header("Accept-Charset", "UTF-8")
                             .field("file", uploadFile, "multipart/form-data")
                             .field("groupName", groupName)
                             .field("sendMail", sendMail)

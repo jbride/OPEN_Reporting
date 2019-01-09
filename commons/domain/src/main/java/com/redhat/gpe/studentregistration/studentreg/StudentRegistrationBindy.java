@@ -13,6 +13,7 @@ public class StudentRegistrationBindy {
     private static final String NAME_DELIMITER = " ";
     private static final String PARTNER_DELIMITER = ".";
     private static final String SFDC_DELIMITER = ":";
+    private static final String EMAIL_AT = "@";
 
     @DataField(pos=1, required=true)
     private String name;
@@ -125,10 +126,18 @@ public class StudentRegistrationBindy {
     }
 
     public Student convertToCanonicalStudent() {
-        Student sObj = new Student();
-        sObj.setFirstname(this.getFirstName());
-        sObj.setLastname(this.getLastName());
+        Student sObj = new Student();        
         sObj.setEmail(this.getEmail());
+        //------ Not to pass multiple byte character to LDAP. To fix https://github.com/redhat-gpe/OPEN_Reporting/issues/312 --------
+        if(this.getFirstName().length()!=this.getFirstName().getBytes().length
+                || this.getLastName().length()!=this.getLastName().getBytes().length) {
+            sObj.setFirstname(this.getEmail().substring(0, this.getEmail().indexOf(EMAIL_AT)));
+            sObj.setLastname("");
+        } else {
+            sObj.setFirstname(this.getFirstName());
+            sObj.setLastname(this.getLastName());
+        }
+        //--------------------------------------------------------------
         sObj.setCompanyName(this.getCompany());
         sObj.setRegion(this.getRegion());
         sObj.setSubregion(this.getSubRegion());
