@@ -21,7 +21,7 @@ when
     $cc2:CourseCompletion(this != $cc1, name == "Ansible Implementation")
     $cc3:CourseCompletion(this != $cc1, this != $cc2, name == "Ansible Tower Implementation")
     $cc4:CourseCompletion(this != $cc1, this != $cc2, this != $cc3, name == "Advanced Deployment with Ansible")
-    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Oct-2017", "26-Oct-2018", $cc1, $cc2, $cc3, $cc4 ))
+    eval(DroolsCommandHelper.isLatestCourseCompletionWithinDates(false, "1-Oct-2017", "1-Jan-2019", $cc1, $cc2, $cc3, $cc4 ))
 then
     CourseCompletion latestCC = DroolsCommandHelper.determineMostRecentCourseCompletion(false, $cc1, $cc2, $cc3, $cc4 );
 
