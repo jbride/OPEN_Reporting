@@ -129,9 +129,9 @@ public class StudentRegistrationBindy {
         Student sObj = new Student();        
         sObj.setEmail(this.getEmail());
         //------ Not to pass multiple byte character to LDAP. To fix https://github.com/redhat-gpe/OPEN_Reporting/issues/312 --------
-        if(this.getFirstName().length()!=this.getFirstName().getBytes().length
-                || this.getLastName().length()!=this.getLastName().getBytes().length) {
+        if(this.getFirstName().length()!=this.getFirstName().getBytes().length) {
             sObj.setFirstname(this.getEmail().substring(0, this.getEmail().indexOf(EMAIL_AT)));
+        } else if(this.getLastName().length()!=this.getLastName().getBytes().length) {
             sObj.setLastname(this.getEmail().substring(0, this.getEmail().indexOf(EMAIL_AT)));
         } else {
             sObj.setFirstname(this.getFirstName());
