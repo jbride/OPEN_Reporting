@@ -132,7 +132,7 @@ public class StudentRegistrationBindy {
         if(this.getFirstName().length()!=this.getFirstName().getBytes().length
                 || this.getLastName().length()!=this.getLastName().getBytes().length) {
             sObj.setFirstname(this.getEmail().substring(0, this.getEmail().indexOf(EMAIL_AT)));
-            sObj.setLastname("");
+            sObj.setLastname(this.getEmail().substring(0, this.getEmail().indexOf(EMAIL_AT)));
         } else {
             sObj.setFirstname(this.getFirstName());
             sObj.setLastname(this.getLastName());
