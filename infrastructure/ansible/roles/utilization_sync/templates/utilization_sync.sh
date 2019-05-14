@@ -7,6 +7,7 @@ echo -en "PGPASSWORD=$PGPASSWORD\n" >> $2
 
 echo -en "pull utilization data: $1\n" >> $2
 psql -h {{ utilization_db_host }} -U {{ utilization_db_username  }} -w $1 -c "\copy provisioned_services TO '{{database_update_script_dir}}/$1-db.csv' CSV DELIMITER ','"
+psql -h {{ utilization_db_host }} -U {{ utilization_db_username  }} -w $1 -c "\copy failed_services TO '{{database_update_script_dir}}/$1failed-db.csv' CSV DELIMITER ','"
 if [ $? != 0 ];
 then
     exit 1;
@@ -14,12 +15,14 @@ fi
 
 echo -en "load utilization data: $1\n" >> $2
 mysql -u root {{lms_reporting_db_name}} -e "truncate table lms_reporting.$1;"
+mysql -u root {{lms_reporting_db_name}} -e "truncate table lms_reporting.$1failed;"
 if [ $? != 0 ];
 then
     exit 1;
 fi
 
 mysql -u root {{lms_reporting_db_name}} -e "load data local infile '{{database_update_script_dir}}/$1-db.csv' into table lms_reporting.$1 fields terminated by ',' lines terminated by '\n';"
+mysql -u root {{lms_reporting_db_name}} -e "load data local infile '{{database_update_script_dir}}/$1failed-db.csv' into table lms_reporting.$1failed fields terminated by ',' lines terminated by '\n';"
 if [ $? != 0 ];
 then
     exit 1;
