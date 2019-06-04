@@ -78,7 +78,7 @@ databases_to_provision_from_prod:
 # The following property is used when updating an environment that has been previously provisioned
 # LMS Reporting should be updated in dev from prod because there are tables in that database that are NOT created from the stored procedures.
 databases_to_update_from_prod:
-#  - "{{ lms_trans_db_name }}"
+  - "{{ lms_trans_db_name }}"
   - "{{ lms_reporting_db_name }}"
   - "{{ dashbuilder_db_name }}"
 
