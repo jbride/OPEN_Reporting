@@ -577,6 +577,33 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
                 http://$HOSTNAME:9090/gpte-accreditation/students/batch
 -----
 
+== Dashbuilder Monitoring
+If Dashbuilder is unavailable (https://reporting.opentlc.com/dashbuilder/) one of the following methods will bring it back up.  
+
+=== Method 1 - Restart Dashbuilder Service
+
+Log in, change to jboss user, bounce dashbuilder, and tail the dashbuilder log to ensure it comes up:
+
+-----
+ssh username-redhat.com@apps-iad01.opentlc.com
+su - jboss
+bd
+td
+-----
+
+=== Method 2 - Dashbuilder.war not deploying 
+
+Log in, change to jboss user, stop dashbuilder, run touch command, start dashbuilder, tail the log:
+
+-----
+ssh username-redhat.com@apps-iad01.opentlc.com
+su - jboss
+systemctl stop dashbuilder
+touch /opt/jboss/wildfly-8.2.0.Final/standalone/deployments/dashbuilder.war.dodeploy
+systemctl start dashbuilder
+td
+-----
+
 == SalesForce Integration
 
 https://docs.google.com/document/d/1vk_oKIzdrhiuTNCbjLgM7IoLohjw8Z2Z3d1FWPDUNsM/edit
