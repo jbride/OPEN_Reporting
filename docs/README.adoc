@@ -578,7 +578,7 @@ curl -v -X PUT  -H "ACCEPT: application/json" \
 -----
 
 == Dashbuilder Monitoring
-If Dashbuilder is unavailable (https://reporting.opentlc.com/dashbuilder/) one of the following methods will bring it back up.  The password for the jboss user is "jboss".
+If Dashbuilder (https://reporting.opentlc.com/dashbuilder/) is unavailable one of the following methods will bring it back up.  The password for the jboss user is "jboss".
 
 === Method 1 - Restart Dashbuilder Service
 
