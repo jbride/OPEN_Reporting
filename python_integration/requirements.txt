@@ -1,6 +1,6 @@
 logging==0.4.9.6
 python-dateutil==2.5.3
-requests==2.10.0
+requests==2.20.0
 schedule==0.3.2
 
 #Use the following command to install mysql-connector library
