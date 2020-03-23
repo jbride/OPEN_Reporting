@@ -8,7 +8,7 @@
   <properties>
 
     <jboss.fuse.bom.version>6.2.1.redhat-084</jboss.fuse.bom.version>
-    <camel.version>2.15.1.redhat-621084</camel.version>
+    <camel.version>3.1.0</camel.version>
     <wildfly.camel.version>2.3.0.redhat-621084</wildfly.camel.version>
     <spring.version>4.1.6.RELEASE</spring.version>
     <drools.kie.version>6.3.0.Final-redhat-7</drools.kie.version>
